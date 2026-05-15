@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { mibToGib } from '@/engines/units'
 import { describe, expect, it } from 'vitest'
+import { mibToGib } from '@/engines/units'
 import { inferRvtoolsVersion } from './captureDate'
 import { parseSnapshot } from './normalizeColumns'
 import { parseXlsx } from './parseXlsx'

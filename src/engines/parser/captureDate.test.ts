@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import type { VInfoRow } from '@/types'
 import { inferCaptureDate, inferRvtoolsVersion, inferVCenterLabel } from './captureDate'
 import type { ParsedWorkbook } from './parseXlsx'
-import type { VInfoRow } from '@/types'
 
 const emptySheets: ParsedWorkbook = { sheets: new Map() }
 
@@ -63,8 +63,7 @@ describe('inferCaptureDate', () => {
 })
 
 describe('inferVCenterLabel', () => {
-  const row = (viSdkServer: string): VInfoRow =>
-    ({ viSdkServer }) as unknown as VInfoRow
+  const row = (viSdkServer: string): VInfoRow => ({ viSdkServer }) as unknown as VInfoRow
 
   it('returns the first non-empty viSdkServer from vinfo', () => {
     expect(inferVCenterLabel([row(''), row('vcenter.prod.local')], 'f.xlsx')).toBe(
@@ -73,9 +72,9 @@ describe('inferVCenterLabel', () => {
   })
 
   it('falls back to the filename stem with the RVTools_export prefix stripped', () => {
-    expect(
-      inferVCenterLabel([row('')], 'RVTools_export_all_2026-01-07_MOM-vCenter.xlsx'),
-    ).toBe('2026-01-07_MOM-vCenter')
+    expect(inferVCenterLabel([row('')], 'RVTools_export_all_2026-01-07_MOM-vCenter.xlsx')).toBe(
+      '2026-01-07_MOM-vCenter',
+    )
   })
 
   it('returns the raw filename when nothing else is available', () => {
