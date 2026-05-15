@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { ParsedWorkbook } from './parseXlsx'
 import { parseSnapshot } from './normalizeColumns'
+import type { ParsedWorkbook } from './parseXlsx'
 
 const VINFO = [
   'VM',
@@ -45,8 +45,38 @@ const workbook = (vinfoRows: unknown[][]): ParsedWorkbook => ({
 describe('parseSnapshot', () => {
   it('returns 2 valid vinfo rows with no parseErrors for a clean 2-VM workbook', () => {
     const wb = workbook([
-      ['vm-1', 'poweredOn', 'cluster-a', 'host-a', 4, 8192, 102400, 51200, 'rhel', 'rhel', 'u1', 'i1', 'sdk', 'vc'],
-      ['vm-2', 'poweredOff', 'cluster-a', 'host-a', 2, 4096, 51200, 25600, 'win', 'win', 'u2', 'i2', 'sdk', 'vc'],
+      [
+        'vm-1',
+        'poweredOn',
+        'cluster-a',
+        'host-a',
+        4,
+        8192,
+        102400,
+        51200,
+        'rhel',
+        'rhel',
+        'u1',
+        'i1',
+        'sdk',
+        'vc',
+      ],
+      [
+        'vm-2',
+        'poweredOff',
+        'cluster-a',
+        'host-a',
+        2,
+        4096,
+        51200,
+        25600,
+        'win',
+        'win',
+        'u2',
+        'i2',
+        'sdk',
+        'vc',
+      ],
     ])
     const { snapshot, warnings } = parseSnapshot(wb)
     expect(snapshot.vinfo).toHaveLength(2)
@@ -56,9 +86,39 @@ describe('parseSnapshot', () => {
 
   it('drops a Zod-invalid row and records one invalid-row parseError', () => {
     const wb = workbook([
-      ['vm-1', 'poweredOn', 'cluster-a', 'host-a', 4, 8192, 102400, 51200, 'rhel', 'rhel', 'u1', 'i1', 'sdk', 'vc'],
+      [
+        'vm-1',
+        'poweredOn',
+        'cluster-a',
+        'host-a',
+        4,
+        8192,
+        102400,
+        51200,
+        'rhel',
+        'rhel',
+        'u1',
+        'i1',
+        'sdk',
+        'vc',
+      ],
       // empty cluster → fails z.string().trim().min(1) on cluster
-      ['vm-2', 'poweredOn', '   ', 'host-a', 2, 4096, 51200, 25600, 'win', 'win', 'u2', 'i2', 'sdk', 'vc'],
+      [
+        'vm-2',
+        'poweredOn',
+        '   ',
+        'host-a',
+        2,
+        4096,
+        51200,
+        25600,
+        'win',
+        'win',
+        'u2',
+        'i2',
+        'sdk',
+        'vc',
+      ],
     ])
     const { snapshot } = parseSnapshot(wb)
     expect(snapshot.vinfo).toHaveLength(1)
