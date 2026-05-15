@@ -76,7 +76,10 @@ describe('useSnapshotUpload', () => {
   it('isUploading toggles true during the loop then false at the end', async () => {
     let resolveParse: (v: unknown) => void = () => undefined
     parseInWorkerMock.mockImplementationOnce(
-      () => new Promise((res) => { resolveParse = res }),
+      () =>
+        new Promise((res) => {
+          resolveParse = res
+        }),
     )
     const { result } = renderHook(() => useSnapshotUpload())
     expect(result.current.isUploading).toBe(false)
@@ -93,13 +96,11 @@ describe('useSnapshotUpload', () => {
   })
 
   it('continues processing after one file fails and toasts the error message', async () => {
-    parseInWorkerMock
-      .mockResolvedValueOnce(okPayload('good.xlsx'))
-      .mockRejectedValueOnce(
-        Object.assign(new Error('missing sheet: vInfo (workbook contained: x)'), {
-          name: 'ParseError',
-        }),
-      )
+    parseInWorkerMock.mockResolvedValueOnce(okPayload('good.xlsx')).mockRejectedValueOnce(
+      Object.assign(new Error('missing sheet: vInfo (workbook contained: x)'), {
+        name: 'ParseError',
+      }),
+    )
     const { result } = renderHook(() => useSnapshotUpload())
     await act(async () => {
       await result.current.upload([makeFile('good.xlsx'), makeFile('bad.xlsx')])

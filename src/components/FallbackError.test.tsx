@@ -8,9 +8,7 @@ describe('FallbackError — Critical-2 leak guard (Pitfall 4)', () => {
       cause: { secret: 'leakedVm', vms: [{ name: 'sensitive-vm-007' }] },
     }) as Error & { cause: unknown }
 
-    const { container } = render(
-      <FallbackError error={err} resetErrorBoundary={() => undefined} />,
-    )
+    const { container } = render(<FallbackError error={err} resetErrorBoundary={() => undefined} />)
 
     expect(screen.queryByText(/user-visible message/)).not.toBeNull()
     expect(screen.queryByText(/leakedVm/)).toBeNull()

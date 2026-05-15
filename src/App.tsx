@@ -2,12 +2,17 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { Toaster } from 'sonner'
 import { FallbackError } from './components/FallbackError'
 import { LanguageToggle } from './components/LanguageToggle'
+import { SnapshotListSidebar } from './components/SnapshotListSidebar'
 import { ThemeToggle } from './components/ThemeToggle'
 import { UploadZone } from './components/UploadZone'
+import { useSnapshotUpload } from './hooks/useSnapshotUpload'
 import { useTheme } from './hooks/useTheme'
+import { selectHasSnapshots, useSnapshotStore } from './store/snapshotStore'
 
 function App() {
   const { resolved } = useTheme()
+  const hasSnapshots = useSnapshotStore(selectHasSnapshots)
+  const { upload, isUploading } = useSnapshotUpload()
 
   return (
     <ErrorBoundary FallbackComponent={FallbackError}>
@@ -19,20 +24,21 @@ function App() {
             <ThemeToggle />
           </div>
         </header>
-        <main className="flex flex-1 items-center justify-center p-8">
-          {/* Plan 05 swaps this for: hasSnapshots ? <SnapshotListSidebar /> : <UploadZone variant="hero" /> */}
-          <UploadZone
-            onFiles={(files) => {
-              // STUB: Plan 05 will wire this to the parser worker
-              // (`useSnapshotUpload`). Logging only the filename — never
-              // file contents — is the Phase-1 privacy posture.
-              console.warn(
-                'Plan 05 will wire this to the parser worker:',
-                files.map((f) => f.name),
-              )
-            }}
-          />
-        </main>
+        {hasSnapshots ? (
+          <div className="flex flex-1 overflow-hidden">
+            <SnapshotListSidebar />
+            <main className="flex-1 p-8">
+              {/* Phase 2 lands the dashboard here. */}
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Snapshots loaded. Dashboard arrives in Phase 2.
+              </p>
+            </main>
+          </div>
+        ) : (
+          <main className="flex flex-1 items-center justify-center p-8">
+            <UploadZone onFiles={upload} disabled={isUploading} variant="hero" />
+          </main>
+        )}
       </div>
       <Toaster theme={resolved} position="bottom-right" />
     </ErrorBoundary>

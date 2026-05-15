@@ -2,11 +2,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { Snapshot } from '@/types/snapshot'
-import {
-  selectActiveSnapshot,
-  selectHasSnapshots,
-  useSnapshotStore,
-} from './snapshotStore'
+import { selectActiveSnapshot, selectHasSnapshots, useSnapshotStore } from './snapshotStore'
 
 // Minimal Snapshot factory — the store does not inspect row contents, only
 // identity + the two fields the mutators touch (vCenterLabel, capturedAt).
@@ -166,10 +162,7 @@ describe('snapshotStore', () => {
 
   it('PAR-05: store module does not import persistence middleware', () => {
     // import.meta.url is not a `file:` URL under Vite/Vitest — resolve from cwd.
-    const moduleSource = readFileSync(
-      resolve(process.cwd(), 'src/store/snapshotStore.ts'),
-      'utf-8',
-    )
+    const moduleSource = readFileSync(resolve(process.cwd(), 'src/store/snapshotStore.ts'), 'utf-8')
     expect(moduleSource).not.toMatch(/zustand\/middleware\/persist/)
     expect(moduleSource).not.toMatch(/localStorage\.setItem/)
     expect(moduleSource).not.toMatch(/sessionStorage/)
