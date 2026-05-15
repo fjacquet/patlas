@@ -84,13 +84,15 @@ if (!installed) {
     if (!sameOrigin(target as string | URL)) {
       throw new PrivacyViolation('fetch', String(target))
     }
-    return originalFetch.call(this, input, init)
+    // `fetch` is a free function (not a method); no receiver to forward.
+    return originalFetch(input, init)
   } as typeof fetch
 
   // 2. XMLHttpRequest
   if (typeof XMLHttpRequest !== 'undefined') {
     const origOpen = XMLHttpRequest.prototype.open
     XMLHttpRequest.prototype.open = function patchedOpen(
+      this: XMLHttpRequest,
       method: string,
       url: string | URL,
       async?: boolean,

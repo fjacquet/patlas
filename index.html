@@ -2,6 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!--
+      Privacy invariant — defense in depth (ADR-0001). `connect-src 'self'`
+      is the principal PRV-02 directive: the browser refuses any cross-origin
+      fetch/XHR/WebSocket/sendBeacon before the runtime guard even runs.
+      'unsafe-inline' (script) covers the FOUC theme-init script — the HTML is
+      the trust boundary; no third-party scripts are bundled.
+      'worker-src self blob:' is required for Vite's dev worker bootstrap.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; connect-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; worker-src 'self' blob:; frame-src 'none'; base-uri 'self'; form-action 'none'"
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="RVTools-driven atlas of your VMware estate (100 % client-side)" />
