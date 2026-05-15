@@ -1,0 +1,187 @@
+# Requirements: vatlas
+
+**Defined:** 2026-05-15
+**Core Value:** A user drops one or more RVTools workbooks and walks away with a polished, shareable HTML report and PPTX deck describing their VMware estate — without uploading a single byte. The report is the product.
+
+## v1 Requirements
+
+### Foundation
+
+- [ ] **FND-01**: User loads the app at a public URL and the entire app runs 100 % client-side (no workbook bytes ever leave the browser)
+- [ ] **FND-02**: User sees a clear drag-and-drop zone for one or more RVTools `.xlsx` files on first load
+- [ ] **FND-03**: User can use the app entirely in French or English (i18n FR + EN, language auto-detected then user-toggleable)
+- [ ] **FND-04**: User can switch between a light and a dark visual theme
+- [ ] **FND-05**: User sees a visible "workbook capture date" indicator wherever data is displayed (header + footer of every export)
+
+### Parsing
+
+- [ ] **PAR-01**: User drops an RVTools `.xlsx` file and the app parses it without blocking the UI (Web Worker)
+- [ ] **PAR-02**: User sees a clear error naming the missing sheet or column when a workbook does not match the RVTools schema
+- [ ] **PAR-03**: User can load workbooks from RVTools 3.10, 3.11, 4.0, and 4.4 — column-name drift is resolved transparently via an alias dictionary
+- [ ] **PAR-04**: User's workbook is parsed with all memory/storage fields preserved as MiB (no `* 1.048576` inflation — RVTools "MB" is MiB)
+- [ ] **PAR-05**: User can refresh the page and confirm the data is gone (no `localStorage` / `IndexedDB` / `OPFS` persistence of dataset rows)
+
+### Global Dashboard
+
+- [ ] **DSH-01**: User sees a global vCenter dashboard with one column per cluster, showing counts of ESX, VMs (Windows / Linux / Other), datastores
+- [ ] **DSH-02**: User sees a global summary card with estate-wide totals (clusters, ESX, VMs, datastores, vCPU, vRAM, storage)
+- [ ] **DSH-03**: User sees per-cluster physical GHz, consumed GHz, mean CPU %, mean RAM %, vCPU allocation
+- [ ] **DSH-04**: User sees an OS-family breakdown (donut or stacked bar) at the global and per-cluster level
+- [ ] **DSH-05**: User sees CPU Ready % (from `vInfo.Overall Cpu Readiness`) where available — mean, max, count above the 5 % VMware-warning threshold
+- [ ] **DSH-06**: User sees three accounting modes (Configured / Active / Storage-realistic) with a visible toggle; defaults are sensible per metric
+
+### Inventory Navigation
+
+- [ ] **INV-01**: User can navigate an inventory tree (vCenter → Datacenter → Cluster → ESX → VM) that stays responsive on estates with 10 000+ VMs
+- [ ] **INV-02**: User can view a sortable, filterable table of VMs with the columns RVTools provides
+- [ ] **INV-03**: User can view a sortable, filterable table of ESX hosts
+- [ ] **INV-04**: User can view a sortable, filterable table of datastores keyed on NAA/UUID (no double-count of shared LUNs)
+- [ ] **INV-05**: User can export the current filtered table view as CSV
+- [ ] **INV-06**: User can show/hide columns per table
+
+### Multi-vCenter
+
+- [ ] **MVC-01**: User drops multiple RVTools workbooks from different vCenters and the app treats them as one logical estate
+- [ ] **MVC-02**: User sees a visual suffix (no silent merge) when two vCenters have identically-named clusters
+- [ ] **MVC-03**: User's estate is keyed on `(VI SDK UUID, vm_bios_uuid)` so vMotion across vCenters is correctly deduplicated
+- [ ] **MVC-04**: User sees each loaded snapshot's vCenter label and RVTools version in the snapshot list
+
+### Stretched Clusters
+
+- [ ] **STR-01**: User can toggle a cluster's "Étendu / Stretched" pill to mark it as a stretched cluster
+- [ ] **STR-02**: User sees CPU and RAM reservation applied per-site (not a flat 50 %) when the cluster is asymmetric (e.g. 6+4)
+- [ ] **STR-03**: User sees a `confidence` indicator per stretched cluster (high / medium / low) based on whether site/fault-domain metadata is in the RVTools export
+- [ ] **STR-04**: User sees a warning chip in the UI for any stretched cluster with `low` confidence
+
+### Allocated Resources
+
+- [ ] **ALC-01**: User can adjust CPU and RAM allocation ratios via sliders, with named presets (1:1, 4:1, 8:1, VDI 10:1)
+- [ ] **ALC-02**: User sees defaults of CPU 4:1 and RAM 1:1 on first load
+- [ ] **ALC-03**: User's chosen ratios are encoded in the URL hash only (no `localStorage` persistence)
+- [ ] **ALC-04**: User sees consolidation ratios calculated against physical cores (not hyperthreads)
+
+### Disaster Recovery Simulation
+
+- [ ] **DRS-01**: User can simulate the loss of one or more ESX hosts and see survivor cluster capacity
+- [ ] **DRS-02**: User can simulate the loss of one or more entire clusters and see survivor estate capacity
+- [ ] **DRS-03**: User can simulate the loss of one or more entire vCenters and see survivor estate capacity
+- [ ] **DRS-04**: User sees an explicit assumptions panel listing what the sim DOES and DOES NOT model (HA admission control, anti-affinity, restart priority)
+- [ ] **DRS-05**: User sees a `confidence` indicator and `caveats` array on every DR result
+- [ ] **DRS-06**: User sees before/after numbers, evacuee totals, and per-survivor verdict for every DR scenario
+
+### OS End-of-Support Forecast
+
+- [ ] **EOS-01**: User sees an EOS forecast view with at-risk counts at +3, +6, +9, +12 months
+- [ ] **EOS-02**: User sees an "overdue" bucket for VMs/hosts on already-EOS OSes (RHEL 7, Windows Server 2012 R2, ESXi 7.0, etc.)
+- [ ] **EOS-03**: User can click a bucket to drill into the affected VM list
+- [ ] **EOS-04**: User sees ESX hosts classified by build → support state, including patch-level and major-version EOS
+- [ ] **EOS-05**: User sees an "unknown OS" bucket when a VM's OS string cannot be matched to the catalogue (rather than silently dropped)
+- [ ] **EOS-06**: User sees a `lastVerified` date on the EOS catalogue (refreshed at CI build time from endoflife.date)
+
+### In-Session Trends
+
+- [ ] **TRD-01**: User can load 2–12 monthly RVTools snapshots together and see headline metrics evolve over time
+- [ ] **TRD-02**: User sees a temporal X-axis (actual capture dates, not categorical labels) on every trend chart
+- [ ] **TRD-03**: User sees per-cluster sparklines on the dashboard when multiple snapshots are loaded
+- [ ] **TRD-04**: User sees a delta panel showing what changed between consecutive snapshots
+- [ ] **TRD-05**: User can refresh the page and confirm trends are gone (no cross-session persistence)
+
+### Visual UX (charts as first-class)
+
+- [ ] **VIZ-01**: User sees crisp SVG charts at every zoom level (Apache ECharts with `{ renderer: 'svg' }` everywhere)
+- [ ] **VIZ-02**: User sees the following chart families used throughout: stacked bar, donut, treemap (datastore footprint), heatmap (cluster × time), calendar-heatmap (EOS), line (trends), gauge (allocation), sparkline (per-row trend)
+- [ ] **VIZ-03**: User sees consistent theming (Midnight Executive palette) across all charts
+
+### HTML Report Export
+
+- [ ] **HTM-01**: User clicks one button and downloads a single self-contained `.html` file describing the estate
+- [ ] **HTM-02**: User opens the exported HTML offline, with no JS execution required to view it, and sees crisp inline SVG charts
+- [ ] **HTM-03**: User's HTML report is < 5 MB for a typical estate and < 15 MB for the largest supported (hard ceiling)
+- [ ] **HTM-04**: User's HTML report contains: cover · executive headlines · per-cluster · EOS forecast · DR results · trends · annex · methodology footer
+- [ ] **HTM-05**: User's HTML report carries factual numbers only — no editorial recommendations ("you should consolidate cluster X")
+
+### PPTX Export
+
+- [ ] **PPT-01**: User clicks one button and downloads a PPTX deck describing the estate
+- [ ] **PPT-02**: User's PPTX uses the same neutral, brand-free Midnight Executive palette as vsizer
+- [ ] **PPT-03**: User's PPTX includes: title · overview · per-cluster · CPU Ready annex (conditional) · EOS · DR · trends · inventory summary
+- [ ] **PPT-04**: User's PPTX numbers are locale-formatted (FR `,` and U+00A0 thousands separator, EN `.` and `,` thousands separator)
+
+### Privacy & Security
+
+- [ ] **PRV-01**: User's browser never makes a non-same-origin network request after the app is loaded (runtime `fetch`/`XHR`/`WS`/`Beacon` guard throws on any attempt)
+- [ ] **PRV-02**: User loads an app whose CSP meta tag is `connect-src 'self'`
+- [ ] **PRV-03**: User's app has no telemetry / analytics SDKs of any kind (Sentry, PostHog, Datadog, etc. denied at CI)
+
+### Deployment
+
+- [ ] **DEP-01**: User can access vatlas at the public URL `fjacquet.github.io/vatlas/`
+- [ ] **DEP-02**: User's deploy is the result of a CI pipeline that runs typecheck → lint → test → build → deploy on every push to `main`
+
+## v2 Requirements
+
+### DR scenario presets
+
+- **DR2-01**: User can pick a preset DR scenario from a menu ("lose largest cluster", "lose vCenter A", "lose left-side of stretched")
+
+### Snapshot diff
+
+- **DIF-01**: User can open a side-by-side comparison view showing what changed between any two loaded snapshots
+
+### Estate treemap headline
+
+- **TRM-01**: User sees an estate-wide treemap as a headline visual on the dashboard
+
+### Cluster × time heatmap
+
+- **HM2-01**: User sees a heatmap of clusters × time showing a chosen metric (CPU% / RAM% / VM count) when 3+ snapshots are loaded
+
+### Multi-file `.zip` bundle ingestion
+
+- **ZIP-01**: User can drop a `.zip` of multiple RVTools workbooks and the app parses them all
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Live Optics ingestion | RVTools-only is an explicit narrowing vs. vsizer; reduces parser surface |
+| Cross-session persistence (DB / IndexedDB / OPFS / localStorage of rows) | Breaks the vsizer privacy invariant — refresh = data gone |
+| Backend / server / file upload | 100 % client-side is a hard product invariant |
+| Telemetry of parsed contents (even anonymous) | Same privacy invariant; reputation risk on operator-facing tools |
+| Editorial recommendations in reports | Like vsizer, vatlas carries numbers only — narrative stays with the presenter |
+| Real-time vCenter API connection | RVTools workbook is the only input; would re-introduce a network requirement |
+| Right-sizing recommendation engine | RVTools snapshots lack peak-active data; unsound recommendations |
+| Saved scenarios / accounts / shared dashboards | Requires backend, breaks privacy invariant |
+| Mobile / touch-first UX | 10k+ row tables are not a mobile use case |
+| In-browser editing of inventory rows | RVTools is source of truth; would invite drift |
+| Source-map upload in CI | Could leak repo internals; no telemetry pipeline anyway |
+| Service worker | Increases attack surface; offers no value for ephemeral data |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| FND-01..05 | Phase 1 | Pending |
+| PAR-01..05 | Phase 1 | Pending |
+| PRV-01..03 | Phase 1 | Pending |
+| DSH-01..06 | Phase 2 | Pending |
+| VIZ-01..03 | Phase 2 | Pending |
+| INV-01..06 | Phase 3 | Pending |
+| MVC-01..04 | Phase 4 | Pending |
+| STR-01..04 | Phase 4 | Pending |
+| ALC-01..04 | Phase 4 | Pending |
+| DRS-01..06 | Phase 4 | Pending |
+| EOS-01..06 | Phase 5 | Pending |
+| TRD-01..05 | Phase 6 | Pending |
+| HTM-01..05 | Phase 7 | Pending |
+| PPT-01..04 | Phase 7 | Pending |
+| DEP-01..02 | Phase 7 | Pending |
+
+**Coverage:**
+- v1 requirements: 56 total
+- Mapped to phases: 56 (preliminary mapping — roadmapper will confirm)
+- Unmapped: 0
+
+---
+*Requirements defined: 2026-05-15*
+*Last updated: 2026-05-15 after initial definition*
