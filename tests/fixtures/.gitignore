@@ -1,0 +1,5 @@
+# Real RVTools workbooks contain potentially-sensitive infrastructure
+# inventory. They are harvested locally by `node scripts/seed-fixtures.mjs`
+# and NEVER committed.
+*.xlsx
+!.gitkeep

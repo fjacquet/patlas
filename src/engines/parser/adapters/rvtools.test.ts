@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { cores, mhz, mib, sockets } from '@/engines/units'
 import type { ParsedSheet, ParsedWorkbook } from '../parseXlsx'
 import { synthesizeOrphanClusters } from '../synthesizeOrphanClusters'
-import { adaptRvtools, adaptRvtoolsVInfo } from './rvtools'
+import {
+  adaptRvtools,
+  adaptRvtoolsVDatastore,
+  adaptRvtoolsVInfo,
+  adaptRvtoolsVMetaData,
+  adaptRvtoolsVPartition,
+} from './rvtools'
 
 /** Build a single `ParsedSheet` (header strings trimmed, rows keyed by header). */
 const mkSheet = (name: string, headers: string[], rows: unknown[][]): ParsedSheet => ({
@@ -185,5 +191,109 @@ describe('synthesizeOrphanClusters integration', () => {
       ],
     })
     expect(bucketed.vinfo[0]?.cluster).toBe('(no cluster) standalone-1')
+  })
+})
+
+describe('optional-sheet adapters', () => {
+  it('adaptRvtoolsVDatastore reads capacity/free/provisioned/naa/type', () => {
+    const rows = adaptRvtoolsVDatastore(
+      mkSheet(
+        'vDatastore',
+        ['Name', 'Capacity MB', 'Free MB', 'Provisioned MB', 'Address', 'Type'],
+        [
+          ['ds-01', 1024, 256, 800, 'naa.6000', 'VMFS'],
+          ['ds-02', 2048, 1024, 1000, '', 'NFS'],
+          ['Total', 0, 0, 0, '', ''],
+        ],
+      ),
+    )
+    expect(rows).toHaveLength(2)
+    expect(rows[0]).toMatchObject({
+      name: 'ds-01',
+      capacityMib: 1024,
+      freeMib: 256,
+      provisionedMib: 800,
+      naa: 'naa.6000',
+      type: 'VMFS',
+    })
+    expect(rows[1]?.naa).toBeNull()
+  })
+
+  it('adaptRvtoolsVPartition reads vm/disk/capacity/consumed/free', () => {
+    const rows = adaptRvtoolsVPartition(
+      mkSheet(
+        'vPartition',
+        ['VM', 'Disk', 'Capacity MB', 'Consumed MB', 'Free MB'],
+        [['vm-a', '/', 10240, 4096, 6144]],
+      ),
+    )
+    expect(rows[0]).toMatchObject({
+      vmName: 'vm-a',
+      disk: '/',
+      capacityMib: 10240,
+      consumedMib: 4096,
+      freeMib: 6144,
+    })
+  })
+
+  it('adaptRvtoolsVMetaData reduces Property/Value rows', () => {
+    const meta = adaptRvtoolsVMetaData(
+      mkSheet(
+        'vMetaData',
+        ['Property', 'Value'],
+        [
+          ['RVTools Version', '4.4.0'],
+          ['Exported Timestamp', '2026-05-15 10:00:00'],
+          ['Unrelated', ''],
+        ],
+      ),
+    )
+    expect(meta).toEqual({
+      rvtoolsVersion: '4.4.0',
+      exportedTimestamp: '2026-05-15 10:00:00',
+    })
+  })
+
+  it('adaptRvtools wires the optional sheets through when present', () => {
+    const out = adaptRvtools(
+      workbook(
+        mkSheet('vInfo', VINFO_FULL, [baseRow]),
+        mkSheet('vHost', VHOST_FULL, [vhostRow]),
+        mkSheet('vDatastore', ['Name', 'Capacity MB', 'Free MB'], [['ds', 100, 50]]),
+        mkSheet('vPartition', ['VM', 'Disk', 'Capacity MB'], [['vm-a', '/', 10]]),
+        mkSheet('vMetaData', ['Property', 'Value'], [['RVTools Version', '4.4.0']]),
+      ),
+    )
+    expect(out.vdatastore).toHaveLength(1)
+    expect(out.vpartition).toHaveLength(1)
+    expect(out.vmetadata.rvtoolsVersion).toBe('4.4.0')
+    expect(out.warnings).toHaveLength(0)
+  })
+})
+
+describe('cell parsing edge cases', () => {
+  it('treats Excel error / sentinel readiness cells as null, not 0', () => {
+    const headers = [...VINFO_FULL, 'Overall Cpu Readiness']
+    const mk = (cell: unknown) =>
+      adaptRvtoolsVInfo(mkSheet('vInfo', headers, [[...baseRow, cell]]))[0]?.cpuReadinessPercent
+    expect(mk('#DIV/0!')).toBeNull()
+    expect(mk('N/A')).toBeNull()
+    expect(mk('-')).toBeNull()
+    expect(mk('')).toBeNull()
+    expect(mk(null)).toBeNull()
+    expect(mk(true)).toBeNull()
+    expect(mk('12.5%')).toBe(12.5)
+    expect(mk(7)).toBe(7)
+  })
+
+  it('coerces locale-formatted numeric cells (spaces, comma decimal)', () => {
+    const rows = adaptRvtoolsVInfo(
+      mkSheet('vInfo', VINFO_FULL, [
+        ['vm-l', 'poweredOn', 'c', 'h', "1'024", '2 048', '4,5', 0, '', '', '', '', '', ''],
+      ]),
+    )
+    expect(rows[0]?.vcpu).toBe(1024)
+    expect(rows[0]?.vramMib).toBe(2048)
+    expect(rows[0]?.provisionedMib).toBe(4.5)
   })
 })

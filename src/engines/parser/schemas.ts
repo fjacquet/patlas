@@ -18,15 +18,24 @@ const MibSchema = z
   .number()
   .nonnegative()
   .transform((n) => n as MiB)
-const MhzSchema = z
-  .number()
-  .nonnegative()
-  .transform((n) => n as MHz)
 const CoresSchema = z
   .number()
   .int()
   .nonnegative()
   .transform((n) => n as Cores)
+// vHost cores/speed must be strictly positive (a host with 0 cores or 0 MHz
+// is a corrupt row, not inventory) — distinct base schemas, NOT a `.pipe()`
+// over the already-branded schema (a pipe re-declares the input as the brand
+// type, breaking the `z.ZodType<T>` annotation under `tsc -b`).
+const PositiveCoresSchema = z
+  .number()
+  .int()
+  .positive()
+  .transform((n) => n as Cores)
+const PositiveMhzSchema = z
+  .number()
+  .positive()
+  .transform((n) => n as MHz)
 const SocketsSchema = z
   .number()
   .int()
@@ -55,18 +64,8 @@ export const VHostRowSchema: z.ZodType<VHostRow> = z.object({
   hostName: z.string().trim().min(1),
   cluster: z.string().trim(),
   sockets: SocketsSchema,
-  cores: CoresSchema.pipe(
-    z
-      .number()
-      .positive()
-      .transform((n) => n as Cores),
-  ),
-  speedMhz: MhzSchema.pipe(
-    z
-      .number()
-      .positive()
-      .transform((n) => n as MHz),
-  ),
+  cores: PositiveCoresSchema,
+  speedMhz: PositiveMhzSchema,
   memoryMib: MibSchema,
   cpuRatio: z.number().min(0).max(1.5),
   ramRatio: z.number().min(0).max(1.5),

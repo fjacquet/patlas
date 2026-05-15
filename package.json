@@ -11,7 +11,7 @@
     "check:supply-chain": "node scripts/check-supply-chain.mjs",
     "generate-mib-canary": "node scripts/generate-mib-canary.mjs",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
