@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
+status: completed
 stopped_at: Completed 01-04-PLAN.md (parser engine in Web Worker — PAR-01/02/03 owned, PAR-04 live canary green). Ready for 01-05 (snapshot store).
-last_updated: "2026-05-15T22:25:31.981Z"
+last_updated: "2026-05-15T22:27:06.309Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 7
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-05-15)
 
 Phase: 1 (Foundation & Invariants) — EXECUTING
 Plan: 5 of 5
-Status: Phase complete — ready for verification
+Status: phase-1-complete
 Last activity: 2026-05-15
 
 Progress: [██████████] 100%
