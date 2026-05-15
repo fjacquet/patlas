@@ -1,0 +1,38 @@
+{
+  "dropzone": {
+    "instruction": "Glissez vos exports RVTools",
+    "or": "ou",
+    "browse": "parcourir vos fichiers",
+    "accepted": "Format accepté : .xlsx (export RVTools). Déposez un ou plusieurs fichiers.",
+    "active": "Déposez les fichiers ici"
+  },
+  "fileLoaded": {
+    "ariaLabel": "Fichier chargé",
+    "remove": "Retirer"
+  },
+  "source": {
+    "rvtools": "RVTools",
+    "unknown": "Inconnu"
+  },
+  "sources": {
+    "list": {
+      "title": "Classeurs importés"
+    },
+    "summary": "{{n}} fichiers · {{vms}} VM · {{hosts}} hôtes",
+    "rowCounts": "{{vms}} VM · {{hosts}} hôtes"
+  },
+  "errors": {
+    "rejected": "Format non reconnu. Glissez un export RVTools .xlsx.",
+    "parseFailed": "Impossible de lire le fichier : {{message}}"
+  },
+  "snapshots": {
+    "list": "Snapshots chargés",
+    "empty": "Aucun snapshot — déposez un classeur",
+    "card": {
+      "vCenterLabel": "vCenter",
+      "capturedAt": "Capturé",
+      "rvtoolsVersion": "RVTools",
+      "rows": "{{vms}} VM · {{hosts}} ESX · {{clusters}} clusters · {{datastores}} datastores"
+    }
+  }
+}

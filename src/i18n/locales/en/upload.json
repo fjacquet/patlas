@@ -1,0 +1,38 @@
+{
+  "dropzone": {
+    "instruction": "Drop your RVTools exports",
+    "or": "or",
+    "browse": "browse your files",
+    "accepted": "Accepted format: .xlsx (RVTools export). Drop one file or several at once.",
+    "active": "Drop the files here"
+  },
+  "fileLoaded": {
+    "ariaLabel": "Loaded file",
+    "remove": "Remove"
+  },
+  "source": {
+    "rvtools": "RVTools",
+    "unknown": "Unknown"
+  },
+  "sources": {
+    "list": {
+      "title": "Imported workbooks"
+    },
+    "summary": "{{n}} files · {{vms}} VMs · {{hosts}} hosts",
+    "rowCounts": "{{vms}} VMs · {{hosts}} hosts"
+  },
+  "errors": {
+    "rejected": "Unrecognized format. Drop an RVTools .xlsx export.",
+    "parseFailed": "Failed to read the file: {{message}}"
+  },
+  "snapshots": {
+    "list": "Loaded snapshots",
+    "empty": "No snapshots yet — drop a workbook",
+    "card": {
+      "vCenterLabel": "vCenter",
+      "capturedAt": "Captured",
+      "rvtoolsVersion": "RVTools",
+      "rows": "{{vms}} VMs · {{hosts}} ESX · {{clusters}} clusters · {{datastores}} datastores"
+    }
+  }
+}

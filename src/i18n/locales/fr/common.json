@@ -1,0 +1,24 @@
+{
+  "appName": "vatlas",
+  "tagline": "RVTools → atlas de votre parc VMware (100 % client)",
+  "footer": "100 % client · votre fichier ne quitte jamais votre navigateur",
+  "error": {
+    "title": "Une erreur est survenue"
+  },
+  "actions": {
+    "reset": "Recommencer",
+    "selectAll": "Tout sélectionner",
+    "selectNone": "Tout désélectionner"
+  },
+  "lang": {
+    "label": "Langue",
+    "fr": "Français",
+    "en": "English"
+  },
+  "theme": {
+    "label": "Thème",
+    "auto": "Auto",
+    "light": "Clair",
+    "dark": "Sombre"
+  }
+}

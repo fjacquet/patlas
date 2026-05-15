@@ -1,0 +1,24 @@
+{
+  "appName": "vatlas",
+  "tagline": "RVTools → atlas of your VMware estate (100 % client-side)",
+  "footer": "100% client-side · your file never leaves your browser",
+  "error": {
+    "title": "An error occurred"
+  },
+  "actions": {
+    "reset": "Start over",
+    "selectAll": "Select all",
+    "selectNone": "Deselect all"
+  },
+  "lang": {
+    "label": "Language",
+    "fr": "Français",
+    "en": "English"
+  },
+  "theme": {
+    "label": "Theme",
+    "auto": "Auto",
+    "light": "Light",
+    "dark": "Dark"
+  }
+}

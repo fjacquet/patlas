@@ -5,6 +5,14 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    // jsdom withholds `localStorage` from opaque origins (e.g. `about:blank`);
+    // setting an explicit URL gives the test environment a same-origin
+    // window so `window.localStorage` and other origin-bound APIs work.
+    environmentOptions: {
+      jsdom: {
+        url: 'http://localhost/',
+      },
+    },
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}', 'tests/**/*.{test,spec}.{ts,tsx}'],
     coverage: {
