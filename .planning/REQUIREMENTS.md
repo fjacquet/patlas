@@ -11,7 +11,7 @@
 - [x] **FND-02**: User sees a clear drag-and-drop zone for one or more RVTools `.xlsx` files on first load
 - [x] **FND-03**: User can use the app entirely in French or English (i18n FR + EN, language auto-detected then user-toggleable)
 - [x] **FND-04**: User can switch between a light and a dark visual theme
-- [ ] **FND-05**: User sees a visible "workbook capture date" indicator wherever data is displayed (header + footer of every export)
+- [x] **FND-05**: User sees a visible "workbook capture date" indicator wherever data is displayed (header + footer of every export)
 
 ### Parsing
 
@@ -19,7 +19,7 @@
 - [x] **PAR-02**: User sees a clear error naming the missing sheet or column when a workbook does not match the RVTools schema
 - [x] **PAR-03**: User can load workbooks from RVTools 3.10, 3.11, 4.0, and 4.4 — column-name drift is resolved transparently via an alias dictionary
 - [x] **PAR-04**: User's workbook is parsed with all memory/storage fields preserved as MiB (no `* 1.048576` inflation — RVTools "MB" is MiB)
-- [ ] **PAR-05**: User can refresh the page and confirm the data is gone (no `localStorage` / `IndexedDB` / `OPFS` persistence of dataset rows)
+- [x] **PAR-05**: User can refresh the page and confirm the data is gone (no `localStorage` / `IndexedDB` / `OPFS` persistence of dataset rows)
 
 ### Global Dashboard
 
@@ -165,12 +165,12 @@
 | FND-02 | Phase 1 | Complete |
 | FND-03 | Phase 1 | Complete |
 | FND-04 | Phase 1 | Complete |
-| FND-05 | Phase 1 | Pending |
+| FND-05 | Phase 1 | Complete |
 | PAR-01 | Phase 1 | Complete |
 | PAR-02 | Phase 1 | Complete |
 | PAR-03 | Phase 1 | Complete |
 | PAR-04 | Phase 1 | Complete |
-| PAR-05 | Phase 1 | Pending |
+| PAR-05 | Phase 1 | Complete |
 | PRV-01 | Phase 1 | Complete |
 | PRV-02 | Phase 1 | Complete |
 | PRV-03 | Phase 1 | Complete |
