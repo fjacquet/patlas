@@ -120,7 +120,7 @@ bool, where applicable). Confidence: HIGH for shape (verified via Swagger docs a
 [endoflife.date/docs/api/v1/](https://endoflife.date/docs/api/v1/)).
 
 **Important caveat:** The API is officially in **Beta** as of mid-2026 (see [issue
-#2066](https://github.com/endoflife-date/endoflife.date/issues/2066)). Breaking changes are
+# 2066](https://github.com/endoflife-date/endoflife.date/issues/2066)). Breaking changes are
 possible. **Mitigation:** vatlas bundles a *snapshot* of the JSON at CI build time
 (`scripts/sync-eos-catalogue.ts`) rather than fetching at runtime. This:
 
@@ -307,7 +307,9 @@ bound (one year of monthly exports). Beyond that, sparklines/line charts become 
 and the user should subsample.
 
 **Headline trend metrics (mirror RVTools Analyser's own list, since users expect it):**
+
 # Clusters, # ESX, # Datastores, # VMs (and per-OS-family), total vCPU allocated, total
+
 vRAM allocated, total disk allocated.
 
 ---
@@ -539,6 +541,7 @@ A defensible MVP that delivers the stated PROJECT.md value in roughly this build
 | [D6] HTML report polish + offline assertion | MEDIUM | MEDIUM (already in P1 [12]) | **P1** |
 
 **Priority key:**
+
 - **P1** — must ship in v1. Stated requirements + minimal viable polish to make the
   result trustworthy.
 - **P2** — add quickly after v1 ships; high value, low cost, but not blocking the v1

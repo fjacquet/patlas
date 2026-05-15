@@ -86,6 +86,7 @@ These are not negotiable in v1 — they cascade into every decision below.
 Each module is a directory of pure functions with sibling `*.test.ts` files. One-line responsibility per file:
 
 ### `engines/parser/`
+
 - `parseXlsx.ts` — SheetJS `XLSX.read` → `ParsedWorkbook { sheets: Map<name, ParsedSheet> }`. **Lift from vsizer.**
 - `adapters/rvtools.ts` — `ParsedWorkbook → { vinfo, vhost, vpartition, vdisk, vdatastore, vsc_vmk?, vmultipath? }`. **Extend vsizer adapter** to read more sheets (datastores, partitions, OS columns).
 - `adapters/columnMap.ts` — Header-alias resolver. **Lift from vsizer.**
@@ -95,10 +96,12 @@ Each module is a directory of pure functions with sibling `*.test.ts` files. One
 Drop entirely from vsizer: `detectSource.ts`, `adapters/liveoptics.ts`, `extractWorkbook.ts` (zip extraction was Live-Optics-specific in vsizer; reassess if vatlas needs zip support — out of scope per PROJECT.md v1).
 
 ### `engines/snapshotMerge/`
+
 - `mergeSnapshotsToEstate.ts` — `Snapshot[] → EstateRows`. Tags every row with its source `vCenterLabel`. Resolves cluster collisions across vCenters via `"<cluster> (<vCenterLabel>)"` suffix.
 - `vCenterIndex.ts` — Build `Map<vCenterLabel, { clusters, hosts, vmCount }>` for the vCenter-pivot views.
 
 ### `engines/aggregation/`
+
 - `ghz.ts` — MHz→GHz primitives. **Lift from vsizer.**
 - `perCluster.ts` — Host-side rollup per cluster. **Lift from vsizer.**
 - `vinfoMerge.ts` — VM-side rollup per cluster, joined into host stats. **Lift from vsizer.**
@@ -109,27 +112,32 @@ Drop entirely from vsizer: `detectSource.ts`, `adapters/liveoptics.ts`, `extract
 - `perEsx.ts` — *New.* Per-host VM list, vCPU/RAM allocation, contention, derived for the inventory tree.
 
 ### `engines/trends/`
+
 - `buildTimeline.ts` — `Snapshot[]` (already aggregated) → `TimelinePoint[]` sorted by `capturedAt`. Each point holds `globals`, `clusterAggregates` keyed by cluster, datastore growth.
 - `deltaMetrics.ts` — Successive `TimelinePoint` pairs → growth-rate (`+5 VMs / month`, `+2 % vCPU`).
 - `seriesForChart.ts` — Pivot timeline by metric for chart consumption: `{ metric: 'vmCount', points: [{t, v}] }`.
 
 ### `engines/eos/`
+
 - `osCatalogue.ts` — Static lookup table: regex → `{ family, releaseDate, eosDate, eolDate }`. Curated, hand-maintained, ships with the app. Covers Windows Server 2008→2025, RHEL 6→10, Ubuntu LTS, ESX 5.5→8.0, etc.
 - `classifyVm.ts` — `VInfoRow → { osFamily, eosDate | null, eolDate | null, status: 'supported' | 'eos-soon' | 'eos' | 'eol' }`.
 - `classifyHost.ts` — ESX build → support state.
 - `forecastAtRisk.ts` — Estate + horizon-months → `EosForecast { atRisk3m, atRisk6m, atRisk9m, atRisk12m, byOs: {…} }`.
 
 ### `engines/drSim/`
+
 - `runScenario.ts` — `(EstateRows, DrScenario, stretchedFlags) → DrSimResult`. Removes failed clusters/vCenters from the host set, re-runs `aggregateClusters` + `aggregateGlobals` on survivors, computes "overflow vCPU / vRAM" the failed sites would dump on survivors.
 - `allocate.ts` — Apply user CPU:pCPU and RAM overcommit ratios to compute headroom and "can survivors absorb the workload?" verdict (number, not editorial — ADR-0003 style).
 
 ### `engines/export/html/`
+
 - `renderReport.tsx` — *Server-side-style* React component tree that takes `EstateView + scenarios` and returns an HTML string via `renderToStaticMarkup`. No event handlers, no hydration — pure HTML.
 - `inlineAssets.ts` — Inline CSS (a small report-specific stylesheet, **not** the full Tailwind output) + base64-inlined chart SVGs.
 - `renderCharts.ts` — Chart-library-agnostic SVG renderer that takes a series spec and emits a static `<svg>` string (charts in the HTML report must be SVG, not canvas, to survive being a single file).
 - `assembleHtml.ts` — Wrap HTML + inline CSS + inline SVG + (optional) data-URI font into one `<html>…</html>` string. Returns `string`.
 
 ### `engines/export/pptx/`
+
 - `builder.ts` — Top-level deck assembler. **Lift from vsizer**, expand slide set.
 - `slides/titleSlide.ts`, `overviewSlide.ts`, `clusterSlide.ts`, `contentionAnnex.ts` — **Lift from vsizer.**
 - `slides/eosSlide.ts`, `drSimSlide.ts`, `trendsSlide.ts`, `inventorySlide.ts` — *New.*
@@ -137,6 +145,7 @@ Drop entirely from vsizer: `detectSource.ts`, `adapters/liveoptics.ts`, `extract
 - `primitives/chartSvg.ts` — *New.* Render a minimal SVG bar/line chart for inclusion in PPTX (pptxgenjs supports SVG via `addImage({ data: 'data:image/svg+xml;base64,…' })`).
 
 ### `engines/format/`
+
 - All formatters from vsizer `utils/format.ts` (locale-aware numbers, GHz, MB→GB, percent, dates). **Lift unchanged.**
 
 ---
@@ -624,6 +633,7 @@ EstateView + scenario + stretched
 ## 14. Integration Points
 
 ### External Services
+
 **None.** vatlas is 100 % client-side. There is no API surface, no third-party service, no telemetry. The OS EOS catalogue is shipped *with the bundle* as a TypeScript module, not fetched.
 
 ### Internal Boundaries

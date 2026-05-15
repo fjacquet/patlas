@@ -117,6 +117,7 @@ Second, **the HTML-export concern dissolves**. The architectural worry behind vi
 **visx remains the right call only if** the team later decides to build a bespoke design language for charts pixel-by-pixel, or if a hard contractual WCAG 2.1 AA requirement appears (in which case Nivo is the better runner-up than visx anyway). Neither applies to v1.
 
 **Implementation rules** (binding for every chart in vatlas):
+
 - Always tree-shake: `import * as echarts from 'echarts/core'` + per-feature imports + `echarts.use([...])`. Target landing zone is 150–300 KB gz. The full `import * as echarts from 'echarts'` is forbidden.
 - Always `{ renderer: 'svg' }` for charts that go into the HTML report. Canvas is permitted **only** as a per-chart escape hatch for in-app dense overview charts (>10k points) that do not need to appear in the report.
 - A thin `<Chart>` wrapper around `<ReactECharts>` injects the SVG renderer + project-wide Midnight Executive theme tokens; components never instantiate ECharts directly.
@@ -142,6 +143,7 @@ The research surfaces a clear dependency graph but **two competing groupings**: 
 ### Natural feature clusters (the roadmapper decides how to group)
 
 **Cluster A — Foundation & invariants (must come first).**
+
 - Bootstrap (Vite 8 + React 19 + TS strict + Tailwind v4 + Biome + Vitest + i18next scaffold).
 - Privacy guard layer: runtime `fetch`/`XHR`/`WS`/`Beacon` wrapper, CSP meta tag, CI denylist, no service worker.
 - Branded units module (`GHz`, `MiB`, `GiB`) + `BYTES_PER_MIB` constant.
@@ -151,6 +153,7 @@ The research surfaces a clear dependency graph but **two competing groupings**: 
 - *Pitfalls addressed:* Critical-1, Critical-2, Critical-5, Moderate-1, Minor-1/3/5.
 
 **Cluster B — Single-snapshot aggregation + dashboard.**
+
 - `engines/aggregation/` ported from `vsizer` (perCluster, vinfoMerge, aggregateClusters, globals, contention) + new `perDatastore` (NAA-keyed) + new `perEsx`.
 - Three accounting modes (Configured / Active / Storage-realistic).
 - Physical-core-basis consolidation ratio (not threads).
@@ -160,6 +163,7 @@ The research surfaces a clear dependency graph but **two competing groupings**: 
 - *Pitfalls addressed:* Critical-6, Moderate-4, Moderate-5, Moderate-11, Moderate-9.
 
 **Cluster C — Inventory navigation.**
+
 - `@tanstack/react-table` + `@tanstack/react-virtual` for the cluster → ESX → VM tree.
 - Sortable / filterable tables per object class (VM, ESX, Datastore).
 - Datastore view with thin-provisioning flags.
@@ -168,6 +172,7 @@ The research surfaces a clear dependency graph but **two competing groupings**: 
 - *Pitfalls addressed:* part of Critical-5 (memory budget on large estates), Minor-2 (multi-line cells).
 
 **Cluster D — Multi-vCenter + scenarios (the analytics core).**
+
 - `engines/snapshotMerge/` with `(vcenter_uuid, cluster_moref)` and `vm_bios_uuid` keys. Detect colliding cluster names; never silent merge.
 - Stretched-cluster pill (port `vsizer` ADR-0007) with per-site reservation math and the `confidence` field.
 - Allocation-ratio sliders (CPU 4:1 / RAM 1:1 defaults, URL-hash-encoded only).
@@ -175,6 +180,7 @@ The research surfaces a clear dependency graph but **two competing groupings**: 
 - *Pitfalls addressed:* Critical-3, Critical-4, Moderate-10.
 
 **Cluster E — EOS forecasting.**
+
 - `scripts/sync-eos-catalogue.ts` (build-time fetch from `endoflife.date`, Zod-validated, bundled JSON with `lastVerified`).
 - OS-string normalizer (regex bank, family/major/minor) with "unknown OS" as a real bucket.
 - Lifecycle phase bucketing including the **"overdue"** bucket (RHEL 7, Win 2012 R2 are past EOS).
@@ -183,6 +189,7 @@ The research surfaces a clear dependency graph but **two competing groupings**: 
 - *Pitfalls addressed:* Moderate-6, Minor-4.
 
 **Cluster F — Multi-snapshot trends.**
+
 - `engines/trends/` (`buildTimeline`, `deltaMetrics`, `seriesForChart`).
 - Background-parse non-default snapshots; lazy-aggregate trends.
 - Temporal (not categorical) X-axis; show actual capture dates on hover; show RVTools version per snapshot.
@@ -191,6 +198,7 @@ The research surfaces a clear dependency graph but **two competing groupings**: 
 - *Pitfalls addressed:* Minor-6, part of Critical-5 (memory budget).
 
 **Cluster G — Export pipeline (HTML + PPTX).**
+
 - `engines/export/html/` — `renderToStaticMarkup` of a hookless React report tree + hand-rolled ~5 KB stylesheet + inlined SVG via `chart.renderToSVGString()` + base64-subset fonts (Inter Latin Extended A). CSP meta in the exported HTML. Anchor-id namespacing per snapshot. Runs in a Worker.
 - `engines/export/pptx/` — ported from `vsizer`, extended with EOS / DR / Trends / Inventory slides. `pptxText` wrapper for text-overflow + control-char stripping. `pptxSafeFormat` for U+202F → U+00A0. Golden-PPTX snapshot test.
 - Both run in `engines/export/index.worker.ts`.
@@ -198,6 +206,7 @@ The research surfaces a clear dependency graph but **two competing groupings**: 
 - *Pitfalls addressed:* Moderate-2, Moderate-7, Moderate-8.
 
 **Cluster H — Polish & deploy.**
+
 - i18n FR + EN with the new namespaces (`inventory`, `eos`, `dr`, `trends`, `report`). CI key-diff gate (FR↔EN must match). All numbers via locale-aware formatter; no pre-formatted numbers in translation strings.
 - Light/dark theme, drag-and-drop multi-file UX, drop-zone validation (D11), explicit data-freshness display (D10).
 - `vatlas-lang` allowed in `localStorage` (locale code only; not dataset content).

@@ -216,15 +216,19 @@ If a tool (Dependabot, Renovate, `npm audit fix --force`) ever rewrites that to 
 ## Stack Patterns by Variant
 
 **If a "host the report on a static site" feature is added later:**
+
 - Add `vite-plugin-singlefile` as a **separate optional build target** (e.g. `npm run build:portable`) to produce a single-file version of the vatlas app itself, alongside the normal GitHub Pages build. This is independent of the per-snapshot HTML report and useful only as an offline distribution form.
 
 **If chart performance becomes a bottleneck at very large estates (>50 k VMs):**
+
 - Switch the offending chart instances from `renderer: 'svg'` to `renderer: 'canvas'` on a per-chart basis. Keep SVG for charts that go into the HTML report; use Canvas only for in-app overview charts that don't need SVG output. ECharts supports this per-instance.
 
 **If a PDF deliverable is added (not v1):**
+
 - Add `@react-pdf/renderer` as a third export engine alongside HTML and PPTX. Reuse the same chart SVGs (the renderer can embed SVG into PDF).
 
 **If accessibility certification becomes a hard requirement:**
+
 - Re-evaluate Nivo vs ECharts for charts. ECharts has accessibility props (`aria` config on series) but Nivo's ARIA story is significantly more polished out of the box.
 
 ---
@@ -248,6 +252,7 @@ If a tool (Dependabot, Renovate, `npm audit fix --force`) ever rewrites that to 
 ## Sources
 
 Charting library:
+
 - [LogRocket — Best React chart libraries 2025/2026](https://blog.logrocket.com/best-react-chart-libraries-2025/) — confirmation that Recharts lacks heatmap/sunburst/calendar and that ECharts/Plotly cover them. MEDIUM.
 - [Querio — 8 Top React Chart Libraries 2026](https://querio.ai/articles/top-react-chart-libraries-data-visualization) — chart-type matrix. MEDIUM.
 - [arcdev — 10 Best React Chart Libraries 2026](https://arcdev.in/10-best-react-chart-libraries-2026-fast-beautiful-powerful/) — corroborating coverage table. MEDIUM.
@@ -259,12 +264,14 @@ Charting library:
 - [Recharts issue #237 — heatmap support request](https://github.com/recharts/recharts/issues/237) — confirms Recharts has no built-in heatmap. HIGH.
 
 HTML report export:
+
 - [vite-plugin-singlefile npm](https://www.npmjs.com/package/vite-plugin-singlefile) — purpose & limitations (build-time, not runtime). HIGH.
 - [React `renderToStaticMarkup` reference](https://react.dev/reference/react-dom/server/renderToStaticMarkup) — official API. HIGH.
 - [ECharts SSR / `renderToSVGString` handbook](https://apache.github.io/echarts-handbook/en/how-to/cross-platform/server/) — SVG-string export from ECharts. HIGH.
 - [Apache ECharts `getDataURL`](https://echarts.apache.org/en/api.html) — `getDataURL({type:'svg'})` fallback. HIGH.
 
 Versions verified upstream as of 2026-05-15:
+
 - [Vite 8 release post](https://vite.dev/blog/announcing-vite8) — Rolldown integration, GA 2026-03-12. HIGH.
 - [Tailwind v4.0 announcement](https://tailwindcss.com/blog/tailwindcss-v4) and [Tailwind upgrade guide](https://tailwindcss.com/docs/upgrade-guide) — v4 architecture, Vite plugin. HIGH.
 - [Tailwind v4 + Vite 8 status](https://benjamincrozat.com/tailwind-css-vite-8-support) — interop confirmed. MEDIUM.
@@ -277,6 +284,7 @@ Versions verified upstream as of 2026-05-15:
 - [React Server Components DoS / source-code-exposure advisories Dec 2025–Jan 2026](https://react.dev/blog/2025/12/11/denial-of-service-and-source-code-exposure-in-react-server-components) — does not apply to client-only apps; reference for hygiene only. HIGH.
 
 SheetJS / CVEs:
+
 - [SheetJS CDN root](https://cdn.sheetjs.com/) — authoritative distribution channel. HIGH.
 - [SheetJS issue #2667 — why npm distribution stopped](https://github.com/SheetJS/sheetjs/issues/2667) — explains the npm-vs-tarball split. HIGH.
 - [SheetJS issue #3098 — npm xlsx@0.18.5 high-severity vulnerability](https://git.sheetjs.com/sheetjs/sheetjs/issues/3098) — the exact failure mode we are avoiding. HIGH.
@@ -284,6 +292,7 @@ SheetJS / CVEs:
 - [GitHub Advisory GHSA-5pgg-2g8v-p4x9](https://github.com/advisories/GHSA-5pgg-2g8v-p4x9) — same CVE, public advisory. HIGH.
 
 PPTX:
+
 - [pptxgenjs project home](https://gitbrent.github.io/PptxGenJS/) and [GitHub](https://github.com/gitbrent/PptxGenJS) — confirms project is alive, 4.0.1 current. HIGH.
 - [Snyk pptxgenjs](https://security.snyk.io/package/npm/pptxgenjs) — no current advisories at recommendation time. HIGH.
 

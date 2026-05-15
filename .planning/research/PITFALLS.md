@@ -25,11 +25,13 @@ These cause wrong numbers, privacy violations, or rewrites. Wrong numbers in an 
 **Consequences:** Systematic over-sizing of every storage forecast, every DR survivor-capacity calculation, every memory headroom number. The error is multiplicative through aggregation.
 
 **Warning signs:**
+
 - Code review adds a conversion factor on any RVTools numeric.
 - Totals don't match a hand-spot-check from RVTools' own UI for a known small workbook.
 - A unit test computes "expected" memory as `rows * factor * 1.048576`.
 
 **Prevention (concrete):**
+
 - Inherit ADR-017 from store-predict verbatim into `docs/adr/0010-rvtools-mb-as-mib.md` on day one.
 - Name every storage/memory column in canonical schemas as `*_mib` / `*_gib` — never `*_mb`. The type name carries the unit.
 - Add a parser test fixture `fixtures/rvtools-mib-canary.xlsx` with hand-computed totals; if a contributor introduces a factor, the test fails immediately.
@@ -44,6 +46,7 @@ These cause wrong numbers, privacy violations, or rewrites. Wrong numbers in an 
 **What goes wrong:** A dependency — analytics SDK, Sentry, LogRocket, posthog-js, a source-map upload service, or a fetch-polyfill with a "phone home" first-load — exfiltrates workbook bytes, parsed rows, or error payloads containing VM names / hostnames / IP addresses. The product invariant ("nothing leaves the browser") is silently broken. This is a reputation-killer for a tool that is *defined* by client-side privacy.
 
 **Warning signs:**
+
 - Network tab during `npm run preview` shows ANY outbound request after page load except the GH Pages base URL.
 - New dependency adds an `analytics` / `telemetry` / `metrics` keyword in its package.json.
 - An error boundary or logger interpolates a row object into a message string.
@@ -77,11 +80,13 @@ These cause wrong numbers, privacy violations, or rewrites. Wrong numbers in an 
 **What goes wrong:** The naive interpretation "stretched cluster = reserve 50%" is *only* right when the cluster is symmetric (equal host count and equal capacity per site) AND running active/active across both sites. Asymmetric stretched clusters (e.g., 6+4) reserve more than 50% on the bigger site. Single-site failover-only stretched clusters are different again. vsizer's ADR-0007 settled on "N/2 hosts of CPU+RAM headroom" — that is the symmetric simplification, which is correct *for the common case* but a footgun if presented as universal truth.
 
 **Warning signs:**
+
 - DR sim says "survivor capacity OK" for a 6+4 stretched cluster losing the 6-host site.
 - Tests only cover even host-count clusters.
 - The HA admission-control percentage in vCenter (if surfaced in RVTools) doesn't match the engine's assumed 50%.
 
 **Prevention (concrete):**
+
 - Carry over vsizer's ADR-0007 verbatim, and add an ADR extension: "asymmetric stretched cluster reservation = max(site_A_capacity, site_B_capacity) / total_capacity, not 0.5."
 - Aggregation engine: compute reservation per-site, not as a flat percentage. If `vCluster` sheet exposes host fault-domain or site tag, use it; otherwise flag the cluster as "assumed symmetric" in the UI.
 - DR sim test matrix: 4+4 (symmetric, classical), 6+4 (asymmetric), 8+0 (non-stretched failback target), 2+2 (minimum), all with mixed host capacities.
@@ -96,16 +101,19 @@ These cause wrong numbers, privacy violations, or rewrites. Wrong numbers in an 
 **What goes wrong:** Two workbooks loaded together. Both have a cluster named `Cluster-Prod`. The aggregator merges them. The user sees a single 20-host cluster that is actually two unrelated 10-host clusters in different datacenters. Or: the same VM has vMotion'd across vCenters between the two snapshots; its UUID appears in both; it gets double-counted in the estate-wide vCPU total.
 
 **Why it happens:**
+
 - Cluster names are not globally unique — they're scoped to the vCenter that created them.
 - VM `VM UUID` (BIOS UUID) is globally unique but `vm.Object ID` (the vCenter MoRef like `vm-1234`) is per-vCenter.
 - RVTools `vInfo` has both; choose wrong and you get duplicates or false merges.
 
 **Warning signs:**
+
 - Estate totals exceed the sum of per-vCenter totals (impossible — must be aggregation bug).
 - A cluster appears with double its expected host count.
 - Two vCenters share a cluster name but have different vCenter UUIDs.
 
 **Prevention (concrete):**
+
 - Aggregation key for clusters: `(vcenter_uuid, cluster_moref)`, never just `cluster_name`.
 - Aggregation key for VMs: `vm_bios_uuid` (deduplicates vMotion across vCenters), with a secondary key `vm_instance_uuid` for VM-cloning edge cases.
 - Datastores: `(vcenter_uuid, datastore_moref)` — same datastore mounted in two vCenters (cross-vCenter shared storage) is rare but real; surface as a "shared across vCenters" badge.
@@ -122,12 +130,14 @@ These cause wrong numbers, privacy violations, or rewrites. Wrong numbers in an 
 **What goes wrong:** A real estate has 15,000 VMs; the RVTools workbook is 80 MB; the user drops it into the browser; the tab freezes for 30 seconds; the user closes the tab thinking the app crashed. Worse — the heap balloons to 600 MB (SheetJS expands ~4-8x in memory; a 50 MB xlsx → 300-400 MB heap), and on a 4 GB Chromebook the tab actually OOMs.
 
 **Warning signs:**
+
 - "Performance" tab shows a multi-second main-thread blockage on `XLSX.read`.
 - User reports a "spinner that never moves."
 - Heap snapshot after load > 500 MB.
 - Loading a second workbook for trends causes a tab crash.
 
 **Prevention (concrete):**
+
 - **Parse in a Web Worker** from day one. The worker reads the file via `FileReader` / `Blob.arrayBuffer()`, calls `XLSX.read(buf, { dense: true })`, and posts back already-normalized canonical rows (not the raw workbook).
 - **Dense mode** (`{ dense: true }`) for SheetJS — designed for the Chrome arrays-of-arrays perf regression.
 - **Drop raw cells eagerly** — never keep the SheetJS `WorkBook` object alive past the worker boundary. Post back `{ vInfo: Row[], vHost: Row[], ... }` and let the original be GC'd.
@@ -145,11 +155,13 @@ These cause wrong numbers, privacy violations, or rewrites. Wrong numbers in an 
 **What goes wrong:** RVTools reports vCPU, RAM, and provisioned storage for *all* VMs including powered-off ones. Naïve "total vCPU = sum(VInfo.CPUs)" inflates the consolidation ratio by including 2,000 zombie VMs that haven't booted in 3 years. The customer's "real" vCPU:pCPU ratio is 4:1; the report says 7:1. Conversely, *excluding* powered-off VMs from storage sizing under-counts capacity needs because thin-provisioned, powered-off VMs still occupy space.
 
 **Warning signs:**
+
 - Consolidation ratio reported far exceeds operator's gut feel.
 - DR sim suggests massive headroom that contradicts vCenter's own admission control.
 - Storage forecast looks low relative to known datastore fill rates.
 
 **Prevention (concrete):**
+
 - Three accounting modes, *explicitly surfaced in the UI*:
   - **Configured** (everything, powered on or off) — the "what's defined" view.
   - **Active** (only `powerState === 'poweredOn'`) — the "what's running today" view.
@@ -186,10 +198,12 @@ Won't cause a rewrite but will cause an embarrassing report, an angry operator, 
 | 3.7 | many | + `VM Folder` on vCPU/vMemory/vDisk/vPartition/vNetwork/vFloppy/vCD/vSnapshot/vTools |
 
 **Warning signs:**
+
 - Zod parse error mentions a column that exists in some sample files but not others.
 - A column-name string literal appears outside a schema/alias dictionary.
 
 **Prevention (concrete):**
+
 - A **column alias dictionary** per canonical field: `cpus: ['CPUs', 'CPU', 'Number of vCPUs', 'vCPU']`. Header-based lookup, never positional.
 - Every canonical field is **optional in Zod** at the row level; aggregation engines declare which fields they require and bail with a structured error (`"engines/aggregation/perCluster requires vInfo.cpus, missing in this workbook (RVTools 3.10 or older?)"`).
 - Capture **RVTools version** from the workbook itself (if a metadata sheet exposes it) or by sniffing presence/absence of marker columns; bind to the loaded snapshot in the store; show in the trends overlay so the user sees "snapshot 1: RVTools 4.4 / snapshot 2: RVTools 3.11" and knows missing columns aren't a bug.
@@ -204,11 +218,13 @@ Won't cause a rewrite but will cause an embarrassing report, an angry operator, 
 **What goes wrong:** The French locale uses **U+202F NARROW NO-BREAK SPACE** as the thousands separator (not a regular space and not the regular non-breaking space U+00A0). `Intl.NumberFormat('fr-FR').format(1234567)` returns `"1 234 567"` where each space is U+202F. If the report or PPTX is opened in software that doesn't render U+202F (older PowerPoint, some PDF readers), it shows as a missing-glyph box. Also: comparing formatted strings with `===` against a regex like `/^\d+ \d+$/` will fail because `\s` matches U+202F but a literal space character does not.
 
 **Warning signs:**
+
 - A test asserts `format(1234) === "1 234"` with a regular space — works in node but the actual output uses U+202F.
 - PPTX numbers display with a tofu (□) where the separator should be.
 - A copy-paste of a number from the report into Excel parses incorrectly.
 
 **Prevention (concrete):**
+
 - Centralize all number formatting in `utils/format.ts` with explicit locale and unit suffixes (`formatGiB`, `formatGHz`, `formatPercent`, `formatRatio`).
 - Tests use `\s` or explicit ` ` codepoints in assertions, not literal spaces.
 - For PPTX numbers (where font fallback may be flaky), pass through a normalizer `pptxSafeFormat(n, locale)` that replaces U+202F → U+00A0 (the regular non-breaking space, which has wider font support).
@@ -224,10 +240,12 @@ Won't cause a rewrite but will cause an embarrassing report, an angry operator, 
 **What goes wrong:** RVTools doesn't export performance counters (no CPU Ready data) — but the user *might* paste counters in alongside, or vatlas might in future ingest a perf overlay. The trap: vCenter's "CPU Ready" is a *summation* in milliseconds across all vCPUs. A 4-vCPU VM with 10% CPU Ready summation is *actually* 2.5% per vCPU — under VMware's 5% threshold. Reporting the raw summation as a single percentage misleads operators into thinking the VM is contended when it isn't.
 
 **Warning signs:**
+
 - Any feature that surfaces "CPU Ready" without specifying "per vCPU."
 - Threshold constant `CPU_READY_WARN = 0.05` applied to a summation value.
 
 **Prevention (concrete):**
+
 - If/when vatlas surfaces CPU Ready (likely future, not v1): the engine returns `{ readyPercentPerVcpu, readyPercentSummation, vcpuCount }`. UI displays per-vCPU by default; tooltip shows summation; threshold check uses per-vCPU.
 - Document this in an ADR before the first feature that needs it. Even if v1 doesn't include perf data, the ADR exists so when it does, no one re-introduces the bug.
 
@@ -240,10 +258,12 @@ Won't cause a rewrite but will cause an embarrassing report, an angry operator, 
 **What goes wrong:** RVTools `vHost` reports both `# CPU` (sockets), `# Cores` (physical cores), and `# CPU Threads` (logical, i.e., HT-enabled count). A consolidation-ratio calculation that uses *threads* claims a 2:1 ratio is actually 4:1 in physical-core terms. Operators read 2:1 and conclude "low utilization"; the host is in fact over-committed.
 
 **Warning signs:**
+
 - `vCPU / pCPU` denominator is sourced from `# CPU Threads`.
 - Two reports of the same estate produce different ratios because one used cores, one used threads.
 
 **Prevention (concrete):**
+
 - Aggregation always computes the ratio against **physical cores** (`# Cores`), with a parallel "thread-basis ratio" in the same data structure for transparency.
 - UI label: "vCPU per physical core" (not "vCPU per pCPU" — that term is ambiguous).
 - The PPTX deck shows the physical-core ratio as the headline number, threads-basis as a footnote in a smaller font.
@@ -258,10 +278,12 @@ Won't cause a rewrite but will cause an embarrassing report, an angry operator, 
 **What goes wrong:** RVTools reports CPU speed in **MHz** (`CPU MHz`), not GHz. A copy-paste into a "GHz" field shows 2600 GHz per host (a hilarious teraflop estate). RAM has a similar trap: `Memory` (MiB) is *configured* RAM; `Reservation` (MiB) is reserved (guaranteed) RAM. Summing configurations exceeds host physical RAM (oversubscription is fine and expected); summing reservations *also* exceeds host RAM is a real configuration error that vatlas should surface.
 
 **Warning signs:**
+
 - A number in the UI ending in three zeros where a single-digit GHz was expected.
 - "Total RAM" suspiciously close to the host memory total instead of the sum of all VMs.
 
 **Prevention (concrete):**
+
 - `engines/units/` carries the conversion constants and named functions: `mhzToGhz(n: number): GHz`. The branded type `GHz` (TS branded number) is incompatible with raw `number`, so you can't accidentally render an unconverted value.
 - Aggregation emits both configured and reserved separately; reserved > host_pCPU_GHz triggers a "configuration warning" surfaced in the cluster card.
 - Test: a host with 2 sockets × 12 cores × 2600 MHz should compute to 62.4 GHz per host, not 62400.
@@ -273,6 +295,7 @@ Won't cause a rewrite but will cause an embarrassing report, an angry operator, 
 ### Moderate-6: OS End-of-Support catalogue — the naming variant trap
 
 **What goes wrong:** RVTools `vInfo.OS according to the configuration file` (the "configured" OS string) and `OS according to the VMware Tools` (the "running" OS string) disagree. Same OS, three names across the estate:
+
 - `Red Hat Enterprise Linux 8 (64-bit)` (vCenter guest OS dropdown name)
 - `Red Hat Enterprise Linux 8.10` (VMware Tools-detected, granular)
 - `Red Hat Enterprise Linux Server release 8.10 (Ootpa)` (old format)
@@ -300,11 +323,13 @@ The EOS catalogue keyed on `'RHEL 8'` matches none of them. Result: 4,000 RHEL V
 | ESXi 8.0 | General Support ends 11 October 2027, Tech Guidance 11 October 2029 |
 
 **Warning signs:**
+
 - "Unknown OS" bucket in the EOS forecast >5% of VMs.
 - The forecast shows zero RHEL 7 risk in an estate that clearly has CentOS 7 / RHEL 7 hosts.
 - Past EOS dates appear in the "future risk" buckets.
 
 **Prevention (concrete):**
+
 - An **OS normalizer** module with a regex-based classifier and a normalized canonical key (`{ family: 'rhel', major: 8, minor: 10, arch: 'x86_64' }`). Test against a fixture of 50 real OS strings (harvest from existing exports).
 - The EOS catalogue is `src/data/os-eos.json`, keyed on `family + major + minor`, with `eosDate`, `extendedSupportDate?` (LTSS/ESU), and a `source` URL (Red Hat lifecycle page, MS lifecycle page).
 - A **lifecycle phase bucketing** function: `phase(eosDate, now) → 'overdue' | '3mo' | '6mo' | '9mo' | '12mo' | 'safe'`. The "overdue" bucket exists because RHEL 7 and Win Server 2012 R2 are already past and *must not* be hidden.
@@ -321,12 +346,14 @@ The EOS catalogue keyed on `'RHEL 8'` matches none of them. Result: 4,000 RHEL V
 **What goes wrong:** The exported HTML "report" is opened by a colleague who isn't on the corporate network. The Google Fonts CSS 404s. The Inter font falls back to Times New Roman. The charts (SVG with external CSS) render unstyled. The corporate VPN's CSP-strict proxy blocks `data:` URIs, so even base64-inlined images don't load. The "shareable, self-contained" file is none of those things.
 
 **Warning signs:**
+
 - The report HTML contains `<link href="https://fonts.googleapis.com">` or any `https://` reference.
 - SVG elements rely on a `<style>` block outside their parent.
 - Opening the HTML file via `file://` (no network) shows missing styles.
 - Resulting HTML > 30 MB (probably base64 chart images for every snapshot exploded).
 
 **Prevention (concrete):**
+
 - The HTML export is a **single file** built by a dedicated builder module `engines/export/html/`. No external references. Self-host fonts; subset them (only the glyphs actually used — Inter Latin Extended A is typically enough for FR+EN).
 - All styles are **inline** in a single `<style>` block (or scoped per-component but written to the file). No external CSS, no `@import`.
 - Charts: **render to inline SVG** (not `<img src="data:image/png;base64...">` for charts — too heavy and lossy). For SVG, ensure every text element has an explicit `font-family` attribute and that the font is embedded as `@font-face` with a `data:font/woff2;base64,…` source.
@@ -354,6 +381,7 @@ The EOS catalogue keyed on `'RHEL 8'` matches none of them. Result: 4,000 RHEL V
 | Tables exceed slide width with many columns | No built-in auto-fit; column widths are author's job. |
 
 **Prevention (concrete):**
+
 - A `pptxText(text, opts)` wrapper that: truncates with ellipsis at a known character budget for the given font size; strips control characters (`text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')`); and uses the `fit: 'shrink'` syntax (newer pptxgenjs) with a fallback to manual sizing.
 - For numbers: pre-format on the JS side using the locale-aware formatter from `utils/format`, then pass the *string* to pptxgenjs. Apply the U+202F → U+00A0 substitution for PPTX context (Moderate-2).
 - Color tokens: maintain a `src/theme/pptxPalette.ts` module that exports hex strings (`PALETTE.primary500 = '#1e40af'`) used by both Tailwind's CSS vars (via `index.css` `:root`) and the PPTX builder, keeping them in lockstep (vsizer's "Midnight Executive" pattern).
@@ -370,11 +398,13 @@ The EOS catalogue keyed on `'RHEL 8'` matches none of them. Result: 4,000 RHEL V
 **What goes wrong:** Recharts (and any naive React chart use) re-renders on every parent state change. Drop the cluster selector in the sidebar; the entire 40-chart dashboard re-renders. Frame rate tanks; the dark-mode toggle takes 800 ms. Worse: the chart library doesn't memo chart data, so unchanged data is reconciled every render.
 
 **Warning signs:**
+
 - React DevTools profiler shows charts re-rendering when unrelated state changes.
 - Interaction latency on the inventory page > 100 ms.
 - "Highlighted update" in DevTools flashes the entire chart grid on every keystroke in a filter input.
 
 **Prevention (concrete):**
+
 - Chart data passed to chart components is memoized with `useMemo` at the source (the selector hook), with stable reference equality. Zustand selectors must use `shallow` comparators where appropriate.
 - Chart components wrapped in `React.memo` with a custom comparator (deep-equal on data, shallow on the rest).
 - For dense datasets (treemap of all VMs in a 10k-VM estate), prefer a Canvas-based renderer (ECharts, Chart.js) or a Visx + offscreen-canvas approach over SVG. Recharts and SVG-based libraries degrade beyond a few thousand cells.
@@ -388,6 +418,7 @@ The EOS catalogue keyed on `'RHEL 8'` matches none of them. Result: 4,000 RHEL V
 ### Moderate-10: DR sim trustworthiness — what makes the sim lie
 
 **What goes wrong:** A DR sim that says "survivor capacity OK after losing the Paris site" while in reality vSphere HA admission control would refuse to power on half the VMs. The sim doesn't account for:
+
 - **HA admission control reservations** (vSphere reserves capacity for restart; doesn't oversubscribe).
 - **Memory reservations vs configured memory** (reserved memory must fit; configured can oversubscribe).
 - **Stretched cluster split-brain** (when the witness is lost, neither side may run anything — depends on policy).
@@ -396,10 +427,12 @@ The EOS catalogue keyed on `'RHEL 8'` matches none of them. Result: 4,000 RHEL V
 - **License constraints** (e.g., Oracle per-core licensing forbidding migration to certain hosts — out of scope, but at least flag).
 
 **Warning signs:**
+
 - DR sim approves a scenario that the operator knows from experience would fail.
 - No "assumptions" disclosure shown alongside the sim verdict.
 
 **Prevention (concrete):**
+
 - The DR sim explicitly carries an **assumptions panel**: a bullet list of what it modeled and what it didn't. The user agrees with the assumptions before the sim is "official."
 - Sim output includes a `caveats` array; if memory reservation total exceeds 80% of survivor RAM (vs. configured), warn.
 - Affinity/anti-affinity rules from `vRP`/`dvSwitch` sheets are parsed; if present, surface as "X anti-affinity rules detected — sim treats them as soft." Hard enforcement is a future enhancement.
@@ -416,10 +449,12 @@ The EOS catalogue keyed on `'RHEL 8'` matches none of them. Result: 4,000 RHEL V
 **What goes wrong:** Two clusters in the same vCenter share a datastore (common with shared SAN). RVTools `vDatastore` lists the datastore once. RVTools `vDisk` lists every VMDK pointing to that datastore. A naive "sum of VMDKs" computes 2× the actual datastore consumption. Or: across multiple vCenters that mount the same datastore (rare but real — cross-vCenter linked-mode storage), the datastore appears in two workbooks.
 
 **Warning signs:**
+
 - Total VMDK size > total datastore capacity (impossible — must be double-counting).
 - Two datastores with the same NAA / UUID / URL appear after multi-vCenter merge.
 
 **Prevention (concrete):**
+
 - Datastore aggregation key: NAA/UUID (`Datastore URL` or `Address` in vDatastore), not name. Names can collide; NAAs cannot.
 - VMDK→datastore mapping: each VMDK's `Path` is parsed for the datastore name (`[datastore_name] folder/file.vmdk`); the datastore name maps to the (vcenter_uuid, ds_uuid) canonical key.
 - A sanity check at aggregation time: per-datastore, `sum(vmdk_provisioned) ≤ datastore_capacity * 10` (10× catches gross thin-provisioning, beyond that is a bug). If exceeded, log a warning to the in-app diagnostics panel.
