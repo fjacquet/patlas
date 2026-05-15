@@ -18,7 +18,7 @@ describe('units converters — round trips', () => {
   it('mibToTib(mib(1024*1024)) === tib(1)', () => {
     expect(mibToTib(mib(1024 * 1024))).toBe(1)
   })
-  it('mibToBytes(mib(1)) === bytes(1_048_576) — proves NO `* 1.048576` factor', () => {
+  it('mibToBytes(mib(1)) === bytes(1_048_576) — proves NO SI inflation factor', () => {
     expect(mibToBytes(mib(1))).toBe(1_048_576)
   })
   it('mhzToGhz(mhz(2600)) === ghz(2.6)', () => {
@@ -30,9 +30,10 @@ describe('units converters — round trips', () => {
 })
 
 describe('units converters — anti-pattern guard', () => {
-  it('mibToBytes does NOT introduce a 1.048576 fudge factor', () => {
-    // If a contributor replaced `n * BYTES_PER_MIB` with `n * 1.048576 * BYTES_PER_MIB`,
-    // this test would catch it (1 MiB would be 1_099_512 instead of 1_048_576).
+  it('mibToBytes does NOT introduce a fudge factor (SI MB→MiB inflation)', () => {
+    // If a contributor multiplied by the SI inflation factor as well as
+    // BYTES_PER_MIB, this test would catch it: 1 MiB would become ~1_099_512
+    // instead of exactly 1_048_576.
     expect(mibToBytes(mib(1))).toBe(1_048_576)
     expect(mibToBytes(mib(100))).toBe(100 * 1_048_576)
   })

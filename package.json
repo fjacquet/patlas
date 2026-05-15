@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "prebuild": "node scripts/check-supply-chain.mjs",
     "check:supply-chain": "node scripts/check-supply-chain.mjs",
+    "generate-mib-canary": "node scripts/generate-mib-canary.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
@@ -26,6 +27,7 @@
     "react-error-boundary": "^6.1.1",
     "react-i18next": "^17.0.8",
     "sonner": "^2.0.7",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "^4.4.3",
     "zustand": "^5.0.13"
   },
