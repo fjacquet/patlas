@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "prebuild": "node scripts/check-supply-chain.mjs",
+    "check:supply-chain": "node scripts/check-supply-chain.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",

@@ -38,7 +38,10 @@ describe('fetchGuard', () => {
     await import('./fetchGuard')
     let threwPrivacy = false
     try {
-      fetch('/samples/foo.xlsx')
+      const p = fetch('/samples/foo.xlsx')
+      // jsdom 29's native fetch rejects relative URLs (no document base);
+      // swallow it — only the guard's synchronous decision is under test.
+      if (p && typeof p.then === 'function') p.then(undefined, () => {})
     } catch (e) {
       threwPrivacy = e instanceof Error && e.name === 'PrivacyViolation'
     }
@@ -88,6 +91,36 @@ describe('fetchGuard', () => {
     expect(WebSocket.OPEN).toBe(1)
     expect(WebSocket.CLOSING).toBe(2)
     expect(WebSocket.CLOSED).toBe(3)
+  })
+
+  it('allows same-origin sendBeacon (returns true when no native impl)', async () => {
+    // jsdom 29 has no native sendBeacon; the guard installs a wrapper that
+    // returns `true` for same-origin calls (nothing to send, nothing leaked).
+    await import('./fetchGuard')
+    expect(navigator.sendBeacon('/telemetry-free/local', 'ok')).toBe(true)
+  })
+
+  it('treats a malformed/relative fetch target as same-origin (catch path)', async () => {
+    // A bare token with no scheme/host. The guard must NOT raise
+    // PrivacyViolation — it should fall through to the original fetch (whose
+    // own URL parsing then fails). We swallow that downstream rejection; only
+    // the guard's synchronous decision is under test here.
+    await import('./fetchGuard')
+    let threwPrivacy = false
+    try {
+      const p = fetch(':::not-a-url:::')
+      // Prevent an unhandled rejection from the doomed native fetch.
+      if (p && typeof p.then === 'function') p.then(undefined, () => {})
+    } catch (e) {
+      threwPrivacy = e instanceof Error && e.name === 'PrivacyViolation'
+    }
+    expect(threwPrivacy).toBe(false)
+  })
+
+  it('rejects a malformed WebSocket URL as InsecureTransportViolation', async () => {
+    // Malformed URL → isSecureWsUrl catch returns false → cleartext rejected.
+    await import('./fetchGuard')
+    expect(() => new WebSocket(':::bogus:::')).toThrow(/InsecureTransportViolation/)
   })
 
   it('PrivacyViolation message does not surface error.cause-style payloads', async () => {
