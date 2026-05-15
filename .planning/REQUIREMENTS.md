@@ -7,10 +7,10 @@
 
 ### Foundation
 
-- [ ] **FND-01**: User loads the app at a public URL and the entire app runs 100 % client-side (no workbook bytes ever leave the browser)
-- [ ] **FND-02**: User sees a clear drag-and-drop zone for one or more RVTools `.xlsx` files on first load
-- [ ] **FND-03**: User can use the app entirely in French or English (i18n FR + EN, language auto-detected then user-toggleable)
-- [ ] **FND-04**: User can switch between a light and a dark visual theme
+- [x] **FND-01**: User loads the app at a public URL and the entire app runs 100 % client-side (no workbook bytes ever leave the browser)
+- [x] **FND-02**: User sees a clear drag-and-drop zone for one or more RVTools `.xlsx` files on first load
+- [x] **FND-03**: User can use the app entirely in French or English (i18n FR + EN, language auto-detected then user-toggleable)
+- [x] **FND-04**: User can switch between a light and a dark visual theme
 - [ ] **FND-05**: User sees a visible "workbook capture date" indicator wherever data is displayed (header + footer of every export)
 
 ### Parsing
@@ -161,10 +161,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FND-01 | Phase 1 | Pending |
-| FND-02 | Phase 1 | Pending |
-| FND-03 | Phase 1 | Pending |
-| FND-04 | Phase 1 | Pending |
+| FND-01 | Phase 1 | Complete |
+| FND-02 | Phase 1 | Complete |
+| FND-03 | Phase 1 | Complete |
+| FND-04 | Phase 1 | Complete |
 | FND-05 | Phase 1 | Pending |
 | PAR-01 | Phase 1 | Pending |
 | PAR-02 | Phase 1 | Pending |
@@ -231,6 +231,7 @@
 | DEP-02 | Phase 7 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 68 total (counted: FND 5 + PAR 5 + PRV 3 + DSH 6 + VIZ 3 + INV 6 + MVC 4 + STR 4 + ALC 4 + DRS 6 + EOS 6 + TRD 5 + HTM 5 + PPT 4 + DEP 2 = 68)
 - Mapped to phases: 68 (final mapping, validated by roadmapper)
 - Unmapped: 0

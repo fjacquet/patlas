@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Roadmap created, ready for Phase 1 planning via `/gsd-plan-phase 1`
-last_updated: "2026-05-15T19:39:16.486Z"
-last_activity: 2026-05-15 -- Phase 1 execution started
+last_updated: "2026-05-15T20:30:24.639Z"
+last_activity: 2026-05-15
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 5
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 20
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-15)
 ## Current Position
 
 Phase: 1 (Foundation & Invariants) — EXECUTING
-Plan: 1 of 5
-Status: Executing Phase 1
-Last activity: 2026-05-15 -- Phase 1 execution started
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-05-15
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 01 P01 | 26min | 3 tasks | 30 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,11 @@ Recent decisions affecting current work:
 - Privacy: runtime fetch/XHR/WS/Beacon guard lands in Phase 1 before any feature is tempted to add telemetry
 - Math: branded `MiB`/`GiB`/`GHz` types in Phase 1 make MB-is-MiB and MHz-vs-GHz bugs unrepresentable
 - Multi-vCenter: keyed on `(VI SDK UUID, vm_bios_uuid)`, never silent merge on names — lands in Phase 4
+- [Phase ?]: react-i18next 17 ships cleanly on TS 5.9 strict; v16 fallback not needed
+- [Phase ?]: Vitest 4 + jsdom 29 + Node 26: jsdom needs explicit url + setup forwards localStorage from globalThis.jsdom.window
+- [Phase ?]: FallbackError reads only error.name + error.message (never error.cause/stack/String) — hardened beyond vsizer's original
+- [Phase ?]: Class-strategy dark mode (NOT data-theme) locked in plan 01-01
+- [Phase ?]: Plan 02 privacy-guard import slot reserved as the first non-trivial line of src/main.tsx
 
 ### Pending Todos
 
@@ -87,6 +93,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-15
+Last session: 2026-05-15T20:29:51.547Z
 Stopped at: Roadmap created, ready for Phase 1 planning via `/gsd-plan-phase 1`
 Resume file: None
