@@ -109,9 +109,9 @@
 
 ### Privacy & Security
 
-- [ ] **PRV-01**: User's browser never makes a non-same-origin network request after the app is loaded (runtime `fetch`/`XHR`/`WS`/`Beacon` guard throws on any attempt)
-- [ ] **PRV-02**: User loads an app whose CSP meta tag is `connect-src 'self'`
-- [ ] **PRV-03**: User's app has no telemetry / analytics SDKs of any kind (Sentry, PostHog, Datadog, etc. denied at CI)
+- [x] **PRV-01**: User's browser never makes a non-same-origin network request after the app is loaded (runtime `fetch`/`XHR`/`WS`/`Beacon` guard throws on any attempt)
+- [x] **PRV-02**: User loads an app whose CSP meta tag is `connect-src 'self'`
+- [x] **PRV-03**: User's app has no telemetry / analytics SDKs of any kind (Sentry, PostHog, Datadog, etc. denied at CI)
 
 ### Deployment
 
@@ -171,9 +171,9 @@
 | PAR-03 | Phase 1 | Pending |
 | PAR-04 | Phase 1 | Pending |
 | PAR-05 | Phase 1 | Pending |
-| PRV-01 | Phase 1 | Pending |
-| PRV-02 | Phase 1 | Pending |
-| PRV-03 | Phase 1 | Pending |
+| PRV-01 | Phase 1 | Complete |
+| PRV-02 | Phase 1 | Complete |
+| PRV-03 | Phase 1 | Complete |
 | DSH-01 | Phase 2 | Pending |
 | DSH-02 | Phase 2 | Pending |
 | DSH-03 | Phase 2 | Pending |
