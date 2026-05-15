@@ -161,27 +161,82 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FND-01..05 | Phase 1 | Pending |
-| PAR-01..05 | Phase 1 | Pending |
-| PRV-01..03 | Phase 1 | Pending |
-| DSH-01..06 | Phase 2 | Pending |
-| VIZ-01..03 | Phase 2 | Pending |
-| INV-01..06 | Phase 3 | Pending |
-| MVC-01..04 | Phase 4 | Pending |
-| STR-01..04 | Phase 4 | Pending |
-| ALC-01..04 | Phase 4 | Pending |
-| DRS-01..06 | Phase 4 | Pending |
-| EOS-01..06 | Phase 5 | Pending |
-| TRD-01..05 | Phase 6 | Pending |
-| HTM-01..05 | Phase 7 | Pending |
-| PPT-01..04 | Phase 7 | Pending |
-| DEP-01..02 | Phase 7 | Pending |
+| FND-01 | Phase 1 | Pending |
+| FND-02 | Phase 1 | Pending |
+| FND-03 | Phase 1 | Pending |
+| FND-04 | Phase 1 | Pending |
+| FND-05 | Phase 1 | Pending |
+| PAR-01 | Phase 1 | Pending |
+| PAR-02 | Phase 1 | Pending |
+| PAR-03 | Phase 1 | Pending |
+| PAR-04 | Phase 1 | Pending |
+| PAR-05 | Phase 1 | Pending |
+| PRV-01 | Phase 1 | Pending |
+| PRV-02 | Phase 1 | Pending |
+| PRV-03 | Phase 1 | Pending |
+| DSH-01 | Phase 2 | Pending |
+| DSH-02 | Phase 2 | Pending |
+| DSH-03 | Phase 2 | Pending |
+| DSH-04 | Phase 2 | Pending |
+| DSH-05 | Phase 2 | Pending |
+| DSH-06 | Phase 2 | Pending |
+| VIZ-01 | Phase 2 | Pending |
+| VIZ-02 | Phase 2 | Pending |
+| VIZ-03 | Phase 2 | Pending |
+| INV-01 | Phase 3 | Pending |
+| INV-02 | Phase 3 | Pending |
+| INV-03 | Phase 3 | Pending |
+| INV-04 | Phase 3 | Pending |
+| INV-05 | Phase 3 | Pending |
+| INV-06 | Phase 3 | Pending |
+| MVC-01 | Phase 4 | Pending |
+| MVC-02 | Phase 4 | Pending |
+| MVC-03 | Phase 4 | Pending |
+| MVC-04 | Phase 4 | Pending |
+| STR-01 | Phase 4 | Pending |
+| STR-02 | Phase 4 | Pending |
+| STR-03 | Phase 4 | Pending |
+| STR-04 | Phase 4 | Pending |
+| ALC-01 | Phase 4 | Pending |
+| ALC-02 | Phase 4 | Pending |
+| ALC-03 | Phase 4 | Pending |
+| ALC-04 | Phase 4 | Pending |
+| DRS-01 | Phase 4 | Pending |
+| DRS-02 | Phase 4 | Pending |
+| DRS-03 | Phase 4 | Pending |
+| DRS-04 | Phase 4 | Pending |
+| DRS-05 | Phase 4 | Pending |
+| DRS-06 | Phase 4 | Pending |
+| EOS-01 | Phase 5 | Pending |
+| EOS-02 | Phase 5 | Pending |
+| EOS-03 | Phase 5 | Pending |
+| EOS-04 | Phase 5 | Pending |
+| EOS-05 | Phase 5 | Pending |
+| EOS-06 | Phase 5 | Pending |
+| TRD-01 | Phase 6 | Pending |
+| TRD-02 | Phase 6 | Pending |
+| TRD-03 | Phase 6 | Pending |
+| TRD-04 | Phase 6 | Pending |
+| TRD-05 | Phase 6 | Pending |
+| HTM-01 | Phase 7 | Pending |
+| HTM-02 | Phase 7 | Pending |
+| HTM-03 | Phase 7 | Pending |
+| HTM-04 | Phase 7 | Pending |
+| HTM-05 | Phase 7 | Pending |
+| PPT-01 | Phase 7 | Pending |
+| PPT-02 | Phase 7 | Pending |
+| PPT-03 | Phase 7 | Pending |
+| PPT-04 | Phase 7 | Pending |
+| DEP-01 | Phase 7 | Pending |
+| DEP-02 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 56 total
-- Mapped to phases: 56 (preliminary mapping — roadmapper will confirm)
+- v1 requirements: 68 total (counted: FND 5 + PAR 5 + PRV 3 + DSH 6 + VIZ 3 + INV 6 + MVC 4 + STR 4 + ALC 4 + DRS 6 + EOS 6 + TRD 5 + HTM 5 + PPT 4 + DEP 2 = 68)
+- Mapped to phases: 68 (final mapping, validated by roadmapper)
 - Unmapped: 0
+
+**Note:** The "56 total" figure in earlier drafts was a miscount — the actual v1 requirement total is **68**. Coverage remains 100 %.
 
 ---
 *Requirements defined: 2026-05-15*
-*Last updated: 2026-05-15 after initial definition*
+*Last updated: 2026-05-15 after roadmap creation — traceability finalized with 7-phase mapping*

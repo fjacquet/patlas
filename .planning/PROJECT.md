@@ -48,11 +48,12 @@ A user drops a RVTools workbook and walks away with a polished, shareable HTML r
 
 ## Constraints
 
-- **Tech stack:** React 19 · TypeScript (strict) · Vite 8 · Tailwind v4 · Zustand 5 · react-i18next · Zod · SheetJS (`xlsx@0.20.3` from official tarball, **not** the CVE-affected npm package) · pptxgenjs 4 · Biome · Vitest + @testing-library/react. Match vsizer.
+- **Tech stack:** React 19 · TypeScript (strict) · Vite 8 · Tailwind v4 · Zustand 5 · react-i18next · Zod · SheetJS (`xlsx@0.20.3` from official tarball, **not** the CVE-affected npm package) · pptxgenjs 4 · Biome · Vitest + @testing-library/react · Apache ECharts via `echarts-for-react` (SVG renderer everywhere, tree-shaken). Match vsizer.
+- **Engineering principles (binding):** **KISS**, **DRY**, **functional programming**. No premature abstractions, no class hierarchies for domain logic, no copy-paste between phases. Engines are pure functions; the Zustand store holds inputs only; `useEstateView` is the one place `useMemo` lives. If two phases would compute the same thing, the second imports from the first.
 - **Privacy invariant:** no fetch ships workbook bytes; no telemetry of parsed contents; no `localStorage` of dataset rows. Refresh = data gone.
-- **Deploy target:** GitHub Pages static site (same CI shape as vsizer: typecheck → lint → test → build → deploy).
+- **Deploy target:** GitHub Pages static site at `fjacquet.github.io/vatlas/` (same CI shape as vsizer: typecheck → lint → test → build → deploy).
 - **Input format:** RVTools `.xlsx` only (no Live Optics, no `.zip` bundles in v1).
-- **Charting library:** undecided — chart-types-driven choice deferred to research phase.
+- **Charting:** Apache ECharts with `{ renderer: 'svg' }` mandated project-wide (locked in during research — SVG everywhere for crisp pictures and trivial HTML-report inlining). Canvas permitted only as a per-chart escape hatch for in-app >10k-point overviews that don't appear in the HTML report.
 
 ## Key Decisions
 
@@ -64,8 +65,9 @@ A user drops a RVTools workbook and walks away with a polished, shareable HTML r
 | RVTools-only ingestion (drop Live Optics) | Narrower parser surface, fewer source-detection branches, focuses scope | — Pending |
 | Reuse vsizer's RVTools parser + aggregation engines | Faster bootstrap; the math has tests and is correct | — Pending |
 | Visual-first UX (charts/graphs as first-class) | Mirrors RVTools Analyser's strength; differentiates from vsizer's static-deck preview style | — Pending |
-| Charting library deferred to research | Choice depends on chart types needed (treemaps for storage? heatmaps for EOS?); let researcher recommend | — Pending |
+| Charting library = Apache ECharts via `echarts-for-react`, SVG renderer | ECharts ships treemap/sunburst/heatmap/calendar/gauge natively (4 of 6 chart families would be hand-built in visx); SVG renderer makes the HTML-report inline-SVG path trivial; live charts are already `<svg>`, plus `renderToSVGString()` for the report builder | — Pending |
 | HTML + PPTX both v1 | "The report is the product" — both formats are how the value leaves the app | — Pending |
+| KISS / DRY / functional programming as binding engineering principles | Pure-function engines, immutable data, no premature abstractions, no domain classes; engines compose via small typed functions. Inherits and extends vsizer's posture. Recorded as durable directive after roadmap. | — Pending |
 
 ## Evolution
 
