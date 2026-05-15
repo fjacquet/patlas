@@ -15,9 +15,9 @@
 
 ### Parsing
 
-- [ ] **PAR-01**: User drops an RVTools `.xlsx` file and the app parses it without blocking the UI (Web Worker)
-- [ ] **PAR-02**: User sees a clear error naming the missing sheet or column when a workbook does not match the RVTools schema
-- [ ] **PAR-03**: User can load workbooks from RVTools 3.10, 3.11, 4.0, and 4.4 — column-name drift is resolved transparently via an alias dictionary
+- [x] **PAR-01**: User drops an RVTools `.xlsx` file and the app parses it without blocking the UI (Web Worker)
+- [x] **PAR-02**: User sees a clear error naming the missing sheet or column when a workbook does not match the RVTools schema
+- [x] **PAR-03**: User can load workbooks from RVTools 3.10, 3.11, 4.0, and 4.4 — column-name drift is resolved transparently via an alias dictionary
 - [x] **PAR-04**: User's workbook is parsed with all memory/storage fields preserved as MiB (no `* 1.048576` inflation — RVTools "MB" is MiB)
 - [ ] **PAR-05**: User can refresh the page and confirm the data is gone (no `localStorage` / `IndexedDB` / `OPFS` persistence of dataset rows)
 
@@ -166,9 +166,9 @@
 | FND-03 | Phase 1 | Complete |
 | FND-04 | Phase 1 | Complete |
 | FND-05 | Phase 1 | Pending |
-| PAR-01 | Phase 1 | Pending |
-| PAR-02 | Phase 1 | Pending |
-| PAR-03 | Phase 1 | Pending |
+| PAR-01 | Phase 1 | Complete |
+| PAR-02 | Phase 1 | Complete |
+| PAR-03 | Phase 1 | Complete |
 | PAR-04 | Phase 1 | Complete |
 | PAR-05 | Phase 1 | Pending |
 | PRV-01 | Phase 1 | Complete |
