@@ -1,0 +1,20 @@
+{
+  "pill": {
+    "label": "Étendu / Stretched",
+    "group": "Stretched cluster"
+  },
+  "site": {
+    "a": "Site A",
+    "b": "Site B"
+  },
+  "reservation": "Reservation",
+  "confidence": {
+    "label": "Confidence",
+    "high": "high",
+    "medium": "medium",
+    "low": "low"
+  },
+  "lowConfidence": {
+    "chip": "site data inferred"
+  }
+}

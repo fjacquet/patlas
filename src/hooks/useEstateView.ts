@@ -1,7 +1,12 @@
 import { useMemo } from 'react'
 import { buildEstateView, EMPTY_VIEW } from '@/engines/aggregation'
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
-import { selectSelectedSnapshotIds, selectSnapshots, useSnapshotStore } from '@/store/snapshotStore'
+import {
+  selectSelectedSnapshotIds,
+  selectSnapshots,
+  selectStretchedClusters,
+  useSnapshotStore,
+} from '@/store/snapshotStore'
 import type { AccountingMode, EstateView } from '@/types/estate'
 
 /**
@@ -14,9 +19,10 @@ import type { AccountingMode, EstateView } from '@/types/estate'
  * the ONE `useMemo`. Returns the frozen `EMPTY_VIEW` when nothing is
  * selected.
  *
- * The two store reads return referentially-stable inputs (`snapshots` Map
- * and `selectedSnapshotIds` Set are REPLACED never mutated), so the memo
- * recomputes only when the selection identity or `mode` actually changes.
+ * The store reads return referentially-stable inputs (`snapshots` Map,
+ * `selectedSnapshotIds` and `stretchedClusters` Sets are REPLACED never
+ * mutated), so the memo recomputes only when a selection identity, the
+ * stretched set, or `mode` actually changes.
  * The `Snapshot[]` is derived INSIDE this memo — never in a selector (a
  * fresh array there loops Zustand's `Object.is`) and never in a SECOND
  * `useMemo` (grep-gated single-memo invariant).
@@ -28,9 +34,10 @@ import type { AccountingMode, EstateView } from '@/types/estate'
 export function useEstateView(mode: AccountingMode): EstateView {
   const snapshots = useSnapshotStore(selectSnapshots)
   const selectedIds = useSnapshotStore(selectSelectedSnapshotIds)
+  const stretchedClusters = useSnapshotStore(selectStretchedClusters)
   return useMemo(() => {
     const selected = [...snapshots.values()].filter((s) => selectedIds.has(s.id))
     if (selected.length === 0) return EMPTY_VIEW
-    return buildEstateView(mergeSnapshotsToEstate(selected), mode)
-  }, [snapshots, selectedIds, mode])
+    return buildEstateView(mergeSnapshotsToEstate(selected), mode, { stretchedClusters })
+  }, [snapshots, selectedIds, stretchedClusters, mode])
 }

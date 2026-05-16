@@ -1,0 +1,20 @@
+{
+  "pill": {
+    "label": "Étendu / Stretched",
+    "group": "Cluster étendu"
+  },
+  "site": {
+    "a": "Site A",
+    "b": "Site B"
+  },
+  "reservation": "Réservation",
+  "confidence": {
+    "label": "Confiance",
+    "high": "élevée",
+    "medium": "moyenne",
+    "low": "faible"
+  },
+  "lowConfidence": {
+    "chip": "données de site déduites"
+  }
+}

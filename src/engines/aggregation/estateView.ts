@@ -12,8 +12,9 @@ import { perEsx } from './perEsx'
  * component and export consumes (via the `useEstateView` hook). No React,
  * no Zustand, no Zod.
  *
- * Stretched-cluster handling is dormant in Phase 2: `stretchedClusters`
- * is always an empty set (the ported math stays for Phase 4). The
+ * Stretched-cluster handling is ACTIVE in Phase 4: `opts.stretchedClusters`
+ * (the user's in-memory selection) drives the per-site reservation; absent
+ * ⇒ empty set ⇒ no reservation (the Phase-2 behaviour). The
  * NAA-deduped `perDatastore` count + first-row capacity sum feed
  * `globals.datastoreCount`/`totalStorageMib` (no double-count, Moderate-11).
  * `trends` is `null` — Phase-4 forward-compat (RESEARCH Pattern 3).
@@ -38,8 +39,12 @@ const emptyBreakdown = (): OsBreakdown => ({ windows: 0, linux: 0, other: 0 })
  * single logical estate (multi-FILE merge is the primary path). The row
  * shapes (`vinfo`/`vhost`/`vdatastore`) are unchanged — only the source is.
  */
-export function buildEstateView(merged: MergedEstate, mode: AccountingMode): EstateView {
-  const stretchedClusters = new Set<string>()
+export function buildEstateView(
+  merged: MergedEstate,
+  mode: AccountingMode,
+  opts?: { stretchedClusters?: ReadonlySet<string> },
+): EstateView {
+  const stretchedClusters = opts?.stretchedClusters ?? new Set<string>()
   // No vDatastore rows ⇒ sheet absent/empty ⇒ per-cluster count is
   // genuinely unknown (undefined → em-dash). Rows present ⇒ attribute
   // them; an unmatched cluster legitimately gets 0, never em-dash.

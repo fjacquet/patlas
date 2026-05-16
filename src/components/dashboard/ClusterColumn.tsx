@@ -1,12 +1,15 @@
 import { useTranslation } from 'react-i18next'
+import { LowConfidenceChip, StretchedPill } from '@/components/stretched/StretchedPill'
 import { MIDNIGHT_EXECUTIVE_DARK, MIDNIGHT_EXECUTIVE_LIGHT } from '@/theme/echartsTheme'
 import type { ClusterAggregate, OsBreakdown } from '@/types/estate'
-import { fmtGhzValue, fmtInt, fmtPercentValue, fmtRatio } from '@/utils/format'
+import { fmtGhzValue, fmtInt, fmtPercentValue, fmtPercentWhole, fmtRatio } from '@/utils/format'
 import { UtilizationGauge } from './UtilizationGauge'
 
 export interface ClusterColumnProps {
   cluster: ClusterAggregate
   os: OsBreakdown
+  /** Flip this cluster's membership in the store's stretched set (STR-01). */
+  onToggleStretched: (cluster: string) => void
 }
 
 const isDark = (): boolean =>
@@ -37,9 +40,11 @@ const Row = ({ label, value }: { label: string; value: string }) => (
  * Footer keeps vertical room for Phase-6 per-cluster sparklines (`trends`
  * is null in Phase 2). Every color utility carries its `dark:` twin.
  */
-export function ClusterColumn({ cluster, os }: ClusterColumnProps) {
+export function ClusterColumn({ cluster, os, onToggleStretched }: ClusterColumnProps) {
   const { t, i18n } = useTranslation('dashboard')
+  const { t: tStr } = useTranslation('str')
   const loc = i18n.language
+  const siteGhz = (v: number | null) => (v === null ? '—' : fmtGhzValue(v, loc))
   const palette = (isDark() ? MIDNIGHT_EXECUTIVE_DARK : MIDNIGHT_EXECUTIVE_LIGHT).color
   const osTotal = os.windows + os.linux + os.other
   const pct = (n: number) => (osTotal > 0 ? `${(n / osTotal) * 100}%` : '0%')
@@ -117,6 +122,38 @@ export function ClusterColumn({ cluster, os }: ClusterColumnProps) {
           label={t('stats.vmsAboveReady')}
           value={fmtInt(cluster.vmsAboveReadinessWarning, loc)}
         />
+      </div>
+
+      <div className="mt-1 flex flex-col gap-2 border-t border-slate-200 pt-2 dark:border-surface-700">
+        <StretchedPill
+          value={cluster.stretched}
+          onChange={() => onToggleStretched(cluster.cluster)}
+        />
+        {cluster.stretched && (
+          <>
+            <Row
+              label={tStr('site.a')}
+              value={siteGhz(cluster.siteACapacityGhz as number | null)}
+            />
+            <Row
+              label={tStr('site.b')}
+              value={siteGhz(cluster.siteBCapacityGhz as number | null)}
+            />
+            <Row
+              label={tStr('reservation')}
+              value={fmtPercentWhole(cluster.reservedFraction, loc)}
+            />
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                {tStr('confidence.label')}
+              </span>
+              <span className="text-xs text-slate-600 dark:text-slate-400">
+                {tStr(`confidence.${cluster.stretchedConfidence}`)}
+              </span>
+            </div>
+            {cluster.stretchedConfidence === 'low' && <LowConfidenceChip />}
+          </>
+        )}
       </div>
 
       {/* Phase-6 per-cluster sparkline lands here (trends is null Phase 2). */}

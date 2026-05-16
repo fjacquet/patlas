@@ -32,10 +32,17 @@ interface SnapshotState {
    * (PROJECT.md line 53).
    */
   selectedSnapshotIds: Set<string>
+  /**
+   * Clusters the user has flagged stretched (Phase 4 STR-01). Drives the
+   * per-site reservation + DR. Inputs-only, REPLACED never mutated; no
+   * persist, no localStorage (PROJECT.md line 53 / T-04-06).
+   */
+  stretchedClusters: Set<string>
   addSnapshot: (s: Snapshot) => void
   removeSnapshot: (id: string) => void
   setActiveSnapshot: (id: string | null) => void
   setSelectedSnapshotIds: (ids: Set<string>) => void
+  setStretchedClusters: (clusters: Set<string>) => void
   renameVCenter: (id: string, label: string) => void
   setCapturedAt: (id: string, date: Date) => void
   clearAll: () => void
@@ -45,6 +52,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
   snapshots: new Map(),
   activeSnapshotId: null,
   selectedSnapshotIds: new Set(),
+  stretchedClusters: new Set(),
 
   addSnapshot: (s) =>
     set((state) => {
@@ -82,6 +90,8 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
 
   setSelectedSnapshotIds: (ids) => set({ selectedSnapshotIds: new Set(ids) }),
 
+  setStretchedClusters: (clusters) => set({ stretchedClusters: new Set(clusters) }),
+
   renameVCenter: (id, label) =>
     set((state) => {
       const snap = state.snapshots.get(id)
@@ -101,7 +111,12 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
     }),
 
   clearAll: () =>
-    set({ snapshots: new Map(), activeSnapshotId: null, selectedSnapshotIds: new Set() }),
+    set({
+      snapshots: new Map(),
+      activeSnapshotId: null,
+      selectedSnapshotIds: new Set(),
+      stretchedClusters: new Set(),
+    }),
 }))
 
 // Selectors — pure, stable references on unchanged state. Never construct a
@@ -122,3 +137,6 @@ export const selectActiveSnapshot = (s: SnapshotState): Snapshot | null =>
 // a second `useMemo` (grep-gated single-memo invariant).
 export const selectSnapshots = (s: SnapshotState): Map<string, Snapshot> => s.snapshots
 export const selectSelectedSnapshotIds = (s: SnapshotState): Set<string> => s.selectedSnapshotIds
+export const selectStretchedClusters = (s: SnapshotState): Set<string> => s.stretchedClusters
+export const selectSetStretchedClusters = (s: SnapshotState): ((c: Set<string>) => void) =>
+  s.setStretchedClusters

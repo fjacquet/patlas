@@ -8,6 +8,8 @@ export interface PerClusterColumnsProps {
   clusters: ClusterAggregate[]
   /** Per-cluster OS breakdown keyed by cluster name (EstateView.vmsByCluster). */
   vmsByCluster: Map<string, OsBreakdown>
+  /** Forwarded to each column's stretched pill (STR-01). */
+  onToggleStretched: (cluster: string) => void
 }
 
 /**
@@ -17,7 +19,11 @@ export interface PerClusterColumnsProps {
  * Presentational prop-consumer (no memo hooks, no engine/store imports — the
  * `useEstateView` output is passed down by `GlobalDashboard`).
  */
-export function PerClusterColumns({ clusters, vmsByCluster }: PerClusterColumnsProps) {
+export function PerClusterColumns({
+  clusters,
+  vmsByCluster,
+  onToggleStretched,
+}: PerClusterColumnsProps) {
   const { t } = useTranslation('dashboard')
 
   return (
@@ -31,6 +37,7 @@ export function PerClusterColumns({ clusters, vmsByCluster }: PerClusterColumnsP
             key={cluster.cluster}
             cluster={cluster}
             os={vmsByCluster.get(cluster.cluster) ?? EMPTY_OS}
+            onToggleStretched={onToggleStretched}
           />
         ))}
       </div>
