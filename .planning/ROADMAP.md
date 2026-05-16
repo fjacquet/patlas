@@ -14,7 +14,7 @@ vatlas is built bottom-up under horizontal layers: foundations first (parser, un
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Invariants** - Bootstrap, parser-in-Worker, privacy guard, branded units, immutable snapshot store (completed 2026-05-15)
-- [ ] **Phase 2: Aggregation & Global Dashboard** - Single-snapshot cluster aggregates + ECharts-driven dashboard with three accounting modes
+- [x] **Phase 2: Aggregation & Global Dashboard** - Single-snapshot cluster aggregates + ECharts-driven dashboard with three accounting modes
 - [ ] **Phase 3: Inventory Navigation** - Virtualised cluster → ESX → VM tree with sortable/filterable tables and CSV export
 - [ ] **Phase 4: Multi-vCenter, Stretched, Allocation & DR Simulation** - The analytics core: merge N workbooks, stretched pill, sliders, three DR modes
 - [ ] **Phase 5: OS End-of-Support Forecast** - Bundled endoflife.date catalogue, 3/6/9/12-month at-risk with drill-down
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Invariants | 5/5 | Complete   | 2026-05-15 |
-| 2. Aggregation & Global Dashboard | 0/3 | Not started | - |
+| 2. Aggregation & Global Dashboard | 3/3 | Complete   | 2026-05-16 |
 | 3. Inventory Navigation | 0/TBD | Not started | - |
 | 4. Multi-vCenter, Stretched, Allocation & DR Simulation | 0/TBD | Not started | - |
 | 5. OS End-of-Support Forecast | 0/TBD | Not started | - |
