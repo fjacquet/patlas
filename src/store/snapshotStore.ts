@@ -24,9 +24,18 @@ import type { Snapshot } from '@/types/snapshot'
 interface SnapshotState {
   snapshots: Map<string, Snapshot>
   activeSnapshotId: string | null
+  /**
+   * The estate selection consumed by the multi-FILE merge (Phase 4 MVC-01).
+   * Default = ALL snapshot ids: multi-file merge is the PRIMARY path; a
+   * single snapshot is the degenerate case that still works. Inputs-only,
+   * REPLACED never mutated (Zustand `Object.is`); no persist, no localStorage
+   * (PROJECT.md line 53).
+   */
+  selectedSnapshotIds: Set<string>
   addSnapshot: (s: Snapshot) => void
   removeSnapshot: (id: string) => void
   setActiveSnapshot: (id: string | null) => void
+  setSelectedSnapshotIds: (ids: Set<string>) => void
   renameVCenter: (id: string, label: string) => void
   setCapturedAt: (id: string, date: Date) => void
   clearAll: () => void
@@ -35,12 +44,22 @@ interface SnapshotState {
 export const useSnapshotStore = create<SnapshotState>((set) => ({
   snapshots: new Map(),
   activeSnapshotId: null,
+  selectedSnapshotIds: new Set(),
 
   addSnapshot: (s) =>
     set((state) => {
       const next = new Map(state.snapshots)
       next.set(s.id, s)
-      return { snapshots: next, activeSnapshotId: state.activeSnapshotId ?? s.id }
+      // Default selection follows the loaded set: a newly dropped file joins
+      // the merged estate automatically (multi-FILE merge is the primary
+      // path). Set is REPLACED, never mutated.
+      const selectedSnapshotIds = new Set(state.selectedSnapshotIds)
+      selectedSnapshotIds.add(s.id)
+      return {
+        snapshots: next,
+        activeSnapshotId: state.activeSnapshotId ?? s.id,
+        selectedSnapshotIds,
+      }
     }),
 
   removeSnapshot: (id) =>
@@ -54,10 +73,14 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
             ? (next.keys().next().value as string)
             : null
           : state.activeSnapshotId
-      return { snapshots: next, activeSnapshotId }
+      const selectedSnapshotIds = new Set(state.selectedSnapshotIds)
+      selectedSnapshotIds.delete(id)
+      return { snapshots: next, activeSnapshotId, selectedSnapshotIds }
     }),
 
   setActiveSnapshot: (id) => set({ activeSnapshotId: id }),
+
+  setSelectedSnapshotIds: (ids) => set({ selectedSnapshotIds: new Set(ids) }),
 
   renameVCenter: (id, label) =>
     set((state) => {
@@ -77,7 +100,8 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
       return { snapshots: next }
     }),
 
-  clearAll: () => set({ snapshots: new Map(), activeSnapshotId: null }),
+  clearAll: () =>
+    set({ snapshots: new Map(), activeSnapshotId: null, selectedSnapshotIds: new Set() }),
 }))
 
 // Selectors — pure, stable references on unchanged state. Never construct a
@@ -88,3 +112,13 @@ export const selectHasSnapshots = (s: SnapshotState): boolean => s.snapshots.siz
 
 export const selectActiveSnapshot = (s: SnapshotState): Snapshot | null =>
   s.activeSnapshotId ? (s.snapshots.get(s.activeSnapshotId) ?? null) : null
+
+// The merge consumes the SELECTED snapshots. Selectors must return stable
+// references (Zustand `Object.is`) so these expose the two underlying
+// referentially-stable inputs (`snapshots` Map + `selectedSnapshotIds` Set,
+// both REPLACED never mutated by the store). The actual `Snapshot[]`
+// derivation happens INSIDE `useEstateView`'s single `useMemo` — never in a
+// selector (a fresh array there would loop the equality check) and never in
+// a second `useMemo` (grep-gated single-memo invariant).
+export const selectSnapshots = (s: SnapshotState): Map<string, Snapshot> => s.snapshots
+export const selectSelectedSnapshotIds = (s: SnapshotState): Set<string> => s.selectedSnapshotIds

@@ -6,12 +6,20 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InventoryTree } from '@/components/inventory/InventoryTree'
 import { VmTable } from '@/components/inventory/VmTable'
-import { buildEstateView } from '@/engines/aggregation'
+import { buildEstateView as buildEstateViewMerged } from '@/engines/aggregation'
 import { inferVCenterLabel } from '@/engines/parser/captureDate'
 import { parseSnapshot } from '@/engines/parser/normalizeColumns'
 import { parseXlsx } from '@/engines/parser/parseXlsx'
+import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
 import i18n from '@/i18n'
+import type { AccountingMode } from '@/types/estate'
 import type { Snapshot } from '@/types/snapshot'
+
+// Phase-4 contract: `buildEstateView` consumes the MERGED bundle. These
+// shipped tests still drive it from a single `Snapshot`; route through the
+// production merge path (single snapshot = degenerate merge case).
+const buildEstateView = (snap: Snapshot, mode: AccountingMode) =>
+  buildEstateViewMerged(mergeSnapshotsToEstate([snap]), mode)
 
 /**
  * 10k-VM synthetic stress proof (ROADMAP Phase-3 success #1/#2/#4). Loads the
@@ -47,6 +55,7 @@ beforeAll(() => {
     rvtoolsVersion: '4.4.0',
     viSdkUuid: rows.viSdkUuid,
     source: 'rvtools',
+    vMetaData: rows.vMetaData,
     vinfo: rows.vinfo,
     vhost: rows.vhost,
     vdatastore: rows.vdatastore,

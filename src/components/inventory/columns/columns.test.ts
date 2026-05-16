@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { buildEstateView } from '@/engines/aggregation/estateView'
+import { buildEstateView as buildEstateViewMerged } from '@/engines/aggregation/estateView'
+import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import { first } from '@/test/arrays'
-import type { VmDisplayRow } from '@/types/estate'
+import type { AccountingMode, VmDisplayRow } from '@/types/estate'
 import type { Snapshot } from '@/types/snapshot'
+
+// Phase-4 contract: `buildEstateView` consumes the MERGED bundle. These
+// shipped tests still drive it from a single `Snapshot`; route through the
+// production merge path (single snapshot = degenerate merge case).
+const buildEstateView = (snap: Snapshot, mode: AccountingMode) =>
+  buildEstateViewMerged(mergeSnapshotsToEstate([snap]), mode)
+
 import type { VHostRow } from '@/types/vhost'
 import type { VInfoRow } from '@/types/vinfo'
 import { datastoreColumns, datastoreDefaultVisible } from './datastoreColumns'

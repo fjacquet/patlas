@@ -43,6 +43,7 @@ vi.mock('@/engines/parser', async () => {
           rvtoolsVersion: inferRvtoolsVersion(sheets),
           viSdkUuid: rows.viSdkUuid,
           source: 'rvtools' as const,
+          vMetaData: rows.vMetaData,
           vinfo: rows.vinfo,
           vhost: rows.vhost,
           vdatastore: rows.vdatastore,

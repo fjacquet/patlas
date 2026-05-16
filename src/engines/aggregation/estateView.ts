@@ -1,6 +1,6 @@
+import type { MergedEstate } from '@/engines/snapshotMerge'
 import { mib } from '@/engines/units'
 import type { AccountingMode, EstateView, OsBreakdown, VmDisplayRow } from '@/types/estate'
-import type { Snapshot } from '@/types/snapshot'
 import { aggregateClusters } from './aggregateClusters'
 import { aggregateGlobals, emptySummary } from './globals'
 import { classifyOsFamily } from './osFamily'
@@ -30,27 +30,35 @@ import { perEsx } from './perEsx'
 
 const emptyBreakdown = (): OsBreakdown => ({ windows: 0, linux: 0, other: 0 })
 
-export function buildEstateView(snapshot: Snapshot, mode: AccountingMode): EstateView {
+/**
+ * Phase 4 contract change: `buildEstateView` now consumes the MERGED row
+ * bundle (`MergedEstate` from `engines/snapshotMerge`) instead of one raw
+ * `Snapshot`. The merge already flattened + deduped + collision-suffixed the
+ * selected snapshots' rows, so every aggregation below operates on the
+ * single logical estate (multi-FILE merge is the primary path). The row
+ * shapes (`vinfo`/`vhost`/`vdatastore`) are unchanged — only the source is.
+ */
+export function buildEstateView(merged: MergedEstate, mode: AccountingMode): EstateView {
   const stretchedClusters = new Set<string>()
   // No vDatastore rows ⇒ sheet absent/empty ⇒ per-cluster count is
   // genuinely unknown (undefined → em-dash). Rows present ⇒ attribute
   // them; an unmatched cluster legitimately gets 0, never em-dash.
   const dsByCluster =
-    snapshot.vdatastore.length === 0 ? undefined : datastoreCountByCluster(snapshot.vdatastore)
+    merged.vdatastore.length === 0 ? undefined : datastoreCountByCluster(merged.vdatastore)
   const clusters = aggregateClusters({
-    vinfo: snapshot.vinfo,
-    vhost: snapshot.vhost,
+    vinfo: merged.vinfo,
+    vhost: merged.vhost,
     mode,
     stretchedClusters,
     datastoreCountByCluster: dsByCluster,
   })
 
-  const datastores = perDatastore(snapshot.vdatastore)
+  const datastores = perDatastore(merged.vdatastore)
   const datastoreCount = datastores.length
   const totalStorageMib = mib(datastores.reduce((acc, d) => acc + (d.capacityMib as number), 0))
 
   const globals = aggregateGlobals(clusters, datastoreCount, totalStorageMib)
-  const hosts = perEsx(snapshot.vhost, snapshot.vinfo, mode)
+  const hosts = perEsx(merged.vhost, merged.vinfo, mode)
 
   // OS breakdown — global + per-cluster. `other` is always present even
   // at 0 (a real, visible donut bucket). The accounting mode does not
@@ -58,7 +66,7 @@ export function buildEstateView(snapshot: Snapshot, mode: AccountingMode): Estat
   const osBreakdown = emptyBreakdown()
   const vmsByCluster = new Map<string, OsBreakdown>()
   const vmRows: VmDisplayRow[] = []
-  for (const vm of snapshot.vinfo) {
+  for (const vm of merged.vinfo) {
     const family = classifyOsFamily(vm.osConfig, vm.osTools)
     osBreakdown[family] += 1
     const perCluster = vmsByCluster.get(vm.cluster) ?? emptyBreakdown()

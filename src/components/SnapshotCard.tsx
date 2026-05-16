@@ -18,7 +18,23 @@ export interface SnapshotCardProps {
  */
 export function SnapshotCard({ snapshot, active, onClick, onRemove }: SnapshotCardProps) {
   const { t } = useTranslation('upload')
+  const { t: tMvc } = useTranslation('mvc')
   const clusterCount = new Set(snapshot.vinfo.map((v) => v.cluster)).size
+
+  // MVC-04: a single RVTools 4.x workbook can embed N vCenters — the count
+  // is the number of DISTINCT vCenter identities in this snapshot's rows
+  // (NEVER 1-file-=-1-vCenter). `viSdkUuid` is the per-row identity; fall
+  // back to the per-vCenter `vMetaData` Server list when uuids are absent.
+  const vcenterCount =
+    new Set(snapshot.vinfo.map((v) => v.viSdkUuid).filter((u) => u !== '')).size ||
+    snapshot.vMetaData.filter((m) => m.server !== '').length ||
+    1
+  const serverLabels = snapshot.vMetaData.map((m) => m.server).filter((s) => s !== '')
+  // RVTools version: prefer the parsed per-vCenter `vMetaData` value (now
+  // correct via the Task-1 columnar fix), else the snapshot-level fallback.
+  const rvtoolsVersion =
+    snapshot.vMetaData.find((m) => m.rvtoolsVersion != null)?.rvtoolsVersion ??
+    snapshot.rvtoolsVersion
 
   return (
     <li className="relative">
@@ -44,9 +60,20 @@ export function SnapshotCard({ snapshot, active, onClick, onRemove }: SnapshotCa
           <span>
             {t('snapshots.card.capturedAt')}: {snapshot.capturedAt.toLocaleDateString()}
           </span>
-          {' · '}
+        </p>
+        <p className="mt-1 text-[12px] font-normal text-slate-500 dark:text-slate-400">
           <span>
-            {t('snapshots.card.rvtoolsVersion')}: {snapshot.rvtoolsVersion}
+            {vcenterCount === 1
+              ? tMvc('snapshot.vcenter.one')
+              : tMvc('snapshot.vcenters', { count: vcenterCount })}
+          </span>
+          {serverLabels.map((label) => (
+            <span key={label} className="block break-all">
+              {label}
+            </span>
+          ))}
+          <span className="block">
+            {tMvc('snapshot.rvtoolsVersion', { version: rvtoolsVersion })}
           </span>
         </p>
         <p className="mt-1 text-slate-500 dark:text-slate-400">

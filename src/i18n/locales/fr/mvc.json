@@ -1,0 +1,13 @@
+{
+  "snapshot": {
+    "vcenters": "{{count}} vCenters",
+    "vcenter": {
+      "one": "1 vCenter"
+    },
+    "rvtoolsVersion": "RVTools {{version}}"
+  },
+  "merge": {
+    "loading": "Fusion du parc en cours…",
+    "singleVCenter": "vCenter unique — aucune fusion inter-vCenter appliquée."
+  }
+}
