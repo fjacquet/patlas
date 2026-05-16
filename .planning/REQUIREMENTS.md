@@ -88,9 +88,9 @@
 
 ### Visual UX (charts as first-class)
 
-- [ ] **VIZ-01**: User sees crisp SVG charts at every zoom level (Apache ECharts with `{ renderer: 'svg' }` everywhere)
-- [ ] **VIZ-02**: User sees the following chart families used throughout: stacked bar, donut, treemap (datastore footprint), heatmap (cluster × time), calendar-heatmap (EOS), line (trends), gauge (allocation), sparkline (per-row trend)
-- [ ] **VIZ-03**: User sees consistent theming (Midnight Executive palette) across all charts
+- [x] **VIZ-01**: User sees crisp SVG charts at every zoom level (Apache ECharts with `{ renderer: 'svg' }` everywhere)
+- [x] **VIZ-02**: User sees the following chart families used throughout: stacked bar, donut, treemap (datastore footprint), heatmap (cluster × time), calendar-heatmap (EOS), line (trends), gauge (allocation), sparkline (per-row trend)
+- [x] **VIZ-03**: User sees consistent theming (Midnight Executive palette) across all charts
 
 ### HTML Report Export
 
@@ -180,9 +180,9 @@
 | DSH-04 | Phase 2 | Pending |
 | DSH-05 | Phase 2 | Pending |
 | DSH-06 | Phase 2 | Pending |
-| VIZ-01 | Phase 2 | Pending |
-| VIZ-02 | Phase 2 | Pending |
-| VIZ-03 | Phase 2 | Pending |
+| VIZ-01 | Phase 2 | Complete |
+| VIZ-02 | Phase 2 | Complete |
+| VIZ-03 | Phase 2 | Complete |
 | INV-01 | Phase 3 | Pending |
 | INV-02 | Phase 3 | Pending |
 | INV-03 | Phase 3 | Pending |
