@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 02-03-PLAN.md (Phase 2 complete — 3/3 plans)
+status: replanning
+stopped_at: Analytics-core replan applied — ROADMAP re-derived 7 to 10 phases (post Phase-4 UAT)
 last_updated: "2026-05-16T20:14:39.995Z"
-last_activity: 2026-05-16 -- Phase 04 marked complete
+last_activity: 2026-05-16 -- analytics-core replan; ROADMAP restructured; next = discuss-phase
 progress:
-  total_phases: 7
-  completed_phases: 4
-  total_plans: 15
-  completed_plans: 15
-  percent: 100
+  total_phases: 10
+  completed_phases: 3
+  total_plans: 12
+  completed_plans: 12
+  percent: 30
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** A user drops a RVTools workbook and walks away with a polished, shareable HTML report and PPTX deck describing their VMware estate — without uploading a single byte. The report is the product.
-**Current focus:** Phase 04 — multi-vcenter-stretched-allocation-dr
+**Current focus:** Analytics-core replan — ROADMAP re-derived (10 phases). Next: discuss/plan re-derived P4 (G1 stretched rework) and new P5/P6, with OPEN-2/3 to resolve.
 
 ## Current Position
 
-Phase: 04 — COMPLETE
-Plan: 4 of 4
-Status: Phase 04 complete
-Last activity: 2026-05-16 -- Phase 04 marked complete
+Phase: 04 — RE-DERIVED (merge engine spine kept & validated; G1 stretched rework + allocation/DR moved to P5/P6 pending)
+Plan: replan applied — phase plans TBD (re-derive in discuss-phase)
+Status: replanning (analytics-core); P1-P3 + 04-01 merge baseline shipped
+Last activity: 2026-05-16 -- ROADMAP restructured 7→10; ANALYTICS-CORE-REPLAN.md is the canonical input
 
-Progress: [██████████] 100%
+Progress: [███░░░░░░░] 30% (3/10 phases; P4 re-derived)
 
 ## Performance Metrics
 
