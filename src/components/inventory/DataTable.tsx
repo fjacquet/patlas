@@ -57,6 +57,14 @@ const yyyymmdd = (d: Date): string =>
  * Not wired into any consumer at 03-01 (App / InventoryView land in 03-03);
  * the `inventory` i18n namespace it references is registered by 03-03, so a
  * missing-namespace at this stage is expected and exercised end-to-end there.
+ *
+ * Header text is resolved through a SINGLE source of truth — `t('col.'+id)`
+ * (the `inventory` namespace bound below) — used identically by the visible
+ * `<thead>` and the CSV header row (`headerFor`). The column defs carry the
+ * `inventory.col.<id>` key as documentation only; the `<thead>` deliberately
+ * does NOT `flexRender(columnDef.header)` (that printed the raw key string —
+ * the UAT bug). A column whose `columnDef.header` is a render function (not
+ * a string key) keeps the `flexRender` fallback.
  */
 export function DataTable<T>({
   data,
@@ -66,6 +74,12 @@ export function DataTable<T>({
   defaultColumnVisibility = {},
 }: DataTableProps<T>) {
   const { t } = useTranslation('inventory')
+
+  // Single header-resolution path shared by the visible <thead> and the
+  // CSV header row: `t('col.<id>')`. A column whose def.header is a render
+  // function (not a string key) is left to flexRender (none of the current
+  // inventory column sets use one — the unified path covers them all).
+  const resolveHeader = (columnId: string): string => t(`col.${columnId}`)
 
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -104,6 +118,9 @@ export function DataTable<T>({
 
   const exportCsv = () => {
     const cols = table.getVisibleLeafColumns()
+    // Same `t('col.<id>')` source of truth as the visible <thead>. The
+    // `headerFor` prop is kept for the rare non-`col.*` column (none today)
+    // and as the explicit, testable contract the consumers wire.
     const headers = cols.map((c) => headerFor(c.id))
     const csvRows = table.getFilteredRowModel().rows.map((r) =>
       cols.map((c) => {
@@ -155,6 +172,14 @@ export function DataTable<T>({
                 {headerGroup.headers.map((header, idx) => {
                   const canSort = header.column.getCanSort()
                   const sorted = header.column.getIsSorted()
+                  // Unified header text: string-key defs resolve via the
+                  // shared `t('col.<id>')` path (NEVER the raw key string);
+                  // a function header keeps flexRender.
+                  const headerDef = header.column.columnDef.header
+                  const headerNode =
+                    typeof headerDef === 'function'
+                      ? flexRender(headerDef, header.getContext())
+                      : resolveHeader(header.column.id)
                   return (
                     <th
                       key={header.id}
@@ -169,13 +194,13 @@ export function DataTable<T>({
                           onClick={header.column.getToggleSortingHandler()}
                           className="flex items-center gap-1 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                         >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {headerNode}
                           <span aria-hidden="true">
                             {sorted === 'asc' ? '↑' : sorted === 'desc' ? '↓' : ''}
                           </span>
                         </button>
                       ) : (
-                        flexRender(header.column.columnDef.header, header.getContext())
+                        headerNode
                       )}
                     </th>
                   )
