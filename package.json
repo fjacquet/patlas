@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "prebuild": "node scripts/check-supply-chain.mjs",
     "check:supply-chain": "node scripts/check-supply-chain.mjs",
+    "check:bundle-size": "node scripts/check-bundle-size.mjs",
     "generate-mib-canary": "node scripts/generate-mib-canary.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
@@ -20,6 +21,8 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.6",
     "i18next": "^26.2.0",
     "i18next-browser-languagedetector": "^8.2.1",
     "react": "^19.2.6",
