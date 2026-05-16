@@ -98,7 +98,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans
 
 - [x] 04-01-PLAN.md — Multi-vCenter merge engine + columnar-vMetaData/fault-domain parser prerequisites + single-memo multi-snapshot contract + MVC-04 labels (MVC-01..04)
-- [ ] 04-02-PLAN.md — Stretched per-site reservation + confidence + pill/chip + Hosts→cluster datastore attribution (STR-01..04)
+- [x] 04-02-PLAN.md — Stretched per-site reservation + confidence + pill/chip + Hosts→cluster datastore attribution (STR-01..03 done; STR-04 vSAN under-count OPEN — RVTools `Hosts` is a count not a name list, see 04-02-SUMMARY)
 - [ ] 04-03-PLAN.md — Allocation sliders + presets + URL-hash codec + ALC-04 guard (ALC-01..04)
 - [ ] 04-04-PLAN.md — DR simulation engine (3 modes) + panel + assumptions + caveats (DRS-01..06)
 **UI hint**: yes
@@ -169,7 +169,7 @@ Phases execute in numeric order: 1 â 2 â 3 â 4 â 5 â 6 
 | 1. Foundation & Invariants | 5/5 | Complete   | 2026-05-15 |
 | 2. Aggregation & Global Dashboard | 3/3 | Complete   | 2026-05-16 |
 | 3. Inventory Navigation | 3/3 | Complete | 2026-05-16 |
-| 4. Multi-vCenter, Stretched, Allocation & DR Simulation | 1/4 | In progress | - |
+| 4. Multi-vCenter, Stretched, Allocation & DR Simulation | 2/4 | In progress | - |
 | 5. OS End-of-Support Forecast | 0/TBD | Not started | - |
 | 6. In-Session Trends | 0/TBD | Not started | - |
 | 7. HTML + PPTX Exports & Deploy | 0/TBD | Not started | - |
