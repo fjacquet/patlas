@@ -72,7 +72,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A user types in the table filter and sees results update within 100 ms (debounced) without re-rendering charts on the dashboard
   4. A user exports the current filtered VM table to CSV and the downloaded file contains exactly the rows visible in the UI (filter respected, column hide respected)
   5. A user views the datastore table and confirms a shared LUN visible in two clusters appears once (NAA-keyed dedupe)
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 03-01-PLAN.md — Table infra: TanStack deps + bundle gate, csv.ts/oneLine.ts, VmDisplayRow projection, generic DataTable/ColumnPicker/ViewToggle (no wiring)
+- [ ] 03-02-PLAN.md — Three object tables: vm/esx/datastore ColumnDefs + thin wrappers, CSV-of-filter×visible + NAA-preserved gates
+- [ ] 03-03-PLAN.md — Tree + shell + inventory i18n EN/FR + App ViewToggle wiring + 10k synthetic fixture + stress/e2e + LIVE tanstack bundle gate
 **UI hint**: yes
 **vsizer reuse**: `utils/csv.ts` (port unchanged); TanStack Table column-definition patterns from vsizer's existing tables (port + extend); no new engines (consumes `perEsx`, `perDatastore`, `vmsByCluster` from Phase 2)
 **Pitfalls owned**: part of Critical-5 (memory budget on 10k+ VM trees — `@tanstack/react-virtual` mandatory, lazy children expansion, snapshot retention policy when N > 4 snapshots), Minor-2 (multi-line cells in VM descriptions/annotations: `oneLine()` at the display boundary, preserve original for CSV)
@@ -158,7 +161,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Foundation & Invariants | 5/5 | Complete   | 2026-05-15 |
 | 2. Aggregation & Global Dashboard | 3/3 | Complete   | 2026-05-16 |
-| 3. Inventory Navigation | 0/TBD | Not started | - |
+| 3. Inventory Navigation | 0/3 | Not started | - |
 | 4. Multi-vCenter, Stretched, Allocation & DR Simulation | 0/TBD | Not started | - |
 | 5. OS End-of-Support Forecast | 0/TBD | Not started | - |
 | 6. In-Session Trends | 0/TBD | Not started | - |
