@@ -51,9 +51,7 @@ const echartsChunks = jsChunks
     const bytes = readFileSync(join(ASSETS_DIR, file))
     return { file, bytes }
   })
-  .filter(({ bytes }) =>
-    bytes.toString('latin1').toLowerCase().includes(ECHARTS_MARKER),
-  )
+  .filter(({ bytes }) => bytes.toString('latin1').toLowerCase().includes(ECHARTS_MARKER))
 
 if (echartsChunks.length === 0) {
   // Nothing wired <Chart> into the bundle yet (plan 02-01 state — charts

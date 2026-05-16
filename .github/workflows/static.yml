@@ -88,6 +88,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Check bundle size (ECharts chunk ≤300 KB gz — T-02-02)
+        run: npm run check:bundle-size
+
       - name: Generate CycloneDX SBOM (prod deps)
         run: |
           npx --yes @cyclonedx/cyclonedx-npm@latest \
