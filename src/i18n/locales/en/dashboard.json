@@ -1,0 +1,51 @@
+{
+  "sections": {
+    "summary": "Estate summary",
+    "clusters": "Clusters",
+    "os": "Operating systems",
+    "cpuReady": "CPU Ready"
+  },
+  "accountingMode": {
+    "label": "Accounting mode",
+    "configured": "Configured",
+    "active": "Active",
+    "storageRealistic": "Storage-realistic",
+    "echo": "({{mode}})",
+    "describe": {
+      "configured": "All VMs including powered-off (vCPU/vRAM).",
+      "active": "Powered-on VMs only.",
+      "storageRealistic": "Powered-on for CPU/RAM, all VMs for provisioned storage."
+    }
+  },
+  "stats": {
+    "clusters": "Clusters",
+    "esx": "ESX",
+    "vms": "VMs",
+    "datastores": "Datastores",
+    "vcpu": "vCPU",
+    "vram": "vRAM",
+    "storage": "Storage",
+    "physicalGhz": "Physical GHz",
+    "consumedGhz": "Consumed GHz",
+    "cpuPct": "CPU %",
+    "ramPct": "RAM %",
+    "vcpuPerCore": "vCPU per physical core",
+    "cpuReadyMean": "CPU Ready (mean)",
+    "cpuReadyMax": "CPU Ready (max)",
+    "vmsAboveReady": "VMs > 5% CPU Ready"
+  },
+  "os": {
+    "windows": "Windows",
+    "linux": "Linux",
+    "other": "Other"
+  },
+  "states": {
+    "emptyHeading": "No snapshot loaded",
+    "emptyBody": "Drop an RVTools .xlsx export in the sidebar to see the estate dashboard.",
+    "loading": "Aggregating the estate…",
+    "error": "This snapshot could not be aggregated: {{message}}. Try re-dropping the workbook in the sidebar."
+  },
+  "cpuReadyNotReported": "not reported",
+  "datastoreNotPerCluster": "not available per cluster",
+  "capturedAt": "Captured {{date}}"
+}

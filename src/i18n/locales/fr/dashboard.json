@@ -1,0 +1,51 @@
+{
+  "sections": {
+    "summary": "Synthèse du parc",
+    "clusters": "Clusters",
+    "os": "Systèmes d'exploitation",
+    "cpuReady": "CPU Ready"
+  },
+  "accountingMode": {
+    "label": "Mode de comptabilisation",
+    "configured": "Configuré",
+    "active": "Actif",
+    "storageRealistic": "Stockage réaliste",
+    "echo": "({{mode}})",
+    "describe": {
+      "configured": "Toutes les VM y compris éteintes (vCPU/vRAM).",
+      "active": "VM démarrées uniquement.",
+      "storageRealistic": "Démarrées pour CPU/RAM, toutes les VM pour le stockage provisionné."
+    }
+  },
+  "stats": {
+    "clusters": "Clusters",
+    "esx": "ESX",
+    "vms": "VM",
+    "datastores": "Datastores",
+    "vcpu": "vCPU",
+    "vram": "vRAM",
+    "storage": "Stockage",
+    "physicalGhz": "GHz physiques",
+    "consumedGhz": "GHz consommés",
+    "cpuPct": "CPU %",
+    "ramPct": "RAM %",
+    "vcpuPerCore": "vCPU par cœur physique",
+    "cpuReadyMean": "CPU Ready (moy.)",
+    "cpuReadyMax": "CPU Ready (max)",
+    "vmsAboveReady": "VM > 5 % CPU Ready"
+  },
+  "os": {
+    "windows": "Windows",
+    "linux": "Linux",
+    "other": "Autre"
+  },
+  "states": {
+    "emptyHeading": "Aucun instantané chargé",
+    "emptyBody": "Déposez un export RVTools .xlsx dans la barre latérale pour afficher le tableau de bord du parc.",
+    "loading": "Agrégation du parc…",
+    "error": "Cet instantané n'a pas pu être agrégé : {{message}}. Réessayez en redéposant le classeur dans la barre latérale."
+  },
+  "cpuReadyNotReported": "non communiqué",
+  "datastoreNotPerCluster": "non disponible par cluster",
+  "capturedAt": "Capturé le {{date}}"
+}
