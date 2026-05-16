@@ -1,6 +1,7 @@
 # vatlas
 
-[![Deploy to GitHub Pages](https://github.com/fjacquet/rvtui/actions/workflows/static.yml/badge.svg?branch=main)](https://github.com/fjacquet/rvtui/actions/workflows/static.yml)
+[![Deploy to GitHub Pages](https://github.com/fjacquet/vatlas/actions/workflows/static.yml/badge.svg?branch=main)](https://github.com/fjacquet/vatlas/actions/workflows/static.yml)
+[![Live app](https://img.shields.io/badge/live-fjacquet.github.io%2Fvatlas-2563eb)](https://fjacquet.github.io/vatlas/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![React 19](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
