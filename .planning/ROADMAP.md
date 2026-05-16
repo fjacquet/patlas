@@ -76,7 +76,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 - [x] 03-01-PLAN.md — Table infra: TanStack deps + bundle gate, csv.ts/oneLine.ts, VmDisplayRow projection, generic DataTable/ColumnPicker/ViewToggle (no wiring)
-- [ ] 03-02-PLAN.md — Three object tables: vm/esx/datastore ColumnDefs + thin wrappers, CSV-of-filter×visible + NAA-preserved gates
+- [x] 03-02-PLAN.md — Three object tables: vm/esx/datastore ColumnDefs + thin wrappers, CSV-of-filter×visible + NAA-preserved gates
 - [ ] 03-03-PLAN.md — Tree + shell + inventory i18n EN/FR + App ViewToggle wiring + 10k synthetic fixture + stress/e2e + LIVE tanstack bundle gate
 **UI hint**: yes
 **vsizer reuse**: `utils/csv.ts` (port unchanged); TanStack Table column-definition patterns from vsizer's existing tables (port + extend); no new engines (consumes `perEsx`, `perDatastore`, `vmsByCluster` from Phase 2)
@@ -163,7 +163,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Foundation & Invariants | 5/5 | Complete   | 2026-05-15 |
 | 2. Aggregation & Global Dashboard | 3/3 | Complete   | 2026-05-16 |
-| 3. Inventory Navigation | 0/3 | Not started | - |
+| 3. Inventory Navigation | 2/3 | In Progress|  |
 | 4. Multi-vCenter, Stretched, Allocation & DR Simulation | 0/TBD | Not started | - |
 | 5. OS End-of-Support Forecast | 0/TBD | Not started | - |
 | 6. In-Session Trends | 0/TBD | Not started | - |

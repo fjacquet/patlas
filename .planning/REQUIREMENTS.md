@@ -33,9 +33,9 @@
 ### Inventory Navigation
 
 - [ ] **INV-01**: User can navigate an inventory tree (vCenter → Datacenter → Cluster → ESX → VM) that stays responsive on estates with 10 000+ VMs
-- [ ] **INV-02**: User can view a sortable, filterable table of VMs with the columns RVTools provides
-- [ ] **INV-03**: User can view a sortable, filterable table of ESX hosts
-- [ ] **INV-04**: User can view a sortable, filterable table of datastores keyed on NAA/UUID (no double-count of shared LUNs)
+- [x] **INV-02**: User can view a sortable, filterable table of VMs with the columns RVTools provides
+- [x] **INV-03**: User can view a sortable, filterable table of ESX hosts
+- [x] **INV-04**: User can view a sortable, filterable table of datastores keyed on NAA/UUID (no double-count of shared LUNs)
 - [x] **INV-05**: User can export the current filtered table view as CSV
 - [x] **INV-06**: User can show/hide columns per table
 
@@ -184,9 +184,9 @@
 | VIZ-02 | Phase 2 | Complete |
 | VIZ-03 | Phase 2 | Complete |
 | INV-01 | Phase 3 | Pending |
-| INV-02 | Phase 3 | Pending |
-| INV-03 | Phase 3 | Pending |
-| INV-04 | Phase 3 | Pending |
+| INV-02 | Phase 3 | Complete |
+| INV-03 | Phase 3 | Complete |
+| INV-04 | Phase 3 | Complete |
 | INV-05 | Phase 3 | Complete |
 | INV-06 | Phase 3 | Complete |
 | MVC-01 | Phase 4 | Pending |
