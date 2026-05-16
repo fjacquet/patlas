@@ -33,8 +33,8 @@ Everything else is "match vsizer", with versions pinned to current upstream as o
 | Zustand | `^5.0.13` | Client state | v5 is stable; v5.0.13 published ~9 days ago. **Use named imports** (`import { create } from 'zustand'`), not the deprecated default export. Memory-only — never persist `vinfo`/`vhost` rows (privacy invariant from vsizer ADR-0001/0004). |
 | Zod | `^4.4.3` | Runtime schema validation at the parser boundary | v4 is stable (GA Aug 2025), with 14× faster string parsing, 7× faster array parsing, 2.3× smaller core bundle, ~10× faster TS compilation than v3. vsizer is already on `^4.4.3`. **Do not** mix v3 patterns — the error customization API changed (`message` → `error`, `.default()` semantics changed). |
 | SheetJS (xlsx) | `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz` | RVTools `.xlsx` parsing | The **only** correct install channel. See "What NOT to Use" — the npm `xlsx` package is stuck at 0.18.5 and carries CVE-2024-22363 (ReDoS). 0.20.3 is the current CDN release; no 0.20.4 has shipped as of 2026-05-15 and there are no open CVEs against 0.20.3. |
-| Apache ECharts | `^5.6.0` | Charting engine (treemap, sunburst, heatmap, calendar, gauge, bar, line, pie, area, radial) | See "Charting decision" section below. Tree-shake via `echarts/core` + per-chart-type imports + `SVGRenderer` to land at ~150–300 KB gzipped. |
-| `echarts-for-react` | `^3.0.2` | Thin React wrapper around ECharts | The de-facto React binding; supports `opts={{ renderer: 'svg' }}` for the SVG renderer which is the keystone of the HTML report export plan. |
+| Apache ECharts | `^6.0.0` | Charting engine (treemap, sunburst, heatmap, calendar, gauge, bar, line, pie, area, radial) | Resolved during Phase-2 research to v6 (GA 2025-07-30; tree-shaking + `SVGRenderer` import paths unchanged from v5). Shipped in Phase 2. See "Charting decision" section below. Tree-shake via `echarts/core` + per-chart-type imports + `SVGRenderer`, ~150–300 KB gzipped. |
+| `echarts-for-react` | `^3.0.6` | Thin React wrapper around ECharts | The de-facto React binding; declares `echarts ^6.0.0` in peerDependencies. Use the core entry (`echarts-for-react/lib/core`) with tree-shaken `echarts.use([...])`; supports `opts={{ renderer: 'svg' }}` which is the keystone of the HTML report export plan. |
 | pptxgenjs | `^4.0.1` | PPTX export | Still the only credible browser-side PPTX generator in 2026. 4.0.1 was the only 4.x release and remains the current version; mature, no known CVEs. vsizer's PPTX engine in `engines/export/pptx/` is reusable. |
 | react-i18next | `^16.6.6` | i18n (FR + EN) | vsizer's setup translates 1:1. |
 | i18next | `^26.1.0` | i18n core | Lockstep with react-i18next. |
@@ -140,8 +140,8 @@ npm install \
   i18next@^26.1.0 \
   react-i18next@^16.6.6 \
   i18next-browser-languagedetector@^8.2.1 \
-  echarts@^5.6.0 \
-  echarts-for-react@^3.0.2
+  echarts@^6.0.0 \
+  echarts-for-react@^3.0.6
 
 # 2) SheetJS — REQUIRED via the official tarball, NOT npm
 npm install https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
@@ -242,7 +242,7 @@ If a tool (Dependabot, Renovate, `npm audit fix --force`) ever rewrites that to 
 | `vite@^8` | `@vitejs/plugin-react@^6` | Plugin-react v5 does not work with Vite 8. |
 | `vite@^8` | `vitest@^4.x` | Vitest 4 is the only line that targets Vite 8 cleanly. Vitest 3 will install but produces resolution warnings. |
 | `tailwindcss@^4.3` | `@tailwindcss/vite@^4.3` | Must match major+minor. |
-| `echarts-for-react@^3` | `echarts@^5.x` | echarts-for-react 4 is not out; stick to 3. Peer-deps on `echarts >=5`. |
+| `echarts-for-react@^3.0.6` | `echarts@^6.x` | echarts-for-react 3.0.6 declares `echarts ^6.0.0` in peerDependencies. v6 tree-shaking + `SVGRenderer` paths unchanged from v5. |
 | `zod@^4` | TypeScript `>=5.5` | Older TS produces slow type-checks on v4 schemas. We are on 5.9. |
 | `zustand@^5` | React `>=18` | React 19 fully supported since 5.0.x. |
 | `xlsx@0.20.3` tarball | Anything | No peer deps. Just verify the resolution did not silently get rewritten by a tool. |

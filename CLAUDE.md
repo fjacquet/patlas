@@ -35,8 +35,8 @@ vatlas is a 100 % client-side web app that turns one or more RVTools `.xlsx` exp
 | Zustand | `^5.0.13` | Client state | v5 is stable; v5.0.13 published ~9 days ago. **Use named imports** (`import { create } from 'zustand'`), not the deprecated default export. Memory-only — never persist `vinfo`/`vhost` rows (privacy invariant from vsizer ADR-0001/0004). |
 | Zod | `^4.4.3` | Runtime schema validation at the parser boundary | v4 is stable (GA Aug 2025), with 14× faster string parsing, 7× faster array parsing, 2.3× smaller core bundle, ~10× faster TS compilation than v3. vsizer is already on `^4.4.3`. **Do not** mix v3 patterns — the error customization API changed (`message` → `error`, `.default()` semantics changed). |
 | SheetJS (xlsx) | `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz` | RVTools `.xlsx` parsing | The **only** correct install channel. See "What NOT to Use" — the npm `xlsx` package is stuck at 0.18.5 and carries CVE-2024-22363 (ReDoS). 0.20.3 is the current CDN release; no 0.20.4 has shipped as of 2026-05-15 and there are no open CVEs against 0.20.3. |
-| Apache ECharts | `^5.6.0` | Charting engine (treemap, sunburst, heatmap, calendar, gauge, bar, line, pie, area, radial) | See "Charting decision" section below. Tree-shake via `echarts/core` + per-chart-type imports + `SVGRenderer` to land at ~150–300 KB gzipped. |
-| `echarts-for-react` | `^3.0.2` | Thin React wrapper around ECharts | The de-facto React binding; supports `opts={{ renderer: 'svg' }}` for the SVG renderer which is the keystone of the HTML report export plan. |
+| Apache ECharts | `^6.0.0` | Charting engine (treemap, sunburst, heatmap, calendar, gauge, bar, line, pie, area, radial) | Resolved during Phase-2 research to v6 (GA 2025-07-30; tree-shaking + `SVGRenderer` import paths unchanged from v5). Shipped in Phase 2. See "Charting decision" section below. Tree-shake via `echarts/core` + per-chart-type imports + `SVGRenderer`, ~150–300 KB gzipped. |
+| `echarts-for-react` | `^3.0.6` | Thin React wrapper around ECharts | The de-facto React binding; declares `echarts ^6.0.0` in peerDependencies. Use the core entry (`echarts-for-react/lib/core`) with tree-shaken `echarts.use([...])`; supports `opts={{ renderer: 'svg' }}` which is the keystone of the HTML report export plan. |
 | pptxgenjs | `^4.0.1` | PPTX export | Still the only credible browser-side PPTX generator in 2026. 4.0.1 was the only 4.x release and remains the current version; mature, no known CVEs. vsizer's PPTX engine in `engines/export/pptx/` is reusable. |
 | react-i18next | `^16.6.6` | i18n (FR + EN) | vsizer's setup translates 1:1. |
 | i18next | `^26.1.0` | i18n core | Lockstep with react-i18next. |
@@ -130,7 +130,7 @@ vatlas is a 100 % client-side web app that turns one or more RVTools `.xlsx` exp
 | `vite@^8` | `@vitejs/plugin-react@^6` | Plugin-react v5 does not work with Vite 8. |
 | `vite@^8` | `vitest@^4.x` | Vitest 4 is the only line that targets Vite 8 cleanly. Vitest 3 will install but produces resolution warnings. |
 | `tailwindcss@^4.3` | `@tailwindcss/vite@^4.3` | Must match major+minor. |
-| `echarts-for-react@^3` | `echarts@^5.x` | echarts-for-react 4 is not out; stick to 3. Peer-deps on `echarts >=5`. |
+| `echarts-for-react@^3.0.6` | `echarts@^6.x` | echarts-for-react 3.0.6 declares `echarts ^6.0.0` in peerDependencies. v6 tree-shaking + `SVGRenderer` paths unchanged from v5. |
 | `zod@^4` | TypeScript `>=5.5` | Older TS produces slow type-checks on v4 schemas. We are on 5.9. |
 | `zustand@^5` | React `>=18` | React 19 fully supported since 5.0.x. |
 | `xlsx@0.20.3` tarball | Anything | No peer deps. Just verify the resolution did not silently get rewritten by a tool. |
@@ -206,6 +206,43 @@ Do not make direct repo edits outside a GSD workflow unless the user explicitly 
 > Profile not yet configured. Run `/gsd-profile-user` to generate your developer profile.
 > This section is managed by `generate-claude-profile` -- do not edit manually.
 <!-- GSD:profile-end -->
+
+<!-- project-notes: hand-maintained, NOT a GSD-managed fence -->
+## Commands
+
+```bash
+npm run dev                       # Vite dev server → http://localhost:5173/vatlas/
+npm run build                     # tsc -b && vite build (prebuild runs supply-chain gate)
+npm run typecheck                 # tsc --noEmit (app + tsconfig.test.json)
+npx @biomejs/biome check .        # Lint — use THIS, not `npm run lint` (see Gotchas)
+npm run test:run                  # vitest run (CI mode)
+npm run test:coverage             # coverage; engines/ gated ≥75%
+npm run check:supply-chain        # fails on telemetry pkgs or xlsx pin drift
+npm run check:bundle-size         # fails if echarts chunk > 300 KB gz
+```
+
+## Architecture (shipped P1–P3)
+
+- `src/engines/**` — pure functions only (no React/DOM/Zustand/Zod; Zod lives only at the parser boundary). Vitest-gated ≥75%.
+- `src/store/datasetStore.ts` — Zustand, **inputs only** (`Map<id,Snapshot>` immutable). No cached aggregates (deliberate vsizer deviation).
+- `src/hooks/useEstateView.ts` — the **single** `useMemo` in non-test `src/`; the only bridge store→UI/exports. Components consume this hook, never engines.
+- Parser runs in a Web Worker; `xlsx` import is confined to `parser.worker.ts`.
+- `src/components/Chart.tsx` — the only ECharts import site; single `option` prop; SVG renderer mandated.
+
+## Conventions
+
+- Commit prefix `<type>(NN-NN): …` (phase-plan id), e.g. `feat(03-02): …`.
+- Branded units (`MiB`/`GiB`/`MHz`/`GHz`/…) — never a raw `* 1.048576` (RVTools "MB" is MiB; ADR-0010).
+- Toggles/tabs reuse the `ThemeToggle` `<fieldset role="group">` + `aria-pressed` idiom — don't reinvent.
+- i18n keys land in BOTH `en/` and `fr/`; no pre-formatted numbers in strings; no editorial verbs ("recommend/should/poor/good").
+- No `localStorage` of dataset rows — only `vatlas-theme` + `vatlas-lang` keys are allowed.
+
+## Gotchas
+
+- **`npm run lint` is intercepted by RTK** and prints a bogus `ESLint output (JSON parse failed)` — the linter is Biome. Run `npx @biomejs/biome check .` directly.
+- **Privacy guard throws, it does not silently block.** Any non-same-origin `fetch`/`XHR`/`WS`/`sendBeacon` throws synchronously (intentional — silent block is undetectable). Adding any network call breaks the app by design.
+- **`gsd-sdk query roadmap update-plan-progress` does not match this ROADMAP's format** — after every `/gsd-execute-phase`, manually flip the phase `[ ]→[x]` and the Progress-table row.
+- Worktree isolation is unavailable in sessions where the repo wasn't a git repo at startup → GSD plans run sequentially on `main`.
 
 <!-- rtk-instructions v2 -->
 # RTK (Rust Token Killer) - Token-Optimized Commands
