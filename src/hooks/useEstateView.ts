@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
 import { buildEstateView, EMPTY_VIEW } from '@/engines/aggregation'
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
+import type { AllocRatios } from '@/hooks/useAllocationHash'
+import { DEFAULT_RATIOS } from '@/hooks/useAllocationHash'
 import {
   selectSelectedSnapshotIds,
   selectSnapshots,
@@ -31,13 +33,19 @@ import type { AccountingMode, EstateView } from '@/types/estate'
  * merge logic (those live in the pure engines). Dashboard components consume
  * its output as plain props and must NOT introduce their own `useMemo`.
  */
-export function useEstateView(mode: AccountingMode): EstateView {
+export function useEstateView(
+  mode: AccountingMode,
+  ratios: AllocRatios = DEFAULT_RATIOS,
+): EstateView {
   const snapshots = useSnapshotStore(selectSnapshots)
   const selectedIds = useSnapshotStore(selectSelectedSnapshotIds)
   const stretchedClusters = useSnapshotStore(selectStretchedClusters)
   return useMemo(() => {
     const selected = [...snapshots.values()].filter((s) => selectedIds.has(s.id))
     if (selected.length === 0) return EMPTY_VIEW
-    return buildEstateView(mergeSnapshotsToEstate(selected), mode, { stretchedClusters })
-  }, [snapshots, selectedIds, stretchedClusters, mode])
+    return buildEstateView(mergeSnapshotsToEstate(selected), mode, {
+      stretchedClusters,
+      allocRatios: { cpuRatio: ratios.cpu, ramRatio: ratios.ram },
+    })
+  }, [snapshots, selectedIds, stretchedClusters, mode, ratios.cpu, ratios.ram])
 }

@@ -42,7 +42,10 @@ const emptyBreakdown = (): OsBreakdown => ({ windows: 0, linux: 0, other: 0 })
 export function buildEstateView(
   merged: MergedEstate,
   mode: AccountingMode,
-  opts?: { stretchedClusters?: ReadonlySet<string> },
+  opts?: {
+    stretchedClusters?: ReadonlySet<string>
+    allocRatios?: { cpuRatio: number; ramRatio: number }
+  },
 ): EstateView {
   const stretchedClusters = opts?.stretchedClusters ?? new Set<string>()
   // No vDatastore rows ⇒ sheet absent/empty ⇒ per-cluster count is
@@ -65,6 +68,7 @@ export function buildEstateView(
     mode,
     stretchedClusters,
     datastoreCountByCluster: dsByCluster,
+    allocRatios: opts?.allocRatios,
   })
 
   const datastores = perDatastore(merged.vdatastore)

@@ -149,6 +149,15 @@ export interface ClusterAggregate {
   /** Average MHz consumed per allocated vCPU. `0` when vcpuAllocated 0. */
   mhzPerVcpu: number
 
+  // ── Allocation headroom (ALC — driven by the URL-hash ratio sliders) ──
+  /** vCPU the cluster can host at the active CPU ratio:
+   *  `usablePhysicalCores × cpuRatio` (default 4:1). The slider changes
+   *  THIS verdict only — never `vcpuPerPcpu` (ALC-04). */
+  capacityVcpu: Cores
+  /** vRAM the cluster can host at the active RAM overcommit factor:
+   *  `physicalRamMib × ramRatio` (default 1:1). */
+  capacityRamMib: MiB
+
   // ── CPU Ready / contention (RVTools-only) ─────────────────────────────
   meanCpuReadinessPercent: number | null
   maxCpuReadinessPercent: number | null

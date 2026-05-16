@@ -26,6 +26,8 @@ const cluster = (over: Partial<ClusterAggregate>): ClusterAggregate => ({
   minRamRatio: 0.4,
   vcpuAllocated: cores(48),
   vramAllocatedMib: mib(196_608),
+  capacityVcpu: cores(96),
+  capacityRamMib: mib(524_288),
   mhzPerVcpu: 500,
   stretched: false,
   drReservedGhz: ghz(0),

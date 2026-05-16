@@ -139,11 +139,16 @@ export const aggregateClusters = ({
   mode,
   stretchedClusters,
   datastoreCountByCluster,
+  allocRatios,
 }: {
   vinfo: VInfoRow[]
   vhost: VHostRow[]
   mode: AccountingMode
   stretchedClusters?: ReadonlySet<string>
+  /** vCPU:pCPU and vRAM overcommit ratios from the URL-hash sliders.
+   *  Defaults to 4:1 / 1:1 (ALC-02). Changes the headroom verdict ONLY —
+   *  never `vcpuPerPcpu` (ALC-04). */
+  allocRatios?: { cpuRatio: number; ramRatio: number }
   /** Per-cluster NAA-deduped datastore counts (from the vDatastore
    *  `Cluster name` column). `undefined` ⇒ the vDatastore sheet was
    *  absent → each cluster's `datastoreCount` is `null` (em-dash). When
@@ -151,6 +156,8 @@ export const aggregateClusters = ({
   datastoreCountByCluster?: ReadonlyMap<string, number>
 }): ClusterAggregate[] => {
   const stretched = stretchedClusters ?? new Set<string>()
+  const cpuRatio = allocRatios?.cpuRatio ?? 4
+  const ramRatio = allocRatios?.ramRatio ?? 1
   const hostStats = aggregateHostsPerCluster(vhost)
   const vmStatsByCluster = new Map(aggregateVmsPerCluster(vinfo, mode).map((s) => [s.cluster, s]))
   // Raw host rows per cluster — perCluster.ts intentionally discards
@@ -235,6 +242,11 @@ export const aggregateClusters = ({
         minRamRatio: h.minRamRatio * ramDrFactor,
         vcpuAllocated: coresOf(vcpuAllocated),
         vramAllocatedMib: v?.vramAllocatedMib ?? mib(0),
+        // Headroom verdict at the active ratios (ALC). usablePhysicalCores
+        // is already DR-aware; the slider scales the verdict, NOT
+        // vcpuPerPcpu (which stays physical-core-based — ALC-04).
+        capacityVcpu: coresOf(usablePhysicalCores * cpuRatio),
+        capacityRamMib: mib(physicalRamMib * ramRatio),
         mhzPerVcpu: computeMhzPerVcpu(consumedGhz, vcpuAllocated),
         stretched: isStretched,
         drReservedGhz: ghzOf(drReservedGhz),

@@ -217,6 +217,50 @@ describe('aggregateClusters', () => {
     expect(c.stretchedConfidence).toBe('high')
   })
 
+  // ── ALC-04: the slider changes the verdict ONLY, never vcpuPerPcpu ────
+  it('allocRatios changes capacity/headroom but vcpuPerPcpu is INVARIANT (ALC-04)', () => {
+    const vinfo = Array.from({ length: 6 }, (_, i) => vm({ vmName: `v${i}`, vcpu: cores(4) }))
+    const vhost = [host({ cores: cores(12) })]
+    const at4 = first(
+      aggregateClusters({
+        vinfo,
+        vhost,
+        mode: 'active',
+        stretchedClusters: new Set(),
+        allocRatios: { cpuRatio: 4, ramRatio: 1 },
+      }),
+    )
+    const at8 = first(
+      aggregateClusters({
+        vinfo,
+        vhost,
+        mode: 'active',
+        stretchedClusters: new Set(),
+        allocRatios: { cpuRatio: 8, ramRatio: 1 },
+      }),
+    )
+    // vcpuPerPcpu is physical-core based (24 vCPU / 12 cores = 2) and does
+    // NOT move with the slider — the guard against threads-based regression.
+    expect(at4.vcpuPerPcpu).toBeCloseTo(2)
+    expect(at8.vcpuPerPcpu).toBe(at4.vcpuPerPcpu)
+    // capacityVcpu = usablePhysicalCores × cpuRatio → DOES scale.
+    expect(at4.capacityVcpu as number).toBeCloseTo(12 * 4)
+    expect(at8.capacityVcpu as number).toBeCloseTo(12 * 8)
+  })
+
+  it('defaults to 4:1 / 1:1 when allocRatios is omitted (ALC-02)', () => {
+    const c = first(
+      aggregateClusters({
+        vinfo: [vm({})],
+        vhost: [host({ cores: cores(12), memoryMib: mib(100) })],
+        mode: 'active',
+        stretchedClusters: new Set(),
+      }),
+    )
+    expect(c.capacityVcpu as number).toBeCloseTo(12 * 4)
+    expect(c.capacityRamMib as number).toBeCloseTo(100 * 1)
+  })
+
   it('sorts clusters stably by localeCompare', () => {
     const out = aggregateClusters({
       vinfo: [vm({ cluster: 'Zeta' }), vm({ cluster: 'alpha' })],
