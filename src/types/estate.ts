@@ -253,6 +253,26 @@ export interface EsxAggregate {
   readinessAvailable: boolean
 }
 
+/**
+ * Flat per-VM row for the Phase-3 inventory table (INV-05). This is a PURE
+ * PROJECTION of `Snapshot.vinfo`, NOT an aggregation — a 1:1 filter/map of
+ * the source rows (same operation-class as the `classifyOsFamily` call in
+ * the existing `buildEstateView` vinfo loop), never a group/sum. It rides
+ * inside that one existing pass so the project keeps exactly one `useMemo`
+ * site (`useEstateView`). Mirrors the lean flat-field `EsxAggregate` idiom.
+ */
+export interface VmDisplayRow {
+  vmName: string
+  cluster: string
+  host: string
+  vcpu: Cores
+  vramMib: MiB
+  /** Running guest OS (`osTools`) when reported, else the configured OS. */
+  os: string
+  poweredOn: boolean
+  provisionedMib: MiB
+}
+
 /** Per-OsFamily counts (DSH-04). `other` is always present (even at 0). */
 export interface OsBreakdown {
   windows: number
@@ -281,6 +301,9 @@ export interface EstateView {
   clusters: ClusterAggregate[]
   hosts: EsxAggregate[]
   datastores: DatastoreAggregate[]
+  /** Flat per-VM rows for the inventory table (INV-05). Pure projection
+   *  of `Snapshot.vinfo`, produced in the single `buildEstateView` pass. */
+  vmRows: VmDisplayRow[]
   /** Per-cluster OS breakdown, keyed by cluster name. */
   vmsByCluster: Map<string, OsBreakdown>
   /** Estate-wide OS breakdown. */

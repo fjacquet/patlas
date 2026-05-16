@@ -1,5 +1,5 @@
 import { mib } from '@/engines/units'
-import type { AccountingMode, EstateView, OsBreakdown } from '@/types/estate'
+import type { AccountingMode, EstateView, OsBreakdown, VmDisplayRow } from '@/types/estate'
 import type { Snapshot } from '@/types/snapshot'
 import { aggregateClusters } from './aggregateClusters'
 import { aggregateGlobals, emptySummary } from './globals'
@@ -47,12 +47,25 @@ export function buildEstateView(snapshot: Snapshot, mode: AccountingMode): Estat
   // change OS classification; it counts every VM the snapshot carries.
   const osBreakdown = emptyBreakdown()
   const vmsByCluster = new Map<string, OsBreakdown>()
+  const vmRows: VmDisplayRow[] = []
   for (const vm of snapshot.vinfo) {
     const family = classifyOsFamily(vm.osConfig, vm.osTools)
     osBreakdown[family] += 1
     const perCluster = vmsByCluster.get(vm.cluster) ?? emptyBreakdown()
     perCluster[family] += 1
     vmsByCluster.set(vm.cluster, perCluster)
+    // 1:1 projection (NEVER group/sum) — same operation-class as the
+    // classifyOsFamily call above; rides this single existing pass.
+    vmRows.push({
+      vmName: vm.vmName,
+      cluster: vm.cluster,
+      host: vm.host,
+      vcpu: vm.vcpu,
+      vramMib: vm.vramMib,
+      os: vm.osTools || vm.osConfig,
+      poweredOn: vm.poweredOn,
+      provisionedMib: vm.provisionedMib,
+    })
   }
 
   return {
@@ -60,6 +73,7 @@ export function buildEstateView(snapshot: Snapshot, mode: AccountingMode): Estat
     clusters,
     hosts,
     datastores,
+    vmRows,
     vmsByCluster,
     osBreakdown,
     accountingMode: mode,
@@ -77,6 +91,7 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   clusters: Object.freeze([]) as never[],
   hosts: Object.freeze([]) as never[],
   datastores: Object.freeze([]) as never[],
+  vmRows: Object.freeze([]) as never[],
   vmsByCluster: new Map(),
   osBreakdown: Object.freeze({ windows: 0, linux: 0, other: 0 }),
   accountingMode: 'active',

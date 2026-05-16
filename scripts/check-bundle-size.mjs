@@ -37,6 +37,19 @@ const ASSETS_DIR = 'dist/assets'
 const MAX_GZIP_BYTES = 307200 // 300 KiB — ROADMAP Phase-2 success #5 authoritative
 const ECHARTS_MARKER = 'echarts'
 
+// Sibling gate for the @tanstack/react-table + @tanstack/react-virtual
+// infrastructure (Phase-3 INV-05/06). Same structural defense as the
+// echarts gate, scoped to whatever chunk the TanStack source lands in.
+// Marker substring '@tanstack' — TanStack ships its own '@tanstack/...'
+// package-path identifier strings into the emitted chunk regardless of
+// Rolldown's chunk-naming, so a case-insensitive scan reliably selects
+// the TanStack-bearing chunk(s). Threshold 60 KiB gz (03-RESEARCH A6:
+// generous headroom over the measured tree-shaken table+virtual cost;
+// tighten after the first production build once 03-03 mounts a real
+// consumer). Until then no chunk carries the marker → graceful no-op.
+const MAX_TANSTACK_GZIP_BYTES = 61440 // 60 KiB — 03-RESEARCH A6
+const TANSTACK_MARKER = '@tanstack'
+
 if (!existsSync(ASSETS_DIR)) {
   console.error(
     'check-bundle-size: dist/assets/ not found — run `npm run build` first (this is a post-build CI gate).',
@@ -78,6 +91,39 @@ for (const { file, bytes } of echartsChunks) {
     exitCode = 1
   } else {
     console.log(`check-bundle-size: ${file} = ${gzBytes} bytes gz (${gzKib} KiB) ≤ 300 KiB`)
+  }
+}
+
+const tanstackChunks = jsChunks
+  .map((file) => {
+    const bytes = readFileSync(join(ASSETS_DIR, file))
+    return { file, bytes }
+  })
+  .filter(({ bytes }) => bytes.toString('latin1').toLowerCase().includes(TANSTACK_MARKER))
+
+if (tanstackChunks.length === 0) {
+  // No consumer mounts <DataTable> into the production graph yet (03-01
+  // builds the primitive; 03-03 wires the first real table). Nothing to
+  // gate until then — graceful no-op, exactly like the echarts path.
+  console.log('check-bundle-size: OK (no @tanstack chunk found — nothing to gate yet)')
+} else {
+  for (const { file, bytes } of tanstackChunks) {
+    const gzBytes = gzipSync(bytes).length
+    const gzKib = (gzBytes / 1024).toFixed(1)
+    if (gzBytes > MAX_TANSTACK_GZIP_BYTES) {
+      console.error(
+        `BUNDLE-SIZE VIOLATION — @tanstack chunk exceeds the 60 KiB gz budget (03-RESEARCH A6).`,
+      )
+      console.error(`  chunk:    ${file}`)
+      console.error(`  gzipped:  ${gzBytes} bytes (${gzKib} KiB)`)
+      console.error(`  limit:    ${MAX_TANSTACK_GZIP_BYTES} bytes (60.0 KiB)`)
+      console.error(
+        `  hint:     pull only the headless table/virtual primitives — no kitchen-sink re-export, no extra @tanstack/* packages.`,
+      )
+      exitCode = 1
+    } else {
+      console.log(`check-bundle-size: ${file} = ${gzBytes} bytes gz (${gzKib} KiB) ≤ 60 KiB`)
+    }
   }
 }
 
