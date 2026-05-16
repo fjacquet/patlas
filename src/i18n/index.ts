@@ -4,9 +4,11 @@ import { initReactI18next } from 'react-i18next'
 
 import enCommon from './locales/en/common.json'
 import enDashboard from './locales/en/dashboard.json'
+import enInventory from './locales/en/inventory.json'
 import enUpload from './locales/en/upload.json'
 import frCommon from './locales/fr/common.json'
 import frDashboard from './locales/fr/dashboard.json'
+import frInventory from './locales/fr/inventory.json'
 import frUpload from './locales/fr/upload.json'
 
 /**
@@ -21,7 +23,7 @@ export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number]
  * at a time without touching unrelated keys. Add a new namespace by listing
  * it here AND adding the matching JSON files under `locales/<lang>/`.
  */
-export const NAMESPACES = ['common', 'upload', 'dashboard'] as const
+export const NAMESPACES = ['common', 'upload', 'dashboard', 'inventory'] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
 export const resources = {
@@ -29,11 +31,13 @@ export const resources = {
     common: enCommon,
     upload: enUpload,
     dashboard: enDashboard,
+    inventory: enInventory,
   },
   fr: {
     common: frCommon,
     upload: frUpload,
     dashboard: frDashboard,
+    inventory: frInventory,
   },
 } as const
 

@@ -1,0 +1,77 @@
+{
+  "nav": {
+    "label": "Vue",
+    "dashboard": "Tableau de bord",
+    "inventory": "Inventaire"
+  },
+  "tab": {
+    "label": "Type d'objet",
+    "vm": "VM",
+    "esx": "Hôtes ESX",
+    "datastore": "Datastores"
+  },
+  "tree": {
+    "label": "Arborescence d'inventaire",
+    "root": "vCenter",
+    "empty": "Aucun instantané chargé",
+    "emptyBody": "Chargez un instantané vCenter depuis la barre latérale pour parcourir l'inventaire.",
+    "loading": "Chargement de l'inventaire…",
+    "error": "L'instantané n'a pas pu être analysé. Rechargez l'instantané ou choisissez-en un autre dans la barre latérale."
+  },
+  "scope": {
+    "all": "Tous les objets",
+    "active": "Limité à {{node}}"
+  },
+  "filter": {
+    "placeholder": "Filtrer par nom, OS, hôte…",
+    "clear": "Effacer le filtre"
+  },
+  "columns": {
+    "button": "Colonnes",
+    "label": "Afficher les colonnes",
+    "reset": "Réinitialiser"
+  },
+  "export": {
+    "csv": "Exporter en CSV"
+  },
+  "rows": {
+    "count": "{{count}} lignes"
+  },
+  "table": {
+    "empty": "Aucun {{object}} dans cet instantané.",
+    "emptyFiltered": "Aucun {{object}} ne correspond au filtre actuel."
+  },
+  "col": {
+    "vmName": "VM",
+    "cluster": "Cluster",
+    "host": "Hôte",
+    "vcpu": "vCPU",
+    "vramMib": "vRAM",
+    "os": "OS",
+    "poweredOn": "Démarrée",
+    "provisionedMib": "Provisionné",
+    "hostName": "Hôte",
+    "sockets": "Sockets",
+    "cores": "Cœurs",
+    "speedMhz": "Fréquence",
+    "physicalGhz": "GHz physiques",
+    "memoryMib": "Mémoire",
+    "vmCount": "VM",
+    "vcpuAllocated": "vCPU alloués",
+    "vramAllocatedMib": "vRAM allouée",
+    "cpuRatio": "Ratio CPU",
+    "ramRatio": "Ratio RAM",
+    "meanCpuReadinessPercent": "CPU Ready (moy.)",
+    "maxCpuReadinessPercent": "CPU Ready (max)",
+    "vmsAboveReadinessWarning": "VM au-dessus du seuil CPU Ready",
+    "key": "Clé datastore",
+    "name": "Nom",
+    "type": "Type",
+    "capacityMib": "Capacité",
+    "freeMib": "Libre",
+    "usedMib": "Utilisé",
+    "usedRatio": "Ratio utilisé",
+    "overProvisionRatio": "Ratio de surprovisionnement",
+    "sharedDuplicateCount": "Copies partagées"
+  }
+}

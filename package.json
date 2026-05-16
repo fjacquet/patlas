@@ -11,6 +11,7 @@
     "check:supply-chain": "node scripts/check-supply-chain.mjs",
     "check:bundle-size": "node scripts/check-bundle-size.mjs",
     "generate-mib-canary": "node scripts/generate-mib-canary.mjs",
+    "generate-inventory-10k": "node scripts/generate-inventory-10k.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
     "lint": "biome check .",

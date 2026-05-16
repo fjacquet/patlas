@@ -1,0 +1,77 @@
+{
+  "nav": {
+    "label": "View",
+    "dashboard": "Dashboard",
+    "inventory": "Inventory"
+  },
+  "tab": {
+    "label": "Object type",
+    "vm": "VMs",
+    "esx": "ESX hosts",
+    "datastore": "Datastores"
+  },
+  "tree": {
+    "label": "Inventory tree",
+    "root": "vCenter",
+    "empty": "No snapshot loaded",
+    "emptyBody": "Load a vCenter snapshot from the sidebar to browse the inventory.",
+    "loading": "Loading inventory…",
+    "error": "Snapshot could not be parsed. Reload the snapshot or pick another one from the sidebar."
+  },
+  "scope": {
+    "all": "All objects",
+    "active": "Scoped to {{node}}"
+  },
+  "filter": {
+    "placeholder": "Filter by name, OS, host…",
+    "clear": "Clear filter"
+  },
+  "columns": {
+    "button": "Columns",
+    "label": "Toggle columns",
+    "reset": "Reset"
+  },
+  "export": {
+    "csv": "Export CSV"
+  },
+  "rows": {
+    "count": "{{count}} rows"
+  },
+  "table": {
+    "empty": "No {{object}} in this snapshot.",
+    "emptyFiltered": "No {{object}} match the current filter."
+  },
+  "col": {
+    "vmName": "VM",
+    "cluster": "Cluster",
+    "host": "Host",
+    "vcpu": "vCPU",
+    "vramMib": "vRAM",
+    "os": "OS",
+    "poweredOn": "Powered on",
+    "provisionedMib": "Provisioned",
+    "hostName": "Host",
+    "sockets": "Sockets",
+    "cores": "Cores",
+    "speedMhz": "Speed",
+    "physicalGhz": "Physical GHz",
+    "memoryMib": "Memory",
+    "vmCount": "VMs",
+    "vcpuAllocated": "vCPU allocated",
+    "vramAllocatedMib": "vRAM allocated",
+    "cpuRatio": "CPU ratio",
+    "ramRatio": "RAM ratio",
+    "meanCpuReadinessPercent": "CPU Ready (mean)",
+    "maxCpuReadinessPercent": "CPU Ready (max)",
+    "vmsAboveReadinessWarning": "VMs above CPU Ready warning",
+    "key": "Datastore key",
+    "name": "Name",
+    "type": "Type",
+    "capacityMib": "Capacity",
+    "freeMib": "Free",
+    "usedMib": "Used",
+    "usedRatio": "Used ratio",
+    "overProvisionRatio": "Over-provision ratio",
+    "sharedDuplicateCount": "Shared copies"
+  }
+}

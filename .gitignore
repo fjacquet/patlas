@@ -16,6 +16,10 @@ coverage
 # RTK tooling
 .rtk/
 
+# Synthetic 10k stress fixture — generated on demand for tests/stress only,
+# large, NOT bundled in the app. Regenerate with `npm run generate-inventory-10k`.
+src/__fixtures__/rvtools-inventory-10k.xlsx
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
