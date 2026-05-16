@@ -297,3 +297,43 @@ describe('cell parsing edge cases', () => {
     expect(rows[0]?.provisionedMib).toBe(4.5)
   })
 })
+
+describe('RVTools >=4.x MiB-suffixed headers resolve (A7 / PITFALLS Moderate-1)', () => {
+  it('vDatastore "Capacity/Provisioned/In Use/Free MiB" map to real numbers, not 0', () => {
+    const ds = adaptRvtoolsVDatastore(
+      mkSheet(
+        'vDatastore',
+        ['Name', 'Type', 'Address', 'Capacity MiB', 'Provisioned MiB', 'In Use MiB', 'Free MiB'],
+        [['datastore1', 'VMFS', 't10.NVMe_x', 784384, 1456, 1456, 782928]],
+      ),
+    )
+    expect(ds[0]?.capacityMib).toBe(mib(784384))
+    expect(ds[0]?.provisionedMib).toBe(mib(1456))
+    expect(ds[0]?.freeMib).toBe(mib(782928))
+  })
+
+  it('vPartition "Capacity/Consumed/Free MiB" map to real numbers, not 0', () => {
+    const vp = adaptRvtoolsVPartition(
+      mkSheet(
+        'vPartition',
+        ['VM', 'Disk', 'Capacity MiB', 'Consumed MiB', 'Free MiB'],
+        [['vm-a', 'C:\\', 81920, 40000, 41920]],
+      ),
+    )
+    expect(vp[0]?.capacityMib).toBe(mib(81920))
+    expect(vp[0]?.consumedMib).toBe(mib(40000))
+    expect(vp[0]?.freeMib).toBe(mib(41920))
+  })
+
+  it('vInfo "Provisioned MiB" / "In Use MiB" map to real numbers, not 0', () => {
+    const vi = adaptRvtoolsVInfo(
+      mkSheet(
+        'vInfo',
+        ['VM', 'Powerstate', 'Cluster', 'Host', 'CPUs', 'Memory', 'Provisioned MiB', 'In Use MiB'],
+        [['vm-a', 'poweredOn', 'CL1', 'esx1', 4, 16384, 81920, 40960]],
+      ),
+    )
+    expect(vi[0]?.provisionedMib).toBe(mib(81920))
+    expect(vi[0]?.inUseMib).toBe(mib(40960))
+  })
+})

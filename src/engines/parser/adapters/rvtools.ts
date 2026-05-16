@@ -61,8 +61,13 @@ const VINFO_COLS = {
   vmInstanceUuid: ['vm instance uuid', 'instance uuid'],
   viSdkUuid: ['vi sdk uuid', 'vcenter uuid'],
   viSdkServer: ['vi sdk server', 'vcenter server', 'vcenter'],
-  provisionedMib: ['provisioned mb', 'provisioned (mb)', 'provisioned'],
-  inUseMib: ['in use mb', 'in use (mb)', 'consumed'],
+  // RVTools ≥4.x emits MiB-suffixed headers ("Provisioned MiB", "In Use
+  // MiB"); pre-4.x used "… MB". MiB spelling listed first so the exact match
+  // wins (matching is exact-normalized, not substring — a bare 'provisioned'
+  // never matched 'provisioned mib'). This is the A7 / PITFALLS-Moderate-1
+  // alias-drift fix.
+  provisionedMib: ['provisioned mib', 'provisioned mb', 'provisioned (mb)', 'provisioned'],
+  inUseMib: ['in use mib', 'in use mb', 'in use (mb)', 'consumed'],
 } as const
 
 const VHOST_COLS = {
@@ -89,9 +94,10 @@ const VHOST_COLS = {
 
 const VDATASTORE_COLS = {
   name: ['name', 'datastore', 'ds name'],
-  capacityMib: ['capacity mb', 'capacity (mb)', 'capacity'],
-  freeMib: ['free mb', 'free (mb)', 'free space mb', 'free'],
-  provisionedMib: ['provisioned mb', 'provisioned (mb)', 'provisioned'],
+  // MiB-suffixed (RVTools ≥4.x) first; '… mb' kept for pre-4.x exports.
+  capacityMib: ['capacity mib', 'capacity mb', 'capacity (mb)', 'capacity'],
+  freeMib: ['free mib', 'free mb', 'free (mb)', 'free space mb', 'free'],
+  provisionedMib: ['provisioned mib', 'provisioned mb', 'provisioned (mb)', 'provisioned'],
   naa: ['address', 'naa', 'url', 'uuid'],
   type: ['type', 'fs type', 'filesystem'],
 } as const
@@ -99,9 +105,10 @@ const VDATASTORE_COLS = {
 const VPARTITION_COLS = {
   vmName: ['vm', 'vm name', 'name'],
   disk: ['disk', 'partition', 'mount', 'disk path'],
-  capacityMib: ['capacity mb', 'capacity (mb)', 'capacity'],
-  consumedMib: ['consumed mb', 'consumed (mb)', 'consumed', 'used mb'],
-  freeMib: ['free mb', 'free (mb)', 'free'],
+  // MiB-suffixed (RVTools ≥4.x) first; '… mb' kept for pre-4.x exports.
+  capacityMib: ['capacity mib', 'capacity mb', 'capacity (mb)', 'capacity'],
+  consumedMib: ['consumed mib', 'consumed mb', 'consumed (mb)', 'consumed', 'used mb'],
+  freeMib: ['free mib', 'free mb', 'free (mb)', 'free'],
 } as const
 
 const VMETADATA_COLS = {
