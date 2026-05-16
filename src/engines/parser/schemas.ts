@@ -78,6 +78,9 @@ export const VDatastoreRowSchema: z.ZodType<VDatastoreRow> = z.object({
   provisionedMib: MibSchema,
   naa: z.string().trim().min(1).nullable(),
   type: z.string().trim(),
+  // Empty string allowed — a host-local datastore has no cluster. Do NOT
+  // .min(1)/require: that would drop legitimately cluster-less rows.
+  clusterName: z.string().trim(),
 })
 
 export const VPartitionRowSchema: z.ZodType<VPartitionRow> = z.object({

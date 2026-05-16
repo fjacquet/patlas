@@ -107,6 +107,12 @@ export interface ClusterAggregate {
   hostCount: number
   /** Number of VMs in this cluster (accounting-mode aware). */
   vmCount: number
+  /** Distinct datastores attributed to this cluster via the vDatastore
+   *  `Cluster name` column, NAA-deduped WITHIN the cluster (Moderate-11:
+   *  a shared LUN counts once per cluster it appears in). `0` when the
+   *  vDatastore sheet parsed but none matched this cluster; the em-dash
+   *  sentinel is reserved for "vDatastore absent" (`null`). */
+  datastoreCount: number | null
 
   // ── CPU capacity ──────────────────────────────────────────────────────
   physicalCores: Cores

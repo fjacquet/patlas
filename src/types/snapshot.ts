@@ -42,6 +42,10 @@ export interface VDatastoreRow {
   naa: string | null
   /** VMFS, NFS, vSAN, … */
   type: string
+  /** Owning cluster from RVTools vDatastore `Cluster name`. Empty string
+   *  when the datastore is host-local / not cluster-attributed (the column
+   *  IS present in real RVTools exports — never assume absent). */
+  clusterName: string
 }
 
 /** A guest-disk partition row from the RVTools `vPartition` sheet. */

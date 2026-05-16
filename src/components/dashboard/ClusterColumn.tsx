@@ -28,9 +28,12 @@ const Row = ({ label, value }: { label: string; value: string }) => (
  * prop-consumer (no memo hooks, no engine/store imports). The W/L/O OS mini is a
  * CSS flex bar using the same 3 theme colors as the donut (KISS — avoids a
  * chart instance per column while keeping the OS encoding consistent). The
- * per-cluster datastore count is the em-dash sentinel `—` with a localized
- * aria-label (A1 — `ClusterAggregate` has no datastore field; Phase-3
- * carry-forward). Labels left / values right-aligned font-mono tabular-nums.
+ * per-cluster datastore count comes from the vDatastore `Cluster name`
+ * column (NAA-deduped within the cluster). The em-dash sentinel `—` (with
+ * a localized aria-label) is shown ONLY when the count is genuinely
+ * unknown — `datastoreCount === null`, i.e. the vDatastore sheet was
+ * absent; a cluster the sheet covers but with no matching datastore shows
+ * a real `0`. Labels left / values right-aligned font-mono tabular-nums.
  * Footer keeps vertical room for Phase-6 per-cluster sparklines (`trends`
  * is null in Phase 2). Every color utility carries its `dark:` twin.
  */
@@ -61,8 +64,13 @@ export function ClusterColumn({ cluster, os }: ClusterColumnProps) {
         <span style={{ width: pct(os.other), backgroundColor: palette[2] }} />
       </div>
 
-      <Row label={t('stats.datastores')} value="—" />
-      <span className="sr-only">{t('datastoreNotPerCluster')}</span>
+      <Row
+        label={t('stats.datastores')}
+        value={cluster.datastoreCount === null ? '—' : fmtInt(cluster.datastoreCount, loc)}
+      />
+      {cluster.datastoreCount === null && (
+        <span className="sr-only">{t('datastoreNotPerCluster')}</span>
+      )}
 
       <Row label={t('stats.physicalGhz')} value={fmtGhzValue(cluster.physicalGhz as number, loc)} />
       <Row label={t('stats.consumedGhz')} value={fmtGhzValue(cluster.consumedGhz as number, loc)} />

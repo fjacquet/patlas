@@ -28,11 +28,17 @@ export const aggregateClusters = ({
   vhost,
   mode,
   stretchedClusters,
+  datastoreCountByCluster,
 }: {
   vinfo: VInfoRow[]
   vhost: VHostRow[]
   mode: AccountingMode
   stretchedClusters?: ReadonlySet<string>
+  /** Per-cluster NAA-deduped datastore counts (from the vDatastore
+   *  `Cluster name` column). `undefined` ⇒ the vDatastore sheet was
+   *  absent → each cluster's `datastoreCount` is `null` (em-dash). When
+   *  present, a cluster with no matching datastore gets `0`, not null. */
+  datastoreCountByCluster?: ReadonlyMap<string, number>
 }): ClusterAggregate[] => {
   const stretched = stretchedClusters ?? new Set<string>()
   const hostStats = aggregateHostsPerCluster(vhost)
@@ -73,6 +79,12 @@ export const aggregateClusters = ({
         cluster: h.cluster,
         hostCount: h.hostCount,
         vmCount: v?.vmCount ?? 0,
+        // null only when the vDatastore sheet was absent; otherwise a
+        // cluster with no attributed datastore is a real `0`.
+        datastoreCount:
+          datastoreCountByCluster === undefined
+            ? null
+            : (datastoreCountByCluster.get(h.cluster) ?? 0),
         physicalCores: h.physicalCores,
         usablePhysicalCores: coresOf(usablePhysicalCores),
         vcpuPerPcpu,

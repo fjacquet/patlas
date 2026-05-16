@@ -7,6 +7,7 @@ const cluster = (over: Partial<ClusterAggregate>): ClusterAggregate => ({
   cluster: 'C1',
   hostCount: 2,
   vmCount: 10,
+  datastoreCount: 0,
   physicalCores: cores(24),
   usablePhysicalCores: cores(24),
   vcpuPerPcpu: 0,

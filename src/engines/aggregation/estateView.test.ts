@@ -62,6 +62,7 @@ const snapshot = (): Snapshot => ({
       provisionedMib: mib(800),
       naa: 'naa.s',
       type: 'VMFS',
+      clusterName: 'C1',
     },
     {
       name: 'ds-A-clusterview',
@@ -70,6 +71,7 @@ const snapshot = (): Snapshot => ({
       provisionedMib: mib(800),
       naa: 'naa.s',
       type: 'VMFS',
+      clusterName: 'C1',
     },
     {
       name: 'ds-B',
@@ -78,6 +80,7 @@ const snapshot = (): Snapshot => ({
       provisionedMib: mib(450),
       naa: 'naa.t',
       type: 'NFS',
+      clusterName: '',
     },
   ],
   vpartition: [],
@@ -104,6 +107,24 @@ describe('buildEstateView', () => {
     expect(view.globals.datastoreCount).toBe(2)
     // Shared LUN counted once: 1000 + 500, NOT 1000 + 1000 + 500.
     expect(view.globals.totalStorageMib as number).toBe(1500)
+  })
+
+  it('attributes datastores per cluster (NAA-deduped within cluster); empty clusterName not mis-attributed', () => {
+    const view = buildEstateView(snapshot(), 'active')
+    const c1 = view.clusters.find((c) => c.cluster === 'C1')
+    // naa.s appears twice in C1 → deduped to 1; naa.t has empty
+    // clusterName → NOT attributed to C1.
+    expect(c1?.datastoreCount).toBe(1)
+    // Global count unchanged: still NAA-deduped estate-wide (naa.s + naa.t).
+    expect(view.globals.datastoreCount).toBe(2)
+  })
+
+  it('renders the em-dash sentinel (datastoreCount null) only when vDatastore is absent', () => {
+    const snap = snapshot()
+    snap.vdatastore = []
+    const view = buildEstateView(snap, 'active')
+    for (const c of view.clusters) expect(c.datastoreCount).toBeNull()
+    expect(view.globals.datastoreCount).toBe(0)
   })
 
   it('the three accounting modes produce three DISTINCT global totals (Critical-6)', () => {

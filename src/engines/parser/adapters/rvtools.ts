@@ -100,6 +100,10 @@ const VDATASTORE_COLS = {
   provisionedMib: ['provisioned mib', 'provisioned mb', 'provisioned (mb)', 'provisioned'],
   naa: ['address', 'naa', 'url', 'uuid'],
   type: ['type', 'fs type', 'filesystem'],
+  // Real RVTools exports DO carry a `Cluster name` column on vDatastore
+  // (verified against production workbooks); 'cluster' kept as a drift
+  // fallback. Exact-normalized match (MiB-style), longest spelling first.
+  clusterName: ['cluster name', 'cluster'],
 } as const
 
 const VPARTITION_COLS = {
@@ -203,6 +207,7 @@ export const adaptRvtoolsVDatastore = (sheet: ParsedSheet): VDatastoreRow[] => {
         provisionedMib: mib(Math.max(0, readNumber(readCol(row, cols.provisionedMib)))),
         naa: naa === '' ? null : naa,
         type: readString(readCol(row, cols.type)),
+        clusterName: readString(readCol(row, cols.clusterName)),
       }
     })
     .filter((r) => !isInternalRow(r.name))

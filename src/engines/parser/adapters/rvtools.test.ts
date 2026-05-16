@@ -217,6 +217,37 @@ describe('optional-sheet adapters', () => {
       type: 'VMFS',
     })
     expect(rows[1]?.naa).toBeNull()
+    // No Cluster column in this sheet ⇒ clusterName is '' (host-local),
+    // never undefined — the schema requires the field.
+    expect(rows[0]?.clusterName).toBe('')
+  })
+
+  it('adaptRvtoolsVDatastore resolves the real `Cluster name` column (UAT regression)', () => {
+    const rows = adaptRvtoolsVDatastore(
+      mkSheet(
+        'vDatastore',
+        ['Name', 'Capacity MB', 'Free MB', 'Provisioned MB', 'Address', 'Type', 'Cluster name'],
+        [
+          ['ds-01', 1024, 256, 800, 'naa.6000', 'VMFS', 'Production-Cluster'],
+          ['ds-02', 2048, 1024, 1000, 'naa.6001', 'NFS', ''],
+        ],
+      ),
+    )
+    expect(rows[0]?.clusterName).toBe('Production-Cluster')
+    // Empty cell ⇒ '' (host-local) — row is NOT dropped.
+    expect(rows[1]?.clusterName).toBe('')
+    expect(rows).toHaveLength(2)
+  })
+
+  it('adaptRvtoolsVDatastore accepts the bare `Cluster` alias spelling', () => {
+    const rows = adaptRvtoolsVDatastore(
+      mkSheet(
+        'vDatastore',
+        ['Name', 'Capacity MB', 'Free MB', 'Cluster'],
+        [['ds-x', 100, 50, 'Cluster-X']],
+      ),
+    )
+    expect(rows[0]?.clusterName).toBe('Cluster-X')
   })
 
   it('adaptRvtoolsVPartition reads vm/disk/capacity/consumed/free', () => {

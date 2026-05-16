@@ -4,7 +4,7 @@ import type { Snapshot } from '@/types/snapshot'
 import { aggregateClusters } from './aggregateClusters'
 import { aggregateGlobals, emptySummary } from './globals'
 import { classifyOsFamily } from './osFamily'
-import { perDatastore } from './perDatastore'
+import { datastoreCountByCluster, perDatastore } from './perDatastore'
 import { perEsx } from './perEsx'
 
 /**
@@ -18,21 +18,31 @@ import { perEsx } from './perEsx'
  * `globals.datastoreCount`/`totalStorageMib` (no double-count, Moderate-11).
  * `trends` is `null` — Phase-4 forward-compat (RESEARCH Pattern 3).
  *
- * A1 (fixture-verified during planning): Phase-1 `VDatastoreRow` carries
- * no cluster field, so datastore attribution is GLOBAL only —
- * `ClusterAggregate` carries no datastore count (02-03 renders em-dash
- * per cluster). Scoped simplification, not a gap.
+ * Datastore→cluster attribution: real RVTools exports DO carry a
+ * `Cluster name` column on vDatastore (the earlier "A1: no cluster field"
+ * premise was false — UAT-confirmed). `datastoreCountByCluster` feeds the
+ * per-cluster count, NAA-deduped WITHIN each cluster (Moderate-11: a
+ * shared LUN counts once per cluster it appears in). When the vDatastore
+ * sheet is absent the map is `undefined` ⇒ `ClusterAggregate.datastoreCount`
+ * is `null` and the column renders the em-dash sentinel; a cluster with
+ * the sheet present but no matching datastore renders a real `0`.
  */
 
 const emptyBreakdown = (): OsBreakdown => ({ windows: 0, linux: 0, other: 0 })
 
 export function buildEstateView(snapshot: Snapshot, mode: AccountingMode): EstateView {
   const stretchedClusters = new Set<string>()
+  // No vDatastore rows ⇒ sheet absent/empty ⇒ per-cluster count is
+  // genuinely unknown (undefined → em-dash). Rows present ⇒ attribute
+  // them; an unmatched cluster legitimately gets 0, never em-dash.
+  const dsByCluster =
+    snapshot.vdatastore.length === 0 ? undefined : datastoreCountByCluster(snapshot.vdatastore)
   const clusters = aggregateClusters({
     vinfo: snapshot.vinfo,
     vhost: snapshot.vhost,
     mode,
     stretchedClusters,
+    datastoreCountByCluster: dsByCluster,
   })
 
   const datastores = perDatastore(snapshot.vdatastore)

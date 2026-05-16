@@ -147,6 +147,7 @@ const sharedLunSnapshot = (): Snapshot => ({
       provisionedMib: mib(800),
       naa: 'naa.s',
       type: 'VMFS',
+      clusterName: 'C1',
     },
     {
       name: 'ds-shared-clusterview',
@@ -155,6 +156,7 @@ const sharedLunSnapshot = (): Snapshot => ({
       provisionedMib: mib(800),
       naa: 'naa.s',
       type: 'VMFS',
+      clusterName: 'C2',
     },
     {
       name: 'ds-local',
@@ -163,6 +165,7 @@ const sharedLunSnapshot = (): Snapshot => ({
       provisionedMib: mib(450),
       naa: 'naa.t',
       type: 'NFS',
+      clusterName: '',
     },
   ],
   vpartition: [],
