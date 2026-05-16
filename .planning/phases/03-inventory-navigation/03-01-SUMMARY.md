@@ -60,17 +60,20 @@ Shared, app-agnostic Phase-3 table infrastructure: pinned + bundle-gated TanStac
 ## What Was Built
 
 **Task 1 — Deps + bundle gate + projection (commit `7fe0bdc`):**
+
 - `@tanstack/react-table@8.21.3` + `@tanstack/react-virtual@3.13.24` installed `--save-exact`, verified via `npm ls`.
 - `scripts/check-bundle-size.mjs`: added a **sibling** `@tanstack`-marker gate at `MAX_TANSTACK_GZIP_BYTES = 61440` (60 KiB gz) with the same gzip-and-assert + graceful "no chunk → OK" path as echarts. The existing echarts gate (`MAX_GZIP_BYTES=307200`, `ECHARTS_MARKER='echarts'`) is byte-identical/untouched.
 - `src/types/estate.ts`: `export interface VmDisplayRow` (estate.ts:264) mirroring the `EsxAggregate` lean-flat-field idiom, doc-commented "pure projection of `Snapshot.vinfo`, NOT an aggregation"; `vmRows: VmDisplayRow[]` added to `EstateView` adjacent to `hosts`/`datastores` (306).
 - `src/engines/aggregation/estateView.ts`: a `vmRows` accumulator declared next to `vmsByCluster`, pushed **inside the existing `for (const vm of snapshot.vinfo)` loop** (no second iteration / hook / memo site); returned in the object literal and frozen in `EMPTY_VIEW` as `Object.freeze([]) as never[]`.
 
 **Task 2 — Pure utils, TDD (commits `03d6ac1` RED, `f0ac63c` GREEN):**
+
 - `src/utils/oneLine.ts`: `export const oneLine = (s) => s.replace(/\s+/g, ' ').trim()`, doc-commented as the DISPLAY-ONLY boundary (Minor-2) — the CSV path never passes through it.
 - `src/utils/csv.ts`: `csvCell` (raw `String(v)`, `null/undefined`→`''`, leading `=+-@` single-quote injection guard, RFC-4180 quote/double-quote) + `toCsv(headers, rows)` (comma fields, CRLF rows). Doc-comment states the deliberate contrast with `format.ts` (raw values, no `toLocaleString`, newlines preserved).
 - 18 tests across `csv.test.ts` + `oneLine.test.ts`, **100% coverage** on both util files (every behavior bullet covered, RED-then-GREEN observed).
 
 **Task 3 — Components, unwired (commit `ca165dc`):**
+
 - `src/components/inventory/DataTable.tsx`: generic `DataTable<T>`; `useReactTable` with component-`useState` sorting/columnFilters/globalFilter/columnVisibility; `useVirtualizer` fixed 36px rows, overscan 12; 150 ms debounced global filter; sticky header + sticky first column on `.panel`; active-sort header in `accent-500`; cells rendered as React text children with `oneLine()` display + original in `title`; "Export CSV" toolbar button → `toCsv(getFilteredRowModel × getVisibleLeafColumns)` raw values → Blob → `URL.createObjectURL` → anchor `download="vatlas-{objectKind}-{YYYYMMDD}.csv"` → `revokeObjectURL`.
 - `src/components/inventory/ColumnPicker.tsx`: INV-06 "Columns" toolbar button opening a `<fieldset>` popover over `getAllLeafColumns().filter(c => c.getCanHide())` checkboxes calling `column.toggleVisibility()`; Escape / outside-pointerdown close; "Reset" → `onReset` callback restoring `DataTable`'s `defaultColumnVisibility`.
 - `src/components/ViewToggle.tsx`: 2-segment `['dashboard','inventory']` controlled control, `AccountingModeToggle` idiom verbatim — `<fieldset role="group">` + literal `biome-ignore lint/a11y/noRedundantRoles` + `<legend sr-only>` + arrow-key wrap `move(delta)` + `aria-pressed` map; active segment uses UI-SPEC accent gold (`bg-accent-500 text-surface-900`). Controlled; consumer/state lifted in 03-03.
@@ -104,6 +107,7 @@ Shared, app-agnostic Phase-3 table infrastructure: pinned + bundle-gated TanStac
 ### Auto-fixed Issues
 
 **1. [Rule 1 - Lint] ColumnPicker popover: `<div role="group">` → `<fieldset><legend sr-only>`**
+
 - **Found during:** Task 3 (biome gate)
 - **Issue:** biome `lint/a11y/useSemanticElements` rejects `<div role="group">` and mandates `<fieldset>`. The plan's ColumnPicker text did not pin the popover element.
 - **Fix:** Converted the popover container to `<fieldset>` + `<legend className="sr-only">`, which is also the project's established checkbox/button-group idiom (ThemeToggle / AccountingModeToggle). `aria-controls`/`id` wiring on the trigger button retained. No behavior change.
@@ -111,6 +115,7 @@ Shared, app-agnostic Phase-3 table infrastructure: pinned + bundle-gated TanStac
 - **Commit:** ca165dc
 
 **2. [Rule 3 - Gate compliance] Removed literal `useMemo`/`localStorage` tokens from doc-comments**
+
 - **Found during:** Task 3 (verify grep gates)
 - **Issue:** The plan's verify uses bare `! grep -rn 'useMemo' ...` / `! grep -rn 'localStorage' ...`. DataTable/ColumnPicker doc-comments explained these are deliberately NOT used, but the literal tokens tripped the bare grep (false positive — comment prose, no code usage).
 - **Fix:** Reworded the doc-comments ("never a render-memo hook", "never browser-persisted") preserving full intent while keeping the automated gate literally green. No code change.

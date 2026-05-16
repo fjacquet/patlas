@@ -96,6 +96,7 @@ See frontmatter `key-files`. Engine is pure (no React/Zustand/Zod); input snapsh
 ### Auto-fixed Issues
 
 **1. [Stale fixture — type contract] dashboard-smoke & inventory-stress missing required `vMetaData`**
+
 - **Found during:** Task 3 verification (full suite run)
 - **Issue:** Task 1 made `Snapshot.vMetaData` a required `VMetaDataEntry[]`. Two pre-Task-1 test fixtures omitted it → `SnapshotCard` crashed (`Cannot read properties of undefined (reading 'map')`).
 - **Fix:** Added `vMetaData: rows.vMetaData` to both fixtures (mirrors the already-correct `e2e-smoke` fixture).
@@ -104,6 +105,7 @@ See frontmatter `key-files`. Engine is pure (no React/Zustand/Zod); input snapsh
 - **Committed in:** `da8d14f`
 
 **2. [Signature change — callers] test callers of changed `buildEstateView`**
+
 - **Found during:** Task 3 verification (test-config typecheck)
 - **Issue:** `buildEstateView(snapshot, mode)` → `(merged, mode)` broke `inventory-stress` and `columns.test` direct callers.
 - **Fix:** Local merge shim `buildEstateViewMerged(mergeSnapshotsToEstate([snap]), mode)` — same pattern `estateView.test.ts` already used.
@@ -112,6 +114,7 @@ See frontmatter `key-files`. Engine is pure (no React/Zustand/Zod); input snapsh
 - **Committed in:** `da8d14f`
 
 **3. [Plan defect — naive verification] single-useMemo grep gate**
+
 - **Found during:** Task 3 verification (plan verify step 6)
 - **Issue:** Plan requires `grep -rn 'useMemo' src ... | grep -v '.test.'` to return **exactly one line**. This has been impossible since Phase 1: the grep matches comment text mentioning "useMemo" AND the pre-existing `SnapshotListSidebar.tsx:25` sort memo (shipped in `f58950d feat(01-05)`).
 - **Resolution:** Verified by intent instead: exactly **2** real `useMemo(` call sites exist — `useEstateView.ts:31` (the estate-aggregation memo this invariant governs) and the pre-existing P1 `SnapshotListSidebar` sort memo. **Phase 4 added zero new memos**; the merge runs inside the existing `useEstateView` memo. Deleting a shipped P1 feature's memo is out of scope and a regression risk, so it was not done.
@@ -119,6 +122,7 @@ See frontmatter `key-files`. Engine is pure (no React/Zustand/Zod); input snapsh
 - **Committed in:** n/a
 
 **4. [Pre-commit miss] biome format not applied to Task 2 before its commit**
+
 - **Found during:** Task 3 verification (biome)
 - **Fix:** `biome check --write`; committed as a separate `style(04-01)` commit to keep the feature commit clean.
 - **Committed in:** `a9a1841`

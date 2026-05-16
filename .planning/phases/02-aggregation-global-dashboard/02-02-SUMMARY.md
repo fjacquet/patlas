@@ -73,6 +73,7 @@ completed: 2026-05-16
 - **Files modified:** 30 (29 created, 1 modified)
 
 ## Accomplishments
+
 - Ported `ghz/perCluster/vinfoMerge/aggregateClusters/globals/contention` to branded units with the mechanical retrofit; `ghz.ts` imports `mhzToGhz` from `@/engines/units` (zero re-declaration — DRY gate green).
 - Added the three net-new pure engines: `osFamily` (3-way, `other` always a visible bucket), `perDatastore` (NAA-keyed, first-row capacity never summed — no shared-LUN double-count), `perEsx` (host rollup reusing the shared `readinessStats`).
 - Threaded the three accounting modes through `vinfoMerge`/`perEsx` as a single `mode` param (one-param recompute, no precomputed parallel arrays); proven to yield three distinct global totals on a ~50/50 powered-on fixture (Critical-6).
@@ -88,6 +89,7 @@ completed: 2026-05-16
 _Both tasks are `tdd="true"`; the port is verbatim/compositional so RED (tests vs not-yet-imported modules) → GREEN was a single coherent cycle per task; RED→GREEN observed via the test runs before each commit._
 
 ## Files Created/Modified
+
 - `src/types/estate.ts` — branded `ClusterAggregate`/`GlobalSummary`/`ClusterHostStats`/`ClusterVmStats` + `AccountingMode`/`OsFamily`/`DatastoreAggregate`/`EsxAggregate`/`OsBreakdown`/`TimelinePoint`/`EstateView`. active-memory chain dropped; `datastoreCount`/`totalStorageMib` added; `trends: TimelinePoint[] | null`.
 - `src/types/index.ts` — re-exports the new estate types.
 - `src/utils/format.ts` (+ test) — ported vsizer formatters; `fmtMemMb` suffixes GiB/TiB (base-2 math unchanged); locale is a passed param; em-dash sentinel preserved.
@@ -120,6 +122,7 @@ _Both tasks are `tdd="true"`; the port is verbatim/compositional so RED (tests v
 **Canary reference values for 02-03's integration test** (canary fixture = 1 VM / 1 host / 1 cluster; vHost: 2 sockets × 12 cores @ 2600 MHz, per 01-04-SUMMARY): `physicalGhz = (2600 × 12) / 1000 = 31.2 GHz` per host; global `physicalGhz = 31.2` (single host); `clusterCount = 1`, `hostCount = 1`. The branded composition `2 × physicalGhz(mhz(2600), cores(12)) = 62.4` is asserted in `ghz.test.ts` (ROADMAP success #6). Exact parsed VM vCPU/vRAM/datastore figures derive from the canary's parsed rows (01-04 contract) — 02-03 should drive `parseSnapshot → buildEstateView` on the fixture and assert structural presence + three-modes-distinct rather than hardcoding parsed scalars.
 
 ## Decisions Made
+
 - `useEstateView` is the one new `useMemo`. The pre-existing Phase-1 `SnapshotListSidebar.tsx:25` `useMemo` (the documented reference idiom in 02-PATTERNS) is out of scope for 02-02 and logged in `deferred-items.md`.
 - Exercised the dormant stretched-cluster DR math with a direct regression test (math ports intact for Phase 4) — lifts branch coverage from 74.3% → 85.3% and protects report-integrity (threat T-02-06).
 - `first()` test helper at `src/test/arrays.ts` (outside all coverage `include` globs) — clean way to satisfy `noUncheckedIndexedAccess` without scattering `!`.
@@ -130,6 +133,7 @@ _Both tasks are `tdd="true"`; the port is verbatim/compositional so RED (tests v
 ### Auto-fixed Issues
 
 **1. [Rule 3 - Blocking] noUncheckedIndexedAccess broke destructured test fixtures**
+
 - **Found during:** Task 1 (engine tests)
 - **Issue:** `const [c] = aggregate...()` yields `T | undefined` under the strict `tsconfig.test.json`; typecheck failed.
 - **Fix:** Added a test-only `first()` helper at `src/test/arrays.ts` (outside coverage include globs) and switched destructuring to `first(...)`.
@@ -138,6 +142,7 @@ _Both tasks are `tdd="true"`; the port is verbatim/compositional so RED (tests v
 - **Committed in:** 11224ce / 36e3e88 (task commits)
 
 **2. [Rule 2 - Missing Critical] Branch coverage below the 75% gate**
+
 - **Found during:** Task 2 (coverage gate)
 - **Issue:** First coverage run hit 74.31% branches — below the ≥75% project gate (ROADMAP success #6). The gap was the dormant stretched-cluster DR branches in `aggregateClusters.ts` and the readiness-rollup branches in `globals.ts`.
 - **Fix:** Added a direct stretched-cluster regression test (the ported math is testable even though Phase-2 callers pass an empty set) plus globals readiness/zero-divisor tests.
@@ -155,10 +160,12 @@ _Both tasks are `tdd="true"`; the port is verbatim/compositional so RED (tests v
 No new security surface introduced. Engines are pure transforms with zero network/DOM/Zod/React/Zustand imports (verified). The ported ADRs (0010/0011/0012/0007) and the ≥75% coverage gate (incl. 62.4 GHz, vcpuPerPcpu-uses-cores, NAA-dedupe, three-modes-distinct) mitigate the report-integrity threats T-02-06/T-02-07 per the plan's threat register.
 
 ## Issues Encountered
+
 - The plan's `useMemo` count gate (`grep -rl 'useMemo' | grep -v test`) matches the literal string in JSDoc/prose, so it reports 4 files. The substantive criterion — exactly one NEW real `useMemo()` call site, containing no aggregation logic — is met (`useEstateView.ts:19`). The only other real call site (`SnapshotListSidebar.tsx:25`) is pre-existing Phase-1 code and the documented reference idiom; logged as a deferred item.
 - The `activeMemMb` absence gate initially tripped on explanatory JSDoc; reworded comments to "active-memory" prose so the gate is genuinely clean (zero `activeMemMb`/`sumActiveMem` tokens in `aggregation/` + `estate.ts`).
 
 ## Next Phase Readiness
+
 - 02-03 (dashboard UI) can build directly on `useEstateView(mode)` + the documented `EstateView` contract; 02-01's `<Chart>` infra is already shipped.
 - Phase 3 inventory consumes `perEsx`/`perDatastore`/`vmsByCluster` — no new engine needed there.
 - Phase 4 multi-snapshot populates `trends` (already typed `TimelinePoint[] | null`) and activates the dormant stretched-cluster math without changing the component contract.
@@ -168,5 +175,5 @@ No new security surface introduced. Engines are pure transforms with zero networ
 All 8 key files verified present on disk; both task commits (`11224ce`, `36e3e88`) verified in git history.
 
 ---
-*Phase: 02-aggregation-global-dashboard*
-*Completed: 2026-05-16*
+_Phase: 02-aggregation-global-dashboard_
+_Completed: 2026-05-16_

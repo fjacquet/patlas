@@ -88,7 +88,7 @@ metrics:
 - **`npm run dev` HMR under CSP + guard:** Dev server boots cleanly in ~210 ms at `http://localhost:5173/vatlas/` with the CSP meta and runtime guard active, no console/CSP errors. Interactive browser HMR-roundtrip was not exercised (autonomous run, no browser). Per 01-RESEARCH.md A2, Vite's HMR uses its own internal runtime (not `globalThis.WebSocket`), so the guard never intercepts it — the guard only fires on application-code `new WebSocket(url)` calls. No `vite.config.ts` dev-CSP fallback was needed.
 - **`worker-src 'self' blob:` sufficiency:** No hello-world Worker was instantiated during this plan (plan 01-04 owns the real `parser.worker.ts`). The directive is present in the CSP for plan 01-04 to validate against. The production build emits the CSP into `dist/index.html` (1 occurrence) and builds clean.
 - **Final forbidden patterns in `scripts/check-supply-chain.mjs`:** `@sentry/`, `posthog-`, `@posthog/`, `posthog`, `@amplitude/`, `amplitude-`, `mixpanel`, `@datadog/`, `logrocket`, `@bugsnag/`, `heap-analytics`, `segment-analytics`, `@segment/`, `fullstory`, `@fullstory/`, `@hotjar/`, `hotjar` — plus a `service-worker` substring guard (PITFALLS.md Critical-2) and the exact SheetJS tarball pin check.
-- **CI insertion line:** The supply-chain step is at **line 34–35** of `.github/workflows/static.yml** (`- name: Check supply chain ...` / `run: node scripts/check-supply-chain.mjs`), directly before `- name: Install dependencies` / `run: npm ci` at lines 37–38. Plan 04 can add a worker-bundle-size budget step nearby (after `Build`, line ~89).
+- **CI insertion line:** The supply-chain step is at **line 34–35** of `.github/workflows/static.yml** (`- name: Check supply chain ...` / `run: node scripts/check-supply-chain.mjs`), directly before`- name: Install dependencies` / `run: npm ci` at lines 37–38. Plan 04 can add a worker-bundle-size budget step nearby (after `Build`, line ~89).
 - **Contract for Plan 04:** `src/engines/parser/parser.worker.ts` MUST have `import '../../privacy/fetchGuard'` as its first executable line (after any `/// <reference lib="webworker" />` pragma if used). The worker has its own global scope, so the main-thread patch in `src/main.tsx` does NOT cover it. The guard module is side-effect-only — import for effect, no symbols to bind.
 
 ## Deviations from Plan
@@ -96,30 +96,35 @@ metrics:
 ### Auto-fixed Issues
 
 **1. [Rule 3 - Blocking] `tsc -b` stricter than `tsc --noEmit` — implicit-any `this`**
+
 - **Found during:** Task 2 (`npm run build`).
 - **Issue:** `npm run typecheck` (`tsc --noEmit`, root tsconfig) passed, but `npm run build` (`tsc -b`, `tsconfig.app.json`) flagged TS2683 implicit-any `this` on the fetch + XHR.open wrappers.
 - **Fix:** Dropped the unneeded receiver on the fetch wrapper (`fetch` is a free function — `originalFetch(input, init)`); added an explicit `this: XMLHttpRequest` parameter to the XHR.open wrapper.
 - **Files modified:** `src/privacy/fetchGuard.ts`. **Commit:** `ed5d37f`.
 
 **2. [Rule 3 - Blocking] jsdom 29 has no native `navigator.sendBeacon`**
+
 - **Found during:** Task 1 GREEN.
 - **Issue:** The plan's guard guarded `sendBeacon` behind `'sendBeacon' in navigator`; jsdom 29 has no native impl, so the wrapper was never installed and the cross-origin `sendBeacon` test failed with `navigator.sendBeacon is not a function`.
 - **Fix:** Install the wrapper whenever `navigator` exists. Cross-origin still throws `PrivacyViolation`; same-origin delegates to a native impl when present, otherwise returns `true` (nothing to send, nothing leaked). Defined via `Object.defineProperty` since jsdom's `navigator.sendBeacon` is absent rather than writable.
 - **Files modified:** `src/privacy/fetchGuard.ts`. **Commit:** `627152f`.
 
 **3. [Rule 1 - Bug] WebSocket check ordering mislabelled cleartext localhost as PrivacyViolation**
+
 - **Found during:** Task 1 GREEN.
 - **Issue:** Plan behavior requires a cleartext `ws://localhost/dev` socket to throw `InsecureTransportViolation` "even when localhost is same-origin in dev". Origin-first ordering produced `PrivacyViolation` instead, because `ws://localhost` and jsdom's `http://localhost` are different origins.
 - **Fix:** Run the transport-security (wss-only) check BEFORE the same-origin check in the WebSocket wrapper. Cleartext is now always `InsecureTransportViolation`, matching the plan's must-have truth and STRIDE T-02-02.
 - **Files modified:** `src/privacy/fetchGuard.ts`. **Commit:** `627152f`.
 
 **4. [Rule 1 - Bug] Unhandled rejection from doomed jsdom relative/invalid fetch in tests**
+
 - **Found during:** Task 3 (`npm run test:run` after adding branch tests).
 - **Issue:** jsdom 29's native `fetch` rejects relative/invalid URLs (no document base). The guard correctly let them through (no `PrivacyViolation`), but the resulting native rejection surfaced as an `Unhandled Rejection` in the test run (still 20/20 passing, but noisy and a hard-failure risk under stricter Vitest config).
 - **Fix:** Swallow the doomed downstream promise (`p.then(undefined, () => {})`) in the relative/invalid-URL tests. The guard's synchronous decision remains the sole assertion.
 - **Files modified:** `src/privacy/fetchGuard.test.ts`. **Commit:** `9f6b1bd`.
 
 **5. [Rule 2 - Missing Critical] Branch coverage below global 75% threshold**
+
 - **Found during:** Task 3 (coverage run).
 - **Issue:** First coverage pass: 90.74% stmts / 69.56% branches. The 75% global branch threshold (vitest.config.ts) would fail a dedicated coverage run; the catch/fallback branches were untested.
 - **Fix:** Added 3 targeted tests (same-origin sendBeacon return-true path, malformed fetch target catch path, malformed WebSocket URL → InsecureTransportViolation). Branch coverage 69.56% → 78.26%, lines → 93.87%.
@@ -144,6 +149,7 @@ None introduced. `src/engines/parser/parser.worker.ts` is intentionally NOT crea
 ## Self-Check
 
 **Files claimed:**
+
 - `src/privacy/fetchGuard.ts`: FOUND
 - `src/privacy/fetchGuard.test.ts`: FOUND
 - `scripts/check-supply-chain.mjs`: FOUND
@@ -154,6 +160,7 @@ None introduced. `src/engines/parser/parser.worker.ts` is intentionally NOT crea
 - `.github/workflows/static.yml` (check before npm ci): FOUND
 
 **Commits claimed:**
+
 - `086d266` (Task 1 RED): FOUND
 - `627152f` (Task 1 GREEN): FOUND
 - `ed5d37f` (Task 2): FOUND

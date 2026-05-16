@@ -5,6 +5,7 @@
 **Analogs found:** 36 / 38 (2 net-new with no direct analog: `osFamily.ts`, `perDatastore.ts` — partial-match guidance given)
 
 **Two analog sources:**
+
 - **vatlas `src/`** (`/Users/fjacquet/Projects/rvtui/src/`) — PREFERRED for store/hook/component/i18n/type/test/script patterns. It already follows every project convention (branded units, `@/` alias, dark-pair classes, i18n namespace shape, inputs-only store).
 - **vsizer `src/`** (`/Users/fjacquet/Projects/vsizer/src/`) — the PORT SOURCE for aggregation math only. Bare `number`; retrofit to branded units against vatlas Phase-1 row types.
 
@@ -60,6 +61,7 @@
 **Brand-retrofit (the one worked example — apply this mechanically everywhere):**
 
 vsizer source (bare number):
+
 ```typescript
 export const physicalGhz = (speedMhz: number, cores: number): number => (speedMhz * cores) / 1000
 export const consumedGhz = (speedMhz: number, cores: number, cpuRatio: number): number =>
@@ -67,6 +69,7 @@ export const consumedGhz = (speedMhz: number, cores: number, cpuRatio: number): 
 ```
 
 vatlas retrofit (signature carries brands, unwrap once internally, re-brand the output via the `units` constructor — RESEARCH port-map row `ghz.ts`):
+
 ```typescript
 import { type Cores, type GHz, ghz, type MHz } from '@/engines/units'
 
@@ -78,6 +81,7 @@ export const physicalGhz = (speedMhz: MHz, cores: Cores): GHz =>
 export const consumedGhz = (speedMhz: MHz, cores: Cores, cpuRatio: number): GHz =>
   ghz((physicalGhz(speedMhz, cores) as number) * cpuRatio)
 ```
+
 **Rule of the retrofit:** brand on the boundary (params + return), `x as number` for arithmetic, re-wrap with `mib()`/`ghz()`/`cores()` on the way out. `cpuRatio`/`ramRatio` stay bare `number` (they are 0..1 floats — `VHostRow.cpuRatio` line 25 is unbranded by design).
 
 **Test analog:** vsizer `ghz.test.ts` (lines 11-32) — port and add the `62.4 GHz` canary in the vatlas style from `src/engines/units/converters.test.ts:42-50` (`2 sockets * 12 cores * mhzToGhz(mhz(2600)) === 62.4` — wrap inputs with `mhz()`/`cores()`).
@@ -91,6 +95,7 @@ export const consumedGhz = (speedMhz: MHz, cores: Cores, cpuRatio: number): GHz 
 **Port verbatim:** `groupByCluster` (drop empty-cluster rows), `sum`/`mean` helpers, the capacity-weighted ratio logic (ADR-0011, lines 82-83), the `physicalRamMb === 0 ? mean(rams) : consumedRamMb / physicalRamMb` fallback.
 
 **Required deviations:**
+
 1. `h.memoryMb` → `h.memoryMib` (vatlas `VHostRow` line 23 renamed it; `perCluster.ts:71,76` is the only field-name change).
 2. `physicalGhzOf`/`consumedGhzOf` now return `GHz` brands — unwrap with `as number` inside `sum(...)` calls (lines 69-70).
 3. `Math.max(...cpus)`/`Math.min(...cpus)` (lines 94-95) on `cpuRatio`/`ramRatio` arrays are bare-number — keep as-is (these are small per-cluster host arrays, not VM-scale; the V8 spread-limit concern is VM-only).
@@ -107,21 +112,26 @@ export const consumedGhz = (speedMhz: MHz, cores: Cores, cpuRatio: number): GHz 
 **The one genuine logic change (Critical-6) — `groupByCluster` lines 44-54:**
 
 vsizer (unconditional powered-off filter):
+
 ```typescript
 const groupByCluster = (rows: VInfoRow[]): Map<string, VInfoRow[]> => {
   for (const row of rows) {
     if (!row.poweredOn) continue   // ← unconditional
 ```
+
 vatlas (mode-driven, RESEARCH §Three Accounting Modes):
+
 ```typescript
 import type { AccountingMode } from '@/types/estate'
 const groupByCluster = (rows: VInfoRow[], mode: AccountingMode): Map<string, VInfoRow[]> => {
   for (const row of rows) {
     if (mode !== 'configured' && !row.poweredOn) continue   // Configured = all VMs
 ```
+
 Thread `mode` through `aggregateVmsPerCluster(vinfo, mode)`. **`readinessStats` is ALWAYS powered-on-only regardless of mode** (a powered-off VM has no CPU Ready — RESEARCH is explicit; do NOT make readiness mode-conditional).
 
 **Required deviations:**
+
 - vsizer `ClusterVmStats` has `vramAllocatedMb` + `activeMemMb`; vatlas `VInfoRow` (line 23) has `vramMib: MiB` and NO `activeMemMb` field. Rename `vramAllocatedMb` → `vramAllocatedMib: MiB`; **drop `activeMemMb`/`sumActiveMem`** (vatlas Phase-1 `VInfoRow` does not parse active memory — confirm against `src/types/vinfo.ts`; it is absent, so the `activeMemMb` chain is dead code here).
 - `v.vcpu`/`v.vramMib` are branded — `reduce` accumulators unwrap (`acc + (v.vcpu as number)`), re-brand the sum (`cores(...)`, `mib(...)`).
 
@@ -134,6 +144,7 @@ Thread `mode` through `aggregateVmsPerCluster(vinfo, mode)`. **`readinessStats` 
 **Port verbatim incl. dormant stretched math:** the `stretchedClusters?: ReadonlySet<string>` param (line 37), the `0.5 × physicalGhz` DR reservation, `cpuDrFactor`/`ramDrFactor`, `usablePhysicalCores`, `vcpuPerPcpu = vcpuAllocated / usablePhysicalCores`, `computeMhzPerVcpu`, the `.sort((a,b) => a.cluster.localeCompare(b.cluster))` stable-order tail.
 
 **Phase-2 deviations:**
+
 1. Callers pass `stretchedClusters = new Set()` (RESEARCH Deferred Ideas — math present but dormant; do NOT delete it).
 2. `vmStatsByCluster` build (line 41) must thread the accounting `mode` into `aggregateVmsPerCluster(vinfo, mode)`.
 3. Drop `activeMemMb` references (lines 80, 97) — see `vinfoMerge.ts` deviation (vatlas `VInfoRow` lacks it).
@@ -148,6 +159,7 @@ Thread `mode` through `aggregateVmsPerCluster(vinfo, mode)`. **`readinessStats` 
 **Port verbatim:** every sum, the capacity-weighted DR-aware `meanCpuRatio`/`meanRamRatio` (lines 90-93), the `reportingReadiness` null-not-zero contract (lines 80-84), the `emptySummary` frozen-constant pattern (this is also the `EMPTY_VIEW` model RESEARCH Pattern 3 wants for `useEstateView`).
 
 **Phase-2 deviations (DSH-02):**
+
 - Add `datastoreCount: number` + `totalStorageMib: MiB` to `GlobalSummary` and to `emptySummary` (`0`/`mib(0)`), sourced from `perDatastore` output. RESEARCH port-map row `globals.ts`.
 - Drop `activeMemMb` (lines 23, 70-74) — vatlas `VInfoRow` lacks the source field.
 
@@ -174,6 +186,7 @@ export function classifyOsFamily(osConfig: string, osTools: string): OsFamily {
   return 'other'
 }
 ```
+
 Inputs are `VInfoRow.osConfig`/`osTools` (vatlas `src/types/vinfo.ts:29,31` — both plain `string`, no brand). `other` is a real visible bucket — never drop it (UI-SPEC donut "Other/unknown is a real, visible bucket"). NOT the Phase-5 EOS normalizer — 3-way only.
 
 ---
@@ -215,6 +228,7 @@ Pure function `buildEstateView(snapshot: Snapshot, mode: AccountingMode): Estate
 **Analog:** vsizer `types/cluster.ts` (`ClusterAggregate`, full read) + `types/global.ts` (`GlobalSummary`, full read) + the brand-import header idiom of vatlas `src/types/vhost.ts:1` (`import type { Cores, MHz, MiB, Sockets } from '@/engines/units'`).
 
 **Port the vsizer interfaces, then:**
+
 - Brand the unit fields: `physicalGhz`/`consumedGhz`/`availableGhz`/`drReservedGhz` → `GHz`; `physicalRamMb`→`physicalRamMib: MiB` (rename + brand); `vramAllocatedMb`→`vramAllocatedMib: MiB`; `physicalCores`/`usablePhysicalCores`/`vcpuAllocated` → `Cores`.
 - **Drop `activeMemMb`** from both interfaces (vatlas `VInfoRow` does not parse it — confirmed `src/types/vinfo.ts` has no such field).
 - Add `AccountingMode = 'configured' | 'active' | 'storage-realistic'` union.
@@ -244,6 +258,7 @@ export function useEstateView(mode: AccountingMode): EstateView {
   )
 }
 ```
+
 **Why it works (shipped contracts):** `selectActiveSnapshot` already exists and returns a stable ref; snapshots are replaced-not-mutated in the store (`snapshotStore.ts:39-43`). This is the ONLY `useMemo` site project-wide (RESEARCH Locked Decisions; reaffirmed `01-05-SUMMARY`). Dashboard components must NOT call engines or `useMemo` — they consume this hook's output as plain props.
 
 ---
@@ -359,8 +374,10 @@ Extend the same pattern to `parseSnapshot → buildEstateView → render <Global
 ## Shared Patterns
 
 ### The Brand Retrofit (apply to EVERY ported engine — the one worked example is `ghz.ts` above)
+
 **Source:** vatlas `src/engines/units/{types,converters}.ts`; worked example in this doc's `ghz.ts` section.
 **Apply to:** `ghz.ts`, `perCluster.ts`, `vinfoMerge.ts`, `aggregateClusters.ts`, `globals.ts`, `perDatastore.ts`, `perEsx.ts`, `estateView.ts`, `src/types/estate.ts`.
+
 - Brand on the boundary (function params + return type, interface fields).
 - `x as number` to unwrap for arithmetic; never invent a conversion factor (ADR-0010 — RVTools "MB" IS MiB, no `* 1.048576`).
 - Re-wrap output with the `units` constructor the return type demands: `mib()`, `ghz()`, `cores()`, `sockets()`, `mhz()`.
@@ -368,26 +385,34 @@ Extend the same pattern to `parseSnapshot → buildEstateView → render <Global
 - Engines stay **Zod-free** — branded types are the contract; validation already happened at the parser boundary (RESEARCH Security V5; 01-RESEARCH A8).
 
 ### Locale-aware Formatting (port vsizer `utils/format.ts` verbatim)
+
 **Source:** `/Users/fjacquet/Projects/vsizer/src/utils/format.ts` (full read — `fmtInt`, `fmtGhzValue`, `fmtPercentValue`, `fmtRatio`, `fmtMemMb`, all em-dash-on-non-finite).
 **Apply to:** every dashboard component rendering a number.
+
 - Port to `src/utils/format.ts` (vatlas has no `src/utils/` yet — create it; or `src/engines/format/` per ARCHITECTURE.md §3 — KISS, planner picks one and is consistent).
 - Functions take bare `number` — **unwrap the brand at the call site** (`fmtGhzValue(view.globals.physicalGhz as number)`). RESEARCH A4: zero-change port.
 - Locale must come from the active i18next language (FND-03 / UI-SPEC §Number Formatting) — pass `i18n.language` not the vsizer hardcoded `'fr-FR'` default. The em-dash sentinel is mandatory for `null` CPU Ready and undeterminable datastore counts.
 - `fmtMemMb` renders "GB/TB" — UI-SPEC mandates "GiB/TiB" suffixes (ADR-0010). Adjust the suffix strings only (the division math is already base-2-correct: `/1024/1024`); do NOT change the arithmetic.
 
 ### Dark-pair Color Classes (every Tailwind color utility needs its `dark:` twin)
+
 **Source:** vatlas `src/components/SnapshotCard.tsx:18` doc ("a missing pair would render invisibly in one theme") + `index.css:71-96` `.panel`/`.label` definitions.
 **Apply to:** all dashboard components.
+
 - Every `bg-*`/`text-*`/`border-*`/`ring-*` carries a `dark:` counterpart. Reuse `.panel` (auto dark via `.dark .panel`).
 - The `.label` utility is `font-medium` (500) — Phase 2 MUST add `font-semibold` (600) at dashboard label sites (UI-SPEC §Typography — only 2 weights allowed; inheriting 500 introduces a forbidden 3rd weight).
 
 ### i18n Component Idiom
+
 **Source:** vatlas `SnapshotCard.tsx:1,20,53` / `ThemeToggle.tsx:1,76,81`.
+
 - `const { t } = useTranslation('dashboard')`; keys nested-object style (match `common.json` shape); count/value interpolation `t('key', { vms, hosts })`; numbers formatted by `format.ts` BEFORE interpolation, never pre-formatted inside JSON.
 
 ### Privacy / Error Contract (Critical-2 — inherited from Phase 1)
+
 **Source:** vatlas `src/components/FallbackError.tsx` + `src/App.tsx:18` `<ErrorBoundary FallbackComponent={FallbackError}>`.
 **Apply to:** `GlobalDashboard.tsx` inline error state, any chart/render error path.
+
 - Render `error.message` / `error.name` ONLY — never interpolate a `VInfoRow`/`Snapshot`/error object (would leak VM names/hostnames). The Phase-1 runtime fetch/XHR/WS guard + CSP cover the new echarts deps (render-only, no network) — no new ASVS surface.
 
 ---
@@ -406,9 +431,10 @@ Extend the same pattern to `parseSnapshot → buildEstateView → render <Global
 
 ## Metadata
 
-**Analog search scope:** `/Users/fjacquet/Projects/rvtui/src/` (types, store, hooks, components, engines/units, i18n, index.css, App, __tests__, scripts) read for vatlas conventions; `/Users/fjacquet/Projects/vsizer/src/engines/aggregation/*` + `src/utils/format.ts` + `src/types/{cluster,global}.ts` read in full for the port.
+**Analog search scope:** `/Users/fjacquet/Projects/rvtui/src/` (types, store, hooks, components, engines/units, i18n, index.css, App, **tests**, scripts) read for vatlas conventions; `/Users/fjacquet/Projects/vsizer/src/engines/aggregation/*` + `src/utils/format.ts` + `src/types/{cluster,global}.ts` read in full for the port.
 **Files scanned:** 30 read in full (16 vatlas, 12 vsizer aggregation/types/format, RESEARCH, UI-SPEC).
 **Key cross-cutting findings:**
+
 1. The brand retrofit is mechanical (boundary-brand / unwrap-arith / rewrap-output) — `ghz.ts` is the one worked example to copy.
 2. `useEstateView` and the segmented toggle are NOT new idioms — `SnapshotListSidebar.tsx` (useMemo-off-store) and `ThemeToggle.tsx` (aria-pressed segmented) are shipped templates to copy near-verbatim.
 3. vatlas `VInfoRow` lacks `activeMemMb` — every vsizer `activeMemMb`/`sumActiveMem` reference is dead code in the port and must be dropped (consistent deviation across `vinfoMerge`/`aggregateClusters`/`globals`/`estate.ts`).

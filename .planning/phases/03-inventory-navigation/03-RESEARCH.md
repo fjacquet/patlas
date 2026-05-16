@@ -91,15 +91,18 @@ The single most consequential finding: **`EstateView` does NOT carry per-VM or p
 | net-new `utils/csv.ts` | `papaparse` / `json2csv` | Overkill for "rows×columns → RFC-4180 string". Adds a dependency + supply-chain surface for ~40 lines. KISS: write it, unit-test it. |
 
 **Installation:**
+
 ```bash
 npm install @tanstack/react-table@8.21.3 @tanstack/react-virtual@3.13.24
 ```
 
 **Version verification (run before locking the plan):**
+
 ```bash
 npm view @tanstack/react-table version    # expect 8.21.3 (verified 2026-05-16)
 npm view @tanstack/react-virtual version  # expect 3.13.24 (verified 2026-05-16)
 ```
+
 Both verified current as of 2026-05-16. `@tanstack/react-table@8` is the stable major (v9 not released); pin exact or `^8.21.3`.
 
 ## Architecture Patterns
@@ -169,6 +172,7 @@ src/
 **What:** One `<DataTable>` parameterised by `ColumnDef<T>[]` + `data: T[]`. Owns `useReactTable` with `getCoreRowModel`, `getSortedRowModel`, `getFilteredRowModel`. Sort/filter/visibility state is local `useState`. Body rows windowed by `useVirtualizer`.
 **When to use:** All three object tables (VM/ESX/datastore).
 **Example:**
+
 ```typescript
 // Source: https://tanstack.com/table/v8/docs/framework/react/examples/virtualized-rows
 //         + https://tanstack.com/virtual/v3 (useVirtualizer)
@@ -192,6 +196,7 @@ const rowVirtualizer = useVirtualizer({
 })
 // render only rowVirtualizer.getVirtualItems(); translateY by virtualItem.start
 ```
+
 Keep row height fixed (one density) — variable-height measurement is a documented perf/complexity tax not justified by INV-01..06.
 
 ### Pattern 2: Flatten-tree-to-rows + lazy children (the 10k recipe)
@@ -200,6 +205,7 @@ Keep row height fixed (one density) — variable-height measurement is a documen
 **When to use:** INV-01.
 **Why this beats TanStack's built-in `getExpandedRowModel` here:** the built-in expanded model materializes the *entire* expanded subtree into row objects. At 36k leaves with all expanded that is 36k row objects per render. A hand-built flat-visible-array with **lazy children (children of a node are only included when that node's id ∈ expandedSet)** keeps the materialized array bounded by what the user actually opened. `[VERIFIED: TanStack docs — "If you have 50,000 rows, TanStack Table will generate 50,000 row objects and expect you to render them all"; getExpandedRowModel flattens all sub-rows]` `[CITED: https://tanstack.com/table/v8/docs/guide/expanding]`
 **Recipe:**
+
 1. Pre-index once (pure, in the same `useEstateView` projection): `clustersOrdered: string[]`, `hostsByCluster: Map<cluster, EsxAggregate[]>` (from `EstateView.hosts`), `vmsByHost: Map<hostName, VmDisplayRow[]>` (from projected vmRows grouped by `VInfoRow.host`).
 2. Component state: `expanded: Set<string>` (node ids like `cl:<name>`, `esx:<name>`).
 3. `buildVisibleRows(expanded)` walks clusters → push cluster row; if expanded push its hosts; if a host expanded push its VMs. Returns `FlatNode[]` whose length ≈ only-opened.
@@ -210,6 +216,7 @@ Keep row height fixed (one density) — variable-height measurement is a documen
 
 **What:** Export must be exactly `table.getFilteredRowModel().rows` (filter respected) projected onto `table.getVisibleLeafColumns()` (column hide respected), with raw values and preserved newlines.
 **Example:**
+
 ```typescript
 // utils/csv.ts  (NEW — vsizer has no csv.ts; verified by filesystem scan)
 // RFC-4180-ish: quote if value contains " , \n or \r ; double internal quotes.
@@ -221,6 +228,7 @@ export function toCsv(headers: string[], rows: string[][]): string {
   return [headers, ...rows].map((r) => r.map(csvCell).join(',')).join('\r\n')
 }
 ```
+
 The table component supplies `headers` from visible columns' i18n header text (or column id) and `rows` from `row.getValue(colId)` for each visible column over the filtered model. **CSV uses the raw cell value, never the display-formatted/`oneLine`-d string** (Minor-2: locale numbers and one-lined annotations are display-only; CSV is data for re-import into Excel). Newlines inside an annotation are preserved by the RFC-4180 quoting above. Trigger: `new Blob([csv], {type:'text/csv;charset=utf-8'})` → `URL.createObjectURL` → anchor `download` → `revokeObjectURL`. No server, no fetch — privacy-clean.
 
 ### Pattern 4: Single density, global filter + a few facets
@@ -290,6 +298,7 @@ Global debounced text filter (`globalFilter` state, 150 ms debounce) over name/O
 ## Code Examples
 
 ### Column visibility (INV-06)
+
 ```typescript
 // Source: https://tanstack.com/table/v8/docs/api/features/column-visibility
 const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -300,6 +309,7 @@ const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 ```
 
 ### CSV of current filtered + visible view (INV-05 × INV-06)
+
 ```typescript
 // Source: TanStack row-model API + RFC 4180
 function exportCsv(table: Table<T>, headerFor: (id: string) => string) {
@@ -320,6 +330,7 @@ function exportCsv(table: Table<T>, headerFor: (id: string) => string) {
 ```
 
 ### Virtualised rows over TanStack's row model
+
 ```typescript
 // Source: https://tanstack.com/table/v8/docs/framework/react/examples/virtualized-rows
 const { rows } = table.getRowModel()
@@ -341,7 +352,7 @@ const v = useVirtualizer({ count: rows.length, getScrollElement: () => ref.curre
 | VM table (INV-02) + tree VM leaves (INV-01) | per-VM rows | **No** — `vmsByCluster` is `Map<string,OsBreakdown>` (counts only) | **Pure projection of `Snapshot.vinfo`** → `VmDisplayRow[]`. |
 | Tree cluster/host levels (INV-01) | cluster list + hosts per cluster | Partially — `clusters: ClusterAggregate[]` + `hosts: EsxAggregate[]` (group hosts by `.cluster`) | Group `EstateView.hosts` by `cluster`; clusters from `EstateView.clusters`. |
 
-**Recommendation (option (a) refined):** extend the existing pure `buildEstateView(snapshot, mode)` to also return `vmRows: VmDisplayRow[]` — a 1:1 **projection** (filter/map) of `snapshot.vinfo`, NOT an aggregation (no grouping/summing). `VmDisplayRow` is a lean subset (~8 fields) of `VInfoRow`: `vmName, cluster, host, vcpu, vramMib, osTools||osConfig, poweredOn, provisionedMib`. Add `vmRows` to the `EstateView` type. `useEstateView` is structurally unchanged (still the only `useMemo`; it just memoizes a slightly larger view object). This satisfies ARCHITECTURE "no new engines" because a projection is the same class of operation `osFamily`/display formatters already are — it does not compute estate facts, it reshapes rows for display. `[ASSUMED placement — A2: if the project treats any new `engines/aggregation/` function as an "engine", place `projectVmRows` in `utils/` or inline in the assembler; behaviorally identical, KISS either way.]` Reading raw `Snapshot.vinfo` for *display* (not aggregation) is explicitly the acceptable path per the brief's Q5 ("raw-row read for display is acceptable if it's pure projection").
+**Recommendation (option (a) refined):** extend the existing pure `buildEstateView(snapshot, mode)` to also return `vmRows: VmDisplayRow[]` — a 1:1 **projection** (filter/map) of `snapshot.vinfo`, NOT an aggregation (no grouping/summing). `VmDisplayRow` is a lean subset (~8 fields) of `VInfoRow`: `vmName, cluster, host, vcpu, vramMib, osTools||osConfig, poweredOn, provisionedMib`. Add `vmRows` to the `EstateView` type. `useEstateView` is structurally unchanged (still the only `useMemo`; it just memoizes a slightly larger view object). This satisfies ARCHITECTURE "no new engines" because a projection is the same class of operation `osFamily`/display formatters already are — it does not compute estate facts, it reshapes rows for display. `[ASSUMED placement — A2: if the project treats any new`engines/aggregation/` function as an "engine", place `projectVmRows` in `utils/`or inline in the assembler; behaviorally identical, KISS either way.]` Reading raw `Snapshot.vinfo` for *display* (not aggregation) is explicitly the acceptable path per the brief's Q5 ("raw-row read for display is acceptable if it's pure projection").
 
 ## State of the Art
 
@@ -427,6 +438,7 @@ const v = useVirtualizer({ count: rows.length, getScrollElement: () => ref.curre
 ## Sources
 
 ### Primary (HIGH confidence)
+
 - `npm view @tanstack/react-table version` → `8.21.3` (modified 2026-05-14); peer `react >=16.8` — verified this session
 - `npm view @tanstack/react-virtual version` → `3.13.24` (modified 2026-05-11); peer `react ^19.0.0` — verified this session
 - Codebase read directly: `src/types/estate.ts`, `src/types/{snapshot,vinfo,vhost}.ts`, `src/hooks/useEstateView.ts`, `src/App.tsx`, `src/i18n/index.ts`, `src/store/snapshotStore.ts`, `scripts/check-bundle-size.mjs`, `02-02/02-03/01-04-SUMMARY.md`, ROADMAP/PITFALLS/ARCHITECTURE/FEATURES/STACK
@@ -436,15 +448,18 @@ const v = useVirtualizer({ count: rows.length, getScrollElement: () => ref.curre
 - [TanStack Table v8 — Column Visibility API](https://tanstack.com/table/v8/docs/api/features/column-visibility)
 
 ### Secondary (MEDIUM confidence)
+
 - [TanStack Table v8 — Virtualization guide](https://tanstack.com/table/v8/docs/guide/virtualization) (TanStack ships no virtualization itself; compose with react-virtual)
 - [Building a High-Performance Virtualized Table with TanStack — Medium/Ashwin Rishi](https://medium.com/@ashwinrishipj/building-a-high-performance-virtualized-table-with-tanstack-react-table-ced0bffb79b5) (proven to ~50k rows; FEATURES.md cited)
 
 ### Tertiary (LOW confidence)
+
 - None relied upon for prescriptive claims.
 
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack: HIGH — versions npm-verified this session, React-19 peers confirmed, architecture mandates the libs by name
 - Architecture/patterns: HIGH — derived from direct reads of the actual `EstateView`/`Snapshot` contracts + TanStack official docs; the flat-tree recipe is the documented large-tree pattern
 - Pitfalls: HIGH — Pitfall 1 & 2 verified by reading types and scanning vsizer; the performance pitfall is grounded in Phase-1's measured timings

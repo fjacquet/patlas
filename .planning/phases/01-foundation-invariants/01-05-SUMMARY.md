@@ -111,6 +111,7 @@ capturedAt     = 2026-05-15   (vMetaData Exported Timestamp; filename has no ISO
 rvtoolsVersion = 4.4.0        (vMetaData RVTools Version)
 row counts     = 1 VM · 1 ESX · 1 cluster · 0 datastores
 ```
+
 This exactly matches the plan's `must_haves` truth #1. Any future test that stubs the canary should assert against these values.
 
 ## localStorage after a full session
@@ -142,24 +143,28 @@ All five Phase 1 ROADMAP success criteria are now demonstrable. Phase 1 is funct
 ### Auto-fixed Issues
 
 **1. [Rule 1 - Bug] Plan's PAR-05 test used `new URL('./x', import.meta.url)` for `readFileSync` — fails under Vite/Vitest**
+
 - **Found during:** Task 1 GREEN (`TypeError: The URL must be of scheme file`).
 - **Issue:** `import.meta.url` is not a `file:` URL in the Vitest/Vite module graph, so `readFileSync(new URL(...))` throws.
 - **Fix:** Resolve the source path via `resolve(process.cwd(), 'src/store/snapshotStore.ts')` instead. Assertion intent unchanged.
 - **Files modified:** `src/store/snapshotStore.test.ts`. **Commit:** `7451f10`.
 
 **2. [Rule 1 - Bug] Store docstring tripped the plan's own PAR-05 lexical grep gate (same class as Plan 04 dev #1)**
+
 - **Found during:** Task 1 GREEN (`grep -E 'sessionStorage|indexedDB|...' src/store/snapshotStore.ts` matched the explanatory docstring).
-- **Issue:** The store's PAR-05 rationale comment literally contained `sessionStorage` / `IndexedDB` / `OPFS`, matching the gate regex that asserts those tokens are *absent*.
-- **Fix:** Rephrased the docstring to describe the policy without the gate tokens ("no web storage, no client database, no origin-private filesystem"). Source file now grep-clean; intent preserved. The recursive `src/store/` form of the gate still matches `snapshotStore.test.ts` because that file legitimately contains the regex *patterns as string literals* for its own assertion — the authoritative single-file gate (`snapshotStore.ts`) and the plan-level `src/`-wide dataset-row gate (#3) are both clean.
+- **Issue:** The store's PAR-05 rationale comment literally contained `sessionStorage` / `IndexedDB` / `OPFS`, matching the gate regex that asserts those tokens are _absent_.
+- **Fix:** Rephrased the docstring to describe the policy without the gate tokens ("no web storage, no client database, no origin-private filesystem"). Source file now grep-clean; intent preserved. The recursive `src/store/` form of the gate still matches `snapshotStore.test.ts` because that file legitimately contains the regex _patterns as string literals_ for its own assertion — the authoritative single-file gate (`snapshotStore.ts`) and the plan-level `src/`-wide dataset-row gate (#3) are both clean.
 - **Files modified:** `src/store/snapshotStore.ts`. **Commit:** `7451f10`.
 
 **3. [Rule 3 - Blocking] App `tsc -b` typechecked the new `.tsx` test files (node imports + JSX)**
+
 - **Found during:** Task 3 (`npm run build`).
 - **Issue:** Plan 04's `tsconfig.app.json` exclude only covered `*.test.ts`/`*.spec.ts`/`src/test/**` — not `*.test.tsx` or `src/__tests__/**`. `e2e-smoke.test.tsx` (node:fs/node:path/process) and `FallbackError.test.tsx` were pulled into the app build and failed. Test files are never bundled (Vitest runs them independently).
 - **Fix:** Extended `tsconfig.app.json` exclude to `*.test.tsx`/`*.spec.tsx`/`src/__tests__/**`; extended `tsconfig.test.json` include to the same so test type-safety is still enforced via `npm run typecheck`'s second pass (mirrors Plan 04 dev #3, lower blast radius — no project-reference restructure).
 - **Files modified:** `tsconfig.app.json`, `tsconfig.test.json`. **Commit:** `f58950d`.
 
 **4. [Rule 1 - Bug] Plan's `<li role="button">` SnapshotCard sketch fails Biome a11y + is invalid HTML**
+
 - **Found during:** Task 3 (`npm run lint` — `lint/a11y/useSemanticElements`, error-level).
 - **Issue:** Biome rejects an interactive `role` on a non-interactive `<li>`; the plan's sketch also nested the remove `<button>` inside the clickable card (invalid nested interactive content).
 - **Fix:** `<li>` now wraps a real `<button>` (card body, `aria-pressed`) with the remove `<button>` as an absolutely-positioned **sibling** (not nested). Identical behaviour (click selects, ✕ removes), keyboard a11y is now native to the `<button>`. Also dropped `JSX.Element` return annotations (no global JSX namespace under this tsconfig — TS infers correctly).
@@ -184,6 +189,7 @@ None functional. The `<main>` Phase-2 dashboard placeholder in `App.tsx` ("Snaps
 ## Self-Check
 
 **Files claimed:**
+
 - `src/store/snapshotStore.ts`: FOUND
 - `src/store/snapshotStore.test.ts`: FOUND
 - `src/hooks/useSnapshotUpload.ts`: FOUND
@@ -194,6 +200,7 @@ None functional. The `<main>` Phase-2 dashboard placeholder in `App.tsx` ("Snaps
 - `src/__tests__/e2e-smoke.test.tsx`: FOUND
 
 **Commits claimed:**
+
 - `7451f10` (Task 1 GREEN): FOUND
 - `6d93bfb` (Task 2 GREEN): FOUND
 - `f58950d` (Task 3): FOUND
@@ -208,5 +215,5 @@ Plan frontmatter is `type: execute` (not `type: tdd`); Tasks 1 & 2 are `tdd="tru
 ## Self-Check: PASSED
 
 ---
-*Phase: 01-foundation-invariants*
-*Completed: 2026-05-16*
+_Phase: 01-foundation-invariants_
+_Completed: 2026-05-16_

@@ -48,6 +48,7 @@ Declared values (multiples of 4; Tailwind default scale — no custom scale inve
 The core spacing scale is exactly `4 / 8 / 16 / 24 / 32 / 48 / 64` and is unchanged.
 
 Exceptions:
+
 - Accounting-mode toggle and any keyboard-operable control: minimum 32px (`h-8`) hit height, ≥40px (`h-10`) recommended for the segmented toggle so the keyboard focus ring is unambiguous (desktop-first; no 44px touch target needed — mobile is explicitly out of scope per FEATURES.md A10). The 40px (`h-10`) value is a touch/keyboard hit-target floor for interactive control sizing ONLY — it is NOT a spacing-scale token and MUST NOT be imported into the spacing scale above (do not add `h-10`/40px as a gap/padding step).
 - Per-cluster column minimum width 200px (`min-w-[200px]`) so figures + gauges stay legible; columns scroll horizontally past the viewport rather than shrinking below this (RVTools-admin grid expectation; not a spacing-scale violation — it is a min-width floor, not a spacing token).
 
@@ -66,6 +67,7 @@ UI font: `system-ui` stack (shipped). Numeric/tabular font: `--font-mono`. Two w
 | Micro | 12px (`text-xs`) | 400 | 1.4 | "not reported" / accounting-mode echo ("Active") / capture-date provenance line / `—` sentinel caption |
 
 Notes:
+
 - Exactly 4 font sizes in active use Phase 2: `12 / 14 / 16 / 20`. 12px Micro is a first-class scale size reserved for provenance, sentinels, and the mode echo (factual metadata, never primary content). No 28px Display size exists — any headline number collapses onto the 20px Heading.
 - Exactly 2 font weights: regular 400 + semibold 600. The Label role uses 600 (`font-semibold`). **Phase-2 deviation from Phase-1 `.label`:** the shipped `.label` utility in `src/index.css` is `text-sm font-medium` (weight 500). Phase 2 MUST override that weight to `font-semibold` (600) at the dashboard label usage sites — do NOT silently inherit the 500 weight from the Phase-1 class, as that would introduce a forbidden 3rd weight.
 - Heading line-height 1.2; body/label line-height 1.4–1.5. No italic. No letter-spacing overrides.
@@ -87,6 +89,7 @@ The 60/30/10 split is expressed against the SHIPPED Midnight Executive tokens. L
 | Destructive | `--color-util-high` red | NOT used Phase 2 — no destructive actions exist in this phase (no delete/clear on the dashboard; snapshot removal lives in the Phase-1 sidebar `SnapshotCard`, out of this contract). Listed for completeness only. |
 
 Accent (gold `--color-accent-500`) reserved for — explicit closed list:
+
 - The "count of VMs above the 5% CPU Ready warning threshold" figure in the CPU Ready panel (DSH-05) — a single factual highlight number, never a label or background.
 - The active-state underline/marker on the currently-selected accounting mode in the toggle, IF the navy primary fill is not used (pick exactly one active-state treatment in implementation — primary-fill OR gold-underline — not both).
 
@@ -147,6 +150,7 @@ Desktop-first. The dashboard replaces the Phase-1 `<main>` placeholder ("Snapsho
 ```
 
 Layout rules:
+
 - Region vertical rhythm: `gap-6` (24px) between toolbar → summary → donut → cluster grid → CPU Ready.
 - `PerClusterColumns` is a single horizontal-scroll flex/grid row; each cluster is one fixed-min-width `.panel` column (`min-w-[200px]`, `gap-4` between columns). This is the RVTools-admin headline reading pattern (DSH-01) — do NOT reflow clusters into a vertical list.
 - Per-cluster figure block: labels left (14px `.label`), values right-aligned in `--font-mono` `tabular-nums` so the same metric lines up vertically across all cluster columns when the user scans horizontally.

@@ -13,6 +13,7 @@ The five hard correctness invariants this phase locks in for every later phase: 
 **Primary recommendation:** Decompose into five plans tracking the natural seams. Plan 1 lays the bootstrap (Vite 8 + React 19 + TS strict + Tailwind v4 + Biome + Vitest + i18n + theme + drag-drop shell + CI + base path) — a deployable empty shell. Plan 2 lands the privacy guard layer (`src/privacy/fetchGuard.ts`, CSP meta tag, CI denylist of telemetry packages, `package.json` engine-denied list) before any business code runs. Plan 3 ships `engines/units/` + ADR-0010 inheritance + the MiB canary fixture. Plan 4 ports the parser into a Web Worker boundary with the extended adapter (OS column, vDatastore, vPartition) and the alias dictionary. Plan 5 implements the multi-snapshot Zustand store + snapshot-list sidebar UI shell and proves the end-to-end smoke on a real RVTools workbook from disk. Plans 1, 2, 3 are mostly independent; 4 depends on 3 (branded types); 5 depends on 4 (Snapshot type).
 
 <user_constraints>
+
 ## User Constraints (from CONTEXT.md)
 
 > No CONTEXT.md was produced for this phase (`workflow.skip_discuss: true` in config.json — Phase 1 went straight from roadmap to research). The constraint surface for the planner therefore comes from the binding documents that govern the whole project: PROJECT.md (constraints + key decisions), REQUIREMENTS.md (Phase 1 owns FND-01..05, PAR-01..05, PRV-01..03), and ROADMAP.md (Phase 1 detailed section). The user-supplied additional context in the spawn message also carries hard constraints, reproduced below verbatim.
@@ -67,6 +68,7 @@ These are explicitly other phases' work — Phase 1 MUST NOT touch them. The pla
 </user_constraints>
 
 <phase_requirements>
+
 ## Phase Requirements
 
 The planner MUST address all thirteen IDs below. Each row maps a requirement to the research finding(s) that enable its implementation; each ID is also tagged with the *plan* it most naturally belongs to (the planner can override).
@@ -414,6 +416,7 @@ vatlas/
 **When to use:** Always, for `.xlsx` parsing. Critical-5 mandates this from day one.
 
 **Key Vite 8 details:**
+
 - Native ESM Worker syntax: `new Worker(new URL('./parser.worker.ts', import.meta.url), { type: 'module' })`. Vite handles bundling natively; no plugin needed.
 - The `type: 'module'` option is **required** — without it the worker errors with "import statements outside a module".
 - `tsconfig.app.json` must include `"WebWorker"` in `lib` (or use the per-file triple-slash directive `/// <reference lib="webworker" />` at the top of the worker file).
@@ -498,7 +501,7 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
 }
 ```
 
-`[VERIFIED: vite.dev/guide/features — "Web Workers" section confirms the `new Worker(new URL(..., import.meta.url), { type: 'module' })` pattern]`
+`[VERIFIED: vite.dev/guide/features — "Web Workers" section confirms the`new Worker(new URL(..., import.meta.url), { type: 'module' })`pattern]`
 
 **Anti-pattern:** Calling `XLSX.read` on the main thread "for now" and saying you'll move it later. Critical-5 mandates the worker boundary from day one — retrofitting is painful because the call site changes from sync to async.
 
@@ -574,7 +577,7 @@ export const FileDropzone = ({ onFiles, disabled }: Props): JSX.Element => {
 }
 ```
 
-`[CITED: vsizer's `FileDropzone.tsx` follows this exact pattern (no react-dropzone dep)]`
+`[CITED: vsizer's`FileDropzone.tsx`follows this exact pattern (no react-dropzone dep)]`
 
 ### Pattern 3: Column alias dictionary extending vsizer's `columnMap`
 
@@ -811,11 +814,12 @@ const MibSchema = z.number().nonnegative().transform((n) => n as MiB)
 const MibSchemaB = z.number().nonnegative().brand<'MiB'>()  // output type: number & z.$brand<'MiB'>
 ```
 
-`[VERIFIED: zod.dev/api — "Branded types" section confirms `.brand<'MiB'>()` syntax in v4. The output is `number & z.$brand<'MiB'>` — slightly different from our hand-rolled `number & { readonly __brand: 'MiB' }`. Pick one shape for the whole project.]`
+`[VERIFIED: zod.dev/api — "Branded types" section confirms`.brand<'MiB'>()` syntax in v4. The output is `number & z.$brand<'MiB'>` — slightly different from our hand-rolled `number & { readonly __brand: 'MiB' }`. Pick one shape for the whole project.]`
 
 **Recommendation:** Hand-rolled branded types (Option A in the example above) — the Zod brand shape `z.$brand<'X'>` is a Zod-internal symbol and bleeds Zod's type identity into engine code that has no other reason to know about Zod. Hand-rolled brands keep engines completely Zod-free.
 
 **Critical-1 enforcement:**
+
 - Every storage/memory field name in the canonical row types carries the unit (`provisionedMib`, `vramMib`, `memoryMib`) — never bare `provisioned` / `memory` / `ram`.
 - The branded type guarantees you cannot write `vramGib + provisionedMib` without an explicit converter — TypeScript rejects the addition.
 - No `* 1.048576` factor anywhere. CI grep: `git grep -nE '1\.048576|1048576\.0|\b1\.05[0-9]?\b' src/` (Note: `1_048_576` for `BYTES_PER_MIB` is fine; `1.048576` is the bug.)
@@ -900,6 +904,7 @@ export const selectActiveSnapshot = (s: SnapshotState): Snapshot | null =>
 ```
 
 **Key invariants encoded in the shape:**
+
 - The `Map` is always **replaced** on mutation, never mutated in place — Zustand uses `Object.is` comparison; mutating the Map identity prevents subscribers from notifying.
 - Snapshots are **frozen at insert** — `addSnapshot` is the only way new rows enter; once in, the object is read-only. Phase 6 (Trends) and Phase 4 (Stretched/DR) depend on this for `useMemo` cache hits.
 - **No persistence.** No `zustand/middleware/persist`. PAR-05 means refresh wipes everything.
@@ -1018,7 +1023,7 @@ if (typeof WebSocket !== 'undefined') {
 
 The WebSocket wrapper now rejects on **both** non-same-origin AND cleartext-transport. `vatlas` never opens its own WebSocket (it has no backend) — this guard is purely defensive against a future dependency that might. (CWE-319 — cleartext transmission of sensitive information.)
 
-**HMR compatibility (dev only):** Vite's dev server runs on `localhost:5173` (or `127.0.0.1:5173`), and HMR uses a WebSocket back to the same origin. Vite's dev HMR connection is established by Vite's own runtime — not through `globalThis.WebSocket` calls in app code — so the guard does NOT intercept it. The guard only fires when **application code** calls `new WebSocket(url)`. `[ASSUMED — verified by reasoning about Vite's HMR architecture (its dev client is bundled separately); recommend the planner add a manual smoke test in Plan 2: `npm run dev`, open the app, confirm HMR works.]`
+**HMR compatibility (dev only):** Vite's dev server runs on `localhost:5173` (or `127.0.0.1:5173`), and HMR uses a WebSocket back to the same origin. Vite's dev HMR connection is established by Vite's own runtime — not through `globalThis.WebSocket` calls in app code — so the guard does NOT intercept it. The guard only fires when **application code** calls `new WebSocket(url)`. `[ASSUMED — verified by reasoning about Vite's HMR architecture (its dev client is bundled separately); recommend the planner add a manual smoke test in Plan 2:`npm run dev`, open the app, confirm HMR works.]`
 
 **CSP meta tag (`index.html` `<head>` — belt-and-suspenders):**
 
@@ -1148,6 +1153,7 @@ Wire it into `static.yml` as a step before `npm ci` (so an offending package is 
 **Why it happens:** SI vs IEC ambiguity is industry-wide; the label "MB" is wrong but ubiquitous. New contributors will "fix" it in good faith.
 
 **How to avoid:**
+
 - Inherit ADR-017 from store-predict verbatim into `docs/adr/0010-rvtools-mb-as-mib.md`.
 - Name every storage/memory column in canonical schemas as `*Mib` / `*Gib` / `*Tib` — never bare `*Mb`. The type name carries the unit.
 - Constant `BYTES_PER_MIB = 1_048_576` lives in `engines/units/constants.ts`. Forbid `1_000_000` near storage code via Biome `noRestrictedSyntax` or a CI grep.
@@ -1185,6 +1191,7 @@ Wire it into `static.yml` as a step before `npm ci` (so an offending package is 
 **What goes wrong:** A real estate has 15 000 VMs; the RVTools workbook is 80 MB; the user drops it; the tab freezes for 30 seconds; the user closes the tab thinking the app crashed. Heap balloons to 600 MB (SheetJS expands ~4–8× in memory); on a small machine the tab OOMs.
 
 **How to avoid:**
+
 - **Parse in a Web Worker from day one** (Pattern 1). Retrofit is painful.
 - **Dense mode** `XLSX.read(buf, { dense: true })` — designed for the Chrome arrays-of-arrays perf regression.
 - **Drop raw cells eagerly** — never keep the SheetJS `WorkBook` object alive past the worker boundary. Post canonical rows back, let SheetJS garbage-collect inside the worker.
@@ -1224,6 +1231,7 @@ A test should construct `new Error('msg', { cause: { secret: 'leakedVm' } })`, r
 **What goes wrong:** vsizer was tested against RVTools 4.x. A customer exports from RVTools 3.11 and the parser fails to find `Creation date` (which doesn't exist in 3.11) or finds an extra column like `Config Checksum` (removed in 4.0) and Zod rejects the row. Or, worse, silently maps the wrong column because positional indexing was used.
 
 **How to avoid:**
+
 - **Column alias dictionary per canonical field** (Pattern 3). Header-based lookup, never positional.
 - **Every canonical field optional in Zod at row level**; aggregation engines declare which fields they require and bail with a structured error.
 - **Capture RVTools version per snapshot** (read from `vMetaData` if present, else infer from marker columns).
@@ -1354,6 +1362,7 @@ Phase 1 has clear external dependencies — every one must be present for execut
 | Real RVTools workbooks for fixtures | Test coverage of PAR-01..05 | ✓ — three real exports + one synthetic on disk | — | If real fixtures became unavailable, ship synthetic-only — but the synthetic vsizer sample is only 26 KB and lacks the 10k-VM-scale assertions for Critical-5. The real workbooks are MANDATORY for the perf test. |
 
 **Real RVTools workbooks on disk** (verified 2026-05-15 via `find`):
+
 - `/Users/fjacquet/Library/CloudStorage/OneDrive-Home/RVTools_export_all_2026-01-07_10.23.35.xlsx`
 - `/Users/fjacquet/Library/CloudStorage/OneDrive-Home/JTI/RVTools_export_all_2026-04-17_16.51.38-MOM-vCenter.xlsx`
 - `/Users/fjacquet/Library/CloudStorage/OneDrive-Home/live-optics/RVTools_export_all_2026-01-14_17.23.32.xlsx`
@@ -1397,6 +1406,7 @@ The planner should NOT commit large (>1 MB) fixtures to git directly; either git
 | Cleartext WebSocket connections | `wss:` only, runtime-enforced | This project's invariant | CWE-319 mitigation. |
 
 **Deprecated/outdated:**
+
 - `xlsx` from npm registry → use the CDN tarball.
 - `default-export` Zustand → named import.
 - Zod 3 error-message API → Zod 4 `error` param.
@@ -1526,6 +1536,7 @@ The project's `CLAUDE.md` is generated by the GSD framework and primarily mirror
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack: **HIGH** — every version verified against the live npm registry, all choices derived from vsizer's shipped baseline.
 - Architecture: **HIGH** — direct extrapolation from vsizer + ARCHITECTURE.md, with one deliberate departure (Zustand store shape) clearly motivated.
 - Privacy guard: **HIGH** — pattern is straightforward monkey-patch; alternatives (service worker, CSP-only) are documented as unsuitable. The `wss:`-only WebSocket guard adds CWE-319 mitigation.

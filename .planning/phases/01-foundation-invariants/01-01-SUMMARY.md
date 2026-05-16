@@ -114,6 +114,7 @@ completed: 2026-05-15
 ## Files Created/Modified
 
 **Configs:**
+
 - `package.json` — vatlas, pinned versions per RESEARCH §Standard Stack. `xlsx` deliberately NOT installed (per scope; lands in plan 01-04). No forbidden telemetry SDKs.
 - `vite.config.ts` — `base: '/vatlas/'`, path aliases preserved, `vendor-pptx` chunk dropped.
 - `vitest.config.ts` — coverage extended for `src/engines/units/**` + `src/privacy/**`; `environmentOptions.jsdom.url = 'http://localhost/'` so jsdom does not block `localStorage` on opaque origins.
@@ -122,6 +123,7 @@ completed: 2026-05-15
 - `.github/workflows/static.yml` — Node 24, OSV-Scanner with shared waivers, typecheck → lint → test → build → deploy.
 
 **Source:**
+
 - `src/main.tsx` — entry point with reserved Plan-02 privacy-guard import slot.
 - `src/App.tsx` — header + LanguageToggle + ThemeToggle + UploadZone (stub `console.warn` for Plan 05).
 - `src/i18n/index.ts` — common + upload only; `lookupLocalStorage: 'vatlas-lang'`.
@@ -136,6 +138,7 @@ completed: 2026-05-15
 - `src/index.css` — Tailwind v4 + Midnight Executive `@theme` + `@layer components`, verbatim from vsizer.
 
 **Infra:**
+
 - `index.html` — vatlas title + RVTools meta description + external theme-init script.
 - `public/theme-init.js` — `vatlas-theme` localStorage key; rest verbatim from vsizer.
 - `public/favicon.svg` — neutral mark inherited from vsizer.

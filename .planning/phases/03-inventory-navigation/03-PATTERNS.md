@@ -40,12 +40,14 @@
 **Analog:** itself. The hook is structurally UNCHANGED. The VmDisplayRow projection rides inside `buildEstateView`, not here.
 
 **The exact insertion contract** — `useEstateView.ts:17-20` stays byte-identical:
+
 ```typescript
 export function useEstateView(mode: AccountingMode): EstateView {
   const snapshot = useSnapshotStore(selectActiveSnapshot)
   return useMemo(() => (snapshot ? buildEstateView(snapshot, mode) : EMPTY_VIEW), [snapshot, mode])
 }
 ```
+
 The doc comment at lines 6-16 already states "the project's SINGLE sanctioned `useMemo` site". **Do not add `useInventoryRows`, do not add a second `useMemo`, do not add a `useMemo` in any table/tree component.** TanStack sort/filter/visibility = component `useState` (RESEARCH Anti-Pattern "a second useMemo-aggregation site").
 
 **Deviation:** none to this file. `EstateView` grows a `vmRows` field; the memo just memoizes a slightly larger object (RESEARCH Data Source §, line 344).
@@ -57,6 +59,7 @@ The doc comment at lines 6-16 already states "the project's SINGLE sanctioned `u
 **Analog:** itself. This is where the VmDisplayRow projection inserts.
 
 **Exact insertion point** — inside `buildEstateView`, alongside the existing `for (const vm of snapshot.vinfo)` loop at `estateView.ts:50-56` (reuse the SAME single pass — do not add a second iteration):
+
 ```typescript
 // existing loop, estateView.ts:48-56
 const osBreakdown = emptyBreakdown()
@@ -69,6 +72,7 @@ for (const vm of snapshot.vinfo) {
   vmsByCluster.set(vm.cluster, perCluster)
 }
 ```
+
 **Required deviation:** add a `vmRows` accumulator populated in this same loop (1:1 projection — filter/map, NEVER group/sum), and add `vmRows` to the returned object literal at `estateView.ts:58-67` AND to `EMPTY_VIEW` at `estateView.ts:75-84` (mirror `hosts: Object.freeze([]) as never[]`). Projection = lean subset of `VInfoRow` (RESEARCH line 207, 344): `{ vmName, cluster, host, vcpu, vramMib, os: osTools||osConfig, poweredOn, provisionedMib }`. This is the same operation-class as the existing `classifyOsFamily` call already in this loop — a reshape, not an estate-fact computation (RESEARCH A2). KISS placement note (RESEARCH A2): a tiny `projectVmRows(snapshot)` helper file is fine if preferred; behaviourally identical.
 
 ---
@@ -78,6 +82,7 @@ for (const vm of snapshot.vinfo) {
 **Analog:** `EsxAggregate` interface, `estate.ts:237-254` (lean per-row display interface — closest shape to VmDisplayRow).
 
 **Pattern to copy** (doc-comment + flat branded fields, `estate.ts:231-254`):
+
 ```typescript
 /**
  * Per-ESX-host rollup (DSH-01 + Phase-3 inventory tree consumer). ...
@@ -90,6 +95,7 @@ export interface EsxAggregate {
   ...
 }
 ```
+
 **Required deviation:** add `export interface VmDisplayRow` (lean ~8-field subset of `VInfoRow` — see `vinfo.ts:13-44` for field source/branding: `vcpu: Cores`, `vramMib: MiB`, `provisionedMib: MiB` are branded; `vmName/cluster/host/os` are `string`; `poweredOn: boolean`). Add `vmRows: VmDisplayRow[]` to `EstateView` (`estate.ts:279-291`), placed next to `hosts`/`datastores`. Doc-comment must state "pure projection of `Snapshot.vinfo`, not an aggregation" (lineage discipline matches every other interface here). RESEARCH recommends a new `src/types/inventory.ts` is acceptable — but `estate.ts` is the established home for the `EstateView` contract; prefer extending it.
 
 ---
@@ -99,6 +105,7 @@ export interface EsxAggregate {
 **Analog (idiom only):** `src/utils/format.ts:1-21` — the pure-fn module idiom: top-of-file doc-comment explaining provenance + lineage, named `export const`/`export function`, bare values, em-dash/empty sentinels, zero React/i18n imports, fully unit-testable.
 
 **Exact code to write** (RESEARCH §Pattern 3, lines 213-224 + CSV-injection guard, RESEARCH line 422):
+
 ```typescript
 function csvCell(v: unknown): string {
   let s = v == null ? '' : String(v)            // raw value, NO locale formatting
@@ -109,6 +116,7 @@ export function toCsv(headers: string[], rows: string[][]): string {
   return [headers, ...rows].map((r) => r.map(csvCell).join(',')).join('\r\n')
 }
 ```
+
 **Required deviation from format.ts:** `format.ts` is locale-AWARE display; `csv.ts` is the OPPOSITE — raw values, NO `toLocaleString`, newlines PRESERVED (RESEARCH Anti-Pattern "Formatting numbers in the CSV", Pitfall 4). Keep the format.ts header-comment style stating this contrast explicitly. ≥75% coverage gate (ADR-0005, RESEARCH line 460).
 
 ---
@@ -118,9 +126,11 @@ export function toCsv(headers: string[], rows: string[][]): string {
 **Analog (idiom):** `src/utils/format.ts` (same pure-module idiom; could fold into a display helper but RESEARCH §structure lists it separate).
 
 **Exact code** (RESEARCH Pitfall 4, line 281):
+
 ```typescript
 export const oneLine = (s: string): string => s.replace(/\s+/g, ' ').trim()
 ```
+
 **Required deviation:** applied ONLY at the table cell-render boundary (display); the CSV path passes the ORIGINAL value to `toCsv`. Two deliberate code paths (RESEARCH Pitfall 4). Full original text goes into the cell `title` attribute (UI-SPEC §Three object tables: "full text in title attribute").
 
 ---
@@ -130,6 +140,7 @@ export const oneLine = (s: string): string => s.replace(/\s+/g, ' ').trim()
 **Analog:** none in repo (no TanStack usage anywhere). Anchor: RESEARCH §Pattern 1 (lines 172-195) + §Virtualised rows (lines 323-331). For React structure/className conventions copy `GlobalDashboard.tsx`/`AccountingModeToggle.tsx` (Tailwind `dark:` twin on every color utility, `.panel` for the panel surface, `focus-visible:ring-2 focus-visible:ring-primary-500`).
 
 **Core pattern to copy** (RESEARCH lines 175-193):
+
 ```typescript
 const table = useReactTable({
   data, columns,
@@ -147,7 +158,9 @@ const rowVirtualizer = useVirtualizer({
   estimateSize: () => 36, overscan: 12,
 })
 ```
+
 **Required deviations / contract:**
+
 - Generic `<T,>` component: props `{ data: T[], columns: ColumnDef<T>[], headerFor: (id) => string }`. Single component, 3 consumers — DRY-justified (RESEARCH line 90).
 - Sort/filter/visibility state = local `useState` (NOT `useMemo` — see useEstateView rule).
 - Fixed row height 36px (RESEARCH line 195 — no measured/variable rows).
@@ -164,12 +177,14 @@ const rowVirtualizer = useVirtualizer({
 **Analog:** none. Anchor: RESEARCH §Pattern 2 "Flatten-tree-to-rows + lazy children (the 10k recipe)" (lines 197-207). React/Tailwind conventions from `GlobalDashboard.tsx`.
 
 **The flatten-visible recipe (extracted verbatim from RESEARCH lines 202-207):**
+
 1. Pre-index ONCE in the same `useEstateView` projection (NOT a new memo): `clustersOrdered: string[]` (from `EstateView.clusters`), `hostsByCluster: Map<cluster, EsxAggregate[]>` (group `EstateView.hosts` by `.cluster`), `vmsByHost: Map<hostName, VmDisplayRow[]>` (group projected `vmRows` by `.host`).
 2. Component state: `expanded: Set<string>` of node ids (`cl:<name>`, `esx:<name>`).
 3. `buildVisibleRows(expanded)`: walk clusters → push cluster row; if cluster ∈ expanded push its hosts; if host ∈ expanded push its VMs → returns `FlatNode[]` whose length ≈ only-opened (lazy children — children included ONLY when parent id ∈ expandedSet).
 4. `useVirtualizer({ count: flat.length, estimateSize: () => 36, overscan: 12 })` → render window only; indent by `node.depth` via `paddingLeft` (16px/level — UI-SPEC §Spacing).
 
 **Required deviations:**
+
 - Tree hierarchy = synthetic vCenter root (`Snapshot.vCenterLabel`) → Cluster → ESX → VM. NO Datacenter level (RESEARCH A1 / Open Q2; UI-SPEC §Inventory layout). Root label key `inventory.tree.root`.
 - DO NOT use TanStack `getExpandedRowModel()` — it materializes the full subtree (RESEARCH Anti-Pattern, line 234; verified TanStack-docs claim line 201).
 - `buildVisibleRows` is render-derived presentation state, NOT aggregation — a local `useMemo` keyed on `expanded` is acceptable render-memoization (RESEARCH line 199) OR a plain call; it does NOT violate the one-useMemo rule (that rule is about *aggregation*).
@@ -184,6 +199,7 @@ const rowVirtualizer = useVirtualizer({
 **Analog:** field lists from `src/types/estate.ts` — `EsxAggregate` (`estate.ts:237-254`), `DatastoreAggregate` (`estate.ts:211-229`), and `VmDisplayRow` (new). Header text via i18n `inventory.col.<field>`.
 
 **Required deviations:**
+
 - `esxColumns: ColumnDef<EsxAggregate>[]` — consume `EstateView.hosts` verbatim (INV-03, no projection).
 - `datastoreColumns: ColumnDef<DatastoreAggregate>[]` — consume `EstateView.datastores` verbatim; NO cluster column; do NOT re-derive (RESEARCH Anti-Pattern line 232, Pitfall NAA dedupe, Open Q3).
 - `vmColumns: ColumnDef<VmDisplayRow>[]` — bound to projected `vmRows`; reference ONLY VmDisplayRow fields (RESEARCH Pitfall 1 warning sign — never reference `OsBreakdown` fields).
@@ -197,12 +213,14 @@ const rowVirtualizer = useVirtualizer({
 **Analog:** `GlobalDashboard.tsx:48-87` — the "single `useEstateView` caller, children get derived `EstateView` as plain props" pattern.
 
 **Pattern to copy** (`GlobalDashboard.tsx:48-52, 79-82`):
+
 ```typescript
 const view = useEstateView(mode)
 ...
 <GlobalSummaryCard globals={view.globals} mode={mode} />
 <PerClusterColumns clusters={view.clusters} vmsByCluster={view.vmsByCluster} />
 ```
+
 **Required deviation:** these are thin wrappers — pick `view.vmRows` / `view.hosts` / `view.datastores`, pass with the matching column module into `<DataTable>`. Do NOT call `useEstateView` per-table (the shell calls it once and passes props down — same lift discipline as `GlobalDashboard`; RESEARCH Pattern 4 line 228 "do not lift filter state above InventoryPanel" — but DO lift the `view` source). No `useMemo`.
 
 ---
@@ -212,10 +230,12 @@ const view = useEstateView(mode)
 **Analog:** `ThemeToggle.tsx:75-108` / `AccountingModeToggle.tsx:32-83` for the a11y button-list + Tailwind idiom (checkbox list instead of segmented buttons).
 
 **Pattern to copy** (RESEARCH §Column visibility, lines 293-300):
+
 ```typescript
 // table.getAllLeafColumns().filter(c => c.getCanHide())
 //   → checkbox calling column.toggleVisibility()
 ```
+
 **Required deviations:** popover anchored to a "Columns" toolbar button (icon + Label); default columns pre-checked; "Reset" restores default set; keyboard-operable, closes on Escape / outside click, applies immediately (UI-SPEC §Column-picker). Visibility state ephemeral in-memory only — NO `localStorage` (RESEARCH Anti-Pattern line 235, Open Q5; privacy invariant). Every color utility carries its `dark:` twin (copy `AccountingModeToggle.tsx:58,69-73`).
 
 ---
@@ -235,6 +255,7 @@ const view = useEstateView(mode)
 **Analog:** `AccountingModeToggle.tsx:32-83` — copy this almost verbatim (it is already the controlled 2/3-segment `aria-pressed` reuse of the `ThemeToggle` idiom; RESEARCH Open Q1, UI-SPEC §Dashboard↔Inventory toggle).
 
 **Exact idiom to copy** (`AccountingModeToggle.tsx:52-82`):
+
 ```typescript
 <fieldset
   role="group"
@@ -251,6 +272,7 @@ const view = useEstateView(mode)
           active ? 'bg-primary-600 text-white' : 'text-slate-500 ... dark:text-slate-400 ...'}`}
         aria-pressed={active} ...>
 ```
+
 Also keep the keyboard `move(delta)` + `onKeyDown` Arrow-Left/Right/Up/Down wrap-around handler (`AccountingModeToggle.tsx:36-50`) and the `biome-ignore lint/a11y/noRedundantRoles` comment on `role="group"` (line 54 — a CI grep gate asserts its literal presence).
 
 **Required deviations:** 2 segments (`dashboard` | `inventory`) instead of 3 modes; default segment `dashboard`; i18n keys `inventory.nav.dashboard` / `inventory.nav.inventory` via `useTranslation('inventory')`; controlled `value`/`onChange` (lift state to `App.tsx`). Active segment = accent gold (UI-SPEC §Color reserved list — confirm token vs. `bg-primary-600`; UI-SPEC says "accent gold", AccountingModeToggle uses `bg-primary-600` — follow the UI-SPEC accent for the active *view* segment).
@@ -272,6 +294,7 @@ Also keep the keyboard `move(delta)` + `onKeyDown` Arrow-Left/Right/Up/Down wrap
 **Analog:** `i18n/index.ts:24-38` (namespace registration) + `locales/en/dashboard.json:1-51` (key-shape mirror).
 
 **Exact registration deviation** (3 edits, copy the `dashboard` lines):
+
 - `index.ts:24` — `export const NAMESPACES = ['common', 'upload', 'dashboard', 'inventory'] as const`
 - `index.ts:5-10` — add `import enInventory from './locales/en/inventory.json'` + fr twin
 - `index.ts:27-38` — add `inventory: enInventory` to `resources.en`, `inventory: frInventory` to `resources.fr`
@@ -301,11 +324,13 @@ Also keep the keyboard `move(delta)` + `onKeyDown` Arrow-Left/Right/Up/Down wrap
 ### Test files (NEW — `*.test.tsx` / `*.test.ts`)
 
 **Analogs:**
+
 - Component tests → `src/components/dashboard/AccountingModeToggle.test.tsx:1-64`: `describe`/`it`/`expect` from vitest, `render`/`screen` from `@testing-library/react`, `userEvent`, `beforeEach(() => i18n.changeLanguage('en'))`, `getByRole('group')`/`getByText`, `aria-pressed` assertions, the non-editorial-copy guard `expect(title).not.toMatch(/recommend|should|good|bad|healthy/i)`.
 - Pure-fn tests (csv/oneLine) → `src/engines/aggregation/estateView.test.ts:1-30` idiom: typed fixture builders (`const host = (over: Partial<VHostRow>) => ({...})`), branded-unit constructors (`cores`, `mib`, `mhz`), `buildEstateView`/`EMPTY_VIEW` direct calls. ≥75% coverage (ADR-0005).
 - Array narrowing under `noUncheckedIndexedAccess` → `src/test/arrays.ts` `first()` helper.
 
 **Required deviations / required net-new tests (RESEARCH line 462):**
+
 - 10k-stress test: load the synthetic fixture, assert sort < 200 ms on 10k (ROADMAP success #2) and a bounded rendered-row-window count in jsdom for tree expand/collapse (fps not measurable in jsdom — assert window size, RESEARCH line 462).
 - CSV-of-filter test: filter → hide a column → assert `toCsv` output = filtered rows × visible columns only, raw values, newline preserved & RFC-4180 quoted (INV-05 × INV-06).
 - Tree-virtualisation test: lazy children — assert collapsed parent's children are NOT in the flat array; expand → present.
@@ -316,8 +341,10 @@ Also keep the keyboard `move(delta)` + `onKeyDown` Arrow-Left/Right/Up/Down wrap
 ## Shared Patterns
 
 ### Segmented-control aria-pressed idiom (ViewToggle + inner table tabs + ColumnPicker)
+
 **Source:** `src/components/dashboard/AccountingModeToggle.tsx:52-82` (which itself reuses `src/components/ThemeToggle.tsx:80-106`)
 **Apply to:** `ViewToggle.tsx`, the VM|ESX|Datastore tab strip in `InventoryView.tsx`.
+
 ```typescript
 <fieldset role="group" aria-label={label} onKeyDown={onKeyDown}
   className="flex items-center gap-1 rounded-md border border-slate-200 bg-white p-0.5 text-sm dark:border-surface-700 dark:bg-surface-900">
@@ -329,26 +356,32 @@ Also keep the keyboard `move(delta)` + `onKeyDown` Arrow-Left/Right/Up/Down wrap
   ))}
 </fieldset>
 ```
+
 Keep the `move(delta)`/`onKeyDown` arrow-key wrap handler and the `biome-ignore lint/a11y/noRedundantRoles` comment (CI grep gate asserts literal `role="group"`).
 
 ### Pure-fn util module (csv, oneLine)
+
 **Source:** `src/utils/format.ts:1-21` (header doc-comment w/ provenance + lineage; named exports; bare values; em-dash sentinel; zero React/i18n)
 **Apply to:** `src/utils/csv.ts`, `src/utils/oneLine.ts`
 
 ### Scoped message-only ErrorBoundary (privacy)
+
 **Source:** `src/components/dashboard/GlobalDashboard.tsx:19-30`
 **Apply to:** `InventoryView.tsx`
 Reads ONLY `error.message`/`error.name` — never `error`, `cause`, `stack` (leaks VM names/hostnames). Top-level `<ErrorBoundary>` in `App.tsx:19` stays the outer net.
 
 ### Single useEstateView caller, props down (NO per-component useMemo)
+
 **Source:** `src/components/dashboard/GlobalDashboard.tsx:48-52, 79-82`
 **Apply to:** `InventoryView.tsx` (the one caller) → `{Vm,Esx,Datastore}Table.tsx` / `InventoryTree.tsx` (plain props). TanStack sort/filter/visibility = component `useState`. The ONLY `useMemo` is `useEstateView.ts:19` (RESEARCH Anti-Pattern line 233; CLAUDE.md binding).
 
 ### Locale-aware display vs. raw data (Pitfall 4 — two deliberate paths)
+
 **Source:** `src/utils/format.ts` (display) vs. RESEARCH §Pattern 3 (CSV raw)
 **Apply to:** every numeric/annotation cell. Table cell → `format.ts` formatter + `oneLine()` + original in `title`. CSV → raw `row.getValue(colId)`, NO locale, newline preserved.
 
 ### Em-dash sentinel for absent data
+
 **Source:** `src/utils/format.ts` (every formatter returns `'—'` on non-finite)
 **Apply to:** all table cells (UI-SPEC §Copywriting: `—`, never `''`, never `"N/A"`). Tree count badges are the exception — count always known, `0` shows `0`.
 
@@ -369,6 +402,7 @@ Reads ONLY `error.message`/`error.name` — never `error`, `cause`, `stack` (lea
 **Analog search scope:** `src/hooks/`, `src/engines/aggregation/`, `src/types/`, `src/components/`, `src/components/dashboard/`, `src/utils/`, `src/i18n/`, `src/test/`, `scripts/`, `package.json`
 **Files scanned:** 17 read in full + directory/grep scans of engines, store, package.json
 **Key cross-cutting findings:**
+
 - The one-`useMemo` rule (`useEstateView.ts:6-16`) is the single most load-bearing constraint — VmDisplayRow rides inside `buildEstateView`'s EXISTING `snapshot.vinfo` loop (`estateView.ts:50-56`), no new hook/memo.
 - `EstateView` carries `hosts`/`datastores` (consume verbatim) but NOT VM rows — `vmsByCluster` is counts-only (`estate.ts:285`); VM table/tree need the new `vmRows` projection (RESEARCH Pitfall 1).
 - `AccountingModeToggle.tsx` is a near-perfect ViewToggle/tab template (already the controlled `aria-pressed` reuse of `ThemeToggle.tsx`).

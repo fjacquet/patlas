@@ -49,6 +49,7 @@ Declared values (multiples of 4 — the inherited Phase-2/3 scale, unchanged):
 | 3xl | 64px | Reserved; not used Phase 4 |
 
 Exceptions:
+
 - Interactive controls (Stretched pill, DR-mode segmented selector, allocation preset buttons, slider thumb) keep the inherited keyboard/hit-target floor: minimum 32px (`h-8`) hit height, 40px (`h-10`) for the segmented selector — this is the SAME `AccountingModeToggle` `h-10` rule, **not** a new spacing token, and MUST NOT be imported into the scale above.
 - Per-cluster column min-width `min-w-[200px]` is unchanged from Phase 2 (a min-width floor for the added Stretched pill + confidence chip; not a spacing token). The pill + chip must fit inside the existing 200px floor without widening it.
 - Range-slider track length is a fluid layout dimension, not a spacing step; it does not enter the scale.
@@ -67,6 +68,7 @@ EXACTLY 4 sizes, EXACTLY 2 weights — inherited from Phase 3 **verbatim** (this
 | Heading | 20px | 600 | 1.2 | Region titles ("DR simulation", "Allocation", "Stretched cluster"), DR-panel header |
 
 Notes:
+
 - Numeric/tabular values use `--font-mono` `tabular-nums` at the **Body (14/400)** size, right-aligned in their column — identical posture to the shipped `ClusterColumn` `Row`. No new numeric role is introduced.
 - The `.label` utility's 600 weight is the only Label treatment; the Phase-2 deviation note (override the shipped `.label` 500 → 600) still applies anywhere a raw `.label` class is reused.
 - No italic, no letter-spacing overrides, no Display size. Any DR headline number collapses onto Body-mono or Heading — never a new size.
@@ -88,6 +90,7 @@ Notes:
 | Destructive | `--color-util-high` red | **NOT used Phase 4.** Phase 4 has no destructive action: DR "failed" is a reversible simulation toggle, not a delete; there is NO confirmation dialog and NO red framing. Declared only for token-table completeness. |
 
 Accent (gold `--color-accent-500`) reserved for — explicit closed list (nothing else; gold is a factual attention marker, never an editorial flourish, never "anything interactive"):
+
 - The active segment of the **DR-mode segmented selector** IF the navy-fill active treatment is not used (pick exactly ONE active treatment in implementation — navy-fill OR gold-underline — consistent with the Phase-2 toggle rule; default: navy-fill, matching `AccountingModeToggle`).
 - The single **evacuee-total** figure in the DR result (the one "this much vCPU/vRAM must be re-homed" headline number) — a factual highlight number, never a label or background.
 - The active **allocation preset** marker IF navy-fill is not used (same one-treatment rule; default: navy-fill).
@@ -95,6 +98,7 @@ Accent (gold `--color-accent-500`) reserved for — explicit closed list (nothin
 Accent is NOT used for: the Stretched pill (uses navy-primary aria-pressed like the shipped toggles), the low-confidence chip (neutral — see below), DR verdicts, links, hovers, borders, or chart series.
 
 **Stretched confidence + low-confidence chip + DR verdict — neutral, factual, NO verdict color (per locked constraint):**
+
 - Confidence indicator `high` / `medium` / `low` (STR-03): a small Caption-size text tag on the cluster card reading the localized word only ("Confidence: high/medium/low") — **no** green/amber/red, **no** traffic-light. Neutral slate text on `.panel`.
 - Low-confidence warning chip (STR-04): a neutral grey chip (`bg-surface-100 text-slate-600 dark:bg-surface-700 dark:text-slate-300`) with an inline-SVG outline info-glyph (`stroke="currentColor"`), shown only when `stretchedConfidence === 'low'`. Factual copy, no "you should", no alarm color (NOT red).
 - DR per-survivor verdict `absorbs` / `tight` / `overflows` (DRS-06): rendered as the localized **factual enum word** in neutral Body text — NOT colored red/amber/green, NOT "good/bad/poor". The number sits adjacent in body color.
@@ -147,6 +151,7 @@ Desktop-first. Phase 4 attaches to the SHIPPED structure — **no third view**. 
 ```
 
 Layout rules:
+
 - Region vertical rhythm `lg` (24px) within the dashboard; `2xl` (48px) only at the Dashboard↔DR-panel break.
 - Allocation toolbar mirrors the Phase-2 dashboard-toolbar height/idiom; sliders + presets sit on one row, wrapping below `min-w` like the cluster grid does.
 - The Stretched pill block stays inside the 200px cluster-column floor; per-site values are mono `tabular-nums` right-aligned exactly like the existing `Row`.
@@ -158,19 +163,23 @@ Layout rules:
 ## Interaction Contract
 
 **Étendu / Stretched pill (STR-01)**
+
 - A 2-state toggle on each cluster card, reusing the shipped `ThemeToggle`/`AccountingModeToggle` `<fieldset> + <legend className="sr-only"> + button aria-pressed` idiom — **no bespoke toggle** (DRY, locked constraint). `aria-pressed="true"` = cluster is in the `stretchedClusters` Set.
 - Active treatment: navy-fill `bg-primary-600 text-white` (identical to `AccountingModeToggle`). Focus ring `ring-2 ring-primary-500`. Fully keyboard-operable (Tab in, Space/Enter toggles).
 - It is an **input** (in-memory store Set, replaced not mutated — RESEARCH §store-holds-inputs); ephemeral, never persisted (no localStorage, no URL hash).
 - Toggling on reveals the per-site reservation rows + confidence tag + (conditionally) the low-confidence chip on that card.
 
 **Per-site reservation display (STR-02)**
+
 - Below the pill: localized "Site A / Site B" rows (label left 16/600, value right mono Body) showing per-site GHz + RAM, then a "Reservation" row showing the computed `maxSiteCap/totalCap` as a locale percentage via the inherited formatter (NO pre-formatted number in the string). Em-dash `—` sentinel when a site cannot be determined.
 
 **Confidence indicator + low-confidence chip (STR-03 / STR-04)**
+
 - `Confidence:` Caption row with the localized enum word (`high`/`medium`/`low`) — neutral text, no traffic-light color.
 - When `low`: a neutral grey chip with an inline info-glyph and factual copy (e.g. "Site metadata absent — symmetric split assumed"). Never red, never "you should", never a verdict. Chip is `aria`-labelled.
 
 **Allocation sliders + presets (ALC-01/02/03/04)**
+
 - Two native `<input type="range">` sliders (CPU ratio, RAM ratio) — keyboard-operable by construction (Arrow keys, Home/End, Page Up/Down), `aria-label` + `aria-valuetext` carrying the localized "n : 1" via the formatter. Slider thumb/fill use `primary-600`.
 - CPU range covers at least 1–16 (presets land inside), RAM at least 0.5–4; values clamped on parse.
 - Named preset buttons: **1:1**, **4:1**, **8:1**, **VDI 10:1** — a single mutually-exclusive group reusing the segmented `aria-pressed` idiom (NOT bespoke). Active preset = navy-fill; selecting a preset sets both sliders. Manually moving a slider off a preset clears the active preset (no preset pressed) — factual, no error.
@@ -179,20 +188,24 @@ Layout rules:
 - The slider changes the **headroom verdict only**, not `vcpuPerPcpu` (which is already physical-core-based — ALC-04 satisfied structurally); copy reflects "capacity at ratio R", never threads.
 
 **DR-mode selector (DRS-01/02/03)**
+
 - A 3-option mutually-exclusive segmented control (Host loss · Cluster loss · vCenter loss) reusing the shipped `aria-pressed` segmented idiom — **no bespoke control**. Active = navy-fill, focus ring `ring-2 ring-primary-500`, Arrow-key navigable (mirrors `AccountingModeToggle`'s `onKeyDown`).
 - Scenario is an **in-memory store input** (Sets of failed host/cluster/vCenter ids), replaced not mutated; never persisted (no hash, no localStorage).
 
 **Marking component(s) "failed" — simulated-failed treatment (locked constraint)**
+
 - Selection affordance: the user clicks/keyboard-activates a host/cluster/vCenter row within the DR panel's scope list (a checkbox-style multi-select reusing the shipped checkbox pattern from the Phase-3 column-picker — keyboard-operable, Space toggles, Escape clears focus).
 - Selected-as-failed visual: the component's existing label renders `line-through` + dimmed (`text-slate-400 dark:text-slate-500`) with a **neutral grey "simulated failed" status chip** — NOT destructive red, NOT an alarm icon.
 - **Fully reversible, NO confirmation dialog:** un-checking immediately restores the component (it is a what-if, never a delete). There is explicitly no "Are you sure?" modal — documented rationale: DR failure here is a non-destructive analytical input, identical in spirit to toggling accounting mode; a confirm dialog would falsely imply data loss. (Locked-constraint reasoning, recorded verbatim for the checker.)
 
 **Before/after + evacuee total + per-survivor verdict (DRS-06)**
+
 - Two side-by-side stat blocks: **Before** (current estate `GlobalSummary`) and **After** (survivors), each listing vCPU / vRAM / GHz / usable cores via the inherited formatter, mono `tabular-nums`.
 - **Evacuee total**: the single gold accent figure — total vCPU/vRAM that must be re-homed (the one closed-list accent use).
 - **Per-survivor verdict list**: each surviving cluster with its localized factual enum verdict `absorbs` / `tight` / `overflows` in neutral Body text + the adjacent capacity number. No color verdict, no editorial verb.
 
 **Assumptions panel (DRS-04) + confidence + caveats (DRS-05)**
+
 - A persistent `.panel`-inset block inside `DrSimPanel`, always visible beside/below the result (never hidden behind a tooltip-only affordance). Two factual lists: "Models:" (capacity subtraction, accounting-mode-respecting) and "Does not model:" (HA admission control, anti-affinity, restart priority, stretched split-brain) — copy is ADR-style factual, NEVER "you should"/"recommend".
 - `Confidence:` row (Caption, neutral enum word, same posture as stretched confidence).
 - `Caveats`: a bulleted list rendered from the engine's `caveats[]` (each item an i18n key, never free text, never a pre-formatted number, never an editorial verb). Empty array → the list is omitted (no "no caveats" filler).

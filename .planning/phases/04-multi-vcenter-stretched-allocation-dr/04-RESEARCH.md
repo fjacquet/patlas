@@ -202,6 +202,7 @@ src/components/
 **What:** Port vsizer `resolveClusterCollisions.ts` but key on `viSdkUuid` instead of filename; suffix with `vCenterLabel`.
 **When:** Two clusters share a name across distinct `viSdkUuid` values (whether across files OR within one RVTools 4.x workbook).
 **Example:**
+
 ```typescript
 // Source: vsizer/src/engines/parser/resolveClusterCollisions.ts (port + generalize)
 // Build Map<clusterName, Set<viSdkUuid>>. size > 1 ⇒ colliding.
@@ -215,6 +216,7 @@ src/components/
 **What:** Dedupe VMs across vCenters/snapshots on `vmBiosUuid` (= RVTools `VM UUID`, the vCenter-assigned 128-bit UUID), with a secondary tiebreak.
 **When:** A VM vMotioned across vCenters appears in two snapshots/vCenter blocks.
 **Example:**
+
 ```typescript
 // Source: parser already maps vmBiosUuid ← 'vm uuid'/'bios uuid'/'uuid' (rvtools.ts:60)
 // RVTools 4.3.1+ fills the `UUID`/`VM UUID` column with the UNIQUE
@@ -230,6 +232,7 @@ src/components/
 **What:** Replace the flat `0.5 × capacity` with `max(siteA, siteB) / total`; derive `confidence` from `vSAN Fault Domain Name` presence.
 **When:** A cluster is in the `stretchedClusters` Set.
 **Example:**
+
 ```typescript
 // Source: extend src/engines/aggregation/aggregateClusters.ts (50% math ported, dormant)
 // Group cluster hosts by vHost.vSAN Fault Domain Name.
@@ -249,6 +252,7 @@ src/components/
 **What:** Pass `{ cpuRatio, ramRatio }` into `aggregateClusters`/`useEstateView` as scalar params, exactly like the shipped `mode` param.
 **When:** Always; defaults CPU 4:1, RAM 1:1.
 **Example:**
+
 ```typescript
 // vcpuPerPcpu already = vcpuAllocated / usablePhysicalCores (physical
 // cores — ALC-04 satisfied, Moderate-4 type-prevented). The ALLOCATION
@@ -263,6 +267,7 @@ src/components/
 **What:** A small hook reads `window.location.hash` on mount, writes on slider change via `history.replaceState`. Mirrors into the inputs-only store or returns the value directly.
 **When:** Allocation ratios only (scenario/stretched stay in-memory store).
 **Example:**
+
 ```typescript
 // useAllocationHash(): parse `#alloc=cpu:8,ram:1.25` → {cpu,ram}
 // (clamp to slider bounds, fall back to {4,1} on parse failure).
@@ -409,6 +414,7 @@ interface VCenterEntry { viSdkUuid: string; server: string; label: string; vmCou
 | Flat 50 % stretched reservation (vsizer ADR-0007) | Per-site `max/total` + confidence | Phase 4 (this) | Asymmetric clusters correct; absence-of-metadata surfaced as low confidence |
 
 **Deprecated/outdated:**
+
 - `vmInstanceUuid` as a reliable secondary VM key — the `VM Instance UUID` column does not exist in RVTools 4.7. Treat as optional enrichment, not a required path.
 - Marker-column RVTools-version sniffing as the *primary* version source — the columnar `vMetaData` is authoritative when present.
 
@@ -487,6 +493,7 @@ interface VCenterEntry { viSdkUuid: string; server: string; label: string; vmCou
 ## Sources
 
 ### Primary (HIGH confidence)
+
 - Direct inspection of `~/Library/CloudStorage/OneDrive-Home/20260430_1400_allvCenters.xlsx` via project SheetJS (sheets, headers, vCenter UUIDs, fault domains, HA fields, vMetaData, datastore Hosts/Cluster-name population, VM-UUID dedup) — 2026-05-16
 - Shipped codebase: `src/types/{estate,snapshot,vinfo,vhost}.ts`, `src/engines/aggregation/{aggregateClusters,estateView}.ts`, `src/engines/parser/adapters/{rvtools,columnMap}.ts`, `src/engines/parser/captureDate.ts`, `src/hooks/useEstateView.ts`, `src/store/snapshotStore.ts`, `src/engines/units/*`
 - Phase summaries: `01-04-SUMMARY.md` (parser/identity carry + A7 RVTools-version gap), `02-02-SUMMARY.md` (aggregation port + dormant stretched math + single-useMemo), `03-01/03-03-SUMMARY.md` (toggle idiom, bundle gates, grep gates)
@@ -496,14 +503,17 @@ interface VCenterEntry { viSdkUuid: string; server: string; label: string; vmCou
 - CLAUDE.md (binding conventions, gotchas, RTK)
 
 ### Secondary (MEDIUM confidence)
+
 - WebSearch (verified against RVTools docs): RVTools 4.3.1 UUID-semantics change (`VM UUID` = vCenter-unique, was SMBIOS); RVTools 4.x multi-vCenter single-workbook export — corroborated by virtual-allan.com, jamesdelaney.co.uk, RVTools 4.4.1 documentation
 
 ### Tertiary (LOW confidence)
+
 - None relied upon. All Phase-4 correctness claims trace to direct file inspection, shipped code, or HIGH-confidence sibling research.
 
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack: HIGH — zero new deps; everything is shipped P1–P3, version-pinned
 - Architecture (merge/stretched/DR/allocation engine shapes): HIGH — sibling-derived + the dormant stretched math is already ported and tested for exactly this phase
 - Real-data correctness (identity keys, fault domains, vMetaData, datastore attribution): HIGH — direct inspection of the actual multi-vCenter workbook, not assumed

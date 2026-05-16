@@ -50,6 +50,7 @@
 **Analogs:** `/Users/fjacquet/Projects/vsizer/src/engines/parser/resolveClusterCollisions.ts` (collision algorithm to port + generalize) AND `/Users/fjacquet/Projects/rvtui/src/engines/aggregation/perDatastore.ts` (dedupe-by-key Map-accumulate shape).
 
 **Collision algorithm to port + generalize** — vsizer `resolveClusterCollisions.ts:41-74`:
+
 ```typescript
 export const resolveClusterCollisions = (
   perFile: FileScopedRows[],
@@ -73,6 +74,7 @@ export const resolveClusterCollisions = (
 ```
 
 **Required deviation (the core Phase-4 algorithm change — CRITICAL):**
+
 - Key the collision map on **row `viSdkUuid`**, NOT `file.filename`. `Map<clusterName, Set<viSdkUuid>>`; `size > 1` ⇒ colliding. This makes the SAME algorithm work for (a) N separately-dropped files [primary] AND (b) one workbook with N vCenters [real-file finding] — because rows from a 3-vCenter workbook carry 3 distinct `viSdkUuid` and the merge groups by row identity, not Snapshot identity (RESEARCH Pitfall 1, Anti-Pattern "Treating the real allvCenters.xlsx as 3 separate files").
 - Suffix = `"${cluster} (${vCenterLabelFor(viSdkUuid)})"` not `(${filename})`. Label resolved via `vCenterIndex` (vMetaData `Server` per `viSdkUuid` from the columnar parser fix, falling back to `viSdkServer` then `snapshot.vCenterLabel`).
 - Add VM dedupe (vsizer has none): keep first occurrence by `vmBiosUuid` (= RVTools `VM UUID`, NOT SMBIOS — `rvtools.ts:60` `vmBiosUuid: ['vm uuid','bios uuid','uuid']`). Blank → fallback key `(viSdkUuid, vmName, cluster)`. `vmInstanceUuid` is ABSENT in RVTools 4.7 — do NOT make it a required path (RESEARCH Pitfall 2).
@@ -107,6 +109,7 @@ export const datastoreCountByCluster = (vdatastore: VDatastoreRow[]): Map<string
 ### `src/engines/aggregation/aggregateClusters.ts` (engine, transform) — MOD, activates dormant math
 
 **Analog:** SELF — the ported-intact-but-dormant stretched math, `aggregateClusters.ts:59-76`:
+
 ```typescript
 const drReservedGhz = isStretched ? 0.5 * physicalGhz : 0
 const availableGhz = physicalGhz - consumedGhz - drReservedGhz
@@ -116,9 +119,11 @@ const usablePhysicalCores = isStretched ? 0.5 * physicalCores : physicalCores
 const cpuDrFactor = isStretched && physicalGhz > 0 ? physicalGhz / (physicalGhz - drReservedGhz) : 1
 const ramDrFactor = isStretched && physicalRamMib > 0 ? physicalRamMib / (physicalRamMib - drReservedRamMib) : 1
 ```
+
 This is the exact shape RESEARCH Code-Example "Per-site reservation" generalizes. 02-02-SUMMARY confirms a direct regression test already exercises this branch — extend that test, do not rewrite.
 
 **Required deviation (RESEARCH Pattern 3 + Pitfall 4):**
+
 - Replace the literal `0.5` with `f = reservedFraction(clusterHosts)` where `f = maxSiteCapacity / totalCapacity`, hosts grouped by **`VHostRow.faultDomain`** (new parsed `vSAN Fault Domain Name` column). Symmetric 4+4 → 0.5; asymmetric 6+4 → 0.6.
 - Compute `f` per resource basis (GHz fraction for GHz, RAM-MiB for RAM, cores for cores) — RESEARCH Open-Question 2 default; pin in an ADR.
 - Derive `stretchedConfidence: 'high'|'medium'|'low'` from fault-domain presence: ≥2 distinct domains covering all hosts → `high` (use `maxSiteCap/totalCap`); absent/partial → `medium` (assume 0.5); odd/asymmetric host count with NO site data → `low` (cannot prove split — drives STR-04 chip). NEVER collapse absence to `high` (Anti-Pattern).
@@ -126,11 +131,13 @@ This is the exact shape RESEARCH Code-Example "Per-site reservation" generalizes
 - Branded units: `x as number` → arithmetic → re-wrap via `ghzOf`/`mib`/`coresOf` (the established retrofit, used throughout this file).
 
 **Type extension** (`estate.ts:158-161` — the dormant block):
+
 ```typescript
   // ── Stretched-cluster DR (dormant in Phase 2) ──
   stretched: boolean
   drReservedGhz: GHz
 ```
+
 Add `stretchedConfidence: 'high'|'medium'|'low'`, per-site capacity figures (`siteACapacityGhz`, `siteBCapacityGhz`, RAM analogues), `reservedFraction: number`. Em-dash sentinel when a site cannot be determined (UI-SPEC §STR-02).
 
 ---
@@ -164,11 +171,13 @@ const globals = aggregateGlobals(clusters, datastoreCount, totalStorageMib)
 **Analog:** `aggregateClusters.ts` derivation style (pure scalar arithmetic, branded unwrap/rewrap).
 
 **Pattern (RESEARCH Code-Example "Allocation headroom verdict"):**
+
 ```typescript
 // capacityVcpu = usablePhysicalCores * cpuRatio  (default 4)
 // capacityRamMib = physicalRamMib * ramRatio     (default 1)
 // verdict = allocated <= 0.8*capacity ? 'absorbs' : allocated <= capacity ? 'tight' : 'overflows'
 ```
+
 **Required deviation:** Factual enum `'absorbs'|'tight'|'overflows'` (no color, no "good/poor" — UI-SPEC §Color, PROJECT.md). Branded: `(x as number)` compute, rewrap `cores()`/`mib()`. Default ratios CPU 4:1 / RAM 1:1 (ALC-02). The slider changes the headroom verdict ONLY, not `vcpuPerPcpu` (already physical-core-based, `aggregateClusters.ts:68`).
 
 ---
@@ -176,6 +185,7 @@ const globals = aggregateGlobals(clusters, datastoreCount, totalStorageMib)
 ### `src/hooks/useEstateView.ts` (hook, request-response) — MOD, the single-useMemo contract change [SPECIAL ATTENTION]
 
 **Analog:** SELF — the entire file IS the pattern (`useEstateView.ts:17-20`):
+
 ```typescript
 export function useEstateView(mode: AccountingMode): EstateView {
   const snapshot = useSnapshotStore(selectActiveSnapshot)
@@ -184,6 +194,7 @@ export function useEstateView(mode: AccountingMode): EstateView {
 ```
 
 **Required deviation (NO second `useMemo` — locked, grep-gated; 02-02-SUMMARY issue note):**
+
 - New signature `useEstateView(mode, ratios)` (or read ratios from a store mirror). Select `selectedSnapshots` (the active selection of the `Map<id,Snapshot>` — store slice below) instead of the single `selectActiveSnapshot`. Default selection = all snapshots (multi-FILE merge is the primary path; a single snapshot is the degenerate case that still works).
 - Inside the SAME `useMemo`: call `mergeSnapshotsToEstate(selected)` → `buildEstateView(merged, mode, { stretchedClusters, scenario, allocRatios })` → `runScenario(...)`. The memo dependency array becomes `[selected-snapshot-identities, stretched, scenario, ratios, mode]`. Selected identities must be a referentially-stable Set (store replaces, never mutates — `snapshotStore.ts:40-44` `new Map(...)` idiom).
 - `buildEstateView` signature change is the partner edit: it currently takes one `Snapshot` (`estateView.ts:33`); it must take the merged row bundle. `EMPTY_VIEW` (`estateView.ts:99-109`) frozen-constant idiom stays for the no-snapshot path.
@@ -194,6 +205,7 @@ export function useEstateView(mode: AccountingMode): EstateView {
 ### `src/store/snapshotStore.ts` (store, event-driven) — MOD, inputs-only slices
 
 **Analog:** SELF — the existing inputs-only Set-replace idiom (`snapshotStore.ts:39-44`):
+
 ```typescript
 addSnapshot: (s) => set((state) => {
   const next = new Map(state.snapshots); next.set(s.id, s)
@@ -225,6 +237,7 @@ addSnapshot: (s) => set((state) => {
            : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
   aria-pressed={active}>{optLabel}</button>
 ```
+
 Also reuse `ThemeToggle.tsx:6-68` inline-SVG `stroke="currentColor"` glyph pattern for the low-confidence info chip.
 
 **Required deviation:** 2-state (pressed = cluster in `stretchedClusters` Set). Controlled (`value`/`onChange` lifted, like `AccountingModeToggle`). Navy-fill active treatment (`bg-primary-600 text-white`), focus ring `ring-2 ring-primary-500`. i18n label `str.pill.label` "Étendu / Stretched", sr-only group label `str.pill.group`. Confidence tag = Caption-size neutral text (NO traffic light — UI-SPEC §Color). Low-confidence chip = neutral grey `bg-surface-100 text-slate-600 dark:bg-surface-700 dark:text-slate-300` + inline info SVG, shown only when `stretchedConfidence === 'low'`. Per-site rows reuse `ClusterColumn.tsx:17-24` `Row` (label left 16/600, value right mono `tabular-nums`).
@@ -250,9 +263,11 @@ Also reuse `ThemeToggle.tsx:6-68` inline-SVG `stroke="currentColor"` glyph patte
 ### `src/components/dashboard/ClusterColumn.tsx` (component) — MOD
 
 **Analog:** SELF — the reserved footer band, `ClusterColumn.tsx:122`:
+
 ```tsx
 {/* Phase-6 per-cluster sparkline lands here (trends is null Phase 2). */}
 ```
+
 **Required deviation:** Above that reserved band, render `<StretchedPill>` + per-site `Row`s + confidence tag + (conditional) low-confidence chip. Column stays `min-w-[200px]` (UI-SPEC §Spacing — pill+chip must fit, no widening). Suffixed colliding cluster name renders verbatim in the existing `<h3>{cluster.cluster}</h3>` (`ClusterColumn.tsx:49-51`) — text child, XSS-safe (MVC-02 is a data transform, no new component).
 
 ---
@@ -260,12 +275,14 @@ Also reuse `ThemeToggle.tsx:6-68` inline-SVG `stroke="currentColor"` glyph patte
 ### `src/components/dashboard/GlobalDashboard.tsx` (component) — MOD [attach point]
 
 **Analog:** SELF — lifted `useState` + single `useEstateView` caller (`GlobalDashboard.tsx:48-87`):
+
 ```tsx
 const [mode, setMode] = useState<AccountingMode>('active')
 const view = useEstateView(mode)
 // ...<AccountingModeToggle value={mode} onChange={setMode} />
 //    <PerClusterColumns ... /> <CpuReadyPanel ... />
 ```
+
 **Required deviation:** Add lifted `useState` for ratios source / DR scenario UI selection (component-state, NOT memo — same pattern as `mode`, A3-sanctioned). Insert `<AllocationSliders>` toolbar directly below the existing toolbar row (`GlobalDashboard.tsx:72-78`). Append `<DrSimPanel>` after `<CpuReadyPanel>` (`:82`) with the `2xl` break. Stays the SINGLE `useEstateView` caller; children get derived props. Reuse the `DashboardError` ErrorBoundary (`:19-30`, `error.message` only — Critical-2).
 
 ---
@@ -273,11 +290,13 @@ const view = useEstateView(mode)
 ### `src/components/SnapshotCard.tsx` (component) — MOD (MVC-04)
 
 **Analog:** SELF — the meta line, `SnapshotCard.tsx:39-51`:
+
 ```tsx
 <p className="mt-1 text-slate-500 dark:text-slate-400">
   <span>{t('snapshots.card.rvtoolsVersion')}: {snapshot.rvtoolsVersion}</span>
 </p>
 ```
+
 **Required deviation:** Below the existing capture-date line, add a Caption meta line: `{{count}} vCenters` + the per-`viSdkUuid` `Server` labels stacked + parsed `RVTools version` (now correct via the columnar `vMetaData` fix). A 3-vCenter workbook = ONE card listing "3 vCenters" — the card must convey N-vCenters-from-one-snapshot, never imply 1 file = 1 vCenter (UI-SPEC §Layout MVC-04). i18n `mvc.snapshot.*`. Needs `Snapshot` to carry per-vCenter vMetaData (parser + type change below).
 
 ---
@@ -287,6 +306,7 @@ const view = useEstateView(mode)
 **Analog:** SELF — `adaptRvtoolsVMetaData` (`rvtools.ts:235-247`) + `VMETADATA_COLS` (`:118-121`) + `metaValue`/`inferRvtoolsVersion` (`captureDate.ts:17-91`).
 
 Current (Property/Value only — BROKEN for RVTools 4.x columnar, RESEARCH Pitfall 3):
+
 ```typescript
 const VMETADATA_COLS = { property: ['property','name','key'], value: ['value','val'] } as const
 export const adaptRvtoolsVMetaData = (sheet: ParsedSheet): VMetaDataRow => {
@@ -296,6 +316,7 @@ export const adaptRvtoolsVMetaData = (sheet: ParsedSheet): VMetaDataRow => {
   }
 }
 ```
+
 ```typescript
 // captureDate.ts:80-90 — falls back to marker sniffing → reports "3.11+" for a 4.7 file
 export const inferRvtoolsVersion = (sheets) => {
@@ -306,6 +327,7 @@ export const inferRvtoolsVersion = (sheets) => {
 ```
 
 **Required deviation:**
+
 - Detect columnar 4.x shape: presence of an **`RVTools version` column** (headers `["RVTools major version","RVTools version","xlsx creation datetime","Server"]`, one row per vCenter). Read `RVTools version` (e.g. `4.7.1.4`) + `xlsx creation datetime` + `Server` PER ROW. Keep the legacy Property/Value path for older exports (alias-dictionary `mapColumns` pattern, `rvtools.ts:147-148` style).
 - `VMetaDataRow` (`snapshot.ts:60-64`) becomes a list of `{ viSdkServer/Server, rvtoolsVersion, exportedTimestamp }` (one per vCenter) — feeds `vCenterIndex` labels + per-vCenter `capturedAt`. Mirror the change in `captureDate.ts` `metaValue`/`inferRvtoolsVersion`/`inferVCenterLabel` and `parser.worker.ts:23-25` so the worker surfaces the per-vCenter list.
 - Add `VDATASTORE_COLS.hosts: ['hosts']` + `['# hosts']` and `VDatastoreRow.hosts: string` (host-name list) for Pitfall-6 attribution. Add `VHOST_COLS.faultDomain: ['vsan fault domain name','fault domain name']` + `VHostRow.faultDomain: string` for STR-02/03 (exact-normalized alias, longest spelling first — the `rvtools.ts:104-106` convention). `vmBiosUuid` alias list is ALREADY correct (`rvtools.ts:60`) — do NOT change it.
@@ -315,9 +337,11 @@ export const inferRvtoolsVersion = (sheets) => {
 ### i18n — `src/i18n/index.ts` + 8 locale files (i18n) — MOD
 
 **Analog:** SELF — `i18n/index.ts:26` `NAMESPACES` array + the existing `locales/{en,fr}/dashboard.json` structure.
+
 ```typescript
 export const NAMESPACES = ['common', 'upload', 'dashboard', 'inventory'] as const
 ```
+
 **Required deviation:** Add `'mvc','str','alloc','dr'` to `NAMESPACES`, import + register in `resources` (both `en` and `fr` — `:29-42`). Create `locales/en/{mvc,str,alloc,dr}.json` + `locales/fr/...`. Keys per UI-SPEC §i18n list (`str.pill.label`, `alloc.preset.*`, `dr.verdict.absorbs|tight|overflows`, `dr.caveats.<key>` …). `{{placeholder}}` interpolation only, NO pre-formatted numbers, NO editorial verbs (CI FR↔EN key-diff gate + denylist apply). FR confidence values `élevée/moyenne/faible`; verdicts `absorbe/juste/dépassé`.
 
 ---
@@ -325,24 +349,31 @@ export const NAMESPACES = ['common', 'upload', 'dashboard', 'inventory'] as cons
 ## Shared Patterns
 
 ### Segmented aria-pressed control (DRY-locked, applies to: StretchedPill, AllocationSliders presets, DrSimPanel mode selector)
+
 **Source:** `/Users/fjacquet/Projects/rvtui/src/components/dashboard/AccountingModeToggle.tsx:52-82` (+ `ThemeToggle.tsx:80-107` for the uncontrolled variant).
+
 - `<fieldset role="group" aria-label> + <legend className="sr-only"> + MODES.map(button aria-pressed)`. Active = `bg-primary-600 text-white`; inactive = `text-slate-500 hover:text-slate-700 dark:...`. Focus ring `focus-visible:ring-2 focus-visible:ring-primary-500`. Arrow-key `onKeyDown` (`AccountingModeToggle.tsx:42-50`) for the mode/preset groups. The `biome-ignore lint/a11y/noRedundantRoles` + literal `role="group"` is asserted by a CI grep gate — keep it.
 **Never** build a bespoke toggle (CLAUDE.md, RESEARCH Don't-Hand-Roll).
 
 ### Branded-unit arithmetic retrofit (applies to: aggregateClusters mod, drSim, allocate)
+
 **Source:** `aggregateClusters.ts:53-76`, `perCluster.ts:46-54` (`x as number` → compute → `ghzOf()`/`mib()`/`coresOf()`).
 Never do raw arithmetic on a brand without unwrap/rewrap (CLAUDE.md). `@/engines/units` already ships `mib/ghz/cores/sockets/mhz` + converters — Don't-Hand-Roll new wrappers.
 
 ### Inputs-only store, Set/Map replaced never mutated (applies to: stretched/scenario/selection slices)
+
 **Source:** `snapshotStore.ts:20-22` (doc) + `:39-58` (`new Map(state.snapshots)` replace). No persist middleware, no localStorage of dataset/scenario/slider state (only `vatlas-theme`/`vatlas-lang` permitted — `i18n/index.ts:59`). Allocation ratios → URL hash only.
 
 ### Pure-engine + frozen-empty-constant + barrel (applies to: snapshotMerge, drSim)
+
 **Source:** `estateView.ts:99-109` `EMPTY_VIEW = Object.freeze({...})` + `globals.ts` `emptySummary` + `engines/aggregation/index.ts` barrel. No React/Zustand/Zod in `engines/` (PROJECT.md line 52). New engines export through their own `index.ts` barrel mirroring `aggregation/index.ts`.
 
 ### Region error fallback — `error.message` only (applies to: DrSimPanel, any new region)
+
 **Source:** `GlobalDashboard.tsx:19-30` `DashboardError` + `FallbackError.tsx`. Read ONLY `error.message`/`error.name` — never the error object/`cause`/`stack` (leaks VM/host names — Critical-2). Region states replace only the affected Phase-4 region; sidebar/header/Phase-2 dashboard stay interactive.
 
 ### Locale formatting (applies to: all new numeric UI)
+
 **Source:** `src/utils/format.ts` — `fmtInt/fmtGhzValue/fmtPercent/fmtRatio/fmtMemMb`, em-dash `—` sentinel for absent/indeterminate (never `0`/`N/A`). Unwrap brand at call site (`fmtGhzValue(x.physicalGhz as number, loc)`, `ClusterColumn.tsx:75`). i18n strings carry placeholders only — numbers formatted in the component (UI-SPEC §Number Formatting).
 
 ---

@@ -108,6 +108,7 @@ npm install echarts@^6.0.0 echarts-for-react@^3.0.6
 `[VERIFIED: npm view]` as of 2026-05-16: `echarts` latest = `6.0.0` (published 2025-07-30); `echarts-for-react` latest = `3.0.6`, peerDependencies `echarts: "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0"`, `react: "^15.0.0 || >=16.0.0"`. Both compatible with the installed React 19.2.6.
 
 **Version verification commands the planner should re-run at execution time** (versions can move):
+
 ```bash
 npm view echarts version
 npm view echarts-for-react version
@@ -193,6 +194,7 @@ src/
 **What:** Register only the series/components/renderer used, once at module load, before any chart renders.
 **When to use:** A single `src/components/Chart.tsx` (or a sibling `echartsRegistry.ts` it imports) does this exactly once.
 **Example:**
+
 ```typescript
 // Source: https://apache.github.io/echarts-handbook/en/basics/import/ [CITED]
 import * as echarts from 'echarts/core'
@@ -212,6 +214,7 @@ echarts.use([
 ])
 echarts.registerTheme('midnight-executive', MIDNIGHT_EXECUTIVE_ECHARTS_THEME)
 ```
+
 `[VERIFIED: official handbook]` ECharts 6 import paths unchanged from v5: charts from `echarts/charts`, components from `echarts/components`, `SVGRenderer` from `echarts/renderers`, core from `echarts/core`. The handbook explicitly states the tree-shakeable interface ships **no renderer by default** — importing only `SVGRenderer` excludes `CanvasRenderer` from the bundle (this is what hits the ≤300 KB gz budget).
 
 ### Pattern 2: `<Chart>` wrapper — KISS-minimal, future-proof
@@ -219,6 +222,7 @@ echarts.registerTheme('midnight-executive', MIDNIGHT_EXECUTIVE_ECHARTS_THEME)
 **What:** One component wrapping `echarts-for-react`'s `ReactEChartsCore`, injecting SVG renderer + theme + a `React.memo` comparator (Moderate-9).
 **When to use:** EVERY chart in vatlas, all phases. Components never call `echarts.init` or import `echarts-for-react` directly.
 **Example (recommended API):**
+
 ```typescript
 // src/components/Chart.tsx
 import ReactEChartsCore from 'echarts-for-react/lib/core'
@@ -260,7 +264,9 @@ export const Chart = React.memo(function Chart({ option, style, className, ariaL
   )
 })
 ```
+
 **Key design choices (rationale for the planner):**
+
 - The single `option` prop is deliberately the *whole ECharts option object*, not a typed per-chart-family prop set. This is the KISS choice that does **not** preclude treemap/heatmap/calendar/line/sparkline: adding a chart family later means importing `TreemapChart` into the registry and passing a treemap `option` — zero `<Chart>` API change. A bespoke prop API per family would be premature abstraction (PROJECT.md forbids).
 - `opts.renderer:'svg'` is injected by the wrapper, not the caller — makes VIZ-01 structurally impossible to violate.
 - `React.memo` with `option === option` (reference) comparator works because chart `option` objects are built inside selector functions memoized off `useEstateView`'s output (which is itself memoized). Deep-equal is unnecessary if upstream memoization is correct; the reference check is the cheap correct-by-construction path. (If a later phase produces option objects inline, revisit with a shallow data compare — flagged as Moderate-9 watch item.)
@@ -271,6 +277,7 @@ export const Chart = React.memo(function Chart({ option, style, className, ariaL
 **What:** A hook that reads the store, calls the pure `estateView` assembler, memoizes the result.
 **When to use:** Every dashboard component (and every later UI/export) reads its data from here. Nothing else calls `engines/aggregation` from React.
 **Example:**
+
 ```typescript
 // src/hooks/useEstateView.ts
 import { useMemo } from 'react'
@@ -288,7 +295,9 @@ export function useEstateView(mode: AccountingMode): EstateView {
   )
 }
 ```
+
 **Why this shape (rationale):**
+
 - `selectActiveSnapshot` (Phase 1, shipped) returns a referentially-stable `Snapshot | null` — perfect `useMemo` dep. Snapshot objects are frozen-on-insert (01-05 contract), so identity changes iff the active snapshot changes.
 - `mode` is the only other dep. Switching accounting mode recomputes (cheap in pure JS — vsizer benchmarks tens of ms for ~10k VMs; Phase 1 measured a 944 KB workbook parse at ~360 ms and the largest real fixture is 249 VMs). **This is the recommended approach over precomputing all three modes** — see Pitfall "Accounting mode: recompute vs precompute".
 - The hook ONLY orchestrates+memoizes. `buildEstateView` is a pure engine function (testable without React).
@@ -339,6 +348,7 @@ vsizer's `VHostRow`/`VInfoRow` used **bare `number`**. Phase 1's vatlas types (`
 **vDatastore columns available** (from Phase 1 `VDatastoreRow`): `name`, `capacityMib: MiB`, `freeMib: MiB`, `provisionedMib: MiB`, `naa: string|null`, `type: string`.
 
 **`DatastoreAggregate` shape (recommended):**
+
 ```typescript
 interface DatastoreAggregate {
   key: string            // naa ?? name
@@ -353,6 +363,7 @@ interface DatastoreAggregate {
   sharedDuplicateCount: number // how many raw rows collapsed into this key (>1 = shared LUN)
 }
 ```
+
 Aggregation: group rows by `naa ?? name`; within a group take capacity/free from the **first** row (a shared LUN has identical capacity in every cluster's view — do NOT sum capacity), sum nothing that double-counts. The Moderate-11 sanity check (`provisioned ≤ capacity × 10` warning) is optional in Phase 2 (no diagnostics panel until later) — recommend computing the ratio and leaving a `// TODO(diagnostics, Phase 3+)` rather than building a panel now (YAGNI).
 
 **Per-cluster datastore count (DSH-01):** RVTools `vDatastore` does not reliably carry a cluster column; the honest count is "datastores visible in the estate" globally (DSH-02) plus, per cluster, the count of distinct datastore keys referenced by that cluster's VMs *if* `vPartition`/`vDisk` path parsing is in scope — **it is NOT in Phase 2** (vPartition path→datastore mapping is a Moderate-11 detail deferred). **Recommendation for DSH-01 per-cluster datastore count:** count distinct datastores per cluster only if a trivial column exists; otherwise show the global datastore count in the summary card (DSH-02) and omit a per-cluster datastore number, or mark it "—". Flag as an Open Question for the planner to confirm with the user against a real fixture. `[ASSUMED]` — needs fixture verification.
@@ -362,6 +373,7 @@ Aggregation: group rows by `naa ?? name`; within a group take capacity/free from
 Per-host rollup from `VHostRow` + the host's VMs (`VInfoRow` filtered by `host` field — Phase 1 `VInfoRow.host` is populated). Drives the per-cluster ESX count (DSH-01) now and the Phase 3 inventory tree (no new engine in Phase 3 — it consumes this).
 
 **`EsxAggregate` shape (recommended):**
+
 ```typescript
 interface EsxAggregate {
   hostName: string
@@ -381,6 +393,7 @@ interface EsxAggregate {
   vmsAboveReadinessWarning: number
 }
 ```
+
 `vmCount`/`vcpuAllocated` honor the accounting mode (same param as `vinfoMerge`). DRY: `perEsx` should call the same `readinessStats` helper `vinfoMerge` uses (export it from a shared spot, don't copy-paste — PROJECT.md DRY).
 
 ## Three Accounting Modes (Question 8, Critical-6)
@@ -394,6 +407,7 @@ interface EsxAggregate {
 **RVTools columns driving each:** the discriminator is `VInfoRow.poweredOn` (Phase 1 parsed `Powerstate`→boolean). Storage uses `VInfoRow.provisionedMib`/`inUseMib` (also `perDatastore` `provisionedMib`). CPU/RAM use `VInfoRow.vcpu`/`vramMib`.
 
 **How surfaced in `EstateView` — RECOMMENDATION: one mode param → recompute (NOT precompute all three).**
+
 - Rationale: precomputing all three triples `EstateView` size and the cluster arrays for marginal benefit; the recompute is cheap (vsizer ~tens of ms / 10k VMs; real fixtures here ≤249 VMs). `useEstateView(mode)` already keys its `useMemo` on `mode`, so a toggle flip is one memo miss → one fast recompute. This is the KISS choice and matches the hook design.
 - The UI accounting-mode state lives in the dashboard root (a `ui` store field or a lifted `useState`). The toggle (DSH-06) sets it; `useEstateView(mode)` re-derives.
 - `EstateView.accountingMode: AccountingMode` is echoed back in the view so charts/labels can show "(Active)" etc.
@@ -404,6 +418,7 @@ interface EsxAggregate {
 ## Physical-Cores Consolidation (Question 9, Moderate-4)
 
 Phase 1 `VHostRow` already separates the fields correctly:
+
 - `sockets: Sockets` ← RVTools `# CPU` (physical socket count)
 - `cores: Cores` ← RVTools `# Cores` (total physical cores across sockets)
 - (RVTools `# CPU Threads` / HT logical count is **NOT** in `VHostRow` — Phase 1 correctly omitted it, structurally preventing the Moderate-4 bug.)
@@ -413,6 +428,7 @@ vsizer's `aggregateClusters.ts` already computes `vcpuPerPcpu = vcpuAllocated / 
 ## CPU Ready (Question 10, DSH-05, ADR-0012)
 
 `contention.ts` + `vinfoMerge.ts` `readinessStats` port **verbatim**. Source: `VInfoRow.cpuReadinessPercent: number | null` (Phase 1 parsed; null when RVTools didn't report it — RVTools-only inputs frequently lack it).
+
 - Mean: **arithmetic** (ADR-0012 §3 — not vCPU-weighted; weighting dilutes exactly the contended cohort the metric exists to detect).
 - Max: via `reduce`, NOT `Math.max(...values)` (vsizer's `readinessStats` already does this — avoids the V8 ~65535 spread-arg limit on hyperscaler clusters). Port the loop verbatim.
 - Count > 5%: `CONTENTION_THRESHOLDS.warning`.
@@ -421,40 +437,47 @@ vsizer's `aggregateClusters.ts` already computes `vcpuPerPcpu = vcpuAllocated / 
 ## Common Pitfalls
 
 ### Pitfall 1: ECharts default theme changed in v6 (relevant because we override)
+
 **What goes wrong:** Relying on ECharts default colors/legend position; v6 changed both (default legend now bottom; color scheme changed).
 **Why it happens:** STACK.md examples may assume v5 defaults.
 **How to avoid:** We register `midnight-executive` and pass `theme="midnight-executive"` on every `<Chart>` (VIZ-03 requires this anyway). The v6 default-theme change is therefore **moot** — but it MUST be an explicit registered theme, never reliance on defaults. `[CITED: ECharts v6 upgrade guide]`
 **Warning signs:** Charts render with wrong palette / legend in unexpected place → theme not registered before first render (registration must be module-scope, before any `<Chart>` mounts).
 
 ### Pitfall 2: Accounting mode — recompute vs precompute (Critical-6 design fork)
+
 **What goes wrong:** Precomputing all three modes into `EstateView` (3× the cluster/global/datastore arrays) for a marginal toggle latency win, bloating the memoized object and every export later.
 **Why it happens:** "Avoid recompute" instinct.
 **How to avoid:** Recompute via `useEstateView(mode)` memo key (recommended above). The compute is provably cheap at vatlas's data scale. Precompute is the premature optimization PROJECT.md's KISS forbids.
 **Warning signs:** `EstateView` grows `clustersConfigured`/`clustersActive`/`clustersStorage` parallel arrays — stop, use the param.
 
 ### Pitfall 3: SVG renderer not actually wired (VIZ-01 / ROADMAP success #4)
+
 **What goes wrong:** A chart renders via Canvas (default if `CanvasRenderer` ever gets imported, or if `opts.renderer` is dropped), breaking the HTML-export contract silently.
 **Why it happens:** Forgetting `opts={{renderer:'svg'}}` on a direct `echarts-for-react` use, or importing `CanvasRenderer`.
 **How to avoid:** `<Chart>` injects `opts={{renderer:'svg'}}` centrally and is the ONLY chart entry point; `CanvasRenderer` is never imported. **Verification (ROADMAP success #4):** a test asserting the rendered DOM contains `<svg>` and no `<canvas>` inside a chart. jsdom limitation: jsdom does not produce real ECharts SVG geometry, but it DOES let you assert the renderer choice — alternatively a lightweight check that the registered renderer is SVG, or a Vitest Browser Mode test for the real geometry (STACK.md flags Browser Mode for chart-render tests; Phase 2 can use a minimal Browser-Mode test for this one assertion or assert at the `opts` level). Flag for the planner: decide jsdom-level assertion vs Browser Mode for success criterion #4.
 **Warning signs:** DevTools shows `<canvas>` in a chart container.
 
 ### Pitfall 4: Bundle-size CI gate value (Question 2)
+
 **What goes wrong:** No gate, or wrong gate value, lets ECharts bloat past the SVG-tree-shaking target unnoticed (ROADMAP success #5: **≤300 KB gzipped** for the ECharts contribution).
 **Why it happens:** STACK.md says "150–300 KB gz target"; Phase 1's build warning budget was a generic 700 KB *raw* chunk warning (different metric — raw vs gz, and chunk-warning vs hard-gate).
 **How to avoid:** Add a CI step that builds and asserts the ECharts-bearing chunk is **≤300 KB gzipped** (ROADMAP success criterion #5 is the authoritative number — use 300 KB gz as the hard gate). Phase 1 precedent: 01-04 used a build probe inspecting `dist/assets/*.js` sizes (parser worker chunk measured at 138 KB gz). Reuse that probe pattern: build, locate the chunk containing echarts, `gzip -c | wc -c`, fail if > 307200 bytes. Keep the Phase-1 700 KB raw chunk *warning* as-is (it's a Vite warning, orthogonal). `[CITED: ROADMAP success criterion 5, STACK.md, 01-04-SUMMARY worker-chunk probe]`
 **Warning signs:** CI green but `import * as echarts from 'echarts'` slipped in (1 MB) — the gate catches it.
 
 ### Pitfall 5: Datastore double-count (Moderate-11)
+
 **What goes wrong:** Summing datastore capacity across clusters that share a LUN → impossible totals (total VMDK > total capacity).
 **How to avoid:** Key `perDatastore` on `naa ?? name`; take capacity/free from the first row in a key-group, never sum capacity. Surface `sharedDuplicateCount`.
 **Warning signs:** Total datastore capacity exceeds the sum of physical arrays the operator knows they have.
 
 ### Pitfall 6: CPU Ready absence rendered as 0% (ADR-0012)
+
 **What goes wrong:** RVTools-only inputs often lack CPU Ready; rendering `null` as `0%` tells the operator "no contention" when the truth is "unknown".
 **How to avoid:** DSH-05 panel checks `readinessAvailable`; renders "not reported" not "0%". `fmtPercentValue` from ported `format.ts` returns em-dash for non-finite — pair with an explicit availability check.
 **Warning signs:** Every cluster shows exactly 0.0% CPU Ready.
 
 ### Pitfall 7: vsizer `ghz.ts` duplicates `units.mhzToGhz` (DRY)
+
 **What goes wrong:** Porting vsizer `ghz.ts`'s own `mhzToGhz` creates two `mhzToGhz` (one in `units`, one in `aggregation`) — DRY violation PROJECT.md forbids ("if two phases compute the same thing, the second imports from the first").
 **How to avoid:** `aggregation/ghz.ts` imports `mhzToGhz` from `@/engines/units`; keeps only the composite helpers (`physicalGhz`, `consumedGhz`) that are genuinely aggregation-specific.
 **Warning signs:** Two `mhzToGhz` definitions in `src/`.
@@ -462,6 +485,7 @@ vsizer's `aggregateClusters.ts` already computes `vcpuPerPcpu = vcpuAllocated / 
 ## Code Examples
 
 ### OS-family classifier (NEW, KISS — DSH-04)
+
 ```typescript
 // src/engines/aggregation/osFamily.ts  — pure, no deps
 export type OsFamily = 'windows' | 'linux' | 'other'
@@ -476,9 +500,11 @@ export function classifyOsFamily(osConfig: string, osTools: string): OsFamily {
   return 'other'
 }
 ```
+
 Source: derived from Moderate-6 OS-string variants in PITFALLS.md. `[CITED: PITFALLS.md Moderate-6]` — the *forecast* normalizer is Phase 5; this is the minimal 3-bucket split DSH-04 needs. The `other` bucket must be visible in the donut (never silently drop), consistent with the "unknown OS is a real bucket" principle.
 
 ### vsizer capacity-weighted cluster ratio (PORT verbatim — proof it ports clean)
+
 ```typescript
 // from vsizer perCluster.ts — ports with only memoryMb→memoryMib + brand unwrap
 const physical  = sum(hosts.map(h => physicalGhzOf(h.speedMhz, h.cores)))
@@ -486,6 +512,7 @@ const consumed  = sum(hosts.map(h => consumedGhzOf(h.speedMhz, h.cores, h.cpuRat
 const physicalRamMib = sum(hosts.map(h => h.memoryMib))             // was memoryMb
 const meanCpuRatio = physical === 0 ? 0 : consumed / physical        // ADR-0011, verbatim
 ```
+
 Source: `/Users/fjacquet/Projects/vsizer/src/engines/aggregation/perCluster.ts` `[VERIFIED: codebase read in full]`.
 
 ## State of the Art
@@ -570,6 +597,7 @@ Source: `/Users/fjacquet/Projects/vsizer/src/engines/aggregation/perCluster.ts` 
 ## Sources
 
 ### Primary (HIGH confidence)
+
 - `/Users/fjacquet/Projects/vsizer/src/engines/aggregation/{ghz,perCluster,vinfoMerge,aggregateClusters,globals,contention,index}.ts` — read in full; the port source `[VERIFIED: codebase]`
 - `/Users/fjacquet/Projects/vsizer/src/utils/format.ts` — read in full `[VERIFIED: codebase]`
 - `/Users/fjacquet/Projects/rvtui/src/types/{snapshot,vinfo,vhost,index}.ts` — Phase 1 shipped types `[VERIFIED: codebase]`
@@ -580,14 +608,17 @@ Source: `/Users/fjacquet/Projects/vsizer/src/engines/aggregation/perCluster.ts` 
 - vatlas planning docs: PROJECT.md, REQUIREMENTS.md, ROADMAP.md (Phase 2 detail), research/{STACK,ARCHITECTURE,PITFALLS,SUMMARY}.md, phases/01-foundation-invariants/01-0{3,4,5}-SUMMARY.md `[VERIFIED: read]`
 
 ### Secondary (MEDIUM confidence)
+
 - WebSearch: "Apache ECharts 6.0 breaking changes tree-shaking SVGRenderer" — corroborated v6 tree-shaking unchanged + default-theme change; cross-checked against the official handbook (raised to HIGH for the import-path claim).
 
 ### Tertiary (LOW confidence)
+
 - A1 (per-cluster datastore count derivability) — needs fixture verification by the planner; marked ASSUMED.
 
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack (ECharts versions): HIGH — npm-registry-verified, peer-dep-confirmed.
 - Aggregation port: HIGH — vsizer source read in full; retrofit is mechanical (field rename + brand unwrap); Phase 1 types confirm the field names.
 - `<Chart>`/`useEstateView` design: HIGH for the constraints (PROJECT.md/01-05 contracts are explicit); MEDIUM for the exact prop shape (Claude's discretion — recommendation given with rationale).

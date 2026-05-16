@@ -73,6 +73,7 @@ Per the timed-out continuation: Task 1 was already committed (`3708d81`) and reu
 ### Auto-fixed Issues
 
 **1. [Rule 3 - Blocking] LIVE @tanstack bundle gate could not measure the chunk**
+
 - **Found during:** Task 3 (running the LIVE bundle gate)
 - **Issue:** The plan mandates the @tanstack ≤60 KiB gz gate go LIVE here, but `vite.config.ts` had no `manualChunks` rule for `@tanstack`, so TanStack folded into the merged `index-*.js`. `check-bundle-size.mjs` detected the chunk by scanning chunk **bytes** for the literal `@tanstack` — minification strips package names, so the gate was a permanent no-op ("no @tanstack chunk found"), not an actual measurement.
 - **Fix:** Added a `vendor-tanstack` `manualChunks` rule (`node_modules/@tanstack` → its own chunk) and switched the bundle-size marker to **filename**-based detection (`vendor-tanstack-*.js`). The gate now measures the real chunk. **Gate NOT widened** — measured **17,414 bytes gz (17.0 KiB) ≪ 60 KiB**.
@@ -80,6 +81,7 @@ Per the timed-out continuation: Task 1 was already committed (`3708d81`) and reu
 - **Commit:** `d8c4597`
 
 **2. [Rule 3 - Blocking] @tanstack/react-virtual yields zero rows under jsdom**
+
 - **Found during:** Task 3 (InventoryTree test RED)
 - **Issue:** `@tanstack/virtual-core` measures the scroll element via `element.offsetHeight`, which jsdom hard-codes to a 0-returning getter. Every virtualised window (the tree, and now DataTable) collapsed to zero rendered rows in tests — the tree/stress/e2e assertions are untestable without a measured viewport.
 - **Fix:** Added deterministic jsdom layout stubs to `src/test/setup.ts` (`offsetHeight`/`offsetWidth` getters, a `getBoundingClientRect` fallback, and a `ResizeObserver` shim) yielding a fixed non-zero viewport. Production is unaffected (real ResizeObserver supersedes). Also added `initialRect` to the tree's `useVirtualizer` for a deterministic first paint.
@@ -87,6 +89,7 @@ Per the timed-out continuation: Task 1 was already committed (`3708d81`) and reu
 - **Commit:** `d8c4597`
 
 **3. [Rule 1 - Bug] Stale 03-01-era i18n-key queries in DataTable.csv.test.tsx**
+
 - **Found during:** Task 3 (full `npm run test:run` regression)
 - **Issue:** Task 1 (committed `3708d81`) registered the `inventory` i18n namespace. `DataTable.csv.test.tsx` (written at 03-02 when the namespace was unregistered) queried toolbar controls by the raw keys `/columns\.button/i` and `/export\.csv/i`; with the namespace live these now resolve to `Columns` / `Export CSV`, so the two tests failed.
 - **Fix:** Updated the two stale query regexes to the resolved EN copy (`/columns/i`, `/export csv/i`). Pure test-fixture correction; no production logic touched.
@@ -120,6 +123,7 @@ The ROADMAP Phase-3 prose still names a `vCenter → Datacenter → Cluster → 
 ## 10k Stress Result
 
 The synthetic 10k-VM fixture (`src/__fixtures__/rvtools-inventory-10k.xlsx`, gitignored, ~6 MB, regenerated on demand) was driven through the real `parseXlsx → parseSnapshot → buildEstateView` pipeline:
+
 - **Sort (#2):** VM rows sorted by `provisionedMib` descending completes **< 200 ms** at 10k (asserted; sorted-invariant verified). Budget not widened.
 - **Bounded tree window (#1 proxy):** the virtualised tree DOM window stays **< 200 nodes** on root-expand and after expanding a cluster + a host with thousands of VMs — far below the total leaf count (fps is not measurable in jsdom; window-size proxy per 03-RESEARCH line 462).
 - **Filtered CSV (#4):** filtering to the generator's deterministic embedded-newline row and exporting yields RFC-4180 double-quoted multi-line cells, verified under **both** `light` and `dark` theme classes.

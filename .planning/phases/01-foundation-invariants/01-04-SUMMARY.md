@@ -127,7 +127,7 @@ Generations covered by real files (real-file-validated): { 3.11+ }
 Generations missing real-file validation:               { 3.10, 4.0, 4.4 }
 ```
 
-**Gap (carry-forward, NOT fabricated):** None of the three real workbooks exposes an explicit `vMetaData.RVTools Version` cell, so the version sniffer correctly resolved them to `3.11+` via the `Creation date` marker column. The alias dictionary *supports* the full 3.10/3.11/4.0/4.4 drift (per RESEARCH.md Pattern 3 — exercised by the 5 alias-spelling unit tests), but only the `3.11+` generation is validated against a real file. 3.10 / 4.0 / 4.4 real-file validation cannot proceed without samples from those generations. **TODO for Plan 05 UAT: ask the user for a 3.10 and a 4.4 workbook.** CI environments will not have the user's OneDrive anyway; the committed canary fixture is what CI uses, so this gap is non-blocking for the pipeline.
+**Gap (carry-forward, NOT fabricated):** None of the three real workbooks exposes an explicit `vMetaData.RVTools Version` cell, so the version sniffer correctly resolved them to `3.11+` via the `Creation date` marker column. The alias dictionary _supports_ the full 3.10/3.11/4.0/4.4 drift (per RESEARCH.md Pattern 3 — exercised by the 5 alias-spelling unit tests), but only the `3.11+` generation is validated against a real file. 3.10 / 4.0 / 4.4 real-file validation cannot proceed without samples from those generations. **TODO for Plan 05 UAT: ask the user for a 3.10 and a 4.4 workbook.** CI environments will not have the user's OneDrive anyway; the committed canary fixture is what CI uses, so this gap is non-blocking for the pipeline.
 
 ## A9 verification report (parse wall-clock)
 
@@ -176,9 +176,11 @@ const { snapshot, warnings } = await parseInWorker(file)
 Type exports from `src/engines/parser/index.ts`: `Snapshot`, `ParseError`, `VDatastoreRow`, `VPartitionRow`, `VInfoRow`, `VHostRow`.
 
 **Reminder to Plan 05:** assemble the final `Snapshot` by stamping the two worker-omitted fields on the main thread:
+
 ```typescript
 const snapshot: Snapshot = { id: crypto.randomUUID(), parsedAt: new Date(), ...payload.snapshot }
 ```
+
 `parseInWorker` is a module-scope singleton worker (multiple drops reuse it). `viSdkUuid`, `capturedAt`, `vCenterLabel`, `rvtoolsVersion`, `fileSize` are already populated by the worker.
 
 ## Deviations from Plan
@@ -186,18 +188,21 @@ const snapshot: Snapshot = { id: crypto.randomUUID(), parsedAt: new Date(), ...p
 ### Auto-fixed Issues
 
 **1. [Rule 1 - Bug] Lexical drop-gate false-positive on documentary comment**
+
 - **Found during:** Task 1 verify (`! grep -rE 'liveoptics|...|detectSource' src/`).
 - **Issue:** A `normalizeColumns.ts` docstring said "no Live Optics / detectSource branch" — matched the plan's own CI drop-gate regex (same class as Plan 03 deviation #4).
 - **Fix:** Rephrased the comment to describe the dropped behavior without containing the gate tokens. Intent preserved; gate now CLEAN across all of `src/`.
 - **Files modified:** `src/engines/parser/normalizeColumns.ts`. **Commit:** `3620290`.
 
 **2. [Rule 1 - Bug] schemas.ts ZodPipe re-declares input as the brand type**
+
 - **Found during:** Task 3 (`npm run build` — `tsc -b` stricter than `tsc --noEmit`).
 - **Issue:** `CoresSchema.pipe(z.number().positive()...)` — the pipe's downstream `z.number()` received `Cores` (CoresSchema's output) as input, breaking the `z.ZodType<VHostRow>` annotation under the app build's stricter check.
 - **Fix:** Replaced the `.pipe()` chains with dedicated `PositiveCoresSchema` / `PositiveMhzSchema` base schemas; removed the now-unused `MhzSchema` (noUnusedLocals).
 - **Files modified:** `src/engines/parser/schemas.ts`. **Commit:** `b856cb2`. Verified: all 89 tests still GREEN, canary unaffected.
 
 **3. [Rule 3 - Blocking] App `tsc -b` typechecks test files (node imports)**
+
 - **Found during:** Task 3 (`npm run build`).
 - **Issue:** `tsconfig.app.json` (`include:["src"]`, `types:["vite/client"]`) typechecked `canary.test.ts` under `tsc -b` and failed on `node:fs`/`node:path`/`__dirname` (`tsc --noEmit` root config is effectively a no-op — the real type gate is the build). Test files are never bundled — Vitest runs them with its own pipeline.
 - **Fix:** Excluded `*.test.ts`/`*.spec.ts`/`src/test/**` from `tsconfig.app.json`; added a standalone `tsconfig.test.json` (node + vitest globals) and wired it into `npm run typecheck` so test type-safety is preserved. Standalone (not a project reference) to avoid forcing `composite:true` retroactively across Plans 01-03's configs (lower blast radius — a project-reference restructure would border Rule 4).
@@ -217,11 +222,12 @@ All STRIDE `mitigate` dispositions for this plan's files implemented: T-04-03 (p
 
 ## Known Stubs
 
-None. `parser.worker.ts` shows 0% line coverage because jsdom cannot execute a real module Worker's `self.onmessage` handler — this is an environment limit, not a stub: every line of parser *logic* it calls (`parseXlsx`, `parseSnapshot`, `inferCaptureDate`/`inferVCenterLabel`/`inferRvtoolsVersion`) is directly unit-tested, the canary proves the end-to-end transform, and `parseInWorker.test.ts` covers the main-thread half via a mocked Worker. The full `src/engines/parser/**` tree clears the 75% gate on all four metrics with margin.
+None. `parser.worker.ts` shows 0% line coverage because jsdom cannot execute a real module Worker's `self.onmessage` handler — this is an environment limit, not a stub: every line of parser _logic_ it calls (`parseXlsx`, `parseSnapshot`, `inferCaptureDate`/`inferVCenterLabel`/`inferRvtoolsVersion`) is directly unit-tested, the canary proves the end-to-end transform, and `parseInWorker.test.ts` covers the main-thread half via a mocked Worker. The full `src/engines/parser/**` tree clears the 75% gate on all four metrics with margin.
 
 ## Self-Check
 
 **Files claimed (spot sample):**
+
 - `src/engines/parser/parser.worker.ts`: FOUND
 - `src/engines/parser/parseInWorker.ts`: FOUND
 - `src/engines/parser/captureDate.ts`: FOUND
@@ -231,6 +237,7 @@ None. `parser.worker.ts` shows 0% line coverage because jsdom cannot execute a r
 - `tsconfig.test.json`: FOUND
 
 **Commits claimed:**
+
 - `8d78c22` (Task 1 RED): FOUND
 - `3620290` (Task 1 GREEN): FOUND
 - `ffdd017` (Task 2 RED): FOUND
@@ -246,5 +253,5 @@ Tasks 1 & 2 are `tdd="true"`. Gate sequence verified in git log: Task 1 `test(01
 ## Self-Check: PASSED
 
 ---
-*Phase: 01-foundation-invariants*
-*Completed: 2026-05-15*
+_Phase: 01-foundation-invariants_
+_Completed: 2026-05-15_

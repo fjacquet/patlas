@@ -75,6 +75,7 @@ Label role stays at weight 600 (`.label` utility). Table cells use Body (14/400)
 | Destructive | Midnight Executive destructive (inherited) | Listed for token completeness — **unused in Phase 3** |
 
 Accent reserved for (closed list, nothing else):
+
 - Active segment of the Dashboard↔Inventory toggle
 - Selected tree node row (selection scope indicator)
 - Active sort column header indicator
@@ -95,6 +96,7 @@ Destructive note: Phase 3 tree and tables are strictly read-only. There are no d
 | Destructive confirmation | not applicable — no destructive actions in Phase 3 |
 
 State copy detail (all FR+EN, no editorial verbs, no pre-formatted numbers):
+
 - Tree empty (no snapshot): "No snapshot loaded" + body above.
 - Tree loading: "Loading inventory…"
 - Tree error (parse fail): error-state copy above.
@@ -107,16 +109,19 @@ State copy detail (all FR+EN, no editorial verbs, no pre-formatted numbers):
 ## Interaction Contract
 
 **Dashboard↔Inventory toggle**
+
 - Two-segment control reusing the ThemeToggle idiom: `role` segmented control, each segment a button with `aria-pressed`, active segment uses accent gold.
 - Default segment: Dashboard. Keyboard-operable (Tab to focus, Enter/Space to switch, arrow keys move between segments).
 - Placement: App header/toolbar, leading edge of the primary toolbar, left of the global filter and Export button.
 
 **Inventory layout**
+
 - Left pane: virtualised tree. Right pane: object-table area. Tree↔table gap = 32px (xl). Tree pane uses `.panel`.
 - Tree hierarchy (simplest coherent model): synthetic vCenter root → Cluster → ESX host → VM. NO Datacenter level.
 - Tree selection scopes the active table: selecting a node filters the right-pane table to objects within that node's subtree. Root selected = unscoped (all objects). Selected row uses accent indicator.
 
 **Virtualised tree**
+
 - Chevron expand/collapse per expandable node (rotates 90°, `aria-expanded`).
 - Indentation: 16px per depth level.
 - Count badge per node: child/descendant count, Caption size, secondary surface, em-dash never used here (count is always known; 0 shows `0`).
@@ -125,6 +130,7 @@ State copy detail (all FR+EN, no editorial verbs, no pre-formatted numbers):
 - States: empty (no snapshot) / loading / error per copywriting table.
 
 **Three object tables (VM / ESX / Datastore)**
+
 - Tab strip switching VM / ESX / Datastore tables; Datastore table is cluster-agnostic (per Phase-2 A1) — tree scoping above Cluster has no effect on it, and it states no cluster column.
 - Columns: each table has a default visible set and a wider available set; show/hide via column-picker (INV-06).
 - Global text filter (single input, toolbar) + per-column sort affordance in header (click to cycle asc/desc/none; active column uses accent indicator).
@@ -134,11 +140,13 @@ State copy detail (all FR+EN, no editorial verbs, no pre-formatted numbers):
 - Numbers/locale: counts, GiB, GHz, % rendered via the inherited Phase-2 formatter (locale-aware display only).
 
 **Column-picker (INV-06)**
+
 - Popover/menu anchored to a "Columns" toolbar button (icon + Label), placed in the toolbar right of the filter.
 - Checkbox list of available columns; default columns pre-checked; "Reset" action restores the default set.
 - Keyboard-operable; closes on Escape / outside click; selection applies immediately.
 
 **CSV export (INV-05)**
+
 - Toolbar button "Export CSV" (key `inventory.export.csv`), right of the column-picker.
 - Exports filtered rows × currently visible columns only.
 - Raw values — no locale formatting (this is data, not display): no thousands separators, no unit suffixes injected by the formatter; the underlying numeric/string value is written.
