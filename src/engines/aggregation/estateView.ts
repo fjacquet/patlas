@@ -43,8 +43,17 @@ export function buildEstateView(merged: MergedEstate, mode: AccountingMode): Est
   // No vDatastore rows ⇒ sheet absent/empty ⇒ per-cluster count is
   // genuinely unknown (undefined → em-dash). Rows present ⇒ attribute
   // them; an unmatched cluster legitimately gets 0, never em-dash.
+  // vHost.hostName → vHost.cluster (single pass) so blank-clusterName
+  // vSAN/host-local datastores attribute to their hosts' cluster(s)
+  // instead of being dropped (Pitfall 6 / Plan 04-02).
+  const hostClusterMap = new Map<string, string>()
+  for (const hrow of merged.vhost) {
+    if (hrow.hostName !== '' && hrow.cluster !== '') hostClusterMap.set(hrow.hostName, hrow.cluster)
+  }
   const dsByCluster =
-    merged.vdatastore.length === 0 ? undefined : datastoreCountByCluster(merged.vdatastore)
+    merged.vdatastore.length === 0
+      ? undefined
+      : datastoreCountByCluster(merged.vdatastore, hostClusterMap)
   const clusters = aggregateClusters({
     vinfo: merged.vinfo,
     vhost: merged.vhost,

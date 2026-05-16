@@ -81,4 +81,48 @@ describe('datastoreCountByCluster — per-cluster NAA dedupe (Moderate-11)', () 
     ])
     expect(map.get('C1')).toBe(1)
   })
+
+  // ── Pitfall 6: blank-clusterName Hosts→cluster attribution (04-02) ─────
+  it('attributes a blank-clusterName datastore via its Hosts list', () => {
+    const hostClusterMap = new Map([
+      ['esx-1', 'C1'],
+      ['esx-2', 'C1'],
+    ])
+    const map = datastoreCountByCluster(
+      [ds({ naa: 'vsan.1', clusterName: '', hosts: 'esx-1, esx-2' })],
+      hostClusterMap,
+    )
+    expect(map.get('C1')).toBe(1)
+  })
+
+  it('a shared blank-clusterName LUN across two clusters counts once per cluster', () => {
+    const hostClusterMap = new Map([
+      ['esx-a', 'C1'],
+      ['esx-b', 'C2'],
+    ])
+    const map = datastoreCountByCluster(
+      [ds({ naa: 'vsan.shared', clusterName: '', hosts: 'esx-a\nesx-b' })],
+      hostClusterMap,
+    )
+    expect(map.get('C1')).toBe(1)
+    expect(map.get('C2')).toBe(1)
+  })
+
+  it('non-blank clusterName still wins even when Hosts is populated (regression)', () => {
+    const hostClusterMap = new Map([['esx-9', 'OTHER']])
+    const map = datastoreCountByCluster(
+      [ds({ naa: 'naa.x', clusterName: 'C1', hosts: 'esx-9' })],
+      hostClusterMap,
+    )
+    expect(map.get('C1')).toBe(1)
+    expect(map.has('OTHER')).toBe(false)
+  })
+
+  it('blank-clusterName datastore whose hosts match no known cluster is not fabricated', () => {
+    const map = datastoreCountByCluster(
+      [ds({ naa: 'orphan', clusterName: '', hosts: 'ghost-host' })],
+      new Map([['esx-1', 'C1']]),
+    )
+    expect([...map.keys()]).toEqual([])
+  })
 })
