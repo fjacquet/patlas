@@ -1,0 +1,41 @@
+{
+  "title": "Simulation PRA",
+  "mode": {
+    "label": "Scénario de perte",
+    "host": "Perte d'hôte",
+    "cluster": "Perte de cluster",
+    "vcenter": "Perte de vCenter"
+  },
+  "fail": {
+    "legend": "Composants à simuler en panne"
+  },
+  "failed": {
+    "chip": "panne simulée"
+  },
+  "before": "Avant",
+  "after": "Après",
+  "evacueeTotal": "Total à réhéberger",
+  "verdict": {
+    "absorbs": "absorbe",
+    "tight": "juste",
+    "overflows": "dépassé"
+  },
+  "assumptions": {
+    "title": "Hypothèses",
+    "models": "Modélise : soustraction de capacité ; respecte le mode de comptabilisation actif.",
+    "doesNotModel": "Ne modélise pas : le contrôle d'admission HA, les règles d'anti-affinité, la priorité de redémarrage des VM, le split-brain de cluster étendu."
+  },
+  "confidence": {
+    "label": "Confiance",
+    "high": "élevée",
+    "medium": "moyenne",
+    "low": "faible"
+  },
+  "caveats": {
+    "label": "Réserves",
+    "reservationHigh": "La réservation étendue d'un cluster survivant dépasse 80% de sa RAM physique."
+  },
+  "empty": {
+    "noSelection": "Sélectionnez un ou plusieurs composants pour simuler une panne."
+  }
+}

@@ -352,6 +352,8 @@ export interface EstateView {
   accountingMode: AccountingMode
   /** Phase-4 forward-compat — always `null` in Phase 2. */
   trends: TimelinePoint[] | null
+  /** Distinct vCenters in the merged estate (DR vCenter-loss picker). */
+  vcenters: { viSdkUuid: string; label: string }[]
   /** DR what-if result. `null` when no component is marked failed
    *  (mirrors the `trends: T | null` idiom). Phase-4 DRS-01..06. */
   drSim: DrSimResult | null

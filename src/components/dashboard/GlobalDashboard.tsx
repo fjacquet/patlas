@@ -5,12 +5,15 @@ import { useAllocationHash } from '@/hooks/useAllocationHash'
 import { useEstateView } from '@/hooks/useEstateView'
 import {
   selectActiveSnapshot,
+  selectScenario,
+  selectSetScenario,
   selectSetStretchedClusters,
   selectStretchedClusters,
   useSnapshotStore,
 } from '@/store/snapshotStore'
-import type { AccountingMode } from '@/types/estate'
+import type { AccountingMode, DrMode } from '@/types/estate'
 import { AllocationSliders } from '../allocation/AllocationSliders'
+import { DrSimPanel } from '../dr/DrSimPanel'
 import { AccountingModeToggle } from './AccountingModeToggle'
 import { CpuReadyPanel } from './CpuReadyPanel'
 import { GlobalSummaryCard } from './GlobalSummaryCard'
@@ -60,6 +63,9 @@ export function GlobalDashboard() {
   const snapshot = useSnapshotStore(selectActiveSnapshot)
   const stretchedClusters = useSnapshotStore(selectStretchedClusters)
   const setStretchedClusters = useSnapshotStore(selectSetStretchedClusters)
+  const scenario = useSnapshotStore(selectScenario)
+  const setScenario = useSnapshotStore(selectSetScenario)
+  const [drMode, setDrMode] = useState<DrMode>('host')
   // Toggle one cluster's stretched membership. Set is REPLACED (never
   // mutated) so Zustand's Object.is fires and `useEstateView` recomputes.
   const onToggleStretched = (cluster: string) => {
@@ -103,6 +109,16 @@ export function GlobalDashboard() {
             onToggleStretched={onToggleStretched}
           />
           <CpuReadyPanel globals={view.globals} clusters={view.clusters} />
+          {/* 2xl (48px) major break before the DR panel (gap-6 24px + mt-6 24px). */}
+          <div className="mt-6">
+            <DrSimPanel
+              view={view}
+              drMode={drMode}
+              onDrMode={setDrMode}
+              scenario={scenario}
+              onScenario={setScenario}
+            />
+          </div>
         </div>
       </ErrorBoundary>
     </main>

@@ -5,6 +5,7 @@ import { initReactI18next } from 'react-i18next'
 import enAlloc from './locales/en/alloc.json'
 import enCommon from './locales/en/common.json'
 import enDashboard from './locales/en/dashboard.json'
+import enDr from './locales/en/dr.json'
 import enInventory from './locales/en/inventory.json'
 import enMvc from './locales/en/mvc.json'
 import enStr from './locales/en/str.json'
@@ -12,6 +13,7 @@ import enUpload from './locales/en/upload.json'
 import frAlloc from './locales/fr/alloc.json'
 import frCommon from './locales/fr/common.json'
 import frDashboard from './locales/fr/dashboard.json'
+import frDr from './locales/fr/dr.json'
 import frInventory from './locales/fr/inventory.json'
 import frMvc from './locales/fr/mvc.json'
 import frStr from './locales/fr/str.json'
@@ -37,6 +39,7 @@ export const NAMESPACES = [
   'mvc',
   'str',
   'alloc',
+  'dr',
 ] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
@@ -49,6 +52,7 @@ export const resources = {
     mvc: enMvc,
     str: enStr,
     alloc: enAlloc,
+    dr: enDr,
   },
   fr: {
     common: frCommon,
@@ -58,6 +62,7 @@ export const resources = {
     mvc: frMvc,
     str: frStr,
     alloc: frAlloc,
+    dr: frDr,
   },
 } as const
 

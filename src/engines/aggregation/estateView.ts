@@ -129,6 +129,7 @@ export function buildEstateView(
     osBreakdown,
     accountingMode: mode,
     trends: null,
+    vcenters: merged.vcenters.map((vc) => ({ viSdkUuid: vc.viSdkUuid, label: vc.label })),
     drSim,
   }
 }
@@ -148,5 +149,6 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   osBreakdown: Object.freeze({ windows: 0, linux: 0, other: 0 }),
   accountingMode: 'active',
   trends: null,
+  vcenters: Object.freeze([]) as never[],
   drSim: null,
 })

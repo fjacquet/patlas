@@ -1,5 +1,12 @@
 import { create } from 'zustand'
+import type { DrScenario } from '@/types/estate'
 import type { Snapshot } from '@/types/snapshot'
+
+const EMPTY_SCENARIO = (): DrScenario => ({
+  failedHosts: new Set(),
+  failedClusters: new Set(),
+  failedVCenters: new Set(),
+})
 
 /**
  * Multi-snapshot, inputs-only Zustand store.
@@ -38,11 +45,17 @@ interface SnapshotState {
    * persist, no localStorage (PROJECT.md line 53 / T-04-06).
    */
   stretchedClusters: Set<string>
+  /**
+   * DR what-if selection (Phase 4 DRS-01..03). Inputs-only, REPLACED
+   * never mutated; never persisted (no hash, no localStorage — T-04-13).
+   */
+  scenario: DrScenario
   addSnapshot: (s: Snapshot) => void
   removeSnapshot: (id: string) => void
   setActiveSnapshot: (id: string | null) => void
   setSelectedSnapshotIds: (ids: Set<string>) => void
   setStretchedClusters: (clusters: Set<string>) => void
+  setScenario: (scenario: DrScenario) => void
   renameVCenter: (id: string, label: string) => void
   setCapturedAt: (id: string, date: Date) => void
   clearAll: () => void
@@ -53,6 +66,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
   activeSnapshotId: null,
   selectedSnapshotIds: new Set(),
   stretchedClusters: new Set(),
+  scenario: EMPTY_SCENARIO(),
 
   addSnapshot: (s) =>
     set((state) => {
@@ -92,6 +106,15 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
 
   setStretchedClusters: (clusters) => set({ stretchedClusters: new Set(clusters) }),
 
+  setScenario: (scenario) =>
+    set({
+      scenario: {
+        failedHosts: new Set(scenario.failedHosts),
+        failedClusters: new Set(scenario.failedClusters),
+        failedVCenters: new Set(scenario.failedVCenters),
+      },
+    }),
+
   renameVCenter: (id, label) =>
     set((state) => {
       const snap = state.snapshots.get(id)
@@ -116,6 +139,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
       activeSnapshotId: null,
       selectedSnapshotIds: new Set(),
       stretchedClusters: new Set(),
+      scenario: EMPTY_SCENARIO(),
     }),
 }))
 
@@ -140,3 +164,5 @@ export const selectSelectedSnapshotIds = (s: SnapshotState): Set<string> => s.se
 export const selectStretchedClusters = (s: SnapshotState): Set<string> => s.stretchedClusters
 export const selectSetStretchedClusters = (s: SnapshotState): ((c: Set<string>) => void) =>
   s.setStretchedClusters
+export const selectScenario = (s: SnapshotState): DrScenario => s.scenario
+export const selectSetScenario = (s: SnapshotState): ((sc: DrScenario) => void) => s.setScenario
