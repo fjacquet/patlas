@@ -65,6 +65,36 @@ describe('aggregateClusters', () => {
     expect(c.drReservedRamMib as number).toBe(0)
   })
 
+  it('applies the 50 % stretched-cluster DR reservation (ADR-0007) when flagged', () => {
+    // The stretched math is dormant in Phase 2 (callers pass an empty
+    // set) but ports INTACT for Phase 4 — exercise it directly so the
+    // DR-factor branches are regression-covered (threat T-02-06).
+    // 1 host: 12 cores × 2600 MHz = 31.2 GHz physical.
+    const c = first(
+      aggregateClusters({
+        vinfo: [vm({ cluster: 'STR', vcpu: cores(4) })],
+        vhost: [host({ cluster: 'STR', cores: cores(12), speedMhz: mhz(2600), cpuRatio: 0.25 })],
+        mode: 'active',
+        stretchedClusters: new Set(['STR']),
+      }),
+    )
+    expect(c.stretched).toBe(true)
+    const physical = 31.2
+    expect(c.physicalGhz as number).toBeCloseTo(physical)
+    expect(c.drReservedGhz as number).toBeCloseTo(0.5 * physical)
+    // available = physical − consumed − drReserved.
+    const consumed = physical * 0.25
+    expect(c.availableGhz as number).toBeCloseTo(physical - consumed - 0.5 * physical)
+    // DR factor doubles the utilization ratios (physical / (physical/2) = 2).
+    expect(c.meanCpuRatio).toBeCloseTo(0.25 * 2)
+    // usablePhysicalCores halved → vcpuPerPcpu doubles vs non-stretched.
+    expect(c.usablePhysicalCores as number).toBeCloseTo(6)
+    expect(c.vcpuPerPcpu).toBeCloseTo(4 / 6)
+    // RAM DR reservation on the host memory.
+    const ram = 262_144
+    expect(c.drReservedRamMib as number).toBeCloseTo(0.5 * ram)
+  })
+
   it('sorts clusters stably by localeCompare', () => {
     const out = aggregateClusters({
       vinfo: [vm({ cluster: 'Zeta' }), vm({ cluster: 'alpha' })],
