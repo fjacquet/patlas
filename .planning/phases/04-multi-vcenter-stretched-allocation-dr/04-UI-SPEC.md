@@ -1,7 +1,8 @@
 ---
 phase: 4
 slug: multi-vcenter-stretched-allocation-dr
-status: draft
+status: approved
+reviewed_at: 2026-05-16T00:00:00Z
 shadcn_initialized: false
 preset: none
 created: 2026-05-16
@@ -240,7 +241,7 @@ All strings i18n-keyed in NEW namespaces — recommend **three** small namespace
 | Assumptions — does not model | "Does not model: HA admission control, anti-affinity rules, VM restart priority, stretched-cluster split-brain." | "Ne modélise pas : le contrôle d'admission HA, les règles d'anti-affinité, la priorité de redémarrage des VM, le split-brain de cluster étendu." |
 | Caveats list label | "Caveats" | "Réserves" |
 | Empty — no snapshot | "No snapshot loaded" | "Aucun instantané chargé" |
-| Empty body — no snapshot | "Drop an RVTools .xlsx export in the sidebar to run the analysis." | "Déposez un export RVTools .xlsx dans la barre latérale pour lancer l'analyse." |
+| Empty body — no snapshot | "Drop one or more RVTools .xlsx exports in the sidebar to run the analysis." | "Déposez un ou plusieurs exports RVTools .xlsx dans la barre latérale pour lancer l'analyse." |
 | Merge-in-progress (loading) | "Merging the estate…" | "Fusion du parc en cours…" |
 | Single-vCenter (no merge applicable) | "Single vCenter — no cross-vCenter merge applied." | "vCenter unique — aucune fusion inter-vCenter appliquée." |
 | DR — no failed component selected | "Select one or more components to simulate a loss." | "Sélectionnez un ou plusieurs composants pour simuler une panne." |
