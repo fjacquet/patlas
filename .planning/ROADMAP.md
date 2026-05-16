@@ -53,6 +53,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. The ECharts bundle lands at ≤300 KB gzipped (CI size-budget gate), proving tree-shaking is effective
   6. `engines/aggregation/` ships with ≥75 % Vitest coverage including the hyperthreads-vs-physical-cores test and the 2-socket × 12-core × 2600 MHz = 62.4 GHz unit test
 **Plans**: 3 plans
+
 - [x] 02-01-PLAN.md — ECharts SVG infra: `<Chart>` wrapper, Midnight Executive theme (light+dark), CI bundle-size gate (≤300 KB gz)
 - [x] 02-02-PLAN.md — Aggregation engines (vsizer port+brand retrofit, perDatastore/perEsx/osFamily, 3 accounting modes) + useEstateView bridge
 - [x] 02-03-PLAN.md — Dashboard UI per UI-SPEC (summary card, per-cluster columns, OS donut, CPU Ready, accounting toggle) + i18n + App wiring
@@ -73,7 +74,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. A user exports the current filtered VM table to CSV and the downloaded file contains exactly the rows visible in the UI (filter respected, column hide respected)
   5. A user views the datastore table and confirms a shared LUN visible in two clusters appears once (NAA-keyed dedupe)
 **Plans**: 3 plans
-- [ ] 03-01-PLAN.md — Table infra: TanStack deps + bundle gate, csv.ts/oneLine.ts, VmDisplayRow projection, generic DataTable/ColumnPicker/ViewToggle (no wiring)
+
+- [x] 03-01-PLAN.md — Table infra: TanStack deps + bundle gate, csv.ts/oneLine.ts, VmDisplayRow projection, generic DataTable/ColumnPicker/ViewToggle (no wiring)
 - [ ] 03-02-PLAN.md — Three object tables: vm/esx/datastore ColumnDefs + thin wrappers, CSV-of-filter×visible + NAA-preserved gates
 - [ ] 03-03-PLAN.md — Tree + shell + inventory i18n EN/FR + App ViewToggle wiring + 10k synthetic fixture + stress/e2e + LIVE tanstack bundle gate
 **UI hint**: yes
