@@ -157,10 +157,7 @@ describe('mergeSnapshotsToEstate — ADDITIONAL: ONE workbook with 3 vCenters', 
         vm({ vmName: 'a', viSdkUuid: 'vc11', cluster: 'CL', vmBiosUuid: 'a' }),
         vm({ vmName: 'b', viSdkUuid: 'vc14', cluster: 'CL', vmBiosUuid: 'b' }),
       ],
-      vhost: [
-        host({ hostName: 'h11', cluster: 'CL' }),
-        host({ hostName: 'h14', cluster: 'CL' }),
-      ],
+      vhost: [host({ hostName: 'h11', cluster: 'CL' }), host({ hostName: 'h14', cluster: 'CL' })],
     })
     const merged = mergeSnapshotsToEstate([w])
     const clusters = new Set(merged.vinfo.map((r) => r.cluster))

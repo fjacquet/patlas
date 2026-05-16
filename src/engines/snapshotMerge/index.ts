@@ -3,5 +3,5 @@
  * `mergeSnapshotsToEstate` inside the project's single `useMemo` before
  * `buildEstateView`. Mirrors the `engines/aggregation/index.ts` barrel.
  */
-export { mergeSnapshotsToEstate, type MergedEstate } from './mergeSnapshotsToEstate'
+export { type MergedEstate, mergeSnapshotsToEstate } from './mergeSnapshotsToEstate'
 export { buildVCenterIndex, type VCenterEntry } from './vCenterIndex'

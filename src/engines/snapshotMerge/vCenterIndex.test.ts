@@ -67,7 +67,9 @@ describe('buildVCenterIndex', () => {
   it('label resolves vMetaData Server (matched by snapshot order) first', () => {
     const s = snap({
       viSdkUuid: 'vc-x',
-      vMetaData: [{ server: 'meta-vc.example', rvtoolsVersion: '4.7.1.4', exportedTimestamp: null }],
+      vMetaData: [
+        { server: 'meta-vc.example', rvtoolsVersion: '4.7.1.4', exportedTimestamp: null },
+      ],
       vinfo: [vm({ viSdkUuid: 'vc-x', viSdkServer: 'row-server.local' })],
     })
     const idx = buildVCenterIndex([s])
