@@ -1,7 +1,8 @@
 ---
 phase: 2
 slug: aggregation-global-dashboard
-status: draft
+status: approved
+reviewed_at: 2026-05-16T00:00:00Z
 shadcn_initialized: false
 preset: none
 created: 2026-05-16
