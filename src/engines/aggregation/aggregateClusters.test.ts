@@ -96,6 +96,127 @@ describe('aggregateClusters', () => {
     expect(c.drReservedRamMib as number).toBeCloseTo(0.5 * ram)
   })
 
+  // ── Phase 4: per-site reservation + factual confidence (ADR-0007-EXT) ──
+  // physicalGhz per fixture host = 2600 MHz × 12 cores / 1000 = 31.2 GHz.
+  const siteHosts = (n: number, faultDomain: string, cluster = 'STR'): VHostRow[] =>
+    Array.from({ length: n }, (_, i) =>
+      host({ hostName: `${faultDomain || 'h'}-${i}`, cluster, faultDomain }),
+    )
+  const GHZ_PER_HOST = 31.2
+
+  it('4+4 symmetric fault-domain split → reservedFraction 0.5, confidence high', () => {
+    const vhost = [...siteHosts(4, 'A'), ...siteHosts(4, 'B')]
+    const c = first(
+      aggregateClusters({
+        vinfo: [vm({ cluster: 'STR' })],
+        vhost,
+        mode: 'active',
+        stretchedClusters: new Set(['STR']),
+      }),
+    )
+    expect(c.stretched).toBe(true)
+    expect(c.reservedFraction).toBeCloseTo(0.5)
+    expect(c.stretchedConfidence).toBe('high')
+    expect(c.drReservedGhz as number).toBeCloseTo(0.5 * 8 * GHZ_PER_HOST)
+    expect(c.siteACapacityGhz as number).toBeCloseTo(4 * GHZ_PER_HOST)
+    expect(c.siteBCapacityGhz as number).toBeCloseTo(4 * GHZ_PER_HOST)
+  })
+
+  it('6+4 asymmetric tagged → reservedFraction 0.6 (NOT flat 0.5), confidence high', () => {
+    const vhost = [...siteHosts(6, 'A'), ...siteHosts(4, 'B')]
+    const c = first(
+      aggregateClusters({
+        vinfo: [vm({ cluster: 'STR' })],
+        vhost,
+        mode: 'active',
+        stretchedClusters: new Set(['STR']),
+      }),
+    )
+    expect(c.reservedFraction).toBeCloseTo(0.6)
+    expect(c.stretchedConfidence).toBe('high')
+    expect(c.drReservedGhz as number).toBeCloseTo(0.6 * 10 * GHZ_PER_HOST)
+    expect(c.siteACapacityGhz as number).toBeCloseTo(6 * GHZ_PER_HOST)
+    expect(c.siteBCapacityGhz as number).toBeCloseTo(4 * GHZ_PER_HOST)
+  })
+
+  it('6+4 untagged → assumed-symmetric 0.5, confidence low, sites em-dash (null)', () => {
+    const vhost = siteHosts(10, '') // no fault-domain metadata at all
+    const c = first(
+      aggregateClusters({
+        vinfo: [vm({ cluster: 'STR' })],
+        vhost,
+        mode: 'active',
+        stretchedClusters: new Set(['STR']),
+      }),
+    )
+    expect(c.reservedFraction).toBeCloseTo(0.5)
+    expect(c.stretchedConfidence).toBe('low')
+    expect(c.siteACapacityGhz).toBeNull()
+    expect(c.siteBCapacityGhz).toBeNull()
+  })
+
+  it('partial fault-domain coverage → confidence medium, assumed-symmetric 0.5', () => {
+    const vhost = [...siteHosts(3, 'A'), ...siteHosts(3, '')]
+    const c = first(
+      aggregateClusters({
+        vinfo: [vm({ cluster: 'STR' })],
+        vhost,
+        mode: 'active',
+        stretchedClusters: new Set(['STR']),
+      }),
+    )
+    expect(c.reservedFraction).toBeCloseTo(0.5)
+    expect(c.stretchedConfidence).toBe('medium')
+    expect(c.siteACapacityGhz).toBeNull()
+  })
+
+  it('8+0 non-stretched (not in set) → no reservation, failback to shipped behavior', () => {
+    const vhost = siteHosts(8, 'A', 'PLAIN')
+    const c = first(
+      aggregateClusters({
+        vinfo: [vm({ cluster: 'PLAIN' })],
+        vhost,
+        mode: 'active',
+        stretchedClusters: new Set(),
+      }),
+    )
+    expect(c.stretched).toBe(false)
+    expect(c.drReservedGhz as number).toBe(0)
+    expect(c.reservedFraction).toBe(0)
+    expect(c.usablePhysicalCores as number).toBe(c.physicalCores as number)
+  })
+
+  it('2+2 minimum stretched tagged → 0.5, high', () => {
+    const vhost = [...siteHosts(2, 'A'), ...siteHosts(2, 'B')]
+    const c = first(
+      aggregateClusters({
+        vinfo: [vm({ cluster: 'STR' })],
+        vhost,
+        mode: 'active',
+        stretchedClusters: new Set(['STR']),
+      }),
+    )
+    expect(c.reservedFraction).toBeCloseTo(0.5)
+    expect(c.stretchedConfidence).toBe('high')
+  })
+
+  it('real CL_VXB1K_CORE shape (4 Secondary + 4 UNI) → 0.5, high', () => {
+    const vhost = [
+      ...siteHosts(4, 'Secondary', 'CL_VXB1K_CORE'),
+      ...siteHosts(4, 'UNI', 'CL_VXB1K_CORE'),
+    ]
+    const c = first(
+      aggregateClusters({
+        vinfo: [vm({ cluster: 'CL_VXB1K_CORE' })],
+        vhost,
+        mode: 'active',
+        stretchedClusters: new Set(['CL_VXB1K_CORE']),
+      }),
+    )
+    expect(c.reservedFraction).toBeCloseTo(0.5)
+    expect(c.stretchedConfidence).toBe('high')
+  })
+
   it('sorts clusters stably by localeCompare', () => {
     const out = aggregateClusters({
       vinfo: [vm({ cluster: 'Zeta' }), vm({ cluster: 'alpha' })],

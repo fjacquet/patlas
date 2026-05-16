@@ -155,10 +155,36 @@ export interface ClusterAggregate {
   vmsAboveReadinessWarning: number
   readinessAvailable: boolean
 
-  // ── Stretched-cluster DR (dormant in Phase 2) ─────────────────────────
+  // ── Stretched-cluster DR (Phase 4 — per-site reservation + confidence) ─
   stretched: boolean
   drReservedGhz: GHz
+  /**
+   * Factual confidence in the per-site reservation, NEVER collapsing
+   * metadata absence to 'high':
+   *   - 'high'   — every host carries a fault domain AND ≥2 distinct
+   *                domains → reservation from real per-site capacity
+   *   - 'medium' — SOME hosts tagged (partial coverage) → assume
+   *                symmetric 0.5
+   *   - 'low'    — NO host tagged → cannot prove a split; assume
+   *                symmetric 0.5 (low-confidence chip shown)
+   */
+  stretchedConfidence: StretchedConfidence
+  /**
+   * Headline reservation fraction (GHz basis) used for the UI "%" row and
+   * the DR subtraction echo. `0` when not stretched. Per-resource fractions
+   * are applied internally (see aggregateClusters ADR comment).
+   */
+  reservedFraction: number
+  /** Larger / smaller site physical GHz. `null` ⇒ sites indeterminate
+   *  (assumed-symmetric medium/low) → em-dash sentinel (UI-SPEC §STR-02). */
+  siteACapacityGhz: GHz | null
+  siteBCapacityGhz: GHz | null
+  siteACapacityRamMib: MiB | null
+  siteBCapacityRamMib: MiB | null
 }
+
+/** Factual confidence enum for the per-site stretched reservation. */
+export type StretchedConfidence = 'high' | 'medium' | 'low'
 
 /**
  * Estate-wide rollup (ported vsizer `GlobalSummary`, active-memory field
