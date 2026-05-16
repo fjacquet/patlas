@@ -84,7 +84,12 @@ describe('Phase 1 end-to-end smoke: drop → parse → render', () => {
     // Capture-date indicator visible (FND-05). The canary's vMetaData carries
     // an Exported Timestamp in 2026; we assert the year appears (locale format
     // of toLocaleDateString varies, so we do not lock the exact string).
-    expect(screen.getByText(/2026/).textContent).toMatch(/2026/)
+    // Phase-2: the dashboard now also renders a "Captured {date}" provenance
+    // line beside the sidebar SnapshotCard, so >1 node matches /2026/ — assert
+    // at least one is present (intent unchanged: the capture date is visible).
+    const dated = screen.getAllByText(/2026/)
+    expect(dated.length).toBeGreaterThan(0)
+    expect(dated[0]?.textContent).toMatch(/2026/)
 
     // vCenter label from the canary fixture.
     expect(screen.queryByText(/vcenter\.canary\.local/)).not.toBeNull()

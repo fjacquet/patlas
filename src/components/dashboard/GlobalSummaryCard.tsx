@@ -42,17 +42,11 @@ export function GlobalSummaryCard({ globals, mode, capturedDate }: GlobalSummary
   const modeLabel = t(`accountingMode.${MODE_KEY[mode]}`)
 
   return (
-    <section className="panel">
-      <div className="flex flex-wrap items-baseline gap-x-2">
-        <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-200">
-          {t('sections.summary')}
-        </h2>
-        <span className="text-xs text-slate-500 dark:text-slate-400">
-          {t('accountingMode.echo', { mode: modeLabel })}
-        </span>
-      </div>
-      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-        {t('capturedAt', { date: capturedDate })}
+    <section className="panel" aria-label={t('sections.summary')}>
+      <p className="text-xs text-slate-500 dark:text-slate-400">
+        <span>{t('accountingMode.echo', { mode: modeLabel })}</span>
+        {' · '}
+        <span>{t('capturedAt', { date: capturedDate })}</span>
       </p>
       <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
         {tiles.map((tile) => (

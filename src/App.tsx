@@ -1,5 +1,6 @@
 import { ErrorBoundary } from 'react-error-boundary'
 import { Toaster } from 'sonner'
+import { GlobalDashboard } from './components/dashboard/GlobalDashboard'
 import { FallbackError } from './components/FallbackError'
 import { LanguageToggle } from './components/LanguageToggle'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
@@ -27,12 +28,7 @@ function App() {
         {hasSnapshots ? (
           <div className="flex flex-1 overflow-hidden">
             <SnapshotListSidebar />
-            <main className="flex-1 p-8">
-              {/* Phase 2 lands the dashboard here. */}
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Snapshots loaded. Dashboard arrives in Phase 2.
-              </p>
-            </main>
+            <GlobalDashboard />
           </div>
         ) : (
           <main className="flex flex-1 items-center justify-center p-8">
