@@ -1,0 +1,16 @@
+{
+  "title": "Allocation ratios",
+  "cpu": {
+    "label": "CPU ratio (vCPU per physical core)"
+  },
+  "ram": {
+    "label": "RAM overcommit"
+  },
+  "preset": {
+    "1to1": "1:1",
+    "4to1": "4:1",
+    "8to1": "8:1",
+    "vdi10to1": "VDI 10:1"
+  },
+  "echo": "CPU {{cpu}} · RAM {{ram}}"
+}

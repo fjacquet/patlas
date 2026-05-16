@@ -1,0 +1,16 @@
+{
+  "title": "Ratios d'allocation",
+  "cpu": {
+    "label": "Ratio CPU (vCPU par cœur physique)"
+  },
+  "ram": {
+    "label": "Surallocation RAM"
+  },
+  "preset": {
+    "1to1": "1:1",
+    "4to1": "4:1",
+    "8to1": "8:1",
+    "vdi10to1": "VDI 10:1"
+  },
+  "echo": "CPU {{cpu}} · RAM {{ram}}"
+}

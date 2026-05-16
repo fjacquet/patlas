@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
+import { useAllocationHash } from '@/hooks/useAllocationHash'
 import { useEstateView } from '@/hooks/useEstateView'
 import {
   selectActiveSnapshot,
@@ -9,6 +10,7 @@ import {
   useSnapshotStore,
 } from '@/store/snapshotStore'
 import type { AccountingMode } from '@/types/estate'
+import { AllocationSliders } from '../allocation/AllocationSliders'
 import { AccountingModeToggle } from './AccountingModeToggle'
 import { CpuReadyPanel } from './CpuReadyPanel'
 import { GlobalSummaryCard } from './GlobalSummaryCard'
@@ -53,7 +55,8 @@ function DashboardError({ error }: FallbackProps) {
 export function GlobalDashboard() {
   const { t, i18n } = useTranslation('dashboard')
   const [mode, setMode] = useState<AccountingMode>('active')
-  const view = useEstateView(mode)
+  const [ratios, setRatios] = useAllocationHash()
+  const view = useEstateView(mode, ratios)
   const snapshot = useSnapshotStore(selectActiveSnapshot)
   const stretchedClusters = useSnapshotStore(selectStretchedClusters)
   const setStretchedClusters = useSnapshotStore(selectSetStretchedClusters)
@@ -91,6 +94,7 @@ export function GlobalDashboard() {
             </h2>
             <AccountingModeToggle value={mode} onChange={setMode} />
           </div>
+          <AllocationSliders ratios={ratios} onChange={setRatios} />
           <GlobalSummaryCard globals={view.globals} mode={mode} capturedDate={capturedDate} />
           <OsBreakdownDonut osBreakdown={view.osBreakdown} />
           <PerClusterColumns
