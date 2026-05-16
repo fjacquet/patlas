@@ -4,12 +4,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 // SVG-assertion path (02-01-PLAN Task 2 <behavior> / RESEARCH Pitfall 3 +
 // Open Question 2): jsdom does NOT produce real ECharts SVG geometry, so we
-// take the documented fallback — mock `echarts-for-react/lib/core` with a
+// take the documented fallback — mock `echarts-for-react/esm/core` with a
 // stand-in that renders an <svg> element IFF the `opts.renderer` it received
 // is 'svg' (and a <canvas> otherwise). This proves the wrapper structurally
 // injects `{ renderer: 'svg' }` (VIZ-01) AND lets the DOM-presence assertion
 // in the behavior contract pass deterministically. Documented in 02-01-SUMMARY.
-vi.mock('echarts-for-react/lib/core', () => ({
+vi.mock('echarts-for-react/esm/core', () => ({
   default: (props: { opts?: { renderer?: string }; theme?: string }) => {
     const renderer = props.opts?.renderer
     // Reflect the injected renderer choice into the DOM exactly as a real

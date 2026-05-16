@@ -8,11 +8,11 @@ import { useSnapshotStore } from '@/store/snapshotStore'
 
 // SVG-assertion path — identical documented fallback 02-01's Chart.test.tsx
 // chose (RESEARCH Open Question 2): jsdom cannot mount real ReactEChartsCore /
-// produce ECharts SVG geometry, so we mock `echarts-for-react/lib/core` with a
+// produce ECharts SVG geometry, so we mock `echarts-for-react/esm/core` with a
 // stand-in that emits an inline <svg> IFF the centrally-injected
 // `opts.renderer === 'svg'` (VIZ-01), else a <canvas>. This proves the
 // dashboard's charts are SVG-wired (Pitfall 3) deterministically.
-vi.mock('echarts-for-react/lib/core', () => ({
+vi.mock('echarts-for-react/esm/core', () => ({
   default: (props: { opts?: { renderer?: string }; theme?: string }) =>
     props.opts?.renderer === 'svg' ? (
       <svg data-testid="echarts-svg" data-theme={props.theme} />

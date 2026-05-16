@@ -8,7 +8,7 @@ import {
 import * as echarts from 'echarts/core'
 import { SVGRenderer } from 'echarts/renderers'
 import type { EChartsOption } from 'echarts/types/dist/shared'
-import ReactEChartsCore from 'echarts-for-react/lib/core'
+import ReactEChartsCore from 'echarts-for-react/esm/core'
 import type { CSSProperties } from 'react'
 import { memo } from 'react'
 import { MIDNIGHT_EXECUTIVE_DARK, MIDNIGHT_EXECUTIVE_LIGHT } from '@/theme/echartsTheme'
