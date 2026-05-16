@@ -34,6 +34,12 @@ export default defineConfig({
             return 'vendor-react'
           }
           if (id.includes('node_modules/xlsx')) return 'vendor-xlsx'
+          // Split the TanStack table/virtual primitives into their own
+          // chunk so the LIVE bundle-size gate (03-RESEARCH A6, ≤ 60 KiB
+          // gz) can actually MEASURE them — minification strips the literal
+          // package name from the merged index chunk, defeating the
+          // marker-scan otherwise.
+          if (id.includes('node_modules/@tanstack')) return 'vendor-tanstack'
           if (id.includes('node_modules/zustand')) return 'vendor-state'
           if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) {
             return 'vendor-i18n'

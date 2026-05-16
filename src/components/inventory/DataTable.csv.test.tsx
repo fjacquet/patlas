@@ -85,11 +85,13 @@ describe('DataTable CSV-of-current-view (INV-05 × INV-06)', () => {
     await user.type(filter, 'C1')
 
     // Hide the 'cluster' column via the ColumnPicker (a hideable column).
-    await user.click(screen.getByRole('button', { name: /columns\.button/i }))
+    // The `inventory` i18n namespace is registered as of 03-03, so toolbar
+    // controls now resolve to their EN copy (not the raw `col.*` keys).
+    await user.click(screen.getByRole('button', { name: /columns/i }))
     const clusterToggle = await screen.findByRole('checkbox', { name: /cluster/i })
     await user.click(clusterToggle)
 
-    const exportBtn = screen.getByRole('button', { name: /export\.csv/i })
+    const exportBtn = screen.getByRole('button', { name: /export csv/i })
 
     // The global filter is debounced (FILTER_DEBOUNCE_MS). Re-export until
     // the captured CSV reflects the settled filtered model — this naturally
@@ -136,7 +138,7 @@ describe('DataTable CSV-of-current-view (INV-05 × INV-06)', () => {
         objectKind="datastore"
       />,
     )
-    await user.click(screen.getByRole('button', { name: /export\.csv/i }))
+    await user.click(screen.getByRole('button', { name: /export csv/i }))
     expect(capturedDownloadName).toMatch(/^vatlas-datastore-\d{8}\.csv$/)
   })
 })

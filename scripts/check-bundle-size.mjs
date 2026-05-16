@@ -94,12 +94,14 @@ for (const { file, bytes } of echartsChunks) {
   }
 }
 
+// Detect the TanStack chunk by FILENAME, not content: minification strips
+// the literal `@tanstack` package string from the emitted code, so a
+// content scan can never find it. The `vendor-tanstack` manualChunks rule
+// (vite.config.ts) gives the chunk a stable, greppable name — that is the
+// reliable LIVE-gate signal (03-RESEARCH A6).
 const tanstackChunks = jsChunks
-  .map((file) => {
-    const bytes = readFileSync(join(ASSETS_DIR, file))
-    return { file, bytes }
-  })
-  .filter(({ bytes }) => bytes.toString('latin1').toLowerCase().includes(TANSTACK_MARKER))
+  .filter((file) => file.toLowerCase().includes(TANSTACK_MARKER.replace('@', '')))
+  .map((file) => ({ file, bytes: readFileSync(join(ASSETS_DIR, file)) }))
 
 if (tanstackChunks.length === 0) {
   // No consumer mounts <DataTable> into the production graph yet (03-01

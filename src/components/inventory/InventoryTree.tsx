@@ -168,6 +168,11 @@ export function InventoryTree({
     getScrollElement: () => scrollRef.current,
     estimateSize: () => ROW_HEIGHT,
     overscan: 12,
+    // jsdom never lays out / measures the scroll element (getBoundingClientRect
+    // returns 0×0), so the virtualiser would otherwise emit an empty window in
+    // tests. A deterministic initial viewport keeps a bounded window in jsdom;
+    // the real ResizeObserver measurement supersedes it in the browser.
+    initialRect: { width: 320, height: 600 },
   })
   const virtualItems = virtualizer.getVirtualItems()
 

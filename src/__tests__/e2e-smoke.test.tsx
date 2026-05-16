@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import i18n from '@/i18n'
 import { useSnapshotStore } from '@/store/snapshotStore'
 
 // jsdom cannot drive a real module Worker, so we mock the `parseInWorker`
@@ -50,8 +52,9 @@ vi.mock('@/engines/parser', async () => {
 import App from '@/App'
 
 describe('Phase 1 end-to-end smoke: drop → parse → render', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     useSnapshotStore.getState().clearAll()
+    await i18n.changeLanguage('en')
   })
 
   it('renders the hero UploadZone when no snapshots are loaded', () => {
@@ -131,5 +134,44 @@ describe('Phase 1 end-to-end smoke: drop → parse → render', () => {
       (k) => !k.startsWith('vatlas-lang') && !k.startsWith('vatlas-theme'),
     )
     expect(stray).toEqual([])
+  })
+
+  it('Phase-3: ViewToggle switches Dashboard↔Inventory with the sidebar intact throughout', async () => {
+    const buf = readFileSync(resolve(process.cwd(), 'src/__fixtures__/rvtools-mib-canary.xlsx'))
+    const file = new File([buf], 'rvtools-mib-canary.xlsx', {
+      lastModified: Date.UTC(2026, 4, 15),
+    })
+
+    render(<App />)
+
+    const fileInput = document.querySelectorAll('input[type="file"]')[0] as HTMLInputElement
+    Object.defineProperty(fileInput, 'files', { value: [file] })
+    await act(async () => {
+      fireEvent.change(fileInput)
+    })
+
+    // Snapshot loaded → sidebar SnapshotCard + dashboard render (default view).
+    await waitFor(() => {
+      expect(screen.queryByText(/rvtools-mib-canary\.xlsx/)).not.toBeNull()
+    })
+    expect(screen.getByRole('button', { name: 'Inventory' }).getAttribute('aria-pressed')).toBe(
+      'false',
+    )
+
+    // Toggle → Inventory: the tree + object-table tab strip render.
+    await userEvent.click(screen.getByRole('button', { name: 'Inventory' }))
+    await waitFor(() => {
+      expect(screen.queryByRole('tree', { name: /inventory tree/i })).not.toBeNull()
+    })
+    expect(screen.getByRole('group', { name: /object type/i })).not.toBeNull()
+    // Sidebar still mounted across the switch.
+    expect(screen.queryByText(/rvtools-mib-canary\.xlsx/)).not.toBeNull()
+
+    // Toggle back → Dashboard: the estate section heading returns.
+    await userEvent.click(screen.getByRole('button', { name: 'Dashboard' }))
+    await waitFor(() => {
+      expect(screen.queryByRole('heading', { level: 2, name: 'Clusters' })).not.toBeNull()
+    })
+    expect(screen.queryByText(/rvtools-mib-canary\.xlsx/)).not.toBeNull()
   })
 })
