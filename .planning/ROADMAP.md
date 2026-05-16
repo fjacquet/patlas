@@ -16,10 +16,13 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation & Invariants** - Bootstrap, parser-in-Worker, privacy guard, branded units, immutable snapshot store (completed 2026-05-15)
 - [x] **Phase 2: Aggregation & Global Dashboard** - Single-snapshot cluster aggregates + ECharts-driven dashboard with three accounting modes
 - [x] **Phase 3: Inventory Navigation** - Virtualised cluster â ESX â VM tree with sortable/filterable tables and CSV export (completed 2026-05-16)
-- [x] **Phase 4: Multi-vCenter, Stretched, Allocation & DR Simulation** - The analytics core: merge N workbooks, stretched pill, sliders, three DR modes
-- [ ] **Phase 5: OS End-of-Support Forecast** - Bundled endoflife.date catalogue, 3/6/9/12-month at-risk with drill-down
-- [ ] **Phase 6: In-Session Trends** - Multi-snapshot timelines, per-cluster sparklines, delta panel, temporal X-axis
-- [ ] **Phase 7: HTML + PPTX Exports & Deploy** - Self-contained HTML report, factual PPTX deck, GitHub Pages CI
+- [~] **Phase 4: Multi-vCenter Merge & Factual Labels** - REDEFINED (analytics-core replan): validated merge engine spine (kept) + per-vCenter/RVTools labels + stretched as the user's declaration with FACTUAL site-data (G1). Its allocation/DR-UI parts are superseded by Phase 6.
+- [ ] **Phase 5: Rich Cluster / Host / ESX Intelligence** - NEW: deep per-cluster card + one-window ESX Summary + operational insights (realized CPU overcommit, avg CPU/mem, ESXi & hardware lifecycle, powered/off/susp/template, footprints)
+- [ ] **Phase 6: Allocation & DR (re-derived)** - NEW: realized consolidation displayed (G2) + separate capacity-planning lens (Personal Ratios + Custom Failover, OPEN-1) + DR server/site loss, physical impact (G3); reuses kept drSim engine
+- [ ] **Phase 7: OS End-of-Support Forecast** - Bundled endoflife.date catalogue, 3/6/9/12-month at-risk with drill-down
+- [ ] **Phase 8: In-Session Trends** - Multi-snapshot timelines, per-cluster sparklines, delta panel, temporal X-axis
+- [ ] **Phase 9: Storage / Network / Detailed Views + Threshold Alerting** - NEW: storage by cluster/ESX/VM/datastore, ports/switches, disk/partition threshold alerting (scope per OPEN-2/3)
+- [ ] **Phase 10: HTML + PPTX Exports & Deploy** - Self-contained HTML report, factual PPTX deck, GitHub Pages CI
 
 ## Phase Details
 
@@ -82,7 +85,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 **vsizer reuse**: `utils/csv.ts` (port unchanged); TanStack Table column-definition patterns from vsizer's existing tables (port + extend); no new engines (consumes `perEsx`, `perDatastore`, `vmsByCluster` from Phase 2)
 **Pitfalls owned**: part of Critical-5 (memory budget on 10k+ VM trees â `@tanstack/react-virtual` mandatory, lazy children expansion, snapshot retention policy when N > 4 snapshots), Minor-2 (multi-line cells in VM descriptions/annotations: `oneLine()` at the display boundary, preserve original for CSV)
 
-### Phase 4: Multi-vCenter, Stretched, Allocation & DR Simulation
+### Phase 4: Multi-vCenter Merge & Factual Labels
+
+> **REDEFINED 2026-05-16 — analytics-core replan** (`.planning/ANALYTICS-CORE-REPLAN.md`).
+> Original P4 ("Multi-vCenter, Stretched, Allocation & DR") was executed (commits `04-01..04`, real-file-validated) but UAT rejected its allocation, DR-mode, and stretched-confidence design. The validated **engine spine is KEPT as baseline** (`engines/snapshotMerge`, `aggregateClusters` per-site math, `engines/drSim`). This phase is now rescoped to: that merge spine + per-vCenter/RVTools labels + the **G1** stretched rework (stretched = the user's declaration; engine adapts the per-site reservation and reports site data FACTUALLY — no auto high/med/low confidence verdict, no judgement chip; no fault-domain metadata ⇒ symmetric 50 %).
+> **Allocation moves to Phase 6 (UAT G2 — calculated, not slider-selected). DR modes/metric move to Phase 6 (UAT G3 — Server+Site loss, physical impact).** Requirements still owned here: MVC-01..04 (done), STR-01..03 (reworked per G1), STR-04 (OPEN — RVTools `Hosts` is a count, see 04-02-SUMMARY). The original Goal/Success/Plans text below is **superseded** by this banner and retained only as history.
 
 **Goal**: Turn vatlas from a single-snapshot viewer into the analytics atlas â merge N RVTools workbooks into one logical estate keyed on `(VI SDK UUID, vm_bios_uuid)` (never silent merge on names), surface the Ãtendu/Stretched pill with per-site reservation math and a `confidence` indicator, expose CPU/RAM allocation sliders with named presets and URL-hash-only persistence, and ship the three DR simulation modes (host loss, cluster loss, vCenter loss) with an explicit assumptions panel and `caveats` array. This is the phase where the engine spine becomes the product â every later capability (EOS, trends, exports) reads the merged estate, not raw snapshots.
 **Depends on**: Phase 2
@@ -105,7 +112,30 @@ Decimal phases appear between their surrounding integers in numeric order.
 **vsizer reuse**: `engines/parser/resolveClusterCollisions.ts` (port + generalise to `vCenterLabel`); `engines/aggregation/aggregateClusters.ts` stretched-cluster DR math (port unchanged, then extend with per-site reservation); ADR-0007 inherited verbatim and extended; new files `engines/snapshotMerge/mergeSnapshotsToEstate.ts`, `vCenterIndex.ts`, `engines/drSim/runScenario.ts`, `allocate.ts`
 **Pitfalls owned**: Critical-3 (asymmetric stretched-cluster 50 % rule conditional â per-site math + confidence field + warning chip), Critical-4 (multi-vCenter aggregation keyed on `(VI SDK UUID, cluster_moref)` and `vm_bios_uuid`, secondary `vm_instance_uuid`; cluster-name collision visual suffix; mixed-RVTools-versions warning), Moderate-10 (DR sim trust â assumptions panel, `caveats` array, reservation-vs-capacity check, anti-affinity rules surfaced as soft constraints if `vRP`/`dvSwitch` expose them)
 
-### Phase 5: OS End-of-Support Forecast
+### Phase 5: Rich Cluster / Host / ESX Intelligence
+
+**NEW — analytics-core replan.** Closes the "far richer per-cluster intelligence" gap; reference depth = RVTools Analyser functions #1,2,4,7,11 (see `.planning/ANALYTICS-CORE-REPLAN.md`).
+**Goal**: Replace the shallow cluster card with RVTools-Analyser-grade depth + a one-window ESX/Host summary: per-cluster + estate operational insights — realized CPU overcommit (`vCPU / usable-pCPU`, calculated, G2), avg CPU usage (core-weighted) / avg memory usage (host-mem-weighted), hosts on ESXi < 8.x + ESXi-version lifecycle posture, hardware lifecycle (hosts out of vendor support), powered-on/off/suspended/template breakdown, provisioned vs in-use, datastore footprint (incl .vswp+snapshots), guest data, total physical cores / host memory rollups. All client-side, in-memory (privacy invariant — NO database).
+**Depends on**: Phase 4 (consumes the merged estate)
+**Requirements**: TBD — re-derive in discuss-phase (RVTools-Analyser #1,2,4,7,11; richer-cluster gap in replan brief)
+**Success Criteria**: TBD — re-derive in discuss-phase
+**Plans**: TBD
+**UI hint**: yes
+**Pitfalls owned**: realized ratio calculated not invented (G2); lifecycle data factual (no editorial verbs); single-`useMemo` invariant preserved
+
+### Phase 6: Allocation & DR (re-derived)
+
+**NEW — analytics-core replan.** Supersedes original P4 allocation (04-03) + DR (04-04). Carries UAT decisions G2, G3 and the resolved OPEN-1.
+**Goal**: (a) Display the **realized** consolidation ratio (`vCPU / usable-pCPU`, `vRAM / physRAM`) as a calculated measured output — no input (G2). (b) A SEPARATE, explicitly-labelled **capacity-planning lens** accepting user **Personal Ratios (CPU/RAM) + Custom Failover** for what-if sizing (OPEN-1 resolved: two distinct features, "measured" vs "planned", never conflated, never overwriting the realized value). (c) **DR simulation** reusing the kept `engines/drSim` engine, reworked to exactly two modes — **Server loss** + **Site loss** (drop cluster/vCenter); Site = fault-domain of clusters the user declared stretched; non-stretched workload at a lost site = LOST (no DR target); impact = **physical CPU (GHz/cores) + physical RAM** removed, not vCPU; survivor verdict vs physical headroom; reversible/neutral failed-selection UI kept (G3). Custom Failover (b) reconciles with this DR model.
+**Depends on**: Phase 4, Phase 5
+**Requirements**: TBD — re-derive in discuss-phase (carries UAT G2/G3, OPEN-1; replaces ALC-01..04, DRS-01..06)
+**Success Criteria**: TBD — re-derive in discuss-phase
+**Plans**: TBD
+**UI hint**: yes
+**vsizer reuse**: keep shipped `engines/drSim/runScenario.ts` + `allocate.ts` + `aggregateClusters` per-site math — rework modes/metric, do NOT rewrite from zero
+**Pitfalls owned**: Moderate-10 (DR trust — assumptions panel + caveats, kept); G2/G3 anti-patterns (no invented ratios; DR units = server/site with physical impact)
+
+### Phase 7: OS End-of-Support Forecast
 
 **Goal**: Independent of multi-vCenter, ship the lifecycle conversation â bundled `endoflife.date` catalogue refreshed at CI build time, OS-string normalizer with regex bank that handles RHEL 8's four variants and Oracle Linux's three, ESX build â support state classifier, lifecycle bucketing at 3/6/9/12-month horizons plus an explicit "overdue" bucket (RHEL 7, Windows Server 2012 R2 are already past), and one-click drill from any bucket to the affected VM list. The phase ends with the EOS catalogue locked in via Zod-validated build-time sync and a `lastVerified` date surfaced in the UI.
 **Depends on**: Phase 2 (uses `vinfo` rows and `vhost` builds from aggregation outputs)
@@ -123,7 +153,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **vsizer reuse**: nothing direct (new engine module); reuses `utils/format.ts` and `<Chart>` infrastructure from Phase 2
 **Pitfalls owned**: Moderate-6 (OS naming variants, `endoflife.date` catalogue source, lifecycle bucketing with "overdue" bucket, extended-support tiers surfaced with asterisks, `lastVerified` CI warning), Minor-4 (case-insensitive OS string matching with original preserved for display)
 
-### Phase 6: In-Session Trends
+### Phase 8: In-Session Trends
 
 **Goal**: Make the multi-snapshot story honest â load 2â12 monthly RVTools snapshots together, run aggregation once per snapshot, produce a temporal (not categorical) timeline keyed on actual `capturedAt` dates, render line charts of headline metrics, per-cluster sparklines on the dashboard, a delta panel showing what changed between consecutive snapshots, and snapshot metadata (vCenter label + RVTools version) per timeline point. Background-parse non-default snapshots so the dashboard stays interactive while trends warm up; release older raw rows when N > 4 snapshots are loaded.
 **Depends on**: Phase 4 (needs stable `(VI SDK UUID, vm_bios_uuid)` keys for cross-snapshot identity)
@@ -141,10 +171,21 @@ Decimal phases appear between their surrounding integers in numeric order.
 **vsizer reuse**: nothing direct (new engine module); reuses `<Chart>` from Phase 2 and the aggregation pipeline from Phase 2
 **Pitfalls owned**: Minor-6 (timestamp drift across snapshots â temporal X-axis, capture-date inference order: explicit user input â filename ISO â `vSource` sheet â file mtime â ordinal), part of Critical-5 (memory budget â release older raw rows when N > 4, keep only aggregated time-series for older snapshots)
 
-### Phase 7: HTML + PPTX Exports & Deploy
+### Phase 9: Storage / Network / Detailed Views + Threshold Alerting
+
+**NEW — analytics-core replan.** Reference = RVTools Analyser functions #10, #12, #14. Scope is bounded by **OPEN-2** (how far to mirror the dedicated-screen nav taxonomy vs the current Dashboard⟷Inventory ViewToggle) and **OPEN-3** (whether threshold alerting + a user-config surface is in this milestone) — both resolved in discuss-phase before planning.
+**Goal**: Storage views (total disk sizes by Cluster / ESX / VM / Datastore), detailed Cluster/ESX/VM/Datastore views with disk & partition **threshold alerting**, ports & switches (network) detail, and the personal-config surface for thresholds (filesystem / logical units) — all client-side, in-memory.
+**Depends on**: Phase 4, Phase 5
+**Requirements**: TBD — re-derive in discuss-phase (RVTools-Analyser #10/#12/#14; OPEN-2/3)
+**Success Criteria**: TBD — re-derive in discuss-phase
+**Plans**: TBD
+**UI hint**: yes
+**Pitfalls owned**: threshold config must not breach the privacy invariant (UI prefs only, never dataset rows); factual alerting (no editorial verbs)
+
+### Phase 10: HTML + PPTX Exports & Deploy
 
 **Goal**: Close the loop â "the report is the product" â by shipping two synthesis surfaces (single-file self-contained HTML report + factual PPTX deck) that consume every view-model from Phases 2/4/5/6 through the same `EstateView` shape, plus the polish that makes the result trustworthy in shareable form (i18n FR + EN with CI key-diff gate, light/dark theme, data-freshness header/footer, methodology footer) and the GitHub Pages deploy that puts it at `fjacquet.github.io/vatlas/`. Both exports run in a Web Worker to keep the UI interactive during a 5-30 MB synthesis.
-**Depends on**: Phase 2, Phase 4, Phase 5, Phase 6 (consumes every view-model)
+**Depends on**: Phase 2, Phase 4, Phase 5, Phase 6, Phase 7, Phase 8, Phase 9 (consumes every analytics view-model)
 **Requirements**: HTM-01, HTM-02, HTM-03, HTM-04, HTM-05, PPT-01, PPT-02, PPT-03, PPT-04, DEP-01, DEP-02
 **Success Criteria** (what must be TRUE):
 
@@ -169,7 +210,10 @@ Phases execute in numeric order: 1 â 2 â 3 â 4 â 5 â 6 
 | 1. Foundation & Invariants | 5/5 | Complete   | 2026-05-15 |
 | 2. Aggregation & Global Dashboard | 3/3 | Complete   | 2026-05-16 |
 | 3. Inventory Navigation | 3/3 | Complete | 2026-05-16 |
-| 4. Multi-vCenter, Stretched, Allocation & DR Simulation | 4/4 | Complete | 2026-05-16 |
-| 5. OS End-of-Support Forecast | 0/TBD | Not started | - |
-| 6. In-Session Trends | 0/TBD | Not started | - |
-| 7. HTML + PPTX Exports & Deploy | 0/TBD | Not started | - |
+| 4. Multi-vCenter Merge & Factual Labels | 1/TBD | Re-derived (replan) — merge spine done; G1 stretched rework pending | - |
+| 5. Rich Cluster / Host / ESX Intelligence | 0/TBD | Not started (NEW) | - |
+| 6. Allocation & DR (re-derived) | 0/TBD | Not started (NEW; carries UAT G2/G3, OPEN-1) | - |
+| 7. OS End-of-Support Forecast | 0/TBD | Not started | - |
+| 8. In-Session Trends | 0/TBD | Not started | - |
+| 9. Storage / Network / Detailed Views + Threshold Alerting | 0/TBD | Not started (NEW; scope per OPEN-2/3) | - |
+| 10. HTML + PPTX Exports & Deploy | 0/TBD | Not started | - |
