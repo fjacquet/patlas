@@ -1,6 +1,13 @@
+import { runScenario } from '@/engines/drSim'
 import type { MergedEstate } from '@/engines/snapshotMerge'
 import { mib } from '@/engines/units'
-import type { AccountingMode, EstateView, OsBreakdown, VmDisplayRow } from '@/types/estate'
+import type {
+  AccountingMode,
+  DrScenario,
+  EstateView,
+  OsBreakdown,
+  VmDisplayRow,
+} from '@/types/estate'
 import { aggregateClusters } from './aggregateClusters'
 import { aggregateGlobals, emptySummary } from './globals'
 import { classifyOsFamily } from './osFamily'
@@ -45,9 +52,11 @@ export function buildEstateView(
   opts?: {
     stretchedClusters?: ReadonlySet<string>
     allocRatios?: { cpuRatio: number; ramRatio: number }
+    scenario?: DrScenario
   },
 ): EstateView {
   const stretchedClusters = opts?.stretchedClusters ?? new Set<string>()
+  const allocRatios = opts?.allocRatios ?? { cpuRatio: 4, ramRatio: 1 }
   // No vDatastore rows ⇒ sheet absent/empty ⇒ per-cluster count is
   // genuinely unknown (undefined → em-dash). Rows present ⇒ attribute
   // them; an unmatched cluster legitimately gets 0, never em-dash.
@@ -68,7 +77,7 @@ export function buildEstateView(
     mode,
     stretchedClusters,
     datastoreCountByCluster: dsByCluster,
-    allocRatios: opts?.allocRatios,
+    allocRatios,
   })
 
   const datastores = perDatastore(merged.vdatastore)
@@ -104,6 +113,12 @@ export function buildEstateView(
     })
   }
 
+  // DR what-if runs INSIDE this single composition (no second memo): the
+  // shipped aggregation re-run on survivors. `null` when nothing failed.
+  const drSim = opts?.scenario
+    ? runScenario(merged, opts.scenario, { mode, stretchedClusters, allocRatios })
+    : null
+
   return {
     globals,
     clusters,
@@ -114,6 +129,7 @@ export function buildEstateView(
     osBreakdown,
     accountingMode: mode,
     trends: null,
+    drSim,
   }
 }
 
@@ -132,4 +148,5 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   osBreakdown: Object.freeze({ windows: 0, linux: 0, other: 0 }),
   accountingMode: 'active',
   trends: null,
+  drSim: null,
 })

@@ -1,12 +1,13 @@
-import type { ClusterAggregate } from '@/types/estate'
+import type { ClusterAggregate, Verdict } from '@/types/estate'
 
 /**
- * Factual per-survivor headroom verdict — NO color, NO "good/poor"
- * (UI-SPEC §Color / PROJECT.md line 39 denylist). Numbers only; the UI
- * renders the localized enum word next to the figure, never a traffic
- * light.
+ * `Verdict` is the factual per-survivor headroom enum — NO color, NO
+ * "good/poor" (UI-SPEC §Color / PROJECT.md line 39 denylist). Numbers
+ * only; the UI renders the localized enum word next to the figure, never
+ * a traffic light. The type lives in `@/types/estate` (engines depend on
+ * types, not the reverse); re-exported here for ergonomic local imports.
  */
-export type Verdict = 'absorbs' | 'tight' | 'overflows'
+export type { Verdict }
 
 const ORDER: Record<Verdict, number> = { absorbs: 0, tight: 1, overflows: 2 }
 

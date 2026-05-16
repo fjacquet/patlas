@@ -352,4 +352,43 @@ export interface EstateView {
   accountingMode: AccountingMode
   /** Phase-4 forward-compat — always `null` in Phase 2. */
   trends: TimelinePoint[] | null
+  /** DR what-if result. `null` when no component is marked failed
+   *  (mirrors the `trends: T | null` idiom). Phase-4 DRS-01..06. */
+  drSim: DrSimResult | null
+}
+
+/** Factual per-survivor headroom verdict (no color, no editorial verb). */
+export type Verdict = 'absorbs' | 'tight' | 'overflows'
+
+/** The dominant DR loss mode of a scenario (UI selector state echo). */
+export type DrMode = 'host' | 'cluster' | 'vcenter'
+
+/**
+ * Inputs-only DR what-if selection. Sets are REPLACED never mutated
+ * (Zustand `Object.is`); never persisted (no hash, no localStorage).
+ */
+export interface DrScenario {
+  failedHosts: Set<string>
+  failedClusters: Set<string>
+  failedVCenters: Set<string>
+}
+
+/**
+ * DR simulation result — the SHIPPED aggregation re-run on the survivor
+ * row subset. Wrong DR numbers are the project's #1 risk; `confidence`
+ * + `caveats` (i18n KEYS, never free text / numbers / editorial verbs)
+ * are the structural disclosure mitigation (DRS-05).
+ */
+export interface DrSimResult {
+  mode: DrMode
+  before: GlobalSummary
+  after: GlobalSummary
+  /** Σ failed-side allocation (the single gold accent figure). */
+  evacueeVcpu: Cores
+  evacueeVramMib: MiB
+  perSurvivor: { cluster: string; verdict: Verdict }[]
+  confidence: 'high' | 'medium' | 'low'
+  /** i18n key suffixes (e.g. `caveats.reservationHigh`) — never free
+   *  text, never a pre-formatted number, never an editorial verb. */
+  caveats: string[]
 }
