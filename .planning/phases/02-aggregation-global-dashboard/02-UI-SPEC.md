@@ -44,27 +44,29 @@ Declared values (multiples of 4; Tailwind default scale — no custom scale inve
 | 2xl | 48px | `gap-12` | Major break between dashboard regions when stacked on narrow desktop |
 | 3xl | 64px | — | Reserved; not used Phase 2 |
 
+The core spacing scale is exactly `4 / 8 / 16 / 24 / 32 / 48 / 64` and is unchanged.
+
 Exceptions:
-- Accounting-mode toggle and any keyboard-operable control: minimum 32px (`h-8`) hit height, ≥40px (`h-10`) recommended for the segmented toggle so the keyboard focus ring is unambiguous (desktop-first; no 44px touch target needed — mobile is explicitly out of scope per FEATURES.md A10).
+- Accounting-mode toggle and any keyboard-operable control: minimum 32px (`h-8`) hit height, ≥40px (`h-10`) recommended for the segmented toggle so the keyboard focus ring is unambiguous (desktop-first; no 44px touch target needed — mobile is explicitly out of scope per FEATURES.md A10). The 40px (`h-10`) value is a touch/keyboard hit-target floor for interactive control sizing ONLY — it is NOT a spacing-scale token and MUST NOT be imported into the spacing scale above (do not add `h-10`/40px as a gap/padding step).
 - Per-cluster column minimum width 200px (`min-w-[200px]`) so figures + gauges stay legible; columns scroll horizontally past the viewport rather than shrinking below this (RVTools-admin grid expectation; not a spacing-scale violation — it is a min-width floor, not a spacing token).
 
 ---
 
 ## Typography
 
-UI font: `system-ui` stack (shipped). Numeric/tabular font: `--font-mono`. Two weights only: regular 400 + semibold 600 (no other weights — KISS).
+UI font: `system-ui` stack (shipped). Numeric/tabular font: `--font-mono`. Two weights only: regular 400 + semibold 600 (no other weights — KISS; the Phase-1 `.label` 500/`font-medium` weight is explicitly overridden to 600 at dashboard usage sites, see Notes).
 
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
-| Display | 28px (`text-3xl`) | 600 | 1.2 | Global summary headline number context only if a single hero metric is shown; otherwise unused — dashboard leads with the grid, not a hero number |
-| Heading | 20px (`text-xl`) | 600 | 1.2 | Section titles ("Estate summary", "Clusters", "CPU Ready"), cluster column header (cluster name) |
+| Heading | 20px (`text-xl`) | 600 | 1.2 | Section titles ("Estate summary", "Clusters", "CPU Ready"), cluster column header (cluster name), and any single hero/headline number context (the dashboard leads with the grid, not a hero number — no separate Display size) |
 | Body | 16px (`text-base`) | 400 | 1.5 | Metric values in summary card, gauge captions, donut legend labels |
-| Label | 14px (`text-sm`) | 500 | 1.4 | Stat labels ("ESX", "VMs", "Physical GHz"), accounting-mode toggle option labels, units suffix; reuses shipped `.label` class (`text-sm font-medium`) |
+| Label | 14px (`text-sm`) | 600 | 1.4 | Stat labels ("ESX", "VMs", "Physical GHz"), accounting-mode toggle option labels, units suffix |
 | Numeric (tabular) | 16px (`text-base`) | 600 | 1.4 | Per-cluster figures (counts, GHz, %, ratio) — set in `--font-mono`, `tabular-nums`, right-aligned within a column so digits align vertically across clusters |
 | Micro | 12px (`text-xs`) | 400 | 1.4 | "not reported" / accounting-mode echo ("Active") / capture-date provenance line / `—` sentinel caption |
 
 Notes:
-- Exactly 4 primary sizes in active use Phase 2: 14 / 16 / 20 / 28. The 12px micro size is a constrained exception reserved for provenance, sentinels, and the mode echo only (factual metadata, never primary content) — documented here so the checker treats it as an allowed 5th rather than a scale violation.
+- Exactly 4 font sizes in active use Phase 2: `12 / 14 / 16 / 20`. 12px Micro is a first-class scale size reserved for provenance, sentinels, and the mode echo (factual metadata, never primary content). No 28px Display size exists — any headline number collapses onto the 20px Heading.
+- Exactly 2 font weights: regular 400 + semibold 600. The Label role uses 600 (`font-semibold`). **Phase-2 deviation from Phase-1 `.label`:** the shipped `.label` utility in `src/index.css` is `text-sm font-medium` (weight 500). Phase 2 MUST override that weight to `font-semibold` (600) at the dashboard label usage sites — do NOT silently inherit the 500 weight from the Phase-1 class, as that would introduce a forbidden 3rd weight.
 - Heading line-height 1.2; body/label line-height 1.4–1.5. No italic. No letter-spacing overrides.
 - All numbers rendered through the ported `utils/format.ts` locale-aware formatters (see Number & Locale Formatting). Never hard-code a font-size on a number outside the Body/Numeric rows above.
 
