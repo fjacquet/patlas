@@ -13,6 +13,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   memoryMib: mib(262_144),
   cpuRatio: 0.3,
   ramRatio: 0.5,
+  faultDomain: '',
   ...over,
 })
 

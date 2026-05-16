@@ -18,6 +18,21 @@ const withMetaData = (rows: { Property: string; Value: string }[]): ParsedWorkbo
   ]),
 })
 
+const withColumnarMetaData = (
+  rows: { 'RVTools version': string; 'xlsx creation datetime': string; Server: string }[],
+): ParsedWorkbook => ({
+  sheets: new Map([
+    [
+      'vMetaData',
+      {
+        name: 'vMetaData',
+        headers: ['RVTools major version', 'RVTools version', 'xlsx creation datetime', 'Server'],
+        rows: rows as unknown as Record<string, unknown>[],
+      },
+    ],
+  ]),
+})
+
 const withVInfoHeaders = (headers: string[]): ParsedWorkbook => ({
   sheets: new Map([['vInfo', { name: 'vInfo', headers, rows: [] }]]),
 })
@@ -94,6 +109,22 @@ describe('inferRvtoolsVersion', () => {
 
   it('sniffs 3.11+ from the "Creation date" marker column', () => {
     expect(inferRvtoolsVersion(withVInfoHeaders(['VM', 'Creation date']))).toBe('3.11+')
+  })
+
+  it('reads the columnar RVTools 4.x version (4.7.1.4, NOT the 3.11+ marker)', () => {
+    const sheets = withColumnarMetaData([
+      {
+        'RVTools version': '4.7.1.4',
+        'xlsx creation datetime': '2026-04-30 14:00:00',
+        Server: 'spvspherevc11.ad.net.fr.ch',
+      },
+      {
+        'RVTools version': '4.7.1.4',
+        'xlsx creation datetime': '2026-04-30 14:00:00',
+        Server: 'spvspherevc13.ad.net.fr.ch',
+      },
+    ])
+    expect(inferRvtoolsVersion(sheets)).toBe('4.7.1.4')
   })
 
   it('returns "unknown" when no signal is present', () => {

@@ -14,6 +14,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   memoryMib: mib(262_144),
   cpuRatio: 0.3,
   ramRatio: 0.5,
+  faultDomain: '',
   ...over,
 })
 
@@ -47,6 +48,7 @@ const snapshot = (): Snapshot => ({
   parsedAt: new Date('2026-01-02'),
   source: 'rvtools',
   viSdkUuid: null,
+  vMetaData: [],
   vhost: [host({})],
   vinfo: [
     vm({ vmName: 'on-1', poweredOn: true, osConfig: 'Microsoft Windows Server 2019' }),
@@ -62,6 +64,7 @@ const snapshot = (): Snapshot => ({
       provisionedMib: mib(800),
       naa: 'naa.s',
       type: 'VMFS',
+      hosts: '',
       clusterName: 'C1',
     },
     {
@@ -71,6 +74,7 @@ const snapshot = (): Snapshot => ({
       provisionedMib: mib(800),
       naa: 'naa.s',
       type: 'VMFS',
+      hosts: '',
       clusterName: 'C1',
     },
     {
@@ -80,6 +84,7 @@ const snapshot = (): Snapshot => ({
       provisionedMib: mib(450),
       naa: 'naa.t',
       type: 'NFS',
+      hosts: '',
       clusterName: '',
     },
   ],

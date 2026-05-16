@@ -24,7 +24,7 @@ vi.mock('@/engines/parser', async () => {
       const sheets = parseXlsx(buf)
       const { snapshot: rows, warnings } = parseSnapshot(sheets)
       const capturedAt = inferCaptureDate(file.name, file.lastModified, sheets)
-      const vCenterLabel = inferVCenterLabel(rows.vinfo, file.name)
+      const vCenterLabel = inferVCenterLabel(rows.vinfo, file.name, sheets)
       const rvtoolsVersion = inferRvtoolsVersion(sheets)
       return {
         snapshot: {
@@ -34,6 +34,7 @@ vi.mock('@/engines/parser', async () => {
           vCenterLabel,
           rvtoolsVersion,
           viSdkUuid: rows.viSdkUuid,
+          vMetaData: rows.vMetaData,
           source: 'rvtools' as const,
           vinfo: rows.vinfo,
           vhost: rows.vhost,

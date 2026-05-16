@@ -16,6 +16,7 @@ const snapshot = (id: string): Snapshot => ({
   parsedAt: new Date('2026-01-02'),
   source: 'rvtools',
   viSdkUuid: null,
+  vMetaData: [],
   vhost: [
     {
       hostName: 'esx-1',
@@ -26,6 +27,7 @@ const snapshot = (id: string): Snapshot => ({
       memoryMib: mib(262_144),
       cpuRatio: 0.3,
       ramRatio: 0.5,
+      faultDomain: '',
     },
   ],
   vinfo: [

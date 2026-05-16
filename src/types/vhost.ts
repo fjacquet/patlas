@@ -25,4 +25,10 @@ export interface VHostRow {
   cpuRatio: number
   /** Mean RAM utilization in [0, 1]. */
   ramRatio: number
+  /**
+   * RVTools `vSAN Fault Domain Name` — the stretched-cluster site key.
+   * Empty string when the column is absent or the host is untagged
+   * (Phase 4 STR-02/03; consumed by Plan 04-02). Never `undefined`.
+   */
+  faultDomain: string
 }

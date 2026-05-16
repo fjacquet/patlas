@@ -45,6 +45,7 @@ describe('synthesizeOrphanClusters edge branches', () => {
           memoryMib: 1 as never,
           cpuRatio: 0,
           ramRatio: 0,
+          faultDomain: '',
         },
       ],
     }
@@ -65,6 +66,7 @@ describe('synthesizeOrphanClusters edge branches', () => {
           memoryMib: 1 as never,
           cpuRatio: 0,
           ramRatio: 0,
+          faultDomain: '',
         },
       ],
     })

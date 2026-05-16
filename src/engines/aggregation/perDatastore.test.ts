@@ -11,6 +11,7 @@ const ds = (over: Partial<VDatastoreRow>): VDatastoreRow => ({
   provisionedMib: mib(786_432),
   naa: 'naa.6000',
   type: 'VMFS',
+  hosts: '',
   clusterName: 'C1',
   ...over,
 })

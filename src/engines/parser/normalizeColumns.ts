@@ -18,7 +18,7 @@ import { synthesizeOrphanClusters } from './synthesizeOrphanClusters'
  */
 export type SnapshotRows = Pick<
   Snapshot,
-  'vinfo' | 'vhost' | 'vdatastore' | 'vpartition' | 'viSdkUuid' | 'parseErrors'
+  'vinfo' | 'vhost' | 'vdatastore' | 'vpartition' | 'viSdkUuid' | 'vMetaData' | 'parseErrors'
 >
 
 /**
@@ -82,6 +82,7 @@ export const parseSnapshot = (
       vdatastore: vdatastore.rows,
       vpartition: vpartition.rows,
       viSdkUuid,
+      vMetaData: raw.vmetadata.entries,
       parseErrors,
     },
     warnings: [...raw.warnings, ...parseErrors],

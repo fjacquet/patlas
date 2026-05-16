@@ -45,7 +45,7 @@ const parseError = (
  * spellings (3.10/3.11/4.0/4.4 — RESEARCH.md Pattern 3). First match wins;
  * case is normalised before comparison.
  */
-const VINFO_COLS = {
+export const VINFO_COLS = {
   vmName: ['vm', 'vm name', 'name', 'nom de la vm', 'vm-name'],
   cluster: ['cluster', 'grappe'],
   host: ['host', 'host name', 'hostname', 'nom hôte'],
@@ -90,6 +90,10 @@ const VHOST_COLS = {
     'mem usage',
     'mem use %',
   ],
+  // STR-02/03 stretched-cluster site key. Exact-normalized match, longest
+  // spelling first (the rvtools.ts convention). Empty string when absent or
+  // the host is untagged — never `undefined`. Consumed by Plan 04-02.
+  faultDomain: ['vsan fault domain name', 'fault domain name'],
 } as const
 
 const VDATASTORE_COLS = {
@@ -104,6 +108,10 @@ const VDATASTORE_COLS = {
   // (verified against production workbooks); 'cluster' kept as a drift
   // fallback. Exact-normalized match (MiB-style), longest spelling first.
   clusterName: ['cluster name', 'cluster'],
+  // Pitfall-6 prerequisite: the host-name list a datastore is mounted on.
+  // Used by Plan 04-02 to attribute vSAN/host-local datastores (blank
+  // `Cluster name`) to their cluster. Longest spelling first.
+  hosts: ['# hosts', 'hosts'],
 } as const
 
 const VPARTITION_COLS = {
@@ -115,9 +123,19 @@ const VPARTITION_COLS = {
   freeMib: ['free mib', 'free mb', 'free (mb)', 'free'],
 } as const
 
+// Legacy pre-4.x `vMetaData` is a 2-column Property/Value sheet.
 const VMETADATA_COLS = {
   property: ['property', 'name', 'key'],
   value: ['value', 'val'],
+} as const
+
+// RVTools 4.x `vMetaData` is COLUMNAR — one row per vCenter. The presence of
+// an `RVTools version` column (NOT `RVTools major version`, which also exists
+// but is just the major digit) is the discriminator (RESEARCH Pitfall 3).
+const VMETADATA_COLUMNAR_COLS = {
+  rvtoolsVersion: ['rvtools version'],
+  exportedTimestamp: ['xlsx creation datetime', 'exported timestamp', 'creation date'],
+  server: ['server', 'vcenter server', 'vcenter'],
 } as const
 
 /**
@@ -190,6 +208,7 @@ export const adaptRvtoolsVHost = (sheet: ParsedSheet): VHostRow[] => {
         memoryMib: mib(Math.max(0, readNumber(readCol(row, cols.memoryMib)))),
         cpuRatio: toRatio(readNumber(readCol(row, cols.cpuRatio))),
         ramRatio: toRatio(readNumber(readCol(row, cols.ramRatio))),
+        faultDomain: readString(readCol(row, cols.faultDomain)),
       }),
     )
     .filter((r) => !isInternalRow(r.hostName))
@@ -207,6 +226,7 @@ export const adaptRvtoolsVDatastore = (sheet: ParsedSheet): VDatastoreRow[] => {
         provisionedMib: mib(Math.max(0, readNumber(readCol(row, cols.provisionedMib)))),
         naa: naa === '' ? null : naa,
         type: readString(readCol(row, cols.type)),
+        hosts: readString(readCol(row, cols.hosts)),
         clusterName: readString(readCol(row, cols.clusterName)),
       }
     })
@@ -229,10 +249,36 @@ export const adaptRvtoolsVPartition = (sheet: ParsedSheet): VPartitionRow[] => {
 }
 
 /**
- * RVTools `vMetaData` is a Property/Value sheet. Reduce it to the two fields
- * vatlas reads (exported timestamp + RVTools version).
+ * Adapt the RVTools `vMetaData` sheet to a per-vCenter entry list.
+ *
+ * RVTools 4.x emits a COLUMNAR sheet (headers
+ * `["RVTools major version","RVTools version","xlsx creation datetime","Server"]`)
+ * with one row per vCenter — a single 3-vCenter workbook yields 3 entries.
+ * Pre-4.x emits a 2-column Property/Value sheet which collapses to ONE entry
+ * with an empty `server`. The presence of an `RVTools version` COLUMN is the
+ * discriminator (RESEARCH Pitfall 3 — fixes the wrong "3.11+" for 4.7 files).
  */
 export const adaptRvtoolsVMetaData = (sheet: ParsedSheet): VMetaDataRow => {
+  // Columnar 4.x shape: an explicit `RVTools version` column is present.
+  if (findColumn(sheet.headers, VMETADATA_COLUMNAR_COLS.rvtoolsVersion) !== undefined) {
+    const cols = mapColumns(sheet.headers, VMETADATA_COLUMNAR_COLS)
+    const entries = sheet.rows
+      .map((row) => {
+        const rv = readString(readCol(row, cols.rvtoolsVersion))
+        const ts = readString(readCol(row, cols.exportedTimestamp))
+        const server = readString(readCol(row, cols.server))
+        return {
+          server,
+          rvtoolsVersion: rv === '' ? null : rv,
+          exportedTimestamp: ts === '' ? null : ts,
+        }
+      })
+      // Drop RVTools internal Total/blank rows (no version AND no server).
+      .filter((e) => e.rvtoolsVersion !== null || e.server !== '')
+    return { entries }
+  }
+
+  // Legacy Property/Value shape → single collapsed entry.
   const cols = mapColumns(sheet.headers, VMETADATA_COLS)
   let exportedTimestamp: string | null = null
   let rvtoolsVersion: string | null = null
@@ -243,7 +289,7 @@ export const adaptRvtoolsVMetaData = (sheet: ParsedSheet): VMetaDataRow => {
     if (prop.includes('exported')) exportedTimestamp = value
     else if (prop.includes('rvtools') && prop.includes('version')) rvtoolsVersion = value
   }
-  return { exportedTimestamp, rvtoolsVersion }
+  return { entries: [{ server: '', rvtoolsVersion, exportedTimestamp }] }
 }
 
 /**
@@ -314,9 +360,7 @@ export const adaptRvtools = (
     vhost: adaptRvtoolsVHost(vhostSheet as ParsedSheet),
     vdatastore: dsSheet ? adaptRvtoolsVDatastore(dsSheet) : [],
     vpartition: partSheet ? adaptRvtoolsVPartition(partSheet) : [],
-    vmetadata: metaSheet
-      ? adaptRvtoolsVMetaData(metaSheet)
-      : { exportedTimestamp: null, rvtoolsVersion: null },
+    vmetadata: metaSheet ? adaptRvtoolsVMetaData(metaSheet) : { entries: [] },
     warnings,
   }
 }

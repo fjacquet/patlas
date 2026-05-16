@@ -101,6 +101,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   memoryMib: mib(262_144),
   cpuRatio: 0.3,
   ramRatio: 0.5,
+  faultDomain: '',
   ...over,
 })
 
@@ -134,6 +135,7 @@ const sharedLunSnapshot = (): Snapshot => ({
   parsedAt: new Date('2026-01-02'),
   source: 'rvtools',
   viSdkUuid: null,
+  vMetaData: [],
   vhost: [host({}), host({ hostName: 'esx-2', cluster: 'C2' })],
   vinfo: [
     vm({ vmName: 'on-1', cluster: 'C1', host: 'esx-1' }),
@@ -147,6 +149,7 @@ const sharedLunSnapshot = (): Snapshot => ({
       provisionedMib: mib(800),
       naa: 'naa.s',
       type: 'VMFS',
+      hosts: '',
       clusterName: 'C1',
     },
     {
@@ -156,6 +159,7 @@ const sharedLunSnapshot = (): Snapshot => ({
       provisionedMib: mib(800),
       naa: 'naa.s',
       type: 'VMFS',
+      hosts: '',
       clusterName: 'C2',
     },
     {
@@ -165,6 +169,7 @@ const sharedLunSnapshot = (): Snapshot => ({
       provisionedMib: mib(450),
       naa: 'naa.t',
       type: 'NFS',
+      hosts: '',
       clusterName: '',
     },
   ],

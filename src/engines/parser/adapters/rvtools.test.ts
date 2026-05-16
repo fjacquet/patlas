@@ -5,9 +5,11 @@ import { synthesizeOrphanClusters } from '../synthesizeOrphanClusters'
 import {
   adaptRvtools,
   adaptRvtoolsVDatastore,
+  adaptRvtoolsVHost,
   adaptRvtoolsVInfo,
   adaptRvtoolsVMetaData,
   adaptRvtoolsVPartition,
+  VINFO_COLS,
 } from './rvtools'
 
 /** Build a single `ParsedSheet` (header strings trimmed, rows keyed by header). */
@@ -187,6 +189,7 @@ describe('synthesizeOrphanClusters integration', () => {
           memoryMib: mib(65536),
           cpuRatio: 0,
           ramRatio: 0,
+          faultDomain: '',
         },
       ],
     })
@@ -267,7 +270,7 @@ describe('optional-sheet adapters', () => {
     })
   })
 
-  it('adaptRvtoolsVMetaData reduces Property/Value rows', () => {
+  it('adaptRvtoolsVMetaData reduces legacy Property/Value rows to a single entry', () => {
     const meta = adaptRvtoolsVMetaData(
       mkSheet(
         'vMetaData',
@@ -280,9 +283,101 @@ describe('optional-sheet adapters', () => {
       ),
     )
     expect(meta).toEqual({
-      rvtoolsVersion: '4.4.0',
-      exportedTimestamp: '2026-05-15 10:00:00',
+      entries: [
+        {
+          server: '',
+          rvtoolsVersion: '4.4.0',
+          exportedTimestamp: '2026-05-15 10:00:00',
+        },
+      ],
     })
+  })
+
+  it('adaptRvtoolsVMetaData parses the RVTools 4.x columnar sheet (one row per vCenter)', () => {
+    const meta = adaptRvtoolsVMetaData(
+      mkSheet(
+        'vMetaData',
+        ['RVTools major version', 'RVTools version', 'xlsx creation datetime', 'Server'],
+        [
+          ['4', '4.7.1.4', '2026-04-30 14:00:00', 'spvspherevc11.ad.net.fr.ch'],
+          ['4', '4.7.1.4', '2026-04-30 14:00:00', 'spvspherevc13.ad.net.fr.ch'],
+          ['4', '4.7.1.4', '2026-04-30 14:00:00', 'spvspherevc14.ad.net.fr.ch'],
+        ],
+      ),
+    )
+    expect(meta.entries).toHaveLength(3)
+    expect(meta.entries[0]).toEqual({
+      server: 'spvspherevc11.ad.net.fr.ch',
+      rvtoolsVersion: '4.7.1.4',
+      exportedTimestamp: '2026-04-30 14:00:00',
+    })
+    expect(meta.entries[2]?.server).toBe('spvspherevc14.ad.net.fr.ch')
+    // The columnar version is read verbatim, NOT the legacy '3.11+' marker.
+    expect(meta.entries.every((e) => e.rvtoolsVersion === '4.7.1.4')).toBe(true)
+  })
+
+  it('adaptRvtoolsVMetaData skips internal Total/blank rows in the columnar sheet', () => {
+    const meta = adaptRvtoolsVMetaData(
+      mkSheet(
+        'vMetaData',
+        ['RVTools major version', 'RVTools version', 'xlsx creation datetime', 'Server'],
+        [
+          ['4', '4.7.1.4', '2026-04-30 14:00:00', 'vc-a.local'],
+          ['', '', '', ''],
+        ],
+      ),
+    )
+    expect(meta.entries).toHaveLength(1)
+    expect(meta.entries[0]?.server).toBe('vc-a.local')
+  })
+
+  it('adaptRvtoolsVHost resolves the vSAN Fault Domain Name column (STR-02/03)', () => {
+    const rows = adaptRvtoolsVHost(
+      mkSheet(
+        'vHost',
+        [...VHOST_FULL, 'vSAN Fault Domain Name'],
+        [
+          ['host-a', 'cluster-a', 2, 12, 2600, 65536, 'Secondary'],
+          ['host-b', 'cluster-a', 2, 12, 2600, 65536, ''],
+        ],
+      ),
+    )
+    expect(rows[0]?.faultDomain).toBe('Secondary')
+    // Untagged host ⇒ '' (never undefined, never dropped).
+    expect(rows[1]?.faultDomain).toBe('')
+  })
+
+  it('adaptRvtoolsVHost defaults faultDomain to "" when the column is absent', () => {
+    const rows = adaptRvtoolsVHost(mkSheet('vHost', VHOST_FULL, [vhostRow]))
+    expect(rows[0]?.faultDomain).toBe('')
+  })
+
+  it('adaptRvtoolsVDatastore resolves the Hosts column (Pitfall-6 prerequisite)', () => {
+    const rows = adaptRvtoolsVDatastore(
+      mkSheet(
+        'vDatastore',
+        ['Name', 'Capacity MB', 'Free MB', 'Hosts'],
+        [
+          ['vsan-ds', 1024, 256, 'esx-1, esx-2, esx-3'],
+          ['local-ds', 512, 128, ''],
+        ],
+      ),
+    )
+    expect(rows[0]?.hosts).toBe('esx-1, esx-2, esx-3')
+    expect(rows[1]?.hosts).toBe('')
+  })
+
+  it('adaptRvtoolsVDatastore defaults hosts to "" when the column is absent', () => {
+    const rows = adaptRvtoolsVDatastore(
+      mkSheet('vDatastore', ['Name', 'Capacity MB', 'Free MB'], [['ds', 100, 50]]),
+    )
+    expect(rows[0]?.hosts).toBe('')
+  })
+
+  it('the vmBiosUuid alias list is the shipped value (RESEARCH Pitfall 2 / A2 guard)', () => {
+    // Guard against an accidental edit: vmBiosUuid MUST resolve to RVTools
+    // `VM UUID` (the vCenter-assigned unique key), NEVER SMBIOS UUID.
+    expect(VINFO_COLS.vmBiosUuid).toEqual(['vm uuid', 'bios uuid', 'uuid'])
   })
 
   it('adaptRvtools wires the optional sheets through when present', () => {
@@ -297,7 +392,7 @@ describe('optional-sheet adapters', () => {
     )
     expect(out.vdatastore).toHaveLength(1)
     expect(out.vpartition).toHaveLength(1)
-    expect(out.vmetadata.rvtoolsVersion).toBe('4.4.0')
+    expect(out.vmetadata.entries[0]?.rvtoolsVersion).toBe('4.4.0')
     expect(out.warnings).toHaveLength(0)
   })
 })

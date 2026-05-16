@@ -25,6 +25,13 @@ export interface Snapshot {
   source: 'rvtools'
   /** vCenter instance UUID from `vInfo.VI SDK UUID`; null when absent. */
   viSdkUuid: string | null
+  /**
+   * Per-vCenter `vMetaData` entries. RVTools 4.x emits one row per vCenter
+   * in a columnar sheet (so a single workbook with 3 vCenters yields 3
+   * entries); legacy Property/Value exports collapse to a single entry.
+   * Empty when the `vMetaData` sheet is absent. (Phase 4 MVC-04.)
+   */
+  vMetaData: VMetaDataEntry[]
   vinfo: VInfoRow[]
   vhost: VHostRow[]
   vdatastore: VDatastoreRow[]
@@ -42,6 +49,13 @@ export interface VDatastoreRow {
   naa: string | null
   /** VMFS, NFS, vSAN, … */
   type: string
+  /**
+   * RVTools `Hosts` — the host-name list this datastore is mounted on.
+   * Empty string when the column is absent. Consumed by Plan 04-02 to
+   * attribute vSAN/host-local datastores (blank `clusterName`) to their
+   * cluster via the `vHost.hostName → vHost.cluster` map (Pitfall 6).
+   */
+  hosts: string
   /** Owning cluster from RVTools vDatastore `Cluster name`. Empty string
    *  when the datastore is host-local / not cluster-attributed (the column
    *  IS present in real RVTools exports — never assume absent). */
@@ -57,10 +71,29 @@ export interface VPartitionRow {
   freeMib: MiB
 }
 
-/** The RVTools `vMetaData` sheet, reduced to the two fields vatlas reads. */
-export interface VMetaDataRow {
-  exportedTimestamp: string | null
+/**
+ * One `vMetaData` entry — per vCenter. RVTools 4.x exports a columnar
+ * `vMetaData` sheet with one row per vCenter (`Server`, `RVTools version`,
+ * `xlsx creation datetime`); pre-4.x exports a single Property/Value sheet
+ * which collapses to a single entry with an empty `server`.
+ */
+export interface VMetaDataEntry {
+  /** RVTools `Server` (vCenter FQDN/IP). `''` for legacy Property/Value. */
+  server: string
+  /** RVTools `RVTools version` (e.g. `4.7.1.4`). `null` when absent. */
   rvtoolsVersion: string | null
+  /** RVTools `xlsx creation datetime` / `Exported Timestamp`. `null` absent. */
+  exportedTimestamp: string | null
+}
+
+/**
+ * The RVTools `vMetaData` sheet, normalized to a per-vCenter entry list
+ * (one entry per vCenter for 4.x columnar; a single entry for legacy
+ * Property/Value). `entries` is never `undefined` — `[]` when the sheet is
+ * absent.
+ */
+export interface VMetaDataRow {
+  entries: VMetaDataEntry[]
 }
 
 /**

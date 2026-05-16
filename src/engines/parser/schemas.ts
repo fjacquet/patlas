@@ -69,6 +69,8 @@ export const VHostRowSchema: z.ZodType<VHostRow> = z.object({
   memoryMib: MibSchema,
   cpuRatio: z.number().min(0).max(1.5),
   ramRatio: z.number().min(0).max(1.5),
+  // Empty string allowed — most hosts carry no vSAN fault-domain tag.
+  faultDomain: z.string().trim(),
 })
 
 export const VDatastoreRowSchema: z.ZodType<VDatastoreRow> = z.object({
@@ -78,6 +80,8 @@ export const VDatastoreRowSchema: z.ZodType<VDatastoreRow> = z.object({
   provisionedMib: MibSchema,
   naa: z.string().trim().min(1).nullable(),
   type: z.string().trim(),
+  // Empty string allowed — not every datastore lists its host set.
+  hosts: z.string().trim(),
   // Empty string allowed — a host-local datastore has no cluster. Do NOT
   // .min(1)/require: that would drop legitimately cluster-less rows.
   clusterName: z.string().trim(),
@@ -92,6 +96,11 @@ export const VPartitionRowSchema: z.ZodType<VPartitionRow> = z.object({
 })
 
 export const VMetaDataRowSchema: z.ZodType<VMetaDataRow> = z.object({
-  exportedTimestamp: z.string().nullable(),
-  rvtoolsVersion: z.string().nullable(),
+  entries: z.array(
+    z.object({
+      server: z.string(),
+      rvtoolsVersion: z.string().nullable(),
+      exportedTimestamp: z.string().nullable(),
+    }),
+  ),
 })

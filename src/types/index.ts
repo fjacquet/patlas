@@ -16,6 +16,7 @@ export type {
   ParseError,
   Snapshot,
   VDatastoreRow,
+  VMetaDataEntry,
   VMetaDataRow,
   VPartitionRow,
 } from './snapshot'

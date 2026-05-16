@@ -21,7 +21,7 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
     const sheets = parseXlsx(e.data.buf)
     const { snapshot: rows, warnings } = parseSnapshot(sheets)
     const capturedAt = inferCaptureDate(e.data.filename, e.data.mtime, sheets)
-    const vCenterLabel = inferVCenterLabel(rows.vinfo, e.data.filename)
+    const vCenterLabel = inferVCenterLabel(rows.vinfo, e.data.filename, sheets)
     const rvtoolsVersion = inferRvtoolsVersion(sheets)
 
     self.postMessage({
@@ -33,6 +33,7 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
         vCenterLabel,
         rvtoolsVersion,
         viSdkUuid: rows.viSdkUuid,
+        vMetaData: rows.vMetaData,
         source: 'rvtools',
         vinfo: rows.vinfo,
         vhost: rows.vhost,
