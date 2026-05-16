@@ -23,12 +23,12 @@
 
 ### Global Dashboard
 
-- [ ] **DSH-01**: User sees a global vCenter dashboard with one column per cluster, showing counts of ESX, VMs (Windows / Linux / Other), datastores
-- [ ] **DSH-02**: User sees a global summary card with estate-wide totals (clusters, ESX, VMs, datastores, vCPU, vRAM, storage)
-- [ ] **DSH-03**: User sees per-cluster physical GHz, consumed GHz, mean CPU %, mean RAM %, vCPU allocation
-- [ ] **DSH-04**: User sees an OS-family breakdown (donut or stacked bar) at the global and per-cluster level
-- [ ] **DSH-05**: User sees CPU Ready % (from `vInfo.Overall Cpu Readiness`) where available — mean, max, count above the 5 % VMware-warning threshold
-- [ ] **DSH-06**: User sees three accounting modes (Configured / Active / Storage-realistic) with a visible toggle; defaults are sensible per metric
+- [x] **DSH-01**: User sees a global vCenter dashboard with one column per cluster, showing counts of ESX, VMs (Windows / Linux / Other), datastores
+- [x] **DSH-02**: User sees a global summary card with estate-wide totals (clusters, ESX, VMs, datastores, vCPU, vRAM, storage)
+- [x] **DSH-03**: User sees per-cluster physical GHz, consumed GHz, mean CPU %, mean RAM %, vCPU allocation
+- [x] **DSH-04**: User sees an OS-family breakdown (donut or stacked bar) at the global and per-cluster level
+- [x] **DSH-05**: User sees CPU Ready % (from `vInfo.Overall Cpu Readiness`) where available — mean, max, count above the 5 % VMware-warning threshold
+- [x] **DSH-06**: User sees three accounting modes (Configured / Active / Storage-realistic) with a visible toggle; defaults are sensible per metric
 
 ### Inventory Navigation
 
@@ -174,12 +174,12 @@
 | PRV-01 | Phase 1 | Complete |
 | PRV-02 | Phase 1 | Complete |
 | PRV-03 | Phase 1 | Complete |
-| DSH-01 | Phase 2 | Pending |
-| DSH-02 | Phase 2 | Pending |
-| DSH-03 | Phase 2 | Pending |
-| DSH-04 | Phase 2 | Pending |
-| DSH-05 | Phase 2 | Pending |
-| DSH-06 | Phase 2 | Pending |
+| DSH-01 | Phase 2 | Complete |
+| DSH-02 | Phase 2 | Complete |
+| DSH-03 | Phase 2 | Complete |
+| DSH-04 | Phase 2 | Complete |
+| DSH-05 | Phase 2 | Complete |
+| DSH-06 | Phase 2 | Complete |
 | VIZ-01 | Phase 2 | Complete |
 | VIZ-02 | Phase 2 | Complete |
 | VIZ-03 | Phase 2 | Complete |

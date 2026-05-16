@@ -54,7 +54,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   6. `engines/aggregation/` ships with ≥75 % Vitest coverage including the hyperthreads-vs-physical-cores test and the 2-socket × 12-core × 2600 MHz = 62.4 GHz unit test
 **Plans**: 3 plans
 - [x] 02-01-PLAN.md — ECharts SVG infra: `<Chart>` wrapper, Midnight Executive theme (light+dark), CI bundle-size gate (≤300 KB gz)
-- [ ] 02-02-PLAN.md — Aggregation engines (vsizer port+brand retrofit, perDatastore/perEsx/osFamily, 3 accounting modes) + useEstateView bridge
+- [x] 02-02-PLAN.md — Aggregation engines (vsizer port+brand retrofit, perDatastore/perEsx/osFamily, 3 accounting modes) + useEstateView bridge
 - [ ] 02-03-PLAN.md — Dashboard UI per UI-SPEC (summary card, per-cluster columns, OS donut, CPU Ready, accounting toggle) + i18n + App wiring
 **UI hint**: yes
 **vsizer reuse**: `engines/aggregation/ghz.ts`, `perCluster.ts`, `vinfoMerge.ts`, `aggregateClusters.ts`, `globals.ts`, `contention.ts` (port unchanged); `utils/format.ts` (port unchanged); new files `perDatastore.ts`, `perEsx.ts`; rewrite `store/datasetStore.ts` shape (multi-snapshot model); `index.css` Midnight Executive palette tokens (port)
