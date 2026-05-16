@@ -52,7 +52,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Every chart on the dashboard renders as inline `<svg>` (verified by DevTools), confirming the SVG renderer is wired correctly for the eventual HTML export
   5. The ECharts bundle lands at ≤300 KB gzipped (CI size-budget gate), proving tree-shaking is effective
   6. `engines/aggregation/` ships with ≥75 % Vitest coverage including the hyperthreads-vs-physical-cores test and the 2-socket × 12-core × 2600 MHz = 62.4 GHz unit test
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 02-01-PLAN.md — ECharts SVG infra: `<Chart>` wrapper, Midnight Executive theme (light+dark), CI bundle-size gate (≤300 KB gz)
+- [ ] 02-02-PLAN.md — Aggregation engines (vsizer port+brand retrofit, perDatastore/perEsx/osFamily, 3 accounting modes) + useEstateView bridge
+- [ ] 02-03-PLAN.md — Dashboard UI per UI-SPEC (summary card, per-cluster columns, OS donut, CPU Ready, accounting toggle) + i18n + App wiring
 **UI hint**: yes
 **vsizer reuse**: `engines/aggregation/ghz.ts`, `perCluster.ts`, `vinfoMerge.ts`, `aggregateClusters.ts`, `globals.ts`, `contention.ts` (port unchanged); `utils/format.ts` (port unchanged); new files `perDatastore.ts`, `perEsx.ts`; rewrite `store/datasetStore.ts` shape (multi-snapshot model); `index.css` Midnight Executive palette tokens (port)
 **Pitfalls owned**: Critical-6 (three accounting modes surfaced in the engine output + UI default to Active for CPU/RAM, Configured for storage), Moderate-4 (consolidation ratio against physical cores, not threads), Moderate-5 (MHz→GHz branded conversion, configured-vs-reserved RAM separation), Moderate-9 (chart re-render storm mitigation: `<Chart>` memo + selector-level data memoisation), Moderate-11 (datastore NAA-keyed aggregation — no double-count of shared LUNs)
@@ -154,7 +157,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Invariants | 5/5 | Complete   | 2026-05-15 |
-| 2. Aggregation & Global Dashboard | 0/TBD | Not started | - |
+| 2. Aggregation & Global Dashboard | 0/3 | Not started | - |
 | 3. Inventory Navigation | 0/TBD | Not started | - |
 | 4. Multi-vCenter, Stretched, Allocation & DR Simulation | 0/TBD | Not started | - |
 | 5. OS End-of-Support Forecast | 0/TBD | Not started | - |
