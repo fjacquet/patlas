@@ -18,7 +18,7 @@ interface Preset {
 }
 
 /**
- * D-05 preset values (verbatim from the superseded `AllocationSliders`
+ * D-05 preset values (carried verbatim from the retired ALC slider
  * `PRESETS` const): 1:1, 4:1, 8:1, VDI 10:1. Default state CPU 4:1 / RAM 1:1
  * (the carried ALC-02 intent — defaulted in the Zustand slice, not here).
  */
@@ -59,7 +59,7 @@ const matchesPreset = (r: PlannedRatios, p: Preset): boolean =>
 /**
  * PLN-03 / D-05 — the planned-ratios control on the Planning surface.
  * Named-preset segmented group (reuses the `<fieldset role="group"> +
- * aria-pressed` idiom VERBATIM from the superseded `AllocationSliders`,
+ * aria-pressed` idiom VERBATIM from the retired ALC slider control,
  * INCLUDING the `biome-ignore` + literal `role="group"` the CI grep gate
  * asserts) that FILLS an editable native `<input type="number">` — no
  * slider widget. Clicking a preset fills the numeric field; typing an

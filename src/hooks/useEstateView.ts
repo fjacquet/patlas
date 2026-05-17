@@ -1,8 +1,6 @@
 import { useMemo } from 'react'
 import { buildEstateView, EMPTY_VIEW } from '@/engines/aggregation'
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
-import type { AllocRatios } from '@/hooks/useAllocationHash'
-import { DEFAULT_RATIOS } from '@/hooks/useAllocationHash'
 import {
   selectPlannedRatios,
   selectScenario,
@@ -34,11 +32,14 @@ import type { AccountingMode, EstateView } from '@/types/estate'
  * This hook ONLY orchestrates + memoizes — it contains no aggregation or
  * merge logic (those live in the pure engines). Dashboard components consume
  * its output as plain props and must NOT introduce their own `useMemo`.
+ *
+ * D-06 / WR-01: the retired URL-hash ratio path (`useAllocationHash`) is
+ * gone — no ratio input is persisted to the URL. The measured lens uses the
+ * engine's default allocation ratio (`buildEstateView` defaults
+ * `allocRatios` to 4:1 / 1:1); the only user-tunable ratios are the planned
+ * lens's in-memory Zustand `plannedRatios` slice (D-05/D-06).
  */
-export function useEstateView(
-  mode: AccountingMode,
-  ratios: AllocRatios = DEFAULT_RATIOS,
-): EstateView {
+export function useEstateView(mode: AccountingMode): EstateView {
   const snapshots = useSnapshotStore(selectSnapshots)
   const selectedIds = useSnapshotStore(selectSelectedSnapshotIds)
   const stretchedClusters = useSnapshotStore(selectStretchedClusters)
@@ -49,19 +50,8 @@ export function useEstateView(
     if (selected.length === 0) return EMPTY_VIEW
     return buildEstateView(mergeSnapshotsToEstate(selected), mode, {
       stretchedClusters,
-      allocRatios: { cpuRatio: ratios.cpu, ramRatio: ratios.ram },
       scenario,
       plannedRatios: { cpuRatio: planned.cpu, ramRatio: planned.ram },
     })
-  }, [
-    snapshots,
-    selectedIds,
-    stretchedClusters,
-    scenario,
-    mode,
-    ratios.cpu,
-    ratios.ram,
-    planned.cpu,
-    planned.ram,
-  ])
+  }, [snapshots, selectedIds, stretchedClusters, scenario, mode, planned.cpu, planned.ram])
 }
