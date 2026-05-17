@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { StretchedPill } from '@/components/stretched/StretchedPill'
+import { TrendSparkline } from '@/components/trends/TrendSparkline'
 import { MIDNIGHT_EXECUTIVE_DARK, MIDNIGHT_EXECUTIVE_LIGHT } from '@/theme/echartsTheme'
-import type { ClusterAggregate, OsBreakdown } from '@/types/estate'
+import type { ClusterAggregate, OsBreakdown, TrendSeries } from '@/types/estate'
 import { fmtGhzValue, fmtInt, fmtPercentValue, fmtPercentWhole, fmtRatio } from '@/utils/format'
 import { UtilizationGauge } from './UtilizationGauge'
 
@@ -12,6 +13,9 @@ export interface ClusterColumnProps {
   onToggleStretched: (cluster: string) => void
   /** Drill into this cluster's full-detail screen (RCI). */
   onSelectCluster: (cluster: string) => void
+  /** P8 trend series (plain prop off the single memo). The per-cluster
+   *  sparkline renders only when this cluster has >=2 trend points. */
+  trends?: TrendSeries | null
 }
 
 const isDark = (): boolean =>
@@ -47,8 +51,10 @@ export function ClusterColumn({
   os,
   onToggleStretched,
   onSelectCluster,
+  trends,
 }: ClusterColumnProps) {
   const { t, i18n } = useTranslation('dashboard')
+  const { t: tTrends } = useTranslation('trends')
   const { t: tStr } = useTranslation('str')
   const { t: tRci } = useTranslation('rci')
   const loc = i18n.language
@@ -56,6 +62,11 @@ export function ClusterColumn({
   const palette = (isDark() ? MIDNIGHT_EXECUTIVE_DARK : MIDNIGHT_EXECUTIVE_LIGHT).color
   const osTotal = os.windows + os.linux + os.other
   const pct = (n: number) => (osTotal > 0 ? `${(n / osTotal) * 100}%` : '0%')
+  // Per-cluster VM-count series across snapshots (calc-from-real-data —
+  // the shipped per-cluster headline). Sparkline only when >=2 points.
+  const sparkValues = (trends?.points ?? [])
+    .map((p) => p.byCluster.get(cluster.cluster)?.vmCount)
+    .filter((v): v is number => v !== undefined)
 
   return (
     <section className="panel flex min-w-[200px] flex-col gap-3">
@@ -172,7 +183,14 @@ export function ClusterColumn({
         )}
       </div>
 
-      {/* Phase-6 per-cluster sparkline lands here (trends is null Phase 2). */}
+      {sparkValues.length >= 2 && (
+        <div className="mt-1 border-t border-slate-200 pt-2 dark:border-surface-700">
+          <TrendSparkline
+            values={sparkValues}
+            ariaLabel={`${cluster.cluster} — ${tTrends('delta.vmCount')}`}
+          />
+        </div>
+      )}
     </section>
   )
 }

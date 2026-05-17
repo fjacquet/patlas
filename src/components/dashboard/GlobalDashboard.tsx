@@ -119,6 +119,7 @@ export function GlobalDashboard() {
             vmsByCluster={view.vmsByCluster}
             onToggleStretched={onToggleStretched}
             onSelectCluster={setSelectedCluster}
+            trends={view.trends}
           />
           <CpuReadyPanel globals={view.globals} clusters={view.clusters} />
         </div>
