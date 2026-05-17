@@ -89,7 +89,12 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 > **REDEFINED 2026-05-16 — analytics-core replan** (`.planning/ANALYTICS-CORE-REPLAN.md`).
 > Original P4 ("Multi-vCenter, Stretched, Allocation & DR") was executed (commits `04-01..04`, real-file-validated) but UAT rejected its allocation, DR-mode, and stretched-confidence design. The validated **engine spine is KEPT as baseline** (`engines/snapshotMerge`, `aggregateClusters` per-site math, `engines/drSim`). This phase is now rescoped to: that merge spine + per-vCenter/RVTools labels + the **G1** stretched rework (stretched = the user's declaration; engine adapts the per-site reservation and reports site data FACTUALLY — no auto high/med/low confidence verdict, no judgement chip; no fault-domain metadata ⇒ symmetric 50 %).
-> **Allocation moves to Phase 6 (UAT G2 — calculated, not slider-selected). DR modes/metric move to Phase 6 (UAT G3 — Server+Site loss, physical impact).** Requirements still owned here: MVC-01..04 (done), STR-01..03 (reworked per G1), STR-04 (OPEN — RVTools `Hosts` is a count, see 04-02-SUMMARY). The original Goal/Success/Plans text below is **superseded** by this banner and retained only as history.
+> **Allocation moves to Phase 6 (UAT G2 — calculated, not slider-selected). DR modes/metric move to Phase 6 (UAT G3 — Server+Site loss, physical impact).** Requirements still owned here: MVC-01..04 (done), STR-01..03 (reworked per G1), STR-04 retired (merged into factual STR-03). The original Goal/Success/Plans text below is **superseded** by this banner and retained only as history.
+>
+> **Re-derived plans (authoritative):**
+> - [x] `04-01` — multi-vCenter merge engine spine — DONE, real-file-validated, kept as baseline
+> - [ ] `04-05` — G1 stretched rework: factual `siteData` (detected/assumed) replaces confidence verdict+chip; reservation math unchanged; estate "N clusters marked stretched"; merge STR-03 / drop STR-04
+> - 04-02/03/04 superseded (02 math kept in 04-01 baseline; 03 allocation→P6; 04 DR→P6)
 
 **Goal**: Turn vatlas from a single-snapshot viewer into the analytics atlas â merge N RVTools workbooks into one logical estate keyed on `(VI SDK UUID, vm_bios_uuid)` (never silent merge on names), surface the Ãtendu/Stretched pill with per-site reservation math and a `confidence` indicator, expose CPU/RAM allocation sliders with named presets and URL-hash-only persistence, and ship the three DR simulation modes (host loss, cluster loss, vCenter loss) with an explicit assumptions panel and `caveats` array. This is the phase where the engine spine becomes the product â every later capability (EOS, trends, exports) reads the merged estate, not raw snapshots.
 **Depends on**: Phase 2
@@ -210,7 +215,7 @@ Phases execute in numeric order: 1 â 2 â 3 â 4 â 5 â 6 
 | 1. Foundation & Invariants | 5/5 | Complete   | 2026-05-15 |
 | 2. Aggregation & Global Dashboard | 3/3 | Complete   | 2026-05-16 |
 | 3. Inventory Navigation | 3/3 | Complete | 2026-05-16 |
-| 4. Multi-vCenter Merge & Factual Labels | 1/TBD | Re-derived (replan) — merge spine done; G1 stretched rework pending | - |
+| 4. Multi-vCenter Merge & Factual Labels | 1/2 | Re-derived — 04-01 baseline done; 04-05 (G1 rework) planned, pending execution | - |
 | 5. Rich Cluster / Host / ESX Intelligence | 0/TBD | Not started (NEW) | - |
 | 6. Allocation & DR (re-derived) | 0/TBD | Not started (NEW; carries UAT G2/G3, OPEN-1) | - |
 | 7. OS End-of-Support Forecast | 0/TBD | Not started | - |
