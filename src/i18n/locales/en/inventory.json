@@ -3,7 +3,8 @@
     "label": "View",
     "dashboard": "Dashboard",
     "inventory": "Inventory",
-    "hosts": "Hosts"
+    "hosts": "Hosts",
+    "planning": "Planning"
   },
   "tab": {
     "label": "Object type",

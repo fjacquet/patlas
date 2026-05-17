@@ -6,6 +6,7 @@ import { FallbackError } from './components/FallbackError'
 import { HostsView } from './components/hosts/HostsView'
 import { InventoryView } from './components/inventory/InventoryView'
 import { LanguageToggle } from './components/LanguageToggle'
+import { PlanningView } from './components/planning/PlanningView'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
 import { ThemeToggle } from './components/ThemeToggle'
 import { UploadZone } from './components/UploadZone'
@@ -38,6 +39,8 @@ function App() {
               <InventoryView />
             ) : activeView === 'hosts' ? (
               <HostsView />
+            ) : activeView === 'planning' ? (
+              <PlanningView />
             ) : (
               <GlobalDashboard />
             )}

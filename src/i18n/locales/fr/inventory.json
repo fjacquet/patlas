@@ -3,7 +3,8 @@
     "label": "Vue",
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
-    "hosts": "Hôtes"
+    "hosts": "Hôtes",
+    "planning": "Planification"
   },
   "tab": {
     "label": "Type d'objet",
