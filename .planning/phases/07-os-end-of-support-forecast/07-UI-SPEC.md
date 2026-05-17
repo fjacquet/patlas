@@ -65,7 +65,7 @@ Matches shipped vatlas type usage exactly (sizes are Tailwind defaults already i
 Rules:
 
 - Exactly 2 weights: `font-normal` (400) and `font-semibold` (600). No other weights.
-- Exactly 4 sizes: 14 / 20 / 24px declared (the `text-xs` 12px caption used elsewhere is NOT introduced for this phase — keep freshness/“as of” at `text-sm` for legibility, matching `HostsView` body text).
+- Exactly 3 sizes: 14 / 20 / 24px declared (within the 4-size maximum; the `text-xs` 12px caption used elsewhere is NOT introduced for this phase — keep freshness/“as of” at `text-sm` for legibility, matching `HostsView` body text).
 - Every numeric value (bucket counts, occurrence counts, reconciliation total) renders in `--font-mono` with `tabular-nums` (verbatim shipped idiom from `HostsView` `<tbody className="font-mono tabular-nums">`). Dates are rendered via the locale-aware `src/utils/format.ts` helpers — never pre-formatted in i18n strings, never raw `toLocaleDateString` inline.
 - The verbatim original RVTools OS string in the unknown-OS list renders in `font-mono` (it is preserved-verbatim data per D-12, not prose) with the row text wrapped/`break-all`-safe like the shipped `HostsView` `hostName` cell.
 
