@@ -1,20 +1,15 @@
 import { useState } from 'react'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
-import { useAllocationHash } from '@/hooks/useAllocationHash'
 import { useEstateView } from '@/hooks/useEstateView'
 import {
   selectActiveSnapshot,
-  selectScenario,
-  selectSetScenario,
   selectSetStretchedClusters,
   selectStretchedClusters,
   useSnapshotStore,
 } from '@/store/snapshotStore'
-import type { AccountingMode, DrMode } from '@/types/estate'
-import { AllocationSliders } from '../allocation/AllocationSliders'
+import type { AccountingMode } from '@/types/estate'
 import { ClusterDetail } from '../cluster/ClusterDetail'
-import { DrSimPanel } from '../dr/DrSimPanel'
 import { AccountingModeToggle } from './AccountingModeToggle'
 import { CpuReadyPanel } from './CpuReadyPanel'
 import { GlobalSummaryCard } from './GlobalSummaryCard'
@@ -61,14 +56,10 @@ export function GlobalDashboard() {
   const { t, i18n } = useTranslation('dashboard')
   const { t: tStr } = useTranslation('str')
   const [mode, setMode] = useState<AccountingMode>('active')
-  const [ratios, setRatios] = useAllocationHash()
-  const view = useEstateView(mode, ratios)
+  const view = useEstateView(mode)
   const snapshot = useSnapshotStore(selectActiveSnapshot)
   const stretchedClusters = useSnapshotStore(selectStretchedClusters)
   const setStretchedClusters = useSnapshotStore(selectSetStretchedClusters)
-  const scenario = useSnapshotStore(selectScenario)
-  const setScenario = useSnapshotStore(selectSetScenario)
-  const [drMode, setDrMode] = useState<DrMode>('server')
   // RCI drill: in-app view state (like `mode`) — NOT a router, NOT a 2nd memo.
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null)
   // Toggle one cluster's stretched membership. Set is REPLACED (never
@@ -120,7 +111,6 @@ export function GlobalDashboard() {
           <p className="text-xs text-slate-600 dark:text-slate-400">
             {tStr('stretched.estateCount', { count: stretchedClusters.size })}
           </p>
-          <AllocationSliders ratios={ratios} onChange={setRatios} />
           <GlobalSummaryCard globals={view.globals} mode={mode} capturedDate={capturedDate} />
           <OperationalInsights insights={view.operationalInsights} />
           <OsBreakdownDonut osBreakdown={view.osBreakdown} />
@@ -131,16 +121,6 @@ export function GlobalDashboard() {
             onSelectCluster={setSelectedCluster}
           />
           <CpuReadyPanel globals={view.globals} clusters={view.clusters} />
-          {/* 2xl (48px) major break before the DR panel (gap-6 24px + mt-6 24px). */}
-          <div className="mt-6">
-            <DrSimPanel
-              view={view}
-              drMode={drMode}
-              onDrMode={setDrMode}
-              scenario={scenario}
-              onScenario={setScenario}
-            />
-          </div>
         </div>
       </ErrorBoundary>
     </main>
