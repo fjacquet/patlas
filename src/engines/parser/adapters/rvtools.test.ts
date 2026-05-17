@@ -391,11 +391,38 @@ describe('optional-sheet adapters', () => {
         mkSheet('vDatastore', ['Name', 'Capacity MB', 'Free MB'], [['ds', 100, 50]]),
         mkSheet('vPartition', ['VM', 'Disk', 'Capacity MB'], [['vm-a', '/', 10]]),
         mkSheet('vMetaData', ['Property', 'Value'], [['RVTools Version', '4.4.0']]),
+        // P9 D-11: the four network sheets are now also OPTIONAL — include
+        // them so "all optional sheets present ⇒ zero warnings" still holds.
+        mkSheet(
+          'vNetwork',
+          ['VM', 'Network', 'Switch', 'Adapter', 'Connected', 'Cluster', 'Host'],
+          [['vm-a', 'PG-A', 'vSwitch0', 'vmxnet3', 'True', 'C1', 'esx-1']],
+        ),
+        mkSheet(
+          'vSwitch',
+          ['Host', 'Cluster', 'Switch', '# Ports', 'Free Ports', 'MTU'],
+          [['esx-1', 'C1', 'vSwitch0', 128, 100, 1500]],
+        ),
+        mkSheet(
+          'dvSwitch',
+          ['Switch', 'Name', 'Version', 'Host members', '# Ports', '# VMs', 'Max MTU'],
+          [['DVS', 'prod-dvs', '8.0.0', 'esx-1, esx-2', 512, 40, 9000]],
+        ),
+        mkSheet(
+          'dvPort',
+          ['Port', 'Switch', 'VLAN', 'Active Uplink', 'Standby Uplink'],
+          [['dvpg-10', 'DVS', '10', 'uplink1', 'uplink2']],
+        ),
       ),
     )
     expect(out.vdatastore).toHaveLength(1)
     expect(out.vpartition).toHaveLength(1)
     expect(out.vmetadata.entries[0]?.rvtoolsVersion).toBe('4.4.0')
+    expect(out.vnetwork).toHaveLength(1)
+    expect(out.vnetwork[0]?.network).toBe('PG-A')
+    expect(out.vswitch[0]?.ports).toBe(128)
+    expect(out.dvswitch[0]?.maxMtu).toBe(9000)
+    expect(out.dvport[0]?.vlan).toBe('10')
     expect(out.warnings).toHaveLength(0)
   })
 })

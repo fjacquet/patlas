@@ -55,6 +55,10 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   vhost: [],
   vdatastore: [],
   vpartition: [],
+  vnetwork: [],
+  vswitch: [],
+  dvswitch: [],
+  dvport: [],
   parseErrors: [],
   ...over,
 })

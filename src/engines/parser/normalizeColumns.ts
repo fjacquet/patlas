@@ -2,13 +2,26 @@ import type {
   ParseError,
   Snapshot,
   VDatastoreRow,
+  VDvPortRow,
+  VDvSwitchRow,
   VHostRow,
   VInfoRow,
+  VNetworkRow,
   VPartitionRow,
+  VSwitchRow,
 } from '@/types'
 import { adaptRvtools } from './adapters/rvtools'
 import type { ParsedWorkbook } from './parseXlsx'
-import { VDatastoreRowSchema, VHostRowSchema, VInfoRowSchema, VPartitionRowSchema } from './schemas'
+import {
+  VDatastoreRowSchema,
+  VDvPortRowSchema,
+  VDvSwitchRowSchema,
+  VHostRowSchema,
+  VInfoRowSchema,
+  VNetworkRowSchema,
+  VPartitionRowSchema,
+  VSwitchRowSchema,
+} from './schemas'
 import { synthesizeOrphanClusters } from './synthesizeOrphanClusters'
 
 /**
@@ -18,7 +31,17 @@ import { synthesizeOrphanClusters } from './synthesizeOrphanClusters'
  */
 export type SnapshotRows = Pick<
   Snapshot,
-  'vinfo' | 'vhost' | 'vdatastore' | 'vpartition' | 'viSdkUuid' | 'vMetaData' | 'parseErrors'
+  | 'vinfo'
+  | 'vhost'
+  | 'vdatastore'
+  | 'vpartition'
+  | 'vnetwork'
+  | 'vswitch'
+  | 'dvswitch'
+  | 'dvport'
+  | 'viSdkUuid'
+  | 'vMetaData'
+  | 'parseErrors'
 >
 
 /**
@@ -66,13 +89,26 @@ export const parseSnapshot = (
   const vhost = validate<VHostRow>(raw.vhost, VHostRowSchema, 'vHost')
   const vdatastore = validate<VDatastoreRow>(raw.vdatastore, VDatastoreRowSchema, 'vDatastore')
   const vpartition = validate<VPartitionRow>(raw.vpartition, VPartitionRowSchema, 'vPartition')
+  const vnetwork = validate<VNetworkRow>(raw.vnetwork, VNetworkRowSchema, 'vNetwork')
+  const vswitch = validate<VSwitchRow>(raw.vswitch, VSwitchRowSchema, 'vSwitch')
+  const dvswitch = validate<VDvSwitchRow>(raw.dvswitch, VDvSwitchRowSchema, 'dvSwitch')
+  const dvport = validate<VDvPortRow>(raw.dvport, VDvPortRowSchema, 'dvPort')
 
   // ADR-0014: bucket clusterless hosts under per-host synthetic cluster
   // names so the aggregator doesn't drop them. Runs after schema validation
   // so input rows are guaranteed typed; the synthesis is pure.
   const bucketed = synthesizeOrphanClusters({ vinfo: vinfo.rows, vhost: vhost.rows })
 
-  const parseErrors = [...vinfo.errors, ...vhost.errors, ...vdatastore.errors, ...vpartition.errors]
+  const parseErrors = [
+    ...vinfo.errors,
+    ...vhost.errors,
+    ...vdatastore.errors,
+    ...vpartition.errors,
+    ...vnetwork.errors,
+    ...vswitch.errors,
+    ...dvswitch.errors,
+    ...dvport.errors,
+  ]
   const viSdkUuid = bucketed.vinfo.find((r) => r.viSdkUuid)?.viSdkUuid ?? null
 
   return {
@@ -81,6 +117,10 @@ export const parseSnapshot = (
       vhost: bucketed.vhost,
       vdatastore: vdatastore.rows,
       vpartition: vpartition.rows,
+      vnetwork: vnetwork.rows,
+      vswitch: vswitch.rows,
+      dvswitch: dvswitch.rows,
+      dvport: dvport.rows,
       viSdkUuid,
       vMetaData: raw.vmetadata.entries,
       parseErrors,

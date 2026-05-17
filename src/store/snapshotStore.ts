@@ -165,6 +165,10 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
         vhost: [],
         vdatastore: [],
         vpartition: [],
+        vnetwork: [],
+        vswitch: [],
+        dvswitch: [],
+        dvport: [],
         rawReleased: true,
         releasedAggregate,
       })
