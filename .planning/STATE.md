@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 6 context gathered
-last_updated: "2026-05-17T09:57:03.477Z"
+stopped_at: Phase 6 UI-SPEC approved
+last_updated: "2026-05-17T13:06:20.970Z"
 last_activity: 2026-05-17 -- Phase 5 complete; next /gsd-discuss-phase 6
 progress:
   total_phases: 10
@@ -102,6 +102,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-17T09:57:03.465Z
-Stopped at: Phase 6 context gathered
-Resume file: .planning/phases/06-allocation-dr-re-derived/06-CONTEXT.md
+Last session: 2026-05-17T13:06:20.956Z
+Stopped at: Phase 6 UI-SPEC approved
+Resume file: .planning/phases/06-allocation-dr-re-derived/06-UI-SPEC.md
