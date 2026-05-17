@@ -1,5 +1,8 @@
 import type { Cores, MiB } from '@/engines/units'
 
+/** Exact RVTools vInfo Powerstate (P5). `poweredOn` is derived from this. */
+export type VPowerState = 'poweredOn' | 'poweredOff' | 'suspended'
+
 /**
  * Canonical VM row produced by the RVTools adapter. The adapter normalizes
  * column names, casing and locale variants into this shape so the downstream
@@ -23,6 +26,12 @@ export interface VInfoRow {
   vramMib: MiB
   /** CPU Ready % from RVTools quickStats (ADR-0012). null when not reported. */
   cpuReadinessPercent: number | null
+  /** Exact RVTools powered-state (P5). */
+  powerState: VPowerState
+  /** RVTools vInfo `Template` flag (P5). `false` when the column is absent. */
+  template: boolean
+  /** Derived: `powerState === 'poweredOn'`. Kept so existing consumers
+   *  (perEsx, aggregateClusters, exports) are unaffected. */
   poweredOn: boolean
   // ── NEW for vatlas ──────────────────────────────────────────────────────
   /** `OS according to the configuration file` (the configured guest OS). */

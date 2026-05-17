@@ -12,6 +12,8 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   vramMib: mib(8192),
   cpuReadinessPercent: null,
   poweredOn: true,
+  powerState: 'poweredOn',
+  template: false,
   osConfig: 'Ubuntu Linux (64-bit)',
   osTools: '',
   vmBiosUuid: '',

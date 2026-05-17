@@ -28,6 +28,9 @@ const snapshot = (id: string): Snapshot => ({
       cpuRatio: 0.3,
       ramRatio: 0.5,
       faultDomain: '',
+      model: '',
+      vendor: '',
+      esxVersion: '',
     },
   ],
   vinfo: [
@@ -39,6 +42,8 @@ const snapshot = (id: string): Snapshot => ({
       vramMib: mib(8192),
       cpuReadinessPercent: null,
       poweredOn: true,
+      powerState: 'poweredOn',
+      template: false,
       osConfig: 'Ubuntu Linux (64-bit)',
       osTools: '',
       vmBiosUuid: '',

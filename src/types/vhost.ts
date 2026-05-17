@@ -31,4 +31,12 @@ export interface VHostRow {
    * (Phase 4 STR-02/03; consumed by Plan 04-02). Never `undefined`.
    */
   faultDomain: string
+  /** RVTools `vHost.Model` — factual host hardware model. '' when absent.
+   *  Plain text only — NO lifecycle verdict (P5; vendor EOS not in RVTools). */
+  model: string
+  /** RVTools `vHost.Vendor` — factual. '' when absent. */
+  vendor: string
+  /** RVTools `vHost.ESX Version` — factual ESXi version string. '' when
+   *  absent. Support-state classification is Phase 7 (EOS), NOT here. */
+  esxVersion: string
 }

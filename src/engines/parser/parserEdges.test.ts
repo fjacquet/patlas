@@ -46,6 +46,9 @@ describe('synthesizeOrphanClusters edge branches', () => {
           cpuRatio: 0,
           ramRatio: 0,
           faultDomain: '',
+          model: '',
+          vendor: '',
+          esxVersion: '',
         },
       ],
     }
@@ -67,6 +70,9 @@ describe('synthesizeOrphanClusters edge branches', () => {
           cpuRatio: 0,
           ramRatio: 0,
           faultDomain: '',
+          model: '',
+          vendor: '',
+          esxVersion: '',
         },
       ],
     })

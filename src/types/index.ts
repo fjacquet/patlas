@@ -21,4 +21,4 @@ export type {
   VPartitionRow,
 } from './snapshot'
 export type { VHostRow } from './vhost'
-export type { VInfoRow } from './vinfo'
+export type { VInfoRow, VPowerState } from './vinfo'

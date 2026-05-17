@@ -6,6 +6,7 @@ import type {
   VInfoRow,
   VMetaDataRow,
   VPartitionRow,
+  VPowerState,
 } from '@/types'
 import type { ParsedSheet, ParsedWorkbook } from '../parseXlsx'
 import {
@@ -54,6 +55,12 @@ export const VINFO_COLS = {
   vramMib: ['memory', 'memory (mb)', 'mem', 'mémoire'],
   cpuReadinessPercent: ['overall cpu readiness', '% cpu readiness', 'cpu readiness'],
   poweredOn: ['powerstate', 'power state', 'état', 'status'],
+  // P5: exact powered-state enum (RVTools emits poweredOn/poweredOff/
+  // suspended). Same source column as `poweredOn`; `poweredOn` stays a
+  // derived boolean so existing consumers are unaffected.
+  powerState: ['powerstate', 'power state', 'état', 'status'],
+  // P5: RVTools vInfo `Template` (TRUE/FALSE). Absent → false (factual).
+  template: ['template'],
   // ── NEW for vatlas ──────────────────────────────────────────────────────
   osConfig: ['os according to the configuration file', 'os', 'guest os'],
   osTools: ['os according to the vmware tools', 'guest os full name', 'vmtools os'],
@@ -94,6 +101,12 @@ const VHOST_COLS = {
   // spelling first (the rvtools.ts convention). Empty string when absent or
   // the host is untagged — never `undefined`. Consumed by Plan 04-02.
   faultDomain: ['vsan fault domain name', 'fault domain name'],
+  // P5: factual host hardware identity + ESXi version. Plain text only —
+  // NO lifecycle verdict (vendor EOS not in RVTools; ESXi support-state is
+  // Phase 7). Empty string when absent.
+  model: ['model', 'host model'],
+  vendor: ['vendor'],
+  esxVersion: ['esx version', 'esxi version', 'version'],
 } as const
 
 const VDATASTORE_COLS = {
@@ -174,6 +187,11 @@ export const adaptRvtoolsVInfo = (sheet: ParsedSheet): VInfoRow[] => {
   return sheet.rows
     .map((row): VInfoRow => {
       const readyRaw = readCol(row, cols.cpuReadinessPercent)
+      // P5: exact powered-state enum; poweredOn DERIVED so no consumer breaks.
+      const psRaw = readString(readCol(row, cols.powerState)).toLowerCase().replace(/\s+/g, '')
+      const powerState: VPowerState =
+        psRaw === 'poweredon' ? 'poweredOn' : psRaw === 'suspended' ? 'suspended' : 'poweredOff'
+      const templateRaw = readString(readCol(row, cols.template)).toLowerCase()
       return {
         vmName: readString(readCol(row, cols.vmName)),
         cluster: readString(readCol(row, cols.cluster)),
@@ -181,7 +199,9 @@ export const adaptRvtoolsVInfo = (sheet: ParsedSheet): VInfoRow[] => {
         vcpu: cores(Math.max(0, Math.trunc(readNumber(readCol(row, cols.vcpu))))),
         vramMib: mib(Math.max(0, readNumber(readCol(row, cols.vramMib)))),
         cpuReadinessPercent: parseReadinessCell(readyRaw),
-        poweredOn: readString(readCol(row, cols.poweredOn)).toLowerCase() === 'poweredon',
+        powerState,
+        template: templateRaw === 'true',
+        poweredOn: powerState === 'poweredOn',
         osConfig: readString(readCol(row, cols.osConfig)),
         osTools: readString(readCol(row, cols.osTools)),
         vmBiosUuid: readString(readCol(row, cols.vmBiosUuid)),
@@ -209,6 +229,9 @@ export const adaptRvtoolsVHost = (sheet: ParsedSheet): VHostRow[] => {
         cpuRatio: toRatio(readNumber(readCol(row, cols.cpuRatio))),
         ramRatio: toRatio(readNumber(readCol(row, cols.ramRatio))),
         faultDomain: readString(readCol(row, cols.faultDomain)),
+        model: readString(readCol(row, cols.model)),
+        vendor: readString(readCol(row, cols.vendor)),
+        esxVersion: readString(readCol(row, cols.esxVersion)),
       }),
     )
     .filter((r) => !isInternalRow(r.hostName))

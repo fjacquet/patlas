@@ -190,6 +190,9 @@ describe('synthesizeOrphanClusters integration', () => {
           cpuRatio: 0,
           ramRatio: 0,
           faultDomain: '',
+          model: '',
+          vendor: '',
+          esxVersion: '',
         },
       ],
     })
@@ -461,5 +464,67 @@ describe('RVTools >=4.x MiB-suffixed headers resolve (A7 / PITFALLS Moderate-1)'
     )
     expect(vi[0]?.provisionedMib).toBe(mib(81920))
     expect(vi[0]?.inUseMib).toBe(mib(40960))
+  })
+})
+
+describe('P5 — Powerstate enum / Template / host model·vendor·ESX version', () => {
+  const VI = ['VM', 'Powerstate', 'Template', 'Cluster', 'Host', 'CPUs', 'Memory']
+  it('Powerstate maps to the exact enum; poweredOn is derived', () => {
+    const vi = adaptRvtoolsVInfo(
+      mkSheet('vInfo', VI, [
+        ['on', 'poweredOn', 'False', 'C', 'h', 2, 1024],
+        ['off', 'poweredOff', 'False', 'C', 'h', 2, 1024],
+        ['susp', 'suspended', 'False', 'C', 'h', 2, 1024],
+      ]),
+    )
+    expect(vi.map((r) => r.powerState)).toEqual(['poweredOn', 'poweredOff', 'suspended'])
+    expect(vi.map((r) => r.poweredOn)).toEqual([true, false, false])
+  })
+
+  it('Template TRUE/FALSE → boolean; absent column → false', () => {
+    const withT = adaptRvtoolsVInfo(
+      mkSheet('vInfo', VI, [
+        ['t', 'poweredOn', 'True', 'C', 'h', 2, 1024],
+        ['f', 'poweredOn', 'False', 'C', 'h', 2, 1024],
+      ]),
+    )
+    expect(withT.map((r) => r.template)).toEqual([true, false])
+    const noT = adaptRvtoolsVInfo(
+      mkSheet(
+        'vInfo',
+        ['VM', 'Powerstate', 'Cluster', 'Host', 'CPUs', 'Memory'],
+        [['x', 'poweredOn', 'C', 'h', 2, 1024]],
+      ),
+    )
+    expect(noT[0]?.template).toBe(false)
+  })
+
+  it('vHost Model / Vendor / ESX Version parse factually; absent → ""', () => {
+    const rows = adaptRvtoolsVHost(
+      mkSheet(
+        'vHost',
+        [...VHOST_FULL, 'Model', 'Vendor', 'ESX Version'],
+        [
+          [
+            'host-a',
+            'cluster-a',
+            2,
+            12,
+            2600,
+            65536,
+            'PowerEdge R740',
+            'Dell Inc.',
+            'VMware ESXi 7.0.3',
+          ],
+        ],
+      ),
+    )
+    expect(rows[0]?.model).toBe('PowerEdge R740')
+    expect(rows[0]?.vendor).toBe('Dell Inc.')
+    expect(rows[0]?.esxVersion).toBe('VMware ESXi 7.0.3')
+    const bare = adaptRvtoolsVHost(mkSheet('vHost', VHOST_FULL, [vhostRow]))
+    expect(bare[0]?.model).toBe('')
+    expect(bare[0]?.vendor).toBe('')
+    expect(bare[0]?.esxVersion).toBe('')
   })
 })

@@ -49,6 +49,8 @@ export const VInfoRowSchema: z.ZodType<VInfoRow> = z.object({
   vcpu: CoresSchema,
   vramMib: MibSchema,
   cpuReadinessPercent: z.number().min(0).max(200).nullable(),
+  powerState: z.enum(['poweredOn', 'poweredOff', 'suspended']),
+  template: z.boolean(),
   poweredOn: z.boolean(),
   osConfig: z.string().trim(),
   osTools: z.string().trim(),
@@ -71,6 +73,9 @@ export const VHostRowSchema: z.ZodType<VHostRow> = z.object({
   ramRatio: z.number().min(0).max(1.5),
   // Empty string allowed — most hosts carry no vSAN fault-domain tag.
   faultDomain: z.string().trim(),
+  model: z.string().trim(),
+  vendor: z.string().trim(),
+  esxVersion: z.string().trim(),
 })
 
 export const VDatastoreRowSchema: z.ZodType<VDatastoreRow> = z.object({

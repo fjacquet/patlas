@@ -14,6 +14,8 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   vramMib: mib(8192),
   cpuReadinessPercent: null,
   poweredOn: true,
+  powerState: 'poweredOn',
+  template: false,
   osConfig: '',
   osTools: '',
   vmBiosUuid: '',
@@ -35,6 +37,9 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   cpuRatio: 0.3,
   ramRatio: 0.5,
   faultDomain: '',
+  model: '',
+  vendor: '',
+  esxVersion: '',
   ...over,
 })
 
