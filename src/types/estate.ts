@@ -290,6 +290,14 @@ export interface EsxAggregate {
   maxCpuReadinessPercent: number | null
   vmsAboveReadinessWarning: number
   readinessAvailable: boolean
+  /** P5 factual host attributes (plain text; '' when absent — NO lifecycle
+   *  verdict, ESXi support-state is Phase 7). */
+  faultDomain: string
+  model: string
+  vendor: string
+  esxVersion: string
+  /** Powered-on VM count on this host (P5 Hosts view). */
+  poweredOnVms: number
 }
 
 /**

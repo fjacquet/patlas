@@ -2,7 +2,8 @@
   "nav": {
     "label": "Vue",
     "dashboard": "Tableau de bord",
-    "inventory": "Inventaire"
+    "inventory": "Inventaire",
+    "hosts": "Hôtes"
   },
   "tab": {
     "label": "Type d'objet",

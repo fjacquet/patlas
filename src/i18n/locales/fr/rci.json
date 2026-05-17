@@ -1,0 +1,51 @@
+{
+  "hosts": {
+    "title": "Hôtes",
+    "rollup": {
+      "title": "Hôtes du parc",
+      "hosts": "Hôtes",
+      "cores": "Cœurs physiques",
+      "memMib": "Mémoire hôte (Mio)",
+      "avgCpu": "CPU moyen %",
+      "avgMem": "Mémoire moyenne %",
+      "poweredOnVms": "VM allumées"
+    },
+    "col": {
+      "host": "Hôte",
+      "cluster": "Cluster",
+      "cores": "Cœurs",
+      "memMib": "Mémoire (Mio)",
+      "cpuPct": "CPU %",
+      "ramPct": "RAM %",
+      "poweredOnVms": "VM allumées",
+      "esxVersion": "Version ESXi",
+      "faultDomain": "Domaine de panne",
+      "model": "Modèle",
+      "vendor": "Fournisseur"
+    }
+  },
+  "insights": {
+    "title": "Indicateurs opérationnels",
+    "overcommit": "vCPU : pCPU",
+    "avgCpu": "CPU moyen %",
+    "avgMem": "Mémoire moyenne %",
+    "powerState": "État d'alimentation",
+    "provisioned": "Provisionné (Mio)",
+    "inUse": "Utilisé (Mio)",
+    "footprint": "Empreinte datastore (Mio)",
+    "guestData": "Données invité (Mio)",
+    "totalCores": "Total cœurs physiques",
+    "totalMem": "Total mémoire hôte (Mio)",
+    "power": {
+      "on": "{{count}} allumées",
+      "off": "{{count}} éteintes",
+      "suspended": "{{count}} suspendues",
+      "template": "{{count}} modèles"
+    }
+  },
+  "detail": {
+    "title": "Détail du cluster",
+    "back": "Retour au tableau de bord"
+  },
+  "na": "—"
+}

@@ -2,7 +2,8 @@
   "nav": {
     "label": "View",
     "dashboard": "Dashboard",
-    "inventory": "Inventory"
+    "inventory": "Inventory",
+    "hosts": "Hosts"
   },
   "tab": {
     "label": "Object type",

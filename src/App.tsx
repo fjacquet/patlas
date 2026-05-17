@@ -3,6 +3,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { Toaster } from 'sonner'
 import { GlobalDashboard } from './components/dashboard/GlobalDashboard'
 import { FallbackError } from './components/FallbackError'
+import { HostsView } from './components/hosts/HostsView'
 import { InventoryView } from './components/inventory/InventoryView'
 import { LanguageToggle } from './components/LanguageToggle'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
@@ -33,7 +34,13 @@ function App() {
         {hasSnapshots ? (
           <div className="flex flex-1 overflow-hidden">
             <SnapshotListSidebar />
-            {activeView === 'inventory' ? <InventoryView /> : <GlobalDashboard />}
+            {activeView === 'inventory' ? (
+              <InventoryView />
+            ) : activeView === 'hosts' ? (
+              <HostsView />
+            ) : (
+              <GlobalDashboard />
+            )}
           </div>
         ) : (
           <main className="flex flex-1 items-center justify-center p-8">

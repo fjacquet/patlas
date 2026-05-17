@@ -23,6 +23,11 @@ const host = (
   maxCpuReadinessPercent: null,
   vmsAboveReadinessWarning: 0,
   readinessAvailable: false,
+  faultDomain: '',
+  model: '',
+  vendor: '',
+  esxVersion: '',
+  poweredOnVms: 0,
   ...over,
 })
 

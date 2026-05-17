@@ -52,6 +52,11 @@ export const perEsx = (
       maxCpuReadinessPercent: ready.max,
       vmsAboveReadinessWarning: ready.countAboveWarning,
       readinessAvailable: ready.available,
+      faultDomain: h.faultDomain,
+      model: h.model,
+      vendor: h.vendor,
+      esxVersion: h.esxVersion,
+      poweredOnVms: allVms.filter((vm) => vm.poweredOn).length,
     }
   })
 }

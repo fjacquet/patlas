@@ -10,6 +10,8 @@ export interface PerClusterColumnsProps {
   vmsByCluster: Map<string, OsBreakdown>
   /** Forwarded to each column's stretched pill (STR-01). */
   onToggleStretched: (cluster: string) => void
+  /** Forwarded to each column's drill affordance (RCI cluster detail). */
+  onSelectCluster: (cluster: string) => void
 }
 
 /**
@@ -23,6 +25,7 @@ export function PerClusterColumns({
   clusters,
   vmsByCluster,
   onToggleStretched,
+  onSelectCluster,
 }: PerClusterColumnsProps) {
   const { t } = useTranslation('dashboard')
 
@@ -38,6 +41,7 @@ export function PerClusterColumns({
             cluster={cluster}
             os={vmsByCluster.get(cluster.cluster) ?? EMPTY_OS}
             onToggleStretched={onToggleStretched}
+            onSelectCluster={onSelectCluster}
           />
         ))}
       </div>

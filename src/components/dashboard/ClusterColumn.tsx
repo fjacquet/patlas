@@ -10,6 +10,8 @@ export interface ClusterColumnProps {
   os: OsBreakdown
   /** Flip this cluster's membership in the store's stretched set (STR-01). */
   onToggleStretched: (cluster: string) => void
+  /** Drill into this cluster's full-detail screen (RCI). */
+  onSelectCluster: (cluster: string) => void
 }
 
 const isDark = (): boolean =>
@@ -40,9 +42,15 @@ const Row = ({ label, value }: { label: string; value: string }) => (
  * Footer keeps vertical room for Phase-6 per-cluster sparklines (`trends`
  * is null in Phase 2). Every color utility carries its `dark:` twin.
  */
-export function ClusterColumn({ cluster, os, onToggleStretched }: ClusterColumnProps) {
+export function ClusterColumn({
+  cluster,
+  os,
+  onToggleStretched,
+  onSelectCluster,
+}: ClusterColumnProps) {
   const { t, i18n } = useTranslation('dashboard')
   const { t: tStr } = useTranslation('str')
+  const { t: tRci } = useTranslation('rci')
   const loc = i18n.language
   const siteGhz = (v: number | null) => (v === null ? '—' : fmtGhzValue(v, loc))
   const palette = (isDark() ? MIDNIGHT_EXECUTIVE_DARK : MIDNIGHT_EXECUTIVE_LIGHT).color
@@ -51,9 +59,18 @@ export function ClusterColumn({ cluster, os, onToggleStretched }: ClusterColumnP
 
   return (
     <section className="panel flex min-w-[200px] flex-col gap-3">
-      <h3 className="break-words text-xl font-semibold text-slate-700 dark:text-slate-200">
-        {cluster.cluster}
-      </h3>
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="break-words text-xl font-semibold text-slate-700 dark:text-slate-200">
+          {cluster.cluster}
+        </h3>
+        <button
+          type="button"
+          onClick={() => onSelectCluster(cluster.cluster)}
+          className="shrink-0 rounded px-2 py-0.5 text-xs font-semibold text-primary-600 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-400 dark:hover:bg-surface-800"
+        >
+          {tRci('detail.title')}
+        </button>
+      </div>
 
       <Row label={t('stats.esx')} value={fmtInt(cluster.hostCount, loc)} />
       <Row label={t('stats.vms')} value={fmtInt(cluster.vmCount, loc)} />

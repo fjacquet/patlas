@@ -13,10 +13,12 @@ import {
 } from '@/store/snapshotStore'
 import type { AccountingMode, DrMode } from '@/types/estate'
 import { AllocationSliders } from '../allocation/AllocationSliders'
+import { ClusterDetail } from '../cluster/ClusterDetail'
 import { DrSimPanel } from '../dr/DrSimPanel'
 import { AccountingModeToggle } from './AccountingModeToggle'
 import { CpuReadyPanel } from './CpuReadyPanel'
 import { GlobalSummaryCard } from './GlobalSummaryCard'
+import { OperationalInsights } from './OperationalInsights'
 import { OsBreakdownDonut } from './OsBreakdownDonut'
 import { PerClusterColumns } from './PerClusterColumns'
 
@@ -67,6 +69,8 @@ export function GlobalDashboard() {
   const scenario = useSnapshotStore(selectScenario)
   const setScenario = useSnapshotStore(selectSetScenario)
   const [drMode, setDrMode] = useState<DrMode>('host')
+  // RCI drill: in-app view state (like `mode`) — NOT a router, NOT a 2nd memo.
+  const [selectedCluster, setSelectedCluster] = useState<string | null>(null)
   // Toggle one cluster's stretched membership. Set is REPLACED (never
   // mutated) so Zustand's Object.is fires and `useEstateView` recomputes.
   const onToggleStretched = (cluster: string) => {
@@ -91,6 +95,17 @@ export function GlobalDashboard() {
 
   const capturedDate = snapshot.capturedAt.toLocaleDateString(i18n.language)
 
+  // Drill: a cluster-detail screen replaces the dashboard body when a
+  // cluster is selected (one-screen-fit, export-ready for Phase 10).
+  const detail = selectedCluster ? view.clusterDetail.get(selectedCluster) : undefined
+  if (detail) {
+    return (
+      <ErrorBoundary FallbackComponent={DashboardError}>
+        <ClusterDetail detail={detail} onBack={() => setSelectedCluster(null)} />
+      </ErrorBoundary>
+    )
+  }
+
   return (
     <main className="flex-1 overflow-y-auto p-8">
       <ErrorBoundary FallbackComponent={DashboardError}>
@@ -107,11 +122,13 @@ export function GlobalDashboard() {
           </p>
           <AllocationSliders ratios={ratios} onChange={setRatios} />
           <GlobalSummaryCard globals={view.globals} mode={mode} capturedDate={capturedDate} />
+          <OperationalInsights insights={view.operationalInsights} />
           <OsBreakdownDonut osBreakdown={view.osBreakdown} />
           <PerClusterColumns
             clusters={view.clusters}
             vmsByCluster={view.vmsByCluster}
             onToggleStretched={onToggleStretched}
+            onSelectCluster={setSelectedCluster}
           />
           <CpuReadyPanel globals={view.globals} clusters={view.clusters} />
           {/* 2xl (48px) major break before the DR panel (gap-6 24px + mt-6 24px). */}

@@ -58,6 +58,14 @@
      requirements. -->
 
 
+### Rich Cluster / Host / ESX Intelligence (Phase 5 — analytics-core replan)
+
+- [ ] **RCI-01**: User sees RVTools-Analyser-grade operational insights (realized vCPU:pCPU overcommit, core-weighted avg CPU %, host-mem-weighted avg memory %, powered-on/off/suspended/template breakdown, provisioned-vs-in-use, datastore footprint, guest data, total cores/host-memory) at BOTH estate scope and per-cluster — every value calculated from parsed RVTools columns, nothing invented
+- [ ] **RCI-02**: User can open a dedicated one-window Hosts/ESX view (estate host-rollup + expandable per-cluster host lists) showing per-host capacity/utilization, ESXi version, fault domain, and host model/vendor as plain factual text (no lifecycle verdict)
+- [ ] **RCI-03**: User sees the estate "Operational Insights" tile row on the dashboard alongside the shipped GlobalSummaryCard
+- [ ] **RCI-04**: A metric that cannot be derived from the export (e.g. guest data when vPartition is absent) renders a factual em-dash sentinel, never an invented 0
+- [ ] **RCI-05**: User clicks a dashboard cluster card and drills into a dedicated single-cluster detail screen showing that cluster's full metric set, laid out one-screen-fit (export-ready so Phase 10 = one PPTX slide per cluster), with a back affordance
+
 ### Allocated Resources
 
 - [ ] **ALC-01**: User can adjust CPU and RAM allocation ratios via sliders, with named presets (1:1, 4:1, 8:1, VDI 10:1)
@@ -201,6 +209,11 @@
 | STR-01 | Phase 4 | Pending |
 | STR-02 | Phase 4 | Pending |
 | STR-03 | Phase 4 | Pending |
+| RCI-01 | Phase 5 | Pending |
+| RCI-02 | Phase 5 | Pending |
+| RCI-03 | Phase 5 | Pending |
+| RCI-04 | Phase 5 | Pending |
+| RCI-05 | Phase 5 | Pending |
 | ALC-01 | Phase 4 | Pending |
 | ALC-02 | Phase 4 | Pending |
 | ALC-03 | Phase 4 | Pending |

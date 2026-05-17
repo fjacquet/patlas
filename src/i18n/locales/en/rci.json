@@ -1,0 +1,51 @@
+{
+  "hosts": {
+    "title": "Hosts",
+    "rollup": {
+      "title": "Estate hosts",
+      "hosts": "Hosts",
+      "cores": "Physical cores",
+      "memMib": "Host memory (MiB)",
+      "avgCpu": "Avg CPU %",
+      "avgMem": "Avg memory %",
+      "poweredOnVms": "Powered-on VMs"
+    },
+    "col": {
+      "host": "Host",
+      "cluster": "Cluster",
+      "cores": "Cores",
+      "memMib": "Memory (MiB)",
+      "cpuPct": "CPU %",
+      "ramPct": "RAM %",
+      "poweredOnVms": "Powered-on VMs",
+      "esxVersion": "ESXi version",
+      "faultDomain": "Fault domain",
+      "model": "Model",
+      "vendor": "Vendor"
+    }
+  },
+  "insights": {
+    "title": "Operational insights",
+    "overcommit": "vCPU : pCPU",
+    "avgCpu": "Avg CPU %",
+    "avgMem": "Avg memory %",
+    "powerState": "Power state",
+    "provisioned": "Provisioned (MiB)",
+    "inUse": "In use (MiB)",
+    "footprint": "Datastore footprint (MiB)",
+    "guestData": "Guest data (MiB)",
+    "totalCores": "Total physical cores",
+    "totalMem": "Total host memory (MiB)",
+    "power": {
+      "on": "{{count}} on",
+      "off": "{{count}} off",
+      "suspended": "{{count}} suspended",
+      "template": "{{count}} templates"
+    }
+  },
+  "detail": {
+    "title": "Cluster detail",
+    "back": "Back to dashboard"
+  },
+  "na": "—"
+}
