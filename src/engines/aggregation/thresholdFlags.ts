@@ -29,6 +29,17 @@ export interface ThresholdInput {
   luUsedPct: number
 }
 
+/** RVTools-Analyser-class defaults (D-03): filesystem ≥90% used, datastore
+ *  >85% used, LU >85% used. The single source of truth — the store
+ *  re-exports this; `buildEstateView` uses it as the `opts.thresholds`
+ *  fallback. Pure-engine home so neither the store nor the engine owns a
+ *  duplicate literal. */
+export const DEFAULT_THRESHOLDS: ThresholdInput = {
+  fsUsedPct: 90,
+  dsUsedPct: 85,
+  luUsedPct: 85,
+}
+
 export interface ThresholdFlags {
   /** Per `vpartition[i]` — at/over the filesystem line. */
   fsFlagged: boolean[]

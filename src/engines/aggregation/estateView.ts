@@ -18,9 +18,13 @@ import type { Snapshot } from '@/types/snapshot'
 import { aggregateClusters } from './aggregateClusters'
 import { aggregateGlobals, emptySummary } from './globals'
 import { aggregateGuestData, type GuestData } from './guestData'
+import { networkRollup } from './network'
 import { classifyOsFamily } from './osFamily'
 import { datastoreCountByCluster, perDatastore } from './perDatastore'
 import { perEsx } from './perEsx'
+import { storageByX } from './storageByX'
+import { computeThresholdFlags, DEFAULT_THRESHOLDS, type ThresholdInput } from './thresholdFlags'
+import { relinkBlankClusterDatastores } from './vsanRelink'
 
 /**
  * Pure estate-view assembler — the single composition every dashboard
@@ -82,6 +86,10 @@ export function buildEstateView(
      *  `plannedDrSim`. Defaults to true here (the in-app toggle is
      *  lifted into Plan 02/03's PlanningView). */
     applyPlannedToDr?: boolean
+    /** P9 threshold-alerting lines (D-02). Absent ⇒ RVTools-Analyser
+     *  defaults (mirrors `stretchedClusters ?? new Set()`). Threaded from
+     *  the in-memory thresholds slice via the single `useEstateView` memo. */
+    thresholds?: ThresholdInput
   },
 ): EstateView {
   const stretchedClusters = opts?.stretchedClusters ?? new Set<string>()
@@ -115,6 +123,18 @@ export function buildEstateView(
 
   const globals = aggregateGlobals(clusters, datastoreCount, totalStorageMib)
   const hosts = perEsx(merged.vhost, merged.vinfo, mode)
+
+  // ── P9 (D-07..D-11) — four pure projections composed in THIS single
+  // pass (no second memo). vsan feeds storage's per-cluster attribution;
+  // flags reads the deduped `datastores` + the in-memory thresholds line.
+  const vsan = relinkBlankClusterDatastores(merged.vinfo, merged.vdatastore)
+  const storage = storageByX(merged, mode, vsan)
+  const network = networkRollup(merged)
+  const flags = computeThresholdFlags(
+    merged.vpartition,
+    datastores,
+    opts?.thresholds ?? DEFAULT_THRESHOLDS,
+  )
 
   // OS breakdown — global + per-cluster. `other` is always present even
   // at 0 (a real, visible donut bucket). The accounting mode does not
@@ -301,6 +321,10 @@ export function buildEstateView(
     plannedView,
     plannedDrSim,
     eos,
+    storage,
+    vsan,
+    network,
+    flags,
   }
 }
 
@@ -346,6 +370,42 @@ const EMPTY_EOS: EosProjection = Object.freeze({
   }),
 })
 
+const EMPTY_STORAGE = Object.freeze({
+  byCluster: Object.freeze([]) as never[],
+  byEsx: Object.freeze([]) as never[],
+  byVm: Object.freeze([]) as never[],
+  byDatastore: Object.freeze([]) as never[],
+  capacityByDatastore: Object.freeze([]) as never[],
+  capacityByCluster: Object.freeze([]) as never[],
+  estate: Object.freeze({
+    provisionedMib: mib(0),
+    inUseMib: mib(0),
+    capacityMib: mib(0),
+    usedMib: mib(0),
+    freeMib: mib(0),
+  }),
+})
+
+const EMPTY_VSAN = Object.freeze({
+  attributed: new Map<string, string>(),
+  shared: new Map<string, number>(),
+  unrelinkable: new Set<string>(),
+})
+
+const EMPTY_NETWORK = Object.freeze({
+  vswitches: Object.freeze([]) as never[],
+  dvswitches: Object.freeze([]) as never[],
+  portgroups: Object.freeze([]) as never[],
+  vmPortgroupCount: 0,
+})
+
+const EMPTY_FLAGS = Object.freeze({
+  fsFlagged: Object.freeze([]) as never[],
+  dsFlagged: Object.freeze([]) as never[],
+  luFlagged: Object.freeze([]) as never[],
+  counts: Object.freeze({ fs: 0, ds: 0, lu: 0 }),
+})
+
 /**
  * The valid empty-but-typed view `useEstateView` returns when no snapshot
  * is active. Frozen (modeled on `globals.ts:emptySummary`) so consumers
@@ -369,4 +429,8 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   plannedView: null,
   plannedDrSim: null,
   eos: EMPTY_EOS,
+  storage: EMPTY_STORAGE,
+  vsan: EMPTY_VSAN,
+  network: EMPTY_NETWORK,
+  flags: EMPTY_FLAGS,
 })

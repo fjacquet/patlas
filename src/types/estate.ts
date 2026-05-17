@@ -1,3 +1,11 @@
+// P9 view-model result shapes. Type-only (erased) imports from the pure
+// aggregation engines — no runtime coupling, no cycle (the engines import
+// their input types from here; these are produced in the single
+// `buildEstateView` pass and surfaced on `EstateView`).
+import type { NetworkRollup } from '@/engines/aggregation/network'
+import type { StorageByX } from '@/engines/aggregation/storageByX'
+import type { ThresholdFlags } from '@/engines/aggregation/thresholdFlags'
+import type { VsanRelinkResult } from '@/engines/aggregation/vsanRelink'
 import type { Cores, GHz, GiB, MHz, MiB, Sockets } from '@/engines/units'
 
 /**
@@ -495,6 +503,27 @@ export interface EstateView {
    * `buildEstateView` pass — no second `useMemo` (D-00). A frozen empty
    * projection in `EMPTY_VIEW`; otherwise always present. */
   eos: EosProjection
+  /**
+   * P9 storage-by-X (D-07/D-08) — two-lens (consumption + capacity)
+   * rollups by Cluster/ESX/VM/Datastore. Produced inside the single
+   * `buildEstateView` pass — no second `useMemo`. Frozen-empty in
+   * `EMPTY_VIEW`; otherwise always present. */
+  storage: StorageByX
+  /**
+   * P9 vSAN / blank-`Cluster name` relink result (D-09/D-10) —
+   * attributed / shared-across-N / unrelinkable maps keyed by the
+   * `naa ?? name` datastore key. Same single-pass origin. */
+  vsan: VsanRelinkResult
+  /**
+   * P9 network topology rollup (D-11) — vSwitch/dvSwitch/portgroup/
+   * uplink aggregates; empty when the OPTIONAL network sheets were
+   * absent (factual-degrade). Same single-pass origin. */
+  network: NetworkRollup
+  /**
+   * P9 threshold flags (D-01/D-04) — factual per-row booleans + counts
+   * driven by the in-memory thresholds slice; no verdict/severity/
+   * colour. Same single-pass origin. */
+  flags: ThresholdFlags
 }
 
 /**

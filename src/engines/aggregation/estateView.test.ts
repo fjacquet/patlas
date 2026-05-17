@@ -173,4 +173,18 @@ describe('buildEstateView', () => {
     expect(EMPTY_VIEW.trends).toBeNull()
     expect(EMPTY_VIEW.osBreakdown.other).toBe(0)
   })
+
+  it('P9: storage/vsan/network/flags compose in the single pass and are frozen-empty on EMPTY_VIEW', () => {
+    const view = buildEstateView(snapshot(), 'active')
+    expect(view.storage.estate).toHaveProperty('provisionedMib')
+    expect(Array.isArray(view.storage.byCluster)).toBe(true)
+    expect(view.vsan.attributed instanceof Map).toBe(true)
+    expect(view.network).toHaveProperty('vswitches')
+    expect(view.flags.counts).toEqual({ fs: 0, ds: 0, lu: 0 })
+    expect(EMPTY_VIEW.storage.byDatastore).toEqual([])
+    expect(EMPTY_VIEW.storage.estate.capacityMib as number).toBe(0)
+    expect(EMPTY_VIEW.vsan.unrelinkable.size).toBe(0)
+    expect(EMPTY_VIEW.network.vmPortgroupCount).toBe(0)
+    expect(EMPTY_VIEW.flags.counts).toEqual({ fs: 0, ds: 0, lu: 0 })
+  })
 })

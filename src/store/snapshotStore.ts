@@ -1,33 +1,18 @@
 import { create } from 'zustand'
+import { DEFAULT_THRESHOLDS, type ThresholdInput } from '@/engines/aggregation/thresholdFlags'
 import type { DrScenario } from '@/types/estate'
 import type { ReleasedTrendAggregate, Snapshot } from '@/types/snapshot'
+
+/** Store-public alias of the pure-engine threshold shape (single source of
+ *  truth lives in `engines/aggregation/thresholdFlags`). Re-exported so
+ *  existing store consumers keep importing it from here. */
+export type ThresholdConfig = ThresholdInput
+export { DEFAULT_THRESHOLDS }
 
 const EMPTY_SCENARIO = (): DrScenario => ({
   failedHosts: new Set(),
   failedSites: new Set(),
 })
-
-/**
- * P9 threshold-alerting config (D-01..D-04). `fsUsedPct` = guest filesystem
- * used-% line; `dsUsedPct` = datastore used-% line; `luUsedPct` = NAA-keyed
- * logical-unit used-% line (D-03: LU semantic = a second datastore-used-%
- * line, RVTools-Analyser-class defaults; all user-editable at runtime).
- * In-memory inputs only — never persisted.
- */
-export interface ThresholdConfig {
-  fsUsedPct: number
-  dsUsedPct: number
-  luUsedPct: number
-}
-
-/** RVTools-Analyser-class defaults (D-03): filesystem ≥90% used, datastore
- *  >85% used, LU >85% used. Single source of truth — reused by `clearAll`
- *  and the `buildEstateView` opts default (plan 09-03 task 3). */
-export const DEFAULT_THRESHOLDS: ThresholdConfig = {
-  fsUsedPct: 90,
-  dsUsedPct: 85,
-  luUsedPct: 85,
-}
 
 /**
  * Multi-snapshot, inputs-only Zustand store.
