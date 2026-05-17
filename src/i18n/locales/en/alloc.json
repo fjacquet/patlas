@@ -12,5 +12,17 @@
     "8to1": "8:1",
     "vdi10to1": "VDI 10:1"
   },
-  "echo": "CPU {{cpu}} · RAM {{ram}}"
+  "echo": "CPU {{cpu}} · RAM {{ram}}",
+  "planned": {
+    "heading": "Capacity planning — what-if",
+    "presetGroup": "Planned ratio presets",
+    "cpuLabel": "Planned CPU ratio (vCPU : pCPU)",
+    "ramLabel": "Planned RAM ratio",
+    "echo": "Planned lens — applies {{cpu}} CPU / {{ram}} RAM. Not the measured value.",
+    "measuredCaption": "Measured ratio — calculated from this snapshot (see Dashboard › Operational Insights).",
+    "drSlotHeading": "DR simulation — what-if",
+    "drSlotPending": "The reworked DR-sim panel lands on this surface in a following plan.",
+    "emptyHeading": "No snapshot loaded",
+    "emptyBody": "Load a vCenter snapshot from the sidebar to use the capacity-planning lens."
+  }
 }
