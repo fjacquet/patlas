@@ -75,6 +75,7 @@
     "usedMib": "Utilisé (Mio)",
     "usedRatio": "Utilisé %",
     "overProvisionRatio": "Ratio de surprovisionnement",
-    "sharedDuplicateCount": "Copies partagées"
+    "sharedDuplicateCount": "Copies partagées",
+    "eolFrom": "Fin de support"
   }
 }
