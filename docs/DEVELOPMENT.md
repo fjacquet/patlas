@@ -103,7 +103,7 @@ These are non-negotiable for new code:
   compute the same thing, the second imports from the first.
 - **`src/engines/**` are pure functions** — no React, no DOM, no Zustand, no Zod.
   Zod is allowed *only* at the parser boundary. Engines are Vitest-gated ≥75%.
-- **The Zustand store holds inputs only.** `src/store/datasetStore.ts` keeps an
+- **The Zustand store holds inputs only.** `src/store/snapshotStore.ts` keeps an
   immutable `Map<id, Snapshot>` and no cached aggregates (a deliberate deviation
   from the sibling vsizer project).
 - **`useEstateView` is the one place `useMemo` lives.** `src/hooks/useEstateView.ts`
@@ -153,10 +153,11 @@ Use Conventional-Commit-style types (`feat`, `fix`, `docs`, `test`, `chore`, …
 
 ## PR process
 
-There is no PR or issue template committed to the repository and no CI lint/test
-enforcement workflow — `.github/workflows/static.yml` only builds and deploys the
-static site to GitHub Pages. Quality gates are therefore the contributor's
-responsibility before pushing:
+There is no PR or issue template committed to the repository. CI enforces quality
+gates: `.github/workflows/static.yml` runs typecheck → lint → test → build (and
+supply-chain, audit, OSV, and bundle-size gates) on every push and PR to `main`
+before deploying the static site to GitHub Pages. Run the same gates locally
+before pushing:
 
 - Run `npm run typecheck`, `npx @biomejs/biome check .`, and `npm run test:run` — all
   must pass.
