@@ -19,7 +19,8 @@
     "format": "biome format --write .",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "sync:eos": "node scripts/sync-eos.mjs"
   },
   "dependencies": {
     "@tanstack/react-table": "8.21.3",
