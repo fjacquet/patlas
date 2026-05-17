@@ -12,7 +12,8 @@ A user drops a RVTools workbook and walks away with a polished, shareable HTML r
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Capacity-planning lens — separate, explicitly-labelled "planned" what-if surface (Personal CPU/RAM ratios via presets→editable numeric, in-memory only) distinct from the realized "measured" ratio — *Validated in Phase 6: Allocation & DR (re-derived); realized ratio satisfied by Phase 5 RCI-01 (G2/OPEN-1)*
+- [x] Disaster Recovery simulation — exactly two modes (Server loss + Site loss), physical CPU/RAM impact, survivor verdict vs physical headroom, factual caveats (no confidence verdict) — *Validated in Phase 6: Allocation & DR (re-derived) (G3; supersedes the original cluster/vCenter-loss design)*
 
 ### Active
 
@@ -20,8 +21,6 @@ A user drops a RVTools workbook and walks away with a polished, shareable HTML r
 - [ ] Detailed inventory with tree views (cluster → ESX → VM), sortable tables, datastore views
 - [ ] Multi-vCenter aggregation — load several RVTools workbooks, treat as one logical estate
 - [ ] OS End-of-Support forecast — Linux / Windows / ESX EOS dates, 3 / 6 / 9 / 12-month at-risk forecast
-- [ ] Allocated-resource calculation with configurable CPU/RAM ratios and custom failover scenarios
-- [ ] Disaster Recovery simulation — mark vCenter(s) / cluster(s) as failed, recompute survivor capacity
 - [ ] Stretched-cluster management — Étendu / Stretched pill on clusters drives DR reservation (CPU + RAM) and feeds DR sim
 - [ ] In-session trends — drop multiple monthly exports, see evolution of clusters / ESX / VMs / vCPU / vRAM / disks
 - [ ] HTML report export — a single self-contained shareable HTML deliverable
@@ -89,4 +88,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-15 after initialization*
+*Last updated: 2026-05-17 after Phase 6 (Allocation & DR re-derived) complete — 6/10 phases, capacity-planning lens + two-mode physical-impact DR shipped & code-reviewed*

@@ -30,7 +30,13 @@ findings:
   warning: 4
   info: 3
   total: 8
-status: issues_found
+status: resolved
+resolution:
+  fixed: [CR-01, WR-01, WR-02, WR-03, WR-04]
+  deferred: [IN-01, IN-02, IN-03]
+  deferred_reason: Info-severity, out of --fix scope (Critical+Warning only)
+  fix_commits: [fdabb81, 29cd9b2, ab531fc, 25a0a70]
+  verified: "tsc -b clean; vitest 310/310; biome ./src clean; locked decisions D-00..D-12 intact"
 ---
 
 # Phase 6: Code Review Report
