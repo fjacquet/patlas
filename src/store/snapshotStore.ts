@@ -45,16 +45,25 @@ interface SnapshotState {
    */
   stretchedClusters: Set<string>
   /**
-   * DR what-if selection (Phase 4 DRS-01..03). Inputs-only, REPLACED
+   * DR what-if selection (Phase 6 DRX-02..05). Inputs-only, REPLACED
    * never mutated; never persisted (no hash, no localStorage — T-04-13).
    */
   scenario: DrScenario
+  /**
+   * P6 capacity-planning "Personal Ratios" — the user's PLANNED CPU/RAM
+   * overcommit for the explicitly-"planned" what-if lens (PLN-03/D-05).
+   * Defaults CPU 4:1 / RAM 1:1 (the carried ALC-02 intent). Inputs-only,
+   * REPLACED never mutated (Zustand `Object.is`); no persist, no
+   * localStorage, no URL-hash codec (PROJECT.md line 53 / D-06 / T-06-01).
+   */
+  plannedRatios: { cpu: number; ram: number }
   addSnapshot: (s: Snapshot) => void
   removeSnapshot: (id: string) => void
   setActiveSnapshot: (id: string | null) => void
   setSelectedSnapshotIds: (ids: Set<string>) => void
   setStretchedClusters: (clusters: Set<string>) => void
   setScenario: (scenario: DrScenario) => void
+  setPlannedRatios: (r: { cpu: number; ram: number }) => void
   renameVCenter: (id: string, label: string) => void
   setCapturedAt: (id: string, date: Date) => void
   clearAll: () => void
@@ -66,6 +75,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
   selectedSnapshotIds: new Set(),
   stretchedClusters: new Set(),
   scenario: EMPTY_SCENARIO(),
+  plannedRatios: { cpu: 4, ram: 1 },
 
   addSnapshot: (s) =>
     set((state) => {
@@ -113,6 +123,10 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
       },
     }),
 
+  // REPLACE never mutate (Zustand `Object.is`) — a fresh object so
+  // subscribers re-render; no persist, no localStorage (D-06).
+  setPlannedRatios: (r) => set({ plannedRatios: { ...r } }),
+
   renameVCenter: (id, label) =>
     set((state) => {
       const snap = state.snapshots.get(id)
@@ -138,6 +152,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
       selectedSnapshotIds: new Set(),
       stretchedClusters: new Set(),
       scenario: EMPTY_SCENARIO(),
+      plannedRatios: { cpu: 4, ram: 1 },
     }),
 }))
 
@@ -164,3 +179,9 @@ export const selectSetStretchedClusters = (s: SnapshotState): ((c: Set<string>) 
   s.setStretchedClusters
 export const selectScenario = (s: SnapshotState): DrScenario => s.scenario
 export const selectSetScenario = (s: SnapshotState): ((sc: DrScenario) => void) => s.setScenario
+// P6 planned-ratios slice (D-06). Stable refs — never construct here.
+export const selectPlannedRatios = (s: SnapshotState): { cpu: number; ram: number } =>
+  s.plannedRatios
+export const selectSetPlannedRatios = (
+  s: SnapshotState,
+): ((r: { cpu: number; ram: number }) => void) => s.setPlannedRatios
