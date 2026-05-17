@@ -24,5 +24,10 @@ export {
   type StorageConsumptionGroup,
   storageByX,
 } from './storageByX'
+export {
+  computeThresholdFlags,
+  type ThresholdFlags,
+  type ThresholdInput,
+} from './thresholdFlags'
 export { aggregateVmsPerCluster, readinessStats, topReadinessVmsByCluster } from './vinfoMerge'
 export { relinkBlankClusterDatastores, type VsanRelinkResult } from './vsanRelink'
