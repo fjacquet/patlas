@@ -1,0 +1,31 @@
+{
+  "heading": "OS end-of-support forecast",
+  "asOf": "Forecast computed as of {{today}}",
+  "verified": "EOS catalogue verified: {{date}}",
+  "stale": "Catalogue may be outdated",
+  "bucket": {
+    "overdue": "Overdue",
+    "w3": "Within 3 months",
+    "w6": "Within 6 months",
+    "w9": "Within 9 months",
+    "w12": "Within 12 months",
+    "unknown": "Unknown OS"
+  },
+  "drill": "Show {{label}} entities ({{count}})",
+  "reconcile": "{{total}} entities — {{bucketed}} bucketed",
+  "split": "VMs: {{vms}} · ESXi hosts: {{hosts}}",
+  "unknownHeading": "Unrecognized OS strings",
+  "occurrences": "{{count}} occurrences",
+  "esxiHeading": "ESXi hosts",
+  "col": {
+    "vmName": "VM",
+    "cluster": "Cluster",
+    "host": "Host",
+    "os": "OS",
+    "eolFrom": "End of support",
+    "esxVersion": "ESXi version",
+    "major": "Major version",
+    "majorEol": "End of support",
+    "patchEol": "Patch end of support"
+  }
+}

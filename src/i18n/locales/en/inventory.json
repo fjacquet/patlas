@@ -4,7 +4,8 @@
     "dashboard": "Dashboard",
     "inventory": "Inventory",
     "hosts": "Hosts",
-    "planning": "Planning"
+    "planning": "Planning",
+    "eos": "OS end-of-support"
   },
   "tab": {
     "label": "Object type",

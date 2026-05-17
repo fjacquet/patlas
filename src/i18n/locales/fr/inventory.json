@@ -4,7 +4,8 @@
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
     "hosts": "Hôtes",
-    "planning": "Planification"
+    "planning": "Planification",
+    "eos": "Fin de support OS"
   },
   "tab": {
     "label": "Type d'objet",

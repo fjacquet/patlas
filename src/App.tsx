@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Toaster } from 'sonner'
 import { GlobalDashboard } from './components/dashboard/GlobalDashboard'
+import { EosView } from './components/eos/EosView'
 import { FallbackError } from './components/FallbackError'
 import { HostsView } from './components/hosts/HostsView'
 import { InventoryView } from './components/inventory/InventoryView'
@@ -41,6 +42,8 @@ function App() {
               <HostsView />
             ) : activeView === 'planning' ? (
               <PlanningView />
+            ) : activeView === 'eos' ? (
+              <EosView />
             ) : (
               <GlobalDashboard />
             )}
