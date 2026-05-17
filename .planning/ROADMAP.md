@@ -193,8 +193,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
+**Wave 1**
 - [ ] 08-01-PLAN.md — pure trends engine (DD-A A2 per-date aggregation, DD-B B1 deltas, D-05 ordinal, DD-C carry) composed into the single buildEstateView pass
 - [ ] 08-02-PLAN.md — releaseRawRows store mutation + latest-first non-blocking warm-up + LineChart registration/bundle re-gate
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 08-03-PLAN.md — trends view + dashboard sparklines + inline capturedAt edit + EN/FR i18n + REQUIREMENTS reconciliation
 **UI hint**: yes
 **vsizer reuse**: nothing direct (new engine module); reuses `<Chart>` from Phase 2 and the aggregation pipeline from Phase 2
