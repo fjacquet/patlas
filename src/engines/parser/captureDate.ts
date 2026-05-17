@@ -8,7 +8,26 @@ import type { ParsedWorkbook } from './parseXlsx'
  */
 
 // `2026-01-07` or `2026-01-07_10.23.35` / `2026-01-07T10:23:35`.
-const ISO_DATE_RE = /(\d{4})-(\d{2})-(\d{2})(?:[_T](\d{2})[.:](\d{2})[.:](\d{2}))?/
+// Exported so the warm-up ordering (plan 08-02) reuses it instead of
+// duplicating the regex (DRY is binding — CLAUDE.md engineering principles).
+export const ISO_DATE_RE = /(\d{4})-(\d{2})-(\d{2})(?:[_T](\d{2})[.:](\d{2})[.:](\d{2}))?/
+
+/**
+ * Pure: the ISO date(+time) embedded in a filename, or `null` when absent
+ * or an overflow date (`2026-13-45` parses to a real but wrong Date — the
+ * ISO round-trip rejects the rollover). No clock, no I/O.
+ */
+export const filenameIsoDate = (filename: string): Date | null => {
+  const m = filename.match(ISO_DATE_RE)
+  if (!m) return null
+  const [, y, mo, d, h, mi, s] = m
+  const iso = `${y}-${mo}-${d}T${h ?? '00'}:${mi ?? '00'}:${s ?? '00'}Z`
+  const parsed = new Date(iso)
+  if (!Number.isNaN(parsed.getTime()) && parsed.toISOString().startsWith(`${y}-${mo}-${d}`)) {
+    return parsed
+  }
+  return null
+}
 
 const findSheet = (sheets: ParsedWorkbook, name: string) =>
   sheets.sheets.get(name) ?? sheets.sheets.get(name.toLowerCase())
@@ -83,17 +102,8 @@ export const inferCaptureDate = (
 ): Date => {
   if (explicit) return explicit
 
-  const m = filename.match(ISO_DATE_RE)
-  if (m) {
-    const [, y, mo, d, h, mi, s] = m
-    const iso = `${y}-${mo}-${d}T${h ?? '00'}:${mi ?? '00'}:${s ?? '00'}Z`
-    const parsed = new Date(iso)
-    // Reject overflow (`new Date('2026-13-45')` parses to a real but wrong
-    // Date; round-trip the ISO to detect the rollover).
-    if (!Number.isNaN(parsed.getTime()) && parsed.toISOString().startsWith(`${y}-${mo}-${d}`)) {
-      return parsed
-    }
-  }
+  const fromFilename = filenameIsoDate(filename)
+  if (fromFilename) return fromFilename
 
   // RVTools 4.x columnar: `xlsx creation datetime` (first vCenter row).
   const columnar = columnarMeta(sheets)

@@ -11,8 +11,11 @@ export type {
   OperationalInsights,
   OsBreakdown,
   OsFamily,
-  TimelinePoint,
   TopReadinessVm,
+  TrendDelta,
+  TrendHeadline,
+  TrendPoint,
+  TrendSeries,
 } from './estate'
 export type {
   ParseError,

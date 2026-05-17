@@ -1,4 +1,4 @@
-import type { Cores, GHz, MHz, MiB, Sockets } from '@/engines/units'
+import type { Cores, GHz, GiB, MHz, MiB, Sockets } from '@/engines/units'
 
 /**
  * Estate aggregate types — ported from vsizer `types/cluster.ts` +
@@ -328,13 +328,68 @@ export interface OsBreakdown {
 }
 
 /**
- * Phase-4 forward-compat placeholder. The field EXISTS on `EstateView`
- * (typed `TimelinePoint[] | null`) and is `null` in Phase 2 — Phase 4
- * populates it without changing the dashboard component contract.
+ * P8 In-Session Trends. The headline metrics tracked across snapshots —
+ * a `Pick` of the shipped `GlobalSummary`/`OperationalInsights` fields
+ * (calc-from-real-data; every value is the shipped aggregate, never a new
+ * derivation). Branded units preserved (no raw `* 1.048576`).
  */
-export interface TimelinePoint {
-  capturedAt: Date
+export interface TrendHeadline {
   vmCount: number
+  poweredOnVms: number
+  hostCount: number
+  clusterCount: number
+  vcpuAllocated: Cores
+  vramAllocatedMib: MiB
+  totalStorageMib: MiB
+}
+
+/**
+ * One timeline point (DD-A A2 — one `capturedAt` calendar day; same-day
+ * multi-vCenter files are spatially merged via the shipped merge engine
+ * first, so the point's counts reconcile with the dashboard for that day).
+ * `metadata` is an array — a merged point legitimately spans multiple
+ * vCenters (criterion 6). `ordinal` is non-null only for D-05
+ * undeterminable-date points (positioned by stable load order, never a
+ * fabricated Date).
+ */
+export interface TrendPoint {
+  date: Date
+  ordinal: number | null
+  metadata: { vCenterLabel: string; rvtoolsVersion: string }[]
+  headline: TrendHeadline
+  byCluster: Map<string, TrendHeadline>
+}
+
+/**
+ * Signed difference between two consecutive points' headlines (DD-B B1 —
+ * count-deltas on existing aggregate fields; branded units via the shipped
+ * converters). A field is `null` when either side is `null` (presentation
+ * of the em-dash sentinel is the UI layer's job, not the engine's).
+ */
+export interface TrendDelta {
+  from: Date
+  to: Date
+  vmCount: number
+  poweredOnVms: number
+  hostCount: number
+  clusterCount: number
+  vcpuAllocated: number
+  vramAllocatedGib: GiB
+  totalStorageGib: GiB
+}
+
+/**
+ * The temporal trend projection. Produced inside the single
+ * `buildEstateView` pass (composed there, never in a component or a
+ * separate memoised hook — the one sanctioned memo is the
+ * `useEstateView` boundary). `null` when fewer than 2 snapshots are
+ * selected (the Phase-2 degenerate case). `orderInferred` drives the
+ * factual D-05 caption when any point is ordinal-positioned.
+ */
+export interface TrendSeries {
+  points: TrendPoint[]
+  deltas: TrendDelta[]
+  orderInferred: boolean
 }
 
 /**
@@ -403,8 +458,11 @@ export interface EstateView {
   /** Estate-wide OS breakdown. */
   osBreakdown: OsBreakdown
   accountingMode: AccountingMode
-  /** Phase-4 forward-compat — always `null` in Phase 2. */
-  trends: TimelinePoint[] | null
+  /**
+   * P8 In-Session Trends. Produced inside the single `buildEstateView`
+   * pass (composed there, never in a component or a separate memoised
+   * hook). `null` when fewer than 2 snapshots are selected. */
+  trends: TrendSeries | null
   /** Distinct vCenters in the merged estate (DR vCenter-loss picker). */
   vcenters: { viSdkUuid: string; label: string }[]
   /** DR what-if result. `null` when no component is marked failed
