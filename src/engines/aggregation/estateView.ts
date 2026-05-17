@@ -55,6 +55,11 @@ const emptyBreakdown = (): OsBreakdown => ({ windows: 0, linux: 0, other: 0 })
 export function buildEstateView(
   merged: MergedEstate,
   mode: AccountingMode,
+  /** Reference clock for the EOS forecast (D-07). Injected by the caller —
+   *  the only sanctioned site is the `useEstateView` hook boundary, which
+   *  passes the workbook-load wall clock. Required so this engine stays a
+   *  pure, deterministic function of its inputs (no in-engine clock). */
+  today: Date,
   opts?: {
     stretchedClusters?: ReadonlySet<string>
     allocRatios?: { cpuRatio: number; ramRatio: number }
@@ -253,13 +258,13 @@ export function buildEstateView(
   // P7 EOS forecast — composed in this single pass (no second memo site,
   // D-00; the only memo is the `useEstateView` hook). `buildEosProjection`
   // iterates the merged rows internally — the same operation-class as the
-  // `classifyOsFamily` vinfo pass above. `today` is the workbook-load wall
-  // clock injected here at the boundary (D-07); the engine stays clock-free.
+  // `classifyOsFamily` vinfo pass above. `today` is the injected reference
+  // clock (D-07) — never constructed here, so this engine stays pure.
   const eos = buildEosProjection({
     vinfo: merged.vinfo,
     vhost: merged.vhost,
     catalogue: loadEosCatalogue(),
-    today: new Date(),
+    today,
   })
 
   return {

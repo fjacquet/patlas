@@ -10,8 +10,11 @@ import { buildEstateView as buildEstateViewMerged, EMPTY_VIEW } from './estateVi
 // Phase-4 contract: `buildEstateView` consumes the MERGED bundle. These
 // shipped tests still drive it from a single `Snapshot`; route through the
 // production merge path (single snapshot = degenerate merge case).
+// Fixed reference clock so the EOS sub-projection is deterministic (D-07:
+// `today` is now an injected param, never an in-engine clock construction).
+const TEST_TODAY = new Date('2026-01-01T00:00:00Z')
 const buildEstateView = (snap: Snapshot, mode: AccountingMode) =>
-  buildEstateViewMerged(mergeSnapshotsToEstate([snap]), mode)
+  buildEstateViewMerged(mergeSnapshotsToEstate([snap]), mode, TEST_TODAY)
 
 const host = (over: Partial<VHostRow>): VHostRow => ({
   hostName: 'esx-1',
