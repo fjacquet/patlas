@@ -168,7 +168,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. A user views the `lastVerified` date on the EOS catalogue and confirms it is within 90 days of the deploy date (CI warns when older)
   5. The OS normalizer achieves <5 % unknown-OS rate on a fixture of 50+ real OS strings harvested from existing RVTools exports
   6. `engines/eos/` ships with â¥75 % Vitest coverage including the RHEL-8-four-variants and Oracle-Linux-three-variants normalization tests
-**Plans**: TBD
+**Plans**: 3 plans
+
+- [ ] 07-01-PLAN.md — build-time catalogue spine (Zod schema, sync:eos, parse-once boundary, CI freshness)
+- [ ] 07-02-PLAN.md — pure EOS engines + real-string fixtures (normalizeOs, classifyEsxi, bucketEos)
+- [ ] 07-03-PLAN.md — EstateView wiring + 5th eos ViewToggle + EosView + EN/FR i18n
 **UI hint**: yes
 **vsizer reuse**: nothing direct (new engine module); reuses `utils/format.ts` and `<Chart>` infrastructure from Phase 2
 **Pitfalls owned**: Moderate-6 (OS naming variants, `endoflife.date` catalogue source, lifecycle bucketing with "overdue" bucket, extended-support tiers surfaced with asterisks, `lastVerified` CI warning), Minor-4 (case-insensitive OS string matching with original preserved for display)
@@ -233,7 +237,7 @@ Phases execute in numeric order: 1 â 2 â 3 â 4 â 5 â 6 
 | 4. Multi-vCenter Merge & Factual Labels | 2/2 | Complete (re-derived) — 04-01 merge baseline + 04-05 G1 rework, real-file-validated | 2026-05-17 |
 | 5. Rich Cluster / Host / ESX Intelligence | 2/2 | Complete — data layer + UI, real-file-validated | 2026-05-17 |
 | 6. Allocation & DR (re-derived) | 3/3 | Complete   | 2026-05-17 |
-| 7. OS End-of-Support Forecast | 0/TBD | Not started | - |
+| 7. OS End-of-Support Forecast | 0/3 | Not started | - |
 | 8. In-Session Trends | 0/TBD | Not started | - |
 | 9. Storage / Network / Detailed Views + Threshold Alerting | 0/TBD | Not started (NEW; scope per OPEN-2/3) | - |
 | 10. HTML + PPTX Exports & Deploy | 0/TBD | Not started | - |
