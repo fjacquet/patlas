@@ -1,6 +1,20 @@
 import type { Bytes, MiB } from '@/engines/units'
+import type { TrendHeadline } from './estate'
 import type { VHostRow } from './vhost'
 import type { VInfoRow } from './vinfo'
+
+/**
+ * The aggregated trend facts that SURVIVE when a snapshot's raw rows are
+ * released (DD-C / Critical-5). Once the rows are gone this is the only
+ * remaining INPUT fact for that timeline point — not a cached derivation
+ * of live state (A3 resolved interpretation). In-memory only; never
+ * persisted (privacy invariant). Populated by the `releaseRawRows` store
+ * mutation (plan 08-02); consumed by `buildTrendSeries` (plan 08-01).
+ */
+export interface ReleasedTrendAggregate {
+  headline: TrendHeadline
+  byCluster: Map<string, TrendHeadline>
+}
 
 /**
  * A single parsed RVTools workbook, normalized to vatlas' canonical shape.
@@ -37,6 +51,19 @@ export interface Snapshot {
   vdatastore: VDatastoreRow[]
   vpartition: VPartitionRow[]
   parseErrors: ParseError[]
+  /**
+   * DD-C: `true` once this snapshot's raw rows have been released to cap
+   * memory when > 4 snapshots are loaded. The active/latest snapshot is
+   * never released. Set by `releaseRawRows` (plan 08-02).
+   */
+  rawReleased?: boolean
+  /**
+   * The surviving aggregated trend facts for a released snapshot. `null`/
+   * absent while raw rows are present; populated by `releaseRawRows` so
+   * `buildTrendSeries` keeps the point without re-aggregating absent rows
+   * (DD-C / Pitfall 4).
+   */
+  releasedAggregate?: ReleasedTrendAggregate | null
 }
 
 /** A datastore row from the RVTools `vDatastore` sheet. */
