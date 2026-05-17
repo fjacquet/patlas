@@ -36,7 +36,11 @@ const replaceClusterHosts = (
   n: number,
 ): Set<string> => {
   const others = new Set([...set].filter((h) => !clusterHosts.includes(h)))
-  for (const h of clusterHosts.slice(0, Math.max(0, Math.min(n, clusterHosts.length)))) {
+  // WR-02: a blank/NaN stepper entry must not silently clear the cluster's
+  // failed hosts (`slice(0, NaN)` → `[]`). Coerce non-finite input to 0
+  // here so EVERY caller is bounded, not just the panel handler.
+  const count = Number.isFinite(n) ? n : 0
+  for (const h of clusterHosts.slice(0, Math.max(0, Math.min(count, clusterHosts.length)))) {
     others.add(h)
   }
   return others
