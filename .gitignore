@@ -30,3 +30,4 @@ src/__fixtures__/rvtools-inventory-10k.xlsx
 *.njsproj
 *.sln
 *.sw?
+.env
