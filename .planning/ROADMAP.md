@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Inventory Navigation** - Virtualised cluster â ESX â VM tree with sortable/filterable tables and CSV export (completed 2026-05-16)
 - [x] **Phase 4: Multi-vCenter Merge & Factual Labels** - REDEFINED (analytics-core replan): validated merge engine spine (kept) + per-vCenter/RVTools labels + stretched as the user's declaration with FACTUAL site-data (G1). Its allocation/DR-UI parts are superseded by Phase 6.
 - [x] **Phase 5: Rich Cluster / Host / ESX Intelligence** - NEW: deep per-cluster card + one-window ESX Summary + operational insights (realized CPU overcommit, avg CPU/mem, ESXi & hardware lifecycle, powered/off/susp/template, footprints) — COMPLETE 2026-05-17, real-file-validated
-- [ ] **Phase 6: Allocation & DR (re-derived)** - NEW: realized consolidation displayed (G2) + separate capacity-planning lens (Personal Ratios + Custom Failover, OPEN-1) + DR server/site loss, physical impact (G3); reuses kept drSim engine
+- [x] **Phase 6: Allocation & DR (re-derived)** - NEW: realized consolidation displayed (G2) + separate capacity-planning lens (Personal Ratios + Custom Failover, OPEN-1) + DR server/site loss, physical impact (G3); reuses kept drSim engine (completed 2026-05-17)
 - [ ] **Phase 7: OS End-of-Support Forecast** - Bundled endoflife.date catalogue, 3/6/9/12-month at-risk with drill-down
 - [ ] **Phase 8: In-Session Trends** - Multi-snapshot timelines, per-cluster sparklines, delta panel, temporal X-axis
 - [ ] **Phase 9: Storage / Network / Detailed Views + Threshold Alerting** - NEW: storage by cluster/ESX/VM/datastore, ports/switches, disk/partition threshold alerting (scope per OPEN-2/3)
@@ -150,7 +150,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] 06-01-PLAN.md — Engine + contract spine: rework `drSim` to two-mode/physical-impact/no-confidence, in-memory `plannedRatios` slice, planned projection through the single memo, drSim tests rewritten ≥75%
 - [x] 06-02-PLAN.md — Planning surface: 4th ViewToggle segment + PlanningView shell + preset+numeric in-memory PlannedRatiosControl (kills the slider/URL-hash) + Dashboard cleanup + EN/FR i18n
-- [ ] 06-03-PLAN.md — DR rework UI: two-mode DrSimPanel (Server stepper + Site picker/lost-line + physical impact + Custom-Failover toggle, confidence removed) wired into PlanningView + dr.json EN/FR + presenter test
+- [x] 06-03-PLAN.md — DR rework UI: two-mode DrSimPanel (Server stepper + Site picker/lost-line + physical impact + Custom-Failover toggle, confidence removed) wired into PlanningView + dr.json EN/FR + presenter test
 **UI hint**: yes
 **vsizer reuse**: keep shipped `engines/drSim/runScenario.ts` + `allocate.ts` + `aggregateClusters` per-site math — rework modes/metric, do NOT rewrite from zero
 **Pitfalls owned**: Moderate-10 (DR trust — assumptions panel + caveats, kept); G2/G3 anti-patterns (no invented ratios; DR units = server/site with physical impact)
@@ -232,7 +232,7 @@ Phases execute in numeric order: 1 â 2 â 3 â 4 â 5 â 6 
 | 3. Inventory Navigation | 3/3 | Complete | 2026-05-16 |
 | 4. Multi-vCenter Merge & Factual Labels | 2/2 | Complete (re-derived) — 04-01 merge baseline + 04-05 G1 rework, real-file-validated | 2026-05-17 |
 | 5. Rich Cluster / Host / ESX Intelligence | 2/2 | Complete — data layer + UI, real-file-validated | 2026-05-17 |
-| 6. Allocation & DR (re-derived) | 2/3 | In progress — 06-02 Planning surface done | - |
+| 6. Allocation & DR (re-derived) | 3/3 | Complete   | 2026-05-17 |
 | 7. OS End-of-Support Forecast | 0/TBD | Not started | - |
 | 8. In-Session Trends | 0/TBD | Not started | - |
 | 9. Storage / Network / Detailed Views + Threshold Alerting | 0/TBD | Not started (NEW; scope per OPEN-2/3) | - |

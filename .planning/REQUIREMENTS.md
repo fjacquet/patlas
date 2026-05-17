@@ -93,12 +93,12 @@
 > and the survivor verdict vs physical headroom. The kept `engines/drSim` engine
 > is evolved, not rewritten (ROADMAP `vsizer reuse`).
 
-- [ ] **DRX-01**: User simulates **Server loss** — both an individual named-host multi-select AND a per-cluster "N of M hosts in cluster X" quick stepper — and sees survivor cluster capacity, with the shipped reversible/neutral failed-selection UI kept (no red, no alarm icon, no confirmation dialog) (D-07/G3)
-- [ ] **DRX-02**: User simulates **Site loss** — site = the fault-domain value of clusters the user declared stretched (Site A / Site B); the engine removes that site's physical hosts; non-stretched workload physically at the lost site is surfaced as an explicit factual "lost — no DR target" line; no fault-domain metadata ⇒ symmetric 50 % split (D-08)
-- [ ] **DRX-03**: User sees the DR impact as **physical CPU removed (GHz / cores) + physical RAM removed (MiB)** — never vCPU — and the per-survivor verdict computed against **physical** headroom using the reused `Verdict` enum, rendered as a factual word + numbers with no color/traffic-light (D-09)
-- [ ] **DRX-04**: User sees an explicit assumptions panel listing what the sim DOES and DOES NOT model (kept verbatim-pattern from the shipped `assumptions.*`, content updated to the two-mode/physical model) (D-10/Moderate-10)
-- [ ] **DRX-05**: User sees a factual `caveats[]` array on every DR result (i18n key suffixes, no editorial verb, no number); there is NO `confidence` indicator anywhere (the high/med/low clause is removed entirely) (D-10)
-- [ ] **DRX-06**: User sees before/after per-survivor numbers and the evacuated total for every DR scenario; the user may toggle a single in-panel "Apply planned ratios to this scenario" affordance (Custom Failover — NOT a 3rd mode) that re-runs the same Server/Site sim with the planning lens's planned ratios, never conflated with the measured DR result (D-11/DRS-06 intent)
+- [x] **DRX-01**: User simulates **Server loss** — both an individual named-host multi-select AND a per-cluster "N of M hosts in cluster X" quick stepper — and sees survivor cluster capacity, with the shipped reversible/neutral failed-selection UI kept (no red, no alarm icon, no confirmation dialog) (D-07/G3)
+- [x] **DRX-02**: User simulates **Site loss** — site = the fault-domain value of clusters the user declared stretched (Site A / Site B); the engine removes that site's physical hosts; non-stretched workload physically at the lost site is surfaced as an explicit factual "lost — no DR target" line; no fault-domain metadata ⇒ symmetric 50 % split (D-08)
+- [x] **DRX-03**: User sees the DR impact as **physical CPU removed (GHz / cores) + physical RAM removed (MiB)** — never vCPU — and the per-survivor verdict computed against **physical** headroom using the reused `Verdict` enum, rendered as a factual word + numbers with no color/traffic-light (D-09)
+- [x] **DRX-04**: User sees an explicit assumptions panel listing what the sim DOES and DOES NOT model (kept verbatim-pattern from the shipped `assumptions.*`, content updated to the two-mode/physical model) (D-10/Moderate-10)
+- [x] **DRX-05**: User sees a factual `caveats[]` array on every DR result (i18n key suffixes, no editorial verb, no number); there is NO `confidence` indicator anywhere (the high/med/low clause is removed entirely) (D-10)
+- [x] **DRX-06**: User sees before/after per-survivor numbers and the evacuated total for every DR scenario; the user may toggle a single in-panel "Apply planned ratios to this scenario" affordance (Custom Failover — NOT a 3rd mode) that re-runs the same Server/Site sim with the planning lens's planned ratios, never conflated with the measured DR result (D-11/DRS-06 intent)
 
 ### OS End-of-Support Forecast
 
@@ -246,12 +246,12 @@
 | ~~DRS-04~~ | Phase 6 | Re-derived → DRX-04 (assumptions kept) |
 | ~~DRS-05~~ | Phase 6 | Confidence clause dropped (D-10); caveats clause → DRX-05 |
 | ~~DRS-06~~ | Phase 6 | Re-derived → DRX-06 (physical before/after + Custom Failover) |
-| DRX-01 | Phase 6 | Pending |
-| DRX-02 | Phase 6 | Pending |
-| DRX-03 | Phase 6 | Pending |
-| DRX-04 | Phase 6 | Pending |
-| DRX-05 | Phase 6 | Pending |
-| DRX-06 | Phase 6 | Pending |
+| DRX-01 | Phase 6 | Complete |
+| DRX-02 | Phase 6 | Complete |
+| DRX-03 | Phase 6 | Complete |
+| DRX-04 | Phase 6 | Complete |
+| DRX-05 | Phase 6 | Complete |
+| DRX-06 | Phase 6 | Complete |
 | EOS-01 | Phase 5 | Pending |
 | EOS-02 | Phase 5 | Pending |
 | EOS-03 | Phase 5 | Pending |
