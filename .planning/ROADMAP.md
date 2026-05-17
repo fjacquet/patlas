@@ -126,7 +126,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Success Criteria**: see 05-CONTEXT.md decisions + 05-0x-PLAN.md success_criteria (OPEN-2 resolved: hybrid ViewToggle 'Hosts' + cluster-detail drill)
 **Plans**: 2 plans
 
-- [ ] 05-01-PLAN.md — Data layer: parser extension (Powerstate enum/Template/model/vendor/ESXi, regression-gated) + pure operational-insights aggregations (estate + per-cluster, single memo)
+- [x] 05-01-PLAN.md — Data layer: parser extension (Powerstate enum/Template/model/vendor/ESXi, regression-gated) + pure operational-insights aggregations (estate + per-cluster, single memo) — DONE 2026-05-17, 311/311 green
 - [ ] 05-02-PLAN.md — UI: ViewToggle 'Hosts' segment + estate-rollup Hosts view + Operational-Insights row + cluster-card drill → one-screen-fit ClusterDetail (export-ready for P10) + rci i18n
 **UI hint**: yes
 **Pitfalls owned**: realized ratio calculated not invented (G2); lifecycle data factual (no editorial verbs); single-`useMemo` invariant preserved
@@ -219,7 +219,7 @@ Phases execute in numeric order: 1 â 2 â 3 â 4 â 5 â 6 
 | 2. Aggregation & Global Dashboard | 3/3 | Complete   | 2026-05-16 |
 | 3. Inventory Navigation | 3/3 | Complete | 2026-05-16 |
 | 4. Multi-vCenter Merge & Factual Labels | 2/2 | Complete (re-derived) — 04-01 merge baseline + 04-05 G1 rework, real-file-validated | 2026-05-17 |
-| 5. Rich Cluster / Host / ESX Intelligence | 0/2 | Planned — 05-01/05-02, pending execution | - |
+| 5. Rich Cluster / Host / ESX Intelligence | 1/2 | 05-01 data layer DONE (green); 05-02 UI pending | - |
 | 6. Allocation & DR (re-derived) | 0/TBD | Not started (NEW; carries UAT G2/G3, OPEN-1) | - |
 | 7. OS End-of-Support Forecast | 0/TBD | Not started | - |
 | 8. In-Session Trends | 0/TBD | Not started | - |

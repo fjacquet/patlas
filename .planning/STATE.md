@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "05-01 Task 1 committed (parser extension, green). PAUSED before 05-01 Task 2 (operational-insights aggregations)."
+stopped_at: "05-01 COMPLETE (data layer, SUMMARY written, 311/311 green). PAUSED before 05-02 (UI plan)."
 last_updated: "2026-05-17T08:02:18.704Z"
-last_activity: 2026-05-17 -- Phase 05 executing — 05-01 T1 done, T2 pending
+last_activity: 2026-05-17 -- Phase 05: 05-01 done; 05-02 (UI) pending
 progress:
   total_phases: 10
   completed_phases: 4
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-15)
 
 ## Current Position
 
-Phase: 05 (rich-cluster-host-esx-intelligence) — EXECUTING (paused mid-05-01)
-Plan: 05-01 — Task 1 DONE & committed (parser extension, regression green); Task 2 PENDING (operational-insights aggregations). Then 05-02 (UI) not started.
-Status: Executing Phase 05 — resume at 05-01 Task 2
-Last activity: 2026-05-17 -- 05-01 T1 committed; paused before T2 (large engine + UI work remaining)
-Resume: /gsd-execute-phase 5 (05-01 has no SUMMARY yet → safe-resume gate will offer resume-from-Task-2; 04-05 pattern)
+Phase: 05 (rich-cluster-host-esx-intelligence) — EXECUTING (05-01 done; 05-02 pending)
+Plan: 05-01 COMPLETE & committed (data layer: parser ext + operational-insights, SUMMARY written, 311/311). 05-02 (UI) NOT started.
+Status: Executing Phase 05 — resume at 05-02
+Last activity: 2026-05-17 -- 05-01 complete; paused before 05-02 (full UI plan = its own reviewable unit)
+Resume: /gsd-execute-phase 5 (05-01 has SUMMARY → skipped as done; runs 05-02 only)
 
 Progress: [████░░░░░░] 40% (4/10 phases)
 
