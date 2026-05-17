@@ -247,7 +247,7 @@ npm run check:supply-chain        # fails on telemetry pkgs or xlsx pin drift
 npm run check:bundle-size         # fails if echarts chunk > 300 KB gz
 ```
 
-## Architecture (shipped P1–P3)
+## Architecture (shipped P1–P7)
 
 - `src/engines/**` — pure functions only (no React/DOM/Zustand/Zod; Zod lives only at the parser boundary). Vitest-gated ≥75%.
 - `src/store/datasetStore.ts` — Zustand, **inputs only** (`Map<id,Snapshot>` immutable). No cached aggregates (deliberate vsizer deviation).
@@ -269,6 +269,8 @@ npm run check:bundle-size         # fails if echarts chunk > 300 KB gz
 - **Privacy guard throws, it does not silently block.** Any non-same-origin `fetch`/`XHR`/`WS`/`sendBeacon` throws synchronously (intentional — silent block is undetectable). Adding any network call breaks the app by design.
 - **`gsd-sdk query roadmap update-plan-progress` does not match this ROADMAP's format** — after every `/gsd-execute-phase`, manually flip the phase `[ ]→[x]` and the Progress-table row.
 - Worktree isolation is unavailable in sessions where the repo wasn't a git repo at startup → GSD plans run sequentially on `main`.
+- **Reusing `components/inventory/DataTable.tsx`:** it resolves visible column headers via `useTranslation('inventory')` → `t('col.<id>')` — the `headerFor` prop is **CSV-only**. A new column `id` needs an `inventory:col.<id>` key in `i18n/locales/{en,fr}/inventory.json` or the header renders the raw key. The virtualized `<tbody>` rows are `flex w-full` + per-cell `flex-1`; the `<thead>` must use the **same** flex layout (not default table-cell sizing) or header/body columns desync (latent bug fixed in P7 — affected all consumers).
+- **`grep -c "<token>" == 0` plan gates (and the security hook) match doc-comments too.** A comment documenting a token's *deliberate absence* (e.g. naming `new Date(` or the React raw-HTML prop to say "never used") fails the gate / blocks the write. Phrase absence comments without the literal token.
 
 <!-- rtk-instructions v2 -->
 # RTK (Rust Token Killer) - Token-Optimized Commands
