@@ -122,9 +122,12 @@ Decimal phases appear between their surrounding integers in numeric order.
 **NEW — analytics-core replan.** Closes the "far richer per-cluster intelligence" gap; reference depth = RVTools Analyser functions #1,2,4,7,11 (see `.planning/ANALYTICS-CORE-REPLAN.md`).
 **Goal**: Replace the shallow cluster card with RVTools-Analyser-grade depth + a one-window ESX/Host summary: per-cluster + estate operational insights — realized CPU overcommit (`vCPU / usable-pCPU`, calculated, G2), avg CPU usage (core-weighted) / avg memory usage (host-mem-weighted), hosts on ESXi < 8.x + ESXi-version lifecycle posture, hardware lifecycle (hosts out of vendor support), powered-on/off/suspended/template breakdown, provisioned vs in-use, datastore footprint (incl .vswp+snapshots), guest data, total physical cores / host memory rollups. All client-side, in-memory (privacy invariant — NO database).
 **Depends on**: Phase 4 (consumes the merged estate)
-**Requirements**: TBD — re-derive in discuss-phase (RVTools-Analyser #1,2,4,7,11; richer-cluster gap in replan brief)
-**Success Criteria**: TBD — re-derive in discuss-phase
-**Plans**: TBD
+**Requirements**: RCI-01..05 (derived in 05-CONTEXT/plans — rich per-cluster intelligence; Hosts view; estate operational-insights; cluster-detail drill; calc-from-real-data both scopes). ESXi-build→support-state + hardware vendor-EOS are NOT P5 (→ P7 / never; factual model/vendor/ESXi text only).
+**Success Criteria**: see 05-CONTEXT.md decisions + 05-0x-PLAN.md success_criteria (OPEN-2 resolved: hybrid ViewToggle 'Hosts' + cluster-detail drill)
+**Plans**: 2 plans
+
+- [ ] 05-01-PLAN.md — Data layer: parser extension (Powerstate enum/Template/model/vendor/ESXi, regression-gated) + pure operational-insights aggregations (estate + per-cluster, single memo)
+- [ ] 05-02-PLAN.md — UI: ViewToggle 'Hosts' segment + estate-rollup Hosts view + Operational-Insights row + cluster-card drill → one-screen-fit ClusterDetail (export-ready for P10) + rci i18n
 **UI hint**: yes
 **Pitfalls owned**: realized ratio calculated not invented (G2); lifecycle data factual (no editorial verbs); single-`useMemo` invariant preserved
 
@@ -216,7 +219,7 @@ Phases execute in numeric order: 1 â 2 â 3 â 4 â 5 â 6 
 | 2. Aggregation & Global Dashboard | 3/3 | Complete   | 2026-05-16 |
 | 3. Inventory Navigation | 3/3 | Complete | 2026-05-16 |
 | 4. Multi-vCenter Merge & Factual Labels | 2/2 | Complete (re-derived) — 04-01 merge baseline + 04-05 G1 rework, real-file-validated | 2026-05-17 |
-| 5. Rich Cluster / Host / ESX Intelligence | 0/TBD | Not started (NEW) | - |
+| 5. Rich Cluster / Host / ESX Intelligence | 0/2 | Planned — 05-01/05-02, pending execution | - |
 | 6. Allocation & DR (re-derived) | 0/TBD | Not started (NEW; carries UAT G2/G3, OPEN-1) | - |
 | 7. OS End-of-Support Forecast | 0/TBD | Not started | - |
 | 8. In-Session Trends | 0/TBD | Not started | - |
