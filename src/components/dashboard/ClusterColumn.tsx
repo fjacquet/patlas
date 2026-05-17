@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { LowConfidenceChip, StretchedPill } from '@/components/stretched/StretchedPill'
+import { StretchedPill } from '@/components/stretched/StretchedPill'
 import { MIDNIGHT_EXECUTIVE_DARK, MIDNIGHT_EXECUTIVE_LIGHT } from '@/theme/echartsTheme'
 import type { ClusterAggregate, OsBreakdown } from '@/types/estate'
 import { fmtGhzValue, fmtInt, fmtPercentValue, fmtPercentWhole, fmtRatio } from '@/utils/format'
@@ -131,27 +131,26 @@ export function ClusterColumn({ cluster, os, onToggleStretched }: ClusterColumnP
         />
         {cluster.stretched && (
           <>
-            <Row
-              label={tStr('site.a')}
-              value={siteGhz(cluster.siteACapacityGhz as number | null)}
-            />
-            <Row
-              label={tStr('site.b')}
-              value={siteGhz(cluster.siteBCapacityGhz as number | null)}
-            />
+            {cluster.siteData === 'detected' && (
+              <>
+                <Row
+                  label={tStr('site.a')}
+                  value={siteGhz(cluster.siteACapacityGhz as number | null)}
+                />
+                <Row
+                  label={tStr('site.b')}
+                  value={siteGhz(cluster.siteBCapacityGhz as number | null)}
+                />
+              </>
+            )}
             <Row
               label={tStr('reservation')}
               value={fmtPercentWhole(cluster.reservedFraction, loc)}
             />
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
-                {tStr('confidence.label')}
-              </span>
-              <span className="text-xs text-slate-600 dark:text-slate-400">
-                {tStr(`confidence.${cluster.stretchedConfidence}`)}
-              </span>
-            </div>
-            {cluster.stretchedConfidence === 'low' && <LowConfidenceChip />}
+            {/* G1: factual site-data caption — neutral, NO verdict, NO chip. */}
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              {tStr(`siteData.${cluster.siteData}`)}
+            </p>
           </>
         )}
       </div>

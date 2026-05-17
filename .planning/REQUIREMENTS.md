@@ -50,8 +50,13 @@
 
 - [ ] **STR-01**: User can toggle a cluster's "Étendu / Stretched" pill to mark it as a stretched cluster
 - [ ] **STR-02**: User sees CPU and RAM reservation applied per-site (not a flat 50 %) when the cluster is asymmetric (e.g. 6+4)
-- [ ] **STR-03**: User sees a `confidence` indicator per stretched cluster (high / medium / low) based on whether site/fault-domain metadata is in the RVTools export
-- [ ] **STR-04**: User sees a warning chip in the UI for any stretched cluster with `low` confidence
+- [ ] **STR-03**: User sees, factually, whether a stretched cluster's per-site split comes from real fault-domain data (Site A/B shown) or an assumed symmetric split — no high/medium/low verdict, no warning chip (UAT G1; the former low-confidence-chip requirement is retired/merged here)
+
+<!-- Forward note (analytics-core replan): vSAN blank-`Cluster name` datastore
+     attribution (vInfo VM→datastore→cluster relink) and full networks
+     inventory (ports/switches) are deferred to Phase 9 — NOT Phase-4
+     requirements. -->
+
 
 ### Allocated Resources
 
@@ -196,7 +201,6 @@
 | STR-01 | Phase 4 | Pending |
 | STR-02 | Phase 4 | Pending |
 | STR-03 | Phase 4 | Pending |
-| STR-04 | Phase 4 | Pending |
 | ALC-01 | Phase 4 | Pending |
 | ALC-02 | Phase 4 | Pending |
 | ALC-03 | Phase 4 | Pending |

@@ -46,32 +46,3 @@ export function StretchedPill({ value, onChange }: StretchedPillProps) {
     </fieldset>
   )
 }
-
-/**
- * STR-04 — neutral low-confidence chip. Grey (NEVER red), no traffic-light,
- * no editorial verb (UI-SPEC §Color). Rendered by `ClusterColumn` ONLY when
- * `stretchedConfidence === 'low'`. The inline info glyph follows the
- * `ThemeToggle` SVG pattern (`stroke="currentColor"`, `aria-hidden`).
- */
-export function LowConfidenceChip() {
-  const { t } = useTranslation('str')
-  return (
-    <span className="inline-flex items-center gap-1 rounded bg-surface-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-surface-700 dark:text-slate-300">
-      <svg
-        aria-hidden="true"
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 16v-4M12 8h.01" />
-      </svg>
-      {t('lowConfidence.chip')}
-    </span>
-  )
-}

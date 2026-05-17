@@ -8,13 +8,11 @@
     "b": "Site B"
   },
   "reservation": "Réservation",
-  "confidence": {
-    "label": "Confiance",
-    "high": "élevée",
-    "medium": "moyenne",
-    "low": "faible"
+  "siteData": {
+    "detected": "données de site : détectées",
+    "assumed": "répartition symétrique supposée (aucune donnée de site)"
   },
-  "lowConfidence": {
-    "chip": "données de site déduites"
+  "stretched": {
+    "estateCount": "{{count}} clusters marqués étendus"
   }
 }

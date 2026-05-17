@@ -57,6 +57,7 @@ function DashboardError({ error }: FallbackProps) {
  */
 export function GlobalDashboard() {
   const { t, i18n } = useTranslation('dashboard')
+  const { t: tStr } = useTranslation('str')
   const [mode, setMode] = useState<AccountingMode>('active')
   const [ratios, setRatios] = useAllocationHash()
   const view = useEstateView(mode, ratios)
@@ -100,6 +101,10 @@ export function GlobalDashboard() {
             </h2>
             <AccountingModeToggle value={mode} onChange={setMode} />
           </div>
+          {/* G1: neutral factual estate echo of the user's stretched declarations. */}
+          <p className="text-xs text-slate-600 dark:text-slate-400">
+            {tStr('stretched.estateCount', { count: stretchedClusters.size })}
+          </p>
           <AllocationSliders ratios={ratios} onChange={setRatios} />
           <GlobalSummaryCard globals={view.globals} mode={mode} capturedDate={capturedDate} />
           <OsBreakdownDonut osBreakdown={view.osBreakdown} />
