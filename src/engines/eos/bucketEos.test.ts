@@ -159,3 +159,39 @@ describe('buildEosProjection — host vs VM cardinality never conflated (D-09b)'
     expect(p.esxi.hosts[0]?.patchEol).toBeNull()
   })
 })
+
+describe('buildEosProjection — month-boundary date math (CodeRabbit PR#1)', () => {
+  // today = end-of-month (31st). The buggy monthsAfter overflowed the +3mo
+  // boundary into the next month (Mar 31 + 3 → Date.UTC(2026,5,31) = Jul 1
+  // instead of the clamped Jun 30). An eolFrom of 2026-07-01 then mis-bucketed
+  // as `w3` (≤ overflowed boundary) instead of the correct `w3to6`.
+  it('end-of-month input does not overflow the 3-month threshold', () => {
+    const cat: EosCatalogue = {
+      lastVerified: '2026-01-01',
+      products: { debian: { name: 'Debian', releases: [r('12', '2026-07-01')] } },
+    }
+    const p = buildEosProjection({
+      vinfo: [vm({ osConfig: 'Debian GNU/Linux 12 (64-bit)' })],
+      vhost: [],
+      catalogue: cat,
+      today: new Date('2026-03-31T00:00:00Z'),
+    })
+    expect(p.partition.w3).toHaveLength(0)
+    expect(p.partition.w3to6).toHaveLength(1)
+  })
+
+  it('a same-day EOL is not flipped to overdue by the injected clock time-of-day', () => {
+    const cat: EosCatalogue = {
+      lastVerified: '2026-01-01',
+      products: { debian: { name: 'Debian', releases: [r('12', '2026-06-15')] } },
+    }
+    const p = buildEosProjection({
+      vinfo: [vm({ osConfig: 'Debian GNU/Linux 12 (64-bit)' })],
+      vhost: [],
+      catalogue: cat,
+      today: new Date('2026-06-15T14:30:00Z'), // same calendar day, afternoon
+    })
+    expect(p.partition.overdue).toHaveLength(0)
+    expect(p.partition.w3).toHaveLength(1)
+  })
+})

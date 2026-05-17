@@ -37,12 +37,25 @@ function isoDay(d: Date): string {
   return `${y}-${m}-${day}`
 }
 
-/** UTC ms `n` calendar months after `today` — clock-free (Pitfall 4). */
+/** Days in a given UTC (year, 0-based month) — pure, no Date construction
+ *  (keeps the "Date.UTC / Date.parse / getters only" contract above true). */
+function daysInUTCMonth(year: number, month: number): number {
+  if (month === 1) {
+    const leap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
+    return leap ? 29 : 28
+  }
+  return [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month] as number
+}
+
+/** UTC ms midnight `n` calendar months after `today` — clock-free (Pitfall
+ *  4). The day is clamped to the target month's last day so end-of-month
+ *  inputs (e.g. Jan 31 + 1mo) do NOT overflow into the following month. */
 function monthsAfter(today: Date, n: number): number {
   const total = today.getUTCMonth() + n
   const year = today.getUTCFullYear() + Math.floor(total / 12)
   const month = ((total % 12) + 12) % 12
-  return Date.UTC(year, month, today.getUTCDate())
+  const day = Math.min(today.getUTCDate(), daysInUTCMonth(year, month))
+  return Date.UTC(year, month, day)
 }
 
 function bucketFor(
@@ -72,7 +85,9 @@ export function buildEosProjection(args: {
   today: Date
 }): EosProjection {
   const { vinfo, vhost, catalogue, today } = args
-  const todayMs = today.getTime()
+  // Date-only: drop time-of-day so a same-day EOL (catalogue dates are UTC
+  // midnight via Date.parse) is not flipped to `overdue` later in the day.
+  const todayMs = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
   const m: [number, number, number, number] = [
     monthsAfter(today, 3),
     monthsAfter(today, 6),
