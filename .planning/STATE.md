@@ -25,13 +25,12 @@ See: .planning/PROJECT.md (updated 2026-05-15)
 
 ## Current Position
 
-Phase: 07 (os-end-of-support-forecast) — EXECUTING
-Plan: 3 of 3
+Phase: 07 (os-end-of-support-forecast) — COMPLETE
+Plan: 3 of 3 (all plans done)
 Status: Phase complete — ready for verification
-Last activity: 2026-05-17
-Progress: [██████████] 100%
-
-Progress: [████░░░░░░] 40% (4/10 phases)
+Last activity: 2026-05-17 - Completed quick task 260517-sdq: CodeRabbit PR#1 review fixes
+Phase progress: [██████████] 100% (3/3 plans)
+Project progress: [███████░░░] 70% (7/10 phases)
 
 ## Performance Metrics
 
@@ -98,6 +97,12 @@ None yet.
 - Phase 4 must verify whether RVTools `vCluster` exposes host fault-domain or site tag in current versions (if not, engine surfaces `confidence: 'medium'` with "assumed symmetric" chip)
 - Phase 5 needs research pass: OS-naming-variant matrix (harvest 50+ real OS strings; assert <5% unknown-OS rate) and `endoflife.date` v1 API Beta schema stability
 - Phase 7 needs research pass: HTML-report font-embedding mechanism (subset selection, corporate-VPN CSP proxy testing, file:// vs http:// vs proxy rendering)
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260517-sdq | Fix 4 CodeRabbit PR#1 review findings: engine purity, EOS month math, fmtDate TZ, STATE.md | 2026-05-17 | 47422e4..6a0c7ec | [260517-sdq-fix-4-coderabbit-pr-1-review-findings-en](./quick/260517-sdq-fix-4-coderabbit-pr-1-review-findings-en/) |
 
 ## Deferred Items
 
