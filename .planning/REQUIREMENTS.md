@@ -110,11 +110,11 @@
 
 ### In-Session Trends
 
-- [ ] **TRD-01**: User can load 2–12 monthly RVTools snapshots together and see headline metrics evolve over time
-- [ ] **TRD-02**: User sees a temporal X-axis (actual capture dates, not categorical labels) on every trend chart
-- [ ] **TRD-03**: User sees per-cluster sparklines on the dashboard when multiple snapshots are loaded
-- [ ] **TRD-04**: User sees a delta panel showing what changed between consecutive snapshots
-- [ ] **TRD-05**: User can refresh the page and confirm trends are gone (no cross-session persistence)
+- [x] **TRD-01**: User can load 2–12 monthly RVTools snapshots together and see headline metrics evolve over time
+- [x] **TRD-02**: User sees a temporal X-axis (actual capture dates, not categorical labels) on every trend chart
+- [x] **TRD-03**: User sees per-cluster sparklines on the dashboard when multiple snapshots are loaded
+- [x] **TRD-04**: User sees a delta panel showing what changed between consecutive snapshots
+- [x] **TRD-05**: User can refresh the page and confirm trends are gone (no cross-session persistence)
 
 ### Visual UX (charts as first-class)
 
@@ -257,11 +257,11 @@
 | EOS-04 | Phase 7 | Complete |
 | EOS-05 | Phase 7 | Complete |
 | EOS-06 | Phase 7 | Complete |
-| TRD-01 | Phase 8 | Pending |
-| TRD-02 | Phase 8 | Pending |
-| TRD-03 | Phase 8 | Pending |
-| TRD-04 | Phase 8 | Pending |
-| TRD-05 | Phase 8 | Pending |
+| TRD-01 | Phase 8 | Complete |
+| TRD-02 | Phase 8 | Complete |
+| TRD-03 | Phase 8 | Complete |
+| TRD-04 | Phase 8 | Complete |
+| TRD-05 | Phase 8 | Complete |
 | HTM-01 | Phase 7 | Pending |
 | HTM-02 | Phase 7 | Pending |
 | HTM-03 | Phase 7 | Pending |

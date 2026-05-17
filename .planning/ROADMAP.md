@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Rich Cluster / Host / ESX Intelligence** - NEW: deep per-cluster card + one-window ESX Summary + operational insights (realized CPU overcommit, avg CPU/mem, ESXi & hardware lifecycle, powered/off/susp/template, footprints) â COMPLETE 2026-05-17, real-file-validated
 - [x] **Phase 6: Allocation & DR (re-derived)** - NEW: realized consolidation displayed (G2) + separate capacity-planning lens (Personal Ratios + Custom Failover, OPEN-1) + DR server/site loss, physical impact (G3); reuses kept drSim engine (completed 2026-05-17)
 - [x] **Phase 7: OS End-of-Support Forecast** - Bundled endoflife.date catalogue, 3/6/9/12-month at-risk with drill-down
-- [ ] **Phase 8: In-Session Trends** - Multi-snapshot timelines, per-cluster sparklines, delta panel, temporal X-axis
+- [x] **Phase 8: In-Session Trends** - Multi-snapshot timelines, per-cluster sparklines, delta panel, temporal X-axis (completed 2026-05-17)
 - [ ] **Phase 9: Storage / Network / Detailed Views + Threshold Alerting** - NEW: storage by cluster/ESX/VM/datastore, ports/switches, disk/partition threshold alerting (scope per OPEN-2/3)
 - [ ] **Phase 10: HTML + PPTX Exports & Deploy** - Self-contained HTML report, factual PPTX deck, GitHub Pages CI
 
@@ -198,7 +198,7 @@ Plans:
 - [x] 08-02-PLAN.md — releaseRawRows store mutation + latest-first non-blocking warm-up + LineChart registration/bundle re-gate
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 08-03-PLAN.md — trends view + dashboard sparklines + inline capturedAt edit + EN/FR i18n + REQUIREMENTS reconciliation
+- [x] 08-03-PLAN.md — trends view + dashboard sparklines + inline capturedAt edit + EN/FR i18n + REQUIREMENTS reconciliation
 **UI hint**: yes
 **vsizer reuse**: nothing direct (new engine module); reuses `<Chart>` from Phase 2 and the aggregation pipeline from Phase 2
 **Pitfalls owned**: Minor-6 (timestamp drift across snapshots Ã¢ÂÂ temporal X-axis, capture-date inference order: explicit user input Ã¢ÂÂ filename ISO Ã¢ÂÂ `vSource` sheet Ã¢ÂÂ file mtime Ã¢ÂÂ ordinal), part of Critical-5 (memory budget Ã¢ÂÂ release older raw rows when N > 4, keep only aggregated time-series for older snapshots)
@@ -246,6 +246,6 @@ Phases execute in numeric order: 1 Ã¢ÂÂ 2 Ã¢ÂÂ 3 Ã¢ÂÂ 4 
 | 5. Rich Cluster / Host / ESX Intelligence | 2/2 | Complete â data layer + UI, real-file-validated | 2026-05-17 |
 | 6. Allocation & DR (re-derived) | 3/3 | Complete   | 2026-05-17 |
 | 7. OS End-of-Support Forecast | 3/3 | Complete â engines + UI, real-file-validated (UAT-approved) | 2026-05-17 |
-| 8. In-Session Trends | 2/3 | In Progress|  |
+| 8. In-Session Trends | 3/3 | Complete   | 2026-05-17 |
 | 9. Storage / Network / Detailed Views + Threshold Alerting | 0/TBD | Not started (NEW; scope per OPEN-2/3) | - |
 | 10. HTML + PPTX Exports & Deploy | 0/TBD | Not started | - |
