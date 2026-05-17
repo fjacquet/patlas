@@ -77,10 +77,10 @@
 > below. The killed slider / URL-hash mechanism (old ALC-01/03) is **retired**
 > — replaced by in-memory preset+numeric on the explicitly-"planned" lens.
 
-- [ ] **PLN-01**: User opens a separate, explicitly-labelled "Capacity planning — what-if (planned)" surface (a 4th top-level ViewToggle segment) that is structurally distinct from the realized "measured" value and never overwrites or hides it (D-03/D-04)
-- [ ] **PLN-02**: User sets a Planned CPU ratio and Planned RAM ratio via named preset buttons (CPU 1:1 / 4:1 / 8:1 / VDI 10:1; RAM same pattern) that fill an editable numeric field the user can override; defaults are CPU 4:1 / RAM 1:1 (D-05) — no slider widget
-- [ ] **PLN-03**: User's planned ratios are held in-memory only (Zustand inputs slice); there is NO URL-hash codec and NO `localStorage` of planned inputs — refresh = data gone (D-06)
-- [ ] **PLN-04**: User sees the planned what-if recompute against physical cores (not hyperthreads) through the single `useEstateView` memo, with the realized "measured" reference shown read-only with a "measured" qualifier pointing at P5 Operational Insights (D-02 — never conflated)
+- [x] **PLN-01**: User opens a separate, explicitly-labelled "Capacity planning — what-if (planned)" surface (a 4th top-level ViewToggle segment) that is structurally distinct from the realized "measured" value and never overwrites or hides it (D-03/D-04)
+- [x] **PLN-02**: User sets a Planned CPU ratio and Planned RAM ratio via named preset buttons (CPU 1:1 / 4:1 / 8:1 / VDI 10:1; RAM same pattern) that fill an editable numeric field the user can override; defaults are CPU 4:1 / RAM 1:1 (D-05) — no slider widget
+- [x] **PLN-03**: User's planned ratios are held in-memory only (Zustand inputs slice); there is NO URL-hash codec and NO `localStorage` of planned inputs — refresh = data gone (D-06)
+- [x] **PLN-04**: User sees the planned what-if recompute against physical cores (not hyperthreads) through the single `useEstateView` memo, with the realized "measured" reference shown read-only with a "measured" qualifier pointing at P5 Operational Insights (D-02 — never conflated)
 
 ### Disaster Recovery Simulation
 
@@ -236,10 +236,10 @@
 | ~~ALC-02~~ | Phase 6 | Re-derived → PLN-02 (CPU 4:1 / RAM 1:1 default kept) |
 | ~~ALC-03~~ | Phase 6 | Retired — URL-hash forbidden (D-06); → PLN-03 in-memory only |
 | ~~ALC-04~~ | Phase 5 | Realized ratio satisfied-by-P5 (RCI-01); planned what-if → PLN-04 |
-| PLN-01 | Phase 6 | Pending |
-| PLN-02 | Phase 6 | Pending |
-| PLN-03 | Phase 6 | Pending |
-| PLN-04 | Phase 6 | Pending |
+| PLN-01 | Phase 6 | Complete |
+| PLN-02 | Phase 6 | Complete |
+| PLN-03 | Phase 6 | Complete |
+| PLN-04 | Phase 6 | Complete |
 | ~~DRS-01~~ | Phase 6 | Re-derived → DRX-01 (Server loss) |
 | ~~DRS-02~~ | Phase 6 | Dropped — cluster-loss removed (G3) |
 | ~~DRS-03~~ | Phase 6 | Dropped — vCenter-loss removed (G3) |
