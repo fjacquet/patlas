@@ -11,5 +11,11 @@ export { classifyOsFamily, type OsFamily } from './osFamily'
 export { aggregateHostsPerCluster } from './perCluster'
 export { perDatastore } from './perDatastore'
 export { perEsx } from './perEsx'
+export {
+  type StorageByX,
+  type StorageCapacityGroup,
+  type StorageConsumptionGroup,
+  storageByX,
+} from './storageByX'
 export { aggregateVmsPerCluster, readinessStats, topReadinessVmsByCluster } from './vinfoMerge'
 export { relinkBlankClusterDatastores, type VsanRelinkResult } from './vsanRelink'
