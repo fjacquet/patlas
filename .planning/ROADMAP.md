@@ -148,7 +148,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   6. `engines/drSim` ships with ≥75 % Vitest coverage on the reworked two-mode/physical-impact contract; the single-`useMemo` invariant is preserved (planned projection + reworked DR result compose inside `buildEstateView`)
 **Plans**: 3 plans
 
-- [ ] 06-01-PLAN.md — Engine + contract spine: rework `drSim` to two-mode/physical-impact/no-confidence, in-memory `plannedRatios` slice, planned projection through the single memo, drSim tests rewritten ≥75%
+- [x] 06-01-PLAN.md — Engine + contract spine: rework `drSim` to two-mode/physical-impact/no-confidence, in-memory `plannedRatios` slice, planned projection through the single memo, drSim tests rewritten ≥75%
 - [ ] 06-02-PLAN.md — Planning surface: 4th ViewToggle segment + PlanningView shell + preset+numeric in-memory PlannedRatiosControl (kills the slider/URL-hash) + Dashboard cleanup + EN/FR i18n
 - [ ] 06-03-PLAN.md — DR rework UI: two-mode DrSimPanel (Server stepper + Site picker/lost-line + physical impact + Custom-Failover toggle, confidence removed) wired into PlanningView + dr.json EN/FR + presenter test
 **UI hint**: yes
@@ -232,7 +232,7 @@ Phases execute in numeric order: 1 â 2 â 3 â 4 â 5 â 6 
 | 3. Inventory Navigation | 3/3 | Complete | 2026-05-16 |
 | 4. Multi-vCenter Merge & Factual Labels | 2/2 | Complete (re-derived) — 04-01 merge baseline + 04-05 G1 rework, real-file-validated | 2026-05-17 |
 | 5. Rich Cluster / Host / ESX Intelligence | 2/2 | Complete — data layer + UI, real-file-validated | 2026-05-17 |
-| 6. Allocation & DR (re-derived) | 0/3 | Not started (NEW; carries UAT G2/G3, OPEN-1) | - |
+| 6. Allocation & DR (re-derived) | 1/3 | In progress — 06-01 engine/contract spine done | - |
 | 7. OS End-of-Support Forecast | 0/TBD | Not started | - |
 | 8. In-Session Trends | 0/TBD | Not started | - |
 | 9. Storage / Network / Detailed Views + Threshold Alerting | 0/TBD | Not started (NEW; scope per OPEN-2/3) | - |
