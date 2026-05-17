@@ -171,7 +171,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 - [x] 07-01-PLAN.md — build-time catalogue spine (Zod schema, sync:eos, parse-once boundary, CI freshness)
-- [ ] 07-02-PLAN.md — pure EOS engines + real-string fixtures (normalizeOs, classifyEsxi, bucketEos)
+- [x] 07-02-PLAN.md — pure EOS engines + real-string fixtures (normalizeOs, classifyEsxi, bucketEos)
 - [ ] 07-03-PLAN.md — EstateView wiring + 5th eos ViewToggle + EosView + EN/FR i18n
 **UI hint**: yes
 **vsizer reuse**: nothing direct (new engine module); reuses `utils/format.ts` and `<Chart>` infrastructure from Phase 2
