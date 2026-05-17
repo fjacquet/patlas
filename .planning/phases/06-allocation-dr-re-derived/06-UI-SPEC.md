@@ -46,6 +46,7 @@ Declared values (multiples of 4; matches the shipped components verbatim — do 
 | 3xl | 64px | Reserved — page-level only; not used inside Planning panels |
 
 Exceptions:
+
 - Numeric input field min touch target: input height `h-9` (36px) is below 44px but is acceptable as it matches the shipped DR-toggle button height (`h-9`) and the preset-button height; preserve visual rhythm over a bespoke 44px exception. Preset buttons use `h-8` (32px) verbatim from the shipped `AllocationSliders` preset group — keep for consistency.
 - Planning-screen two-block separation uses the `2xl` (48px) break between the planned-ratios block and the DR-sim block to enforce the D-03 structural "measured vs planned never share a tile" separation visually.
 
@@ -63,6 +64,7 @@ Matches shipped vatlas type usage exactly (sizes are Tailwind defaults already i
 | Display (evacuee / headline figure) | 24px (`text-2xl`) | 600 (semibold) | 1.2 |
 
 Rules:
+
 - Exactly 2 weights: `font-normal` (400) and `font-semibold` (600). No other weights.
 - Exactly 4 sizes: 12 / 14 / 20 / 24px. No new sizes for this phase.
 - Every numeric value (ratios, GHz, cores, RAM MiB, verdict numbers) renders in `--font-mono` with `tabular-nums` (verbatim shipped idiom). Numbers are never pre-formatted in i18n strings; use the shipped `fmt*` helpers (`fmtRatio`, `fmtGhzValue`, `fmtInt`).
@@ -81,6 +83,7 @@ Midnight Executive palette (locked in `src/index.css @theme`; do NOT add colors)
 | Destructive | none — **deliberately absent in this phase** | DR failed-selection is **neutral & reversible** (D-10/G3): grey strike-through + neutral chip, NEVER red, NEVER an alarm icon, NEVER a confirmation dialog. There are no destructive actions in this phase (see Copywriting). |
 
 Accent (gold `accent-500`) reserved **only** for:
+
 1. The active **ViewToggle top-level segment** (the "Planning" segment when selected) — `bg-accent-500 text-surface-900` — verbatim with the shipped `ViewToggle` accent idiom (the existing 3 segments already use this; the 4th inherits it unchanged).
 2. The single **physical-impact headline figure** in the DR result (the evacuated / removed physical CPU+RAM total) — the one gold figure per the shipped `DrSimPanel` "single gold accent figure" rule, re-pointed from vCPU to **physical CPU+RAM** (D-09). Exactly one gold figure in the DR result block.
 

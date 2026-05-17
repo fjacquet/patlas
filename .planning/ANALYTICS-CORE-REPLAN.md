@@ -23,7 +23,7 @@
 
 ## Open decisions (resolve in discuss-phase BEFORE planning — do NOT assume)
 
-- **OPEN-1 (load-bearing): G2 vs reference #8.** UAT G2 says "calculated, no user ratios." RVTools Analyser #8 explicitly offers "Personal Ratios (CPU and RAM) and Custom Failovers." Likely reconciliation to confirm with user: *realized* consolidation is calculated & always shown (G2); a SEPARATE **capacity-planning** lens may accept user **Personal Ratios + Custom Failover** inputs for sizing/headroom (reference #8). Are these two distinct features, or is #8 rejected? Decides whether any ratio input UI returns and how DR "Custom Failover" relates to G3's site/server model.
+- **OPEN-1 — RESOLVED: TWO DISTINCT FEATURES.** (a) Realized consolidation (`vCPU÷pCPU`, `vRAM÷physRAM`) = always calculated & shown, NO input (G2 applies here only). (b) A SEPARATE, explicitly-labelled **capacity-planning lens** DOES accept user **Personal Ratios + Custom Failover** for what-if sizing (reference #8) — in-scope, visibly distinct ("measured" vs "planned"), never conflated with or overwriting the realized metric. Custom Failover reconciles with the G3 DR server/site/physical model during phase planning.
 - **OPEN-2:** RVTools Analyser is single-app-with-DB + multi-screen nav. vatlas is drop-and-go client app. How far do we mirror its navigation taxonomy (dedicated Clusters/ESX/VMs/Storage/Network/Stats screens) vs the current Dashboard⟷Inventory ViewToggle? Affects phase count.
 - **OPEN-3:** Threshold **alerting** (#12/#14: filesystem & LU thresholds, partition alerts) introduces user-config + a config surface. In-scope for this milestone or deferred?
 
