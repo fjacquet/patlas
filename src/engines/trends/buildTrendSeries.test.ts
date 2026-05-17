@@ -42,6 +42,7 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   viSdkServer: '',
   provisionedMib: mib(40_960),
   inUseMib: mib(20_480),
+  path: '',
   ...over,
 })
 
@@ -73,6 +74,10 @@ const snap = (over: Partial<Snapshot> & { id: string }): Snapshot => ({
     },
   ],
   vpartition: [],
+  vnetwork: [],
+  vswitch: [],
+  dvswitch: [],
+  dvport: [],
   parseErrors: [],
   ...over,
 })

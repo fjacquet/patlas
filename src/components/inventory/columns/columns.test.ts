@@ -135,6 +135,7 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   viSdkServer: '',
   provisionedMib: mib(40_960),
   inUseMib: mib(20_480),
+  path: '',
   ...over,
 })
 
@@ -188,6 +189,10 @@ const sharedLunSnapshot = (): Snapshot => ({
     },
   ],
   vpartition: [],
+  vnetwork: [],
+  vswitch: [],
+  dvswitch: [],
+  dvport: [],
   parseErrors: [],
 })
 

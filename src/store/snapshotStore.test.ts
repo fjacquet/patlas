@@ -21,6 +21,10 @@ const makeSnapshot = (id: string, overrides: Partial<Snapshot> = {}): Snapshot =
     vhost: [],
     vdatastore: [],
     vpartition: [],
+    vnetwork: [],
+    vswitch: [],
+    dvswitch: [],
+    dvport: [],
     parseErrors: [],
     ...overrides,
   }) as unknown as Snapshot

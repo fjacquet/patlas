@@ -39,6 +39,7 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   viSdkServer: '',
   provisionedMib: mib(0),
   inUseMib: mib(0),
+  path: '',
   ...over,
 })
 

@@ -52,10 +52,15 @@ const snapshot = (id: string): Snapshot => ({
       viSdkServer: '',
       provisionedMib: mib(40_960),
       inUseMib: mib(20_480),
+      path: '',
     },
   ],
   vdatastore: [],
   vpartition: [],
+  vnetwork: [],
+  vswitch: [],
+  dvswitch: [],
+  dvport: [],
   parseErrors: [],
 })
 
