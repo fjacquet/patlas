@@ -11,12 +11,10 @@ interface RunOpts {
   allocRatios: { cpuRatio: number; ramRatio: number }
 }
 
-const isEmpty = (s: DrScenario): boolean =>
-  s.failedHosts.size === 0 && s.failedSites.size === 0
+const isEmpty = (s: DrScenario): boolean => s.failedHosts.size === 0 && s.failedSites.size === 0
 
 /** Dominant mode for the UI echo: Site loss ▷ Server loss (D-07/D-08). */
-const dominantMode = (s: DrScenario): DrMode =>
-  s.failedSites.size > 0 ? 'site' : 'server'
+const dominantMode = (s: DrScenario): DrMode => (s.failedSites.size > 0 ? 'site' : 'server')
 
 /**
  * DR what-if: re-run the SHIPPED aggregation on the survivor row subset

@@ -4,6 +4,7 @@ import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
 import type { AllocRatios } from '@/hooks/useAllocationHash'
 import { DEFAULT_RATIOS } from '@/hooks/useAllocationHash'
 import {
+  selectPlannedRatios,
   selectScenario,
   selectSelectedSnapshotIds,
   selectSnapshots,
@@ -42,6 +43,7 @@ export function useEstateView(
   const selectedIds = useSnapshotStore(selectSelectedSnapshotIds)
   const stretchedClusters = useSnapshotStore(selectStretchedClusters)
   const scenario = useSnapshotStore(selectScenario)
+  const planned = useSnapshotStore(selectPlannedRatios)
   return useMemo(() => {
     const selected = [...snapshots.values()].filter((s) => selectedIds.has(s.id))
     if (selected.length === 0) return EMPTY_VIEW
@@ -49,6 +51,17 @@ export function useEstateView(
       stretchedClusters,
       allocRatios: { cpuRatio: ratios.cpu, ramRatio: ratios.ram },
       scenario,
+      plannedRatios: { cpuRatio: planned.cpu, ramRatio: planned.ram },
     })
-  }, [snapshots, selectedIds, stretchedClusters, scenario, mode, ratios.cpu, ratios.ram])
+  }, [
+    snapshots,
+    selectedIds,
+    stretchedClusters,
+    scenario,
+    mode,
+    ratios.cpu,
+    ratios.ram,
+    planned.cpu,
+    planned.ram,
+  ])
 }

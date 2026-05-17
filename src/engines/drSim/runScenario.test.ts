@@ -53,8 +53,7 @@ const estate = (vinfo: VInfoRow[], vhost: VHostRow[]): MergedEstate => ({
 
 const SCN = (over: Partial<DrScenario>): DrScenario => ({
   failedHosts: new Set(),
-  failedClusters: new Set(),
-  failedVCenters: new Set(),
+  failedSites: new Set(),
   ...over,
 })
 
@@ -64,61 +63,96 @@ const OPTS = {
   allocRatios: { cpuRatio: 4, ramRatio: 1 },
 }
 
-describe('runScenario — DR what-if (DRS-01..06)', () => {
+describe('runScenario — DR what-if (DRX-02..05, two-mode physical-impact)', () => {
   it('empty scenario → null (no failed component)', () => {
     const m = estate([vm({})], [host({})])
     expect(runScenario(m, SCN({}), OPTS)).toBeNull()
   })
 
-  it('host-loss removes the host + its VMs; evacuee = failed-side allocation', () => {
+  it('server-loss removes the failed host + its VMs; physical impact = before−after', () => {
     const m = estate(
       [
-        vm({ vmName: 'a', host: 'esx-1', cluster: 'C1', vcpu: cores(4) }),
-        vm({ vmName: 'b', host: 'esx-2', cluster: 'C1', vcpu: cores(8) }),
+        vm({ vmName: 'a', host: 'esx-1', cluster: 'C1' }),
+        vm({ vmName: 'b', host: 'esx-2', cluster: 'C1' }),
       ],
       [host({ hostName: 'esx-1', cluster: 'C1' }), host({ hostName: 'esx-2', cluster: 'C1' })],
     )
     const r = runScenario(m, SCN({ failedHosts: new Set(['esx-1']) }), OPTS)
     expect(r).not.toBeNull()
-    expect(r?.mode).toBe('host')
-    // 'a' (4 vCPU) evacuated; before 12, after 8 → evacuee 4.
-    expect(r?.evacueeVcpu as number).toBe(4)
-    expect((r?.after.vcpuAllocated as number) ?? -1).toBe(8)
+    expect(r?.mode).toBe('server')
+    // Two identical 12-core / 2600 MHz hosts; losing one removes exactly
+    // one host's PHYSICAL capacity (cores + GHz + RAM), never vCPU.
+    // physicalGhz = cores × speedGHz = 12 × 2.6 = 31.2 GHz.
+    expect(r?.physicalCpuRemovedCores as number).toBe(12)
+    expect(r?.physicalCpuRemovedGhz as number).toBeCloseTo(31.2, 5)
+    expect(r?.physicalRamRemovedMib as number).toBe(262_144)
+    // Survivor estate keeps exactly the second host's physical cores.
+    expect(r?.after.physicalCores as number).toBe(12)
   })
 
-  it('cluster-loss removes all hosts of the cluster', () => {
+  it('site-loss removes every host whose faultDomain ∈ failedSites + their VMs', () => {
     const m = estate(
       [
-        vm({ vmName: 'a', cluster: 'CL_A', host: 'h-a' }),
-        vm({ vmName: 'b', cluster: 'CL_B', host: 'h-b' }),
+        vm({ vmName: 'a', cluster: 'STR', host: 'sa' }),
+        vm({ vmName: 'b', cluster: 'STR', host: 'sb' }),
       ],
-      [host({ hostName: 'h-a', cluster: 'CL_A' }), host({ hostName: 'h-b', cluster: 'CL_B' })],
+      [
+        host({ hostName: 'sa', cluster: 'STR', faultDomain: 'Site A' }),
+        host({ hostName: 'sb', cluster: 'STR', faultDomain: 'Site B' }),
+      ],
     )
-    const r = runScenario(m, SCN({ failedClusters: new Set(['CL_A']) }), OPTS)
-    expect(r?.mode).toBe('cluster')
-    expect(r?.after.clusterCount).toBe(1)
-    expect(r?.perSurvivor.map((p) => p.cluster)).toEqual(['CL_B'])
+    const r = runScenario(m, SCN({ failedSites: new Set(['Site A']) }), OPTS)
+    expect(r?.mode).toBe('site')
+    // Host on Site A removed → its physical cores leave the estate.
+    expect(r?.physicalCpuRemovedCores as number).toBe(12)
+    expect(r?.after.physicalCores as number).toBe(12) // only Site B host left
   })
 
-  it('vCenter-loss filters by viSdkUuid on the MERGED estate (3 vCenters)', () => {
+  it('site-loss with no fault-domain metadata removes nothing (symmetric, factual)', () => {
+    // Hosts carry no faultDomain (''), so no host matches a named site —
+    // the symmetric/no-metadata case stays factual: nothing removed.
+    const m = estate(
+      [vm({ vmName: 'a', host: 'h1', cluster: 'C1' })],
+      [host({ hostName: 'h1', cluster: 'C1', faultDomain: '' })],
+    )
+    const r = runScenario(m, SCN({ failedSites: new Set(['Site A']) }), OPTS)
+    expect(r?.mode).toBe('site')
+    expect(r?.physicalCpuRemovedCores as number).toBe(0)
+    expect(r?.after.physicalCores as number).toBe(r?.before.physicalCores as number)
+  })
+
+  it('physical impact is GHz/cores/RAM (branded), never vCPU', () => {
     const m = estate(
       [
-        vm({ vmName: 'a', viSdkUuid: 'vc1', cluster: 'CL_1', host: 'h1' }),
-        vm({ vmName: 'b', viSdkUuid: 'vc2', cluster: 'CL_2', host: 'h2' }),
-        vm({ vmName: 'c', viSdkUuid: 'vc3', cluster: 'CL_3', host: 'h3' }),
+        vm({ vmName: 'a', host: 'esx-1', cluster: 'C1', vcpu: cores(64) }),
+        vm({ vmName: 'b', host: 'esx-2', cluster: 'C1', vcpu: cores(1) }),
       ],
       [
-        host({ hostName: 'h1', cluster: 'CL_1' }),
-        host({ hostName: 'h2', cluster: 'CL_2' }),
-        host({ hostName: 'h3', cluster: 'CL_3' }),
+        host({ hostName: 'esx-1', cluster: 'C1', cores: cores(20), speedMhz: mhz(3000) }),
+        host({ hostName: 'esx-2', cluster: 'C1', cores: cores(20), speedMhz: mhz(3000) }),
       ],
     )
-    const r = runScenario(m, SCN({ failedVCenters: new Set(['vc2']) }), OPTS)
-    expect(r?.mode).toBe('vcenter')
-    expect(r?.after.clusterCount).toBe(2)
-    expect(r?.perSurvivor.map((p) => p.cluster).sort()).toEqual(['CL_1', 'CL_3'])
-    // input never mutated
-    expect(m.vinfo).toHaveLength(3)
+    const r = runScenario(m, SCN({ failedHosts: new Set(['esx-1']) }), OPTS)
+    // Impact tracks the HOST'S physical resources (20 cores / 60 GHz),
+    // NOT the 64 vCPU the failed host's VM had allocated.
+    expect(r?.physicalCpuRemovedCores as number).toBe(20)
+    expect(r?.physicalCpuRemovedGhz as number).toBeCloseTo(60, 5)
+    // The result exposes no vCPU evacuee field at all.
+    expect(r).not.toHaveProperty('evacueeVcpu')
+    expect(r).not.toHaveProperty('evacueeVramMib')
+  })
+
+  it('no confidence field on the result', () => {
+    const m = estate(
+      [
+        vm({ vmName: 'a', host: 'esx-1', cluster: 'C1' }),
+        vm({ vmName: 'b', host: 'esx-2', cluster: 'C1' }),
+      ],
+      [host({ hostName: 'esx-1', cluster: 'C1' }), host({ hostName: 'esx-2', cluster: 'C1' })],
+    )
+    const r = runScenario(m, SCN({ failedHosts: new Set(['esx-1']) }), OPTS)
+    expect(r).not.toBeNull()
+    expect(r).not.toHaveProperty('confidence')
   })
 
   it('does NOT mutate the merged estate', () => {
@@ -141,8 +175,8 @@ describe('runScenario — DR what-if (DRS-01..06)', () => {
         host({ hostName: 'da', cluster: 'DEAD' }),
       ],
     )
-    const plain = runScenario(m, SCN({ failedClusters: new Set(['DEAD']) }), OPTS)
-    const stretched = runScenario(m, SCN({ failedClusters: new Set(['DEAD']) }), {
+    const plain = runScenario(m, SCN({ failedHosts: new Set(['da']) }), OPTS)
+    const stretched = runScenario(m, SCN({ failedHosts: new Set(['da']) }), {
       ...OPTS,
       stretchedClusters: new Set(['STR']),
     })
@@ -153,17 +187,12 @@ describe('runScenario — DR what-if (DRS-01..06)', () => {
     )
   })
 
-  it('emits the reservation-vs-capacity caveat key when survivor reservation > 80% RAM', () => {
-    // A 2+2 stretched survivor reserves 0.5·RAM (≤80%) → no caveat; an
-    // untagged single-host stretched survivor also reserves 0.5 → ≤80%.
-    // Force >80% via a degenerate 1-host fault-domain split is not
-    // possible (max 0.5); instead assert the caveat array is well-formed
-    // (keys only, no free text) and empty here.
+  it('emits the reservation-vs-capacity caveat key as keys-only (no free text)', () => {
     const m = estate(
       [vm({ cluster: 'STR', host: 'h' }), vm({ vmName: 'x', cluster: 'D', host: 'd' })],
       [host({ hostName: 'h', cluster: 'STR' }), host({ hostName: 'd', cluster: 'D' })],
     )
-    const r = runScenario(m, SCN({ failedClusters: new Set(['D']) }), {
+    const r = runScenario(m, SCN({ failedHosts: new Set(['d']) }), {
       ...OPTS,
       stretchedClusters: new Set(['STR']),
     })
@@ -171,18 +200,27 @@ describe('runScenario — DR what-if (DRS-01..06)', () => {
     for (const k of r?.caveats ?? []) expect(k.startsWith('caveats.')).toBe(true)
   })
 
-  it('confidence reflects the worst survivor verdict', () => {
+  it('combined server + site loss removes the union of failed hosts', () => {
     const m = estate(
       [
-        // 100 vCPU allocated, 12-core host → capacity 12·4=48 → overflows.
-        ...Array.from({ length: 25 }, (_, i) =>
-          vm({ vmName: `v${i}`, cluster: 'TIGHT', host: 'th', vcpu: cores(4) }),
-        ),
-        vm({ vmName: 'dead', cluster: 'DEAD', host: 'dh' }),
+        vm({ vmName: 'a', host: 'h-a', cluster: 'C1' }),
+        vm({ vmName: 'b', host: 'h-b', cluster: 'C1' }),
+        vm({ vmName: 'c', host: 'h-c', cluster: 'C1' }),
       ],
-      [host({ hostName: 'th', cluster: 'TIGHT' }), host({ hostName: 'dh', cluster: 'DEAD' })],
+      [
+        host({ hostName: 'h-a', cluster: 'C1', faultDomain: 'Site A' }),
+        host({ hostName: 'h-b', cluster: 'C1', faultDomain: 'Site B' }),
+        host({ hostName: 'h-c', cluster: 'C1', faultDomain: 'Site B' }),
+      ],
     )
-    const r = runScenario(m, SCN({ failedClusters: new Set(['DEAD']) }), OPTS)
-    expect(r?.confidence).toBe('low') // TIGHT cluster overflows
+    // Server loss = h-b explicitly; Site loss = Site A (→ h-a). Union of
+    // removed hosts is {h-a, h-b}; only h-c (Site B) survives.
+    const r = runScenario(
+      m,
+      SCN({ failedHosts: new Set(['h-b']), failedSites: new Set(['Site A']) }),
+      OPTS,
+    )
+    expect(r?.mode).toBe('site') // failedSites non-empty ▷ site
+    expect(r?.after.physicalCores as number).toBe(12) // one surviving host
   })
 })

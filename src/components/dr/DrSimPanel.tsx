@@ -31,16 +31,20 @@ const Stat = ({ label, value }: { label: string; value: string }) => (
 )
 
 /**
- * DRS-01..06 — DR what-if panel. Pure presenter: every number comes from
- * `view.drSim` (computed in the single `useEstateView` memo). The 3-mode
- * selector reuses the `AccountingModeToggle` `<fieldset role="group">` +
- * aria-pressed + Arrow-key idiom verbatim. Marking a component failed is a
- * REVERSIBLE what-if input — neutral grey strike/dim + "simulated failed"
- * chip, NO red, NO alarm icon, NO confirmation dialog (locked constraint:
- * unchecking restores immediately). Evacuee total is the single gold
- * accent figure. Verdicts are factual enum words, never colored.
- * Assumptions + caveats disclose what is NOT modeled (the project's #1
- * risk mitigation).
+ * DRX-02..05 — DR what-if panel. Pure presenter: every number comes from
+ * `view.drSim` (computed in the single `useEstateView` memo). The
+ * two-mode (Server / Site) selector reuses the `<fieldset role="group">`
+ * + aria-pressed + Arrow-key idiom verbatim. Marking a component failed
+ * is a REVERSIBLE what-if input — neutral grey strike/dim + "simulated
+ * failed" chip, NO red, NO alarm icon, NO confirmation dialog (locked
+ * constraint: unchecking restores immediately). Physical-removed
+ * (GHz/cores + MiB) is the single gold accent figure (D-09). Verdicts
+ * are factual enum words, never colored. The high/med/low confidence
+ * grade is RETIRED (D-10); assumptions + caveats disclose what is NOT
+ * modeled (the project's #1 risk mitigation). NOTE: the dedicated
+ * Server-loss stepper / Site "lost — no DR target" line / "apply
+ * planned ratios" affordance + the Planning view shell land in Plans
+ * 02/03 — this 06-01 edit is the minimal spine-compat rework.
  */
 export function DrSimPanel({ view, drMode, onDrMode, scenario, onScenario }: DrSimPanelProps) {
   const { t } = useTranslation('dr')
@@ -180,9 +184,7 @@ export function DrSimPanel({ view, drMode, onDrMode, scenario, onScenario }: DrS
               ))}
             </div>
             <div className="min-w-[160px]">
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                {t('physicalRemoved')}
-              </p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">{t('physicalRemoved')}</p>
               <p className="font-mono text-2xl font-semibold tabular-nums text-accent-500">
                 {fmtGhzValue(drSim.physicalCpuRemovedGhz as number, loc)} GHz
               </p>

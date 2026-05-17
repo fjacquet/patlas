@@ -61,7 +61,12 @@ export const survivorVerdict = (
 export const survivorPhysicalVerdict = (
   c: Pick<
     ClusterAggregate,
-    'consumedGhz' | 'physicalGhz' | 'drReservedGhz' | 'consumedRamMib' | 'physicalRamMib' | 'drReservedRamMib'
+    | 'consumedGhz'
+    | 'physicalGhz'
+    | 'drReservedGhz'
+    | 'consumedRamMib'
+    | 'physicalRamMib'
+    | 'drReservedRamMib'
   >,
 ): Verdict => {
   const cpuCap = (c.physicalGhz as number) - (c.drReservedGhz as number)

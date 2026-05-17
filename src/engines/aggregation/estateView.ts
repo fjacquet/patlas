@@ -56,6 +56,15 @@ export function buildEstateView(
     stretchedClusters?: ReadonlySet<string>
     allocRatios?: { cpuRatio: number; ramRatio: number }
     scenario?: DrScenario
+    /** P6 PLANNED Personal Ratios — the explicitly-"planned" what-if
+     *  lens (D-05). Drives `plannedView` (and `plannedDrSim` when
+     *  `applyPlannedToDr`). NEVER overwrites the measured path. */
+    plannedRatios?: { cpuRatio: number; ramRatio: number }
+    /** P6 Custom Failover (D-11): when true AND a scenario is present,
+     *  re-run `runScenario` under the PLANNED ratios into
+     *  `plannedDrSim`. Defaults to true here (the in-app toggle is
+     *  lifted into Plan 02/03's PlanningView). */
+    applyPlannedToDr?: boolean
   },
 ): EstateView {
   const stretchedClusters = opts?.stretchedClusters ?? new Set<string>()
@@ -204,6 +213,40 @@ export function buildEstateView(
     ? runScenario(merged, opts.scenario, { mode, stretchedClusters, allocRatios })
     : null
 
+  // ── P6 PLANNED what-if (PLN-03/PLN-04/D-02/D-11) — composes in THIS
+  // single pass (no second memo, no new file). A SEPARATE re-aggregation
+  // under the user's PLANNED Personal Ratios; the measured `globals`/
+  // `clusters`/`drSim` above are untouched (never conflated — D-02/D-11).
+  // `applyPlannedToDr` defaults true (the in-app toggle is lifted into
+  // Plan 02/03's PlanningView; absent ⇒ planned DR mirrors measured DR).
+  const plannedRatios = opts?.plannedRatios ?? null
+  const applyPlannedToDr = opts?.applyPlannedToDr ?? true
+  const plannedView =
+    plannedRatios === null
+      ? null
+      : (() => {
+          const plannedClusters = aggregateClusters({
+            vinfo: merged.vinfo,
+            vhost: merged.vhost,
+            mode,
+            stretchedClusters,
+            datastoreCountByCluster: dsByCluster,
+            allocRatios: plannedRatios,
+          })
+          return {
+            globals: aggregateGlobals(plannedClusters, datastoreCount, totalStorageMib),
+            clusters: plannedClusters,
+          }
+        })()
+  const plannedDrSim =
+    plannedRatios !== null && applyPlannedToDr && opts?.scenario
+      ? runScenario(merged, opts.scenario, {
+          mode,
+          stretchedClusters,
+          allocRatios: plannedRatios,
+        })
+      : null
+
   return {
     globals,
     clusters,
@@ -219,8 +262,8 @@ export function buildEstateView(
     operationalInsights,
     clusterInsights,
     clusterDetail,
-    plannedView: null,
-    plannedDrSim: null,
+    plannedView,
+    plannedDrSim,
   }
 }
 
