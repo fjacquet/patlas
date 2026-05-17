@@ -116,6 +116,20 @@ export const runScenario = (
   )
   if (reservationHigh) caveats.push('caveats.reservationHigh')
 
+  // WR-04: D-08 Site loss is RAW physical subtraction of every host in the
+  // failed fault-domain — including hosts of declared-stretched clusters.
+  // The before−after delta books those stretched hosts as removed (no
+  // surviving-site failover is modeled). The panel's "lost — no DR target"
+  // line only counts NON-stretched hosts, which would otherwise imply the
+  // stretched portion is protected; emit an explicit factual caveat so the
+  // displayed narrative matches what the engine actually computes.
+  if (scenario.failedSites.size > 0) {
+    const stretchedSiteHostRemoved = merged.vhost.some(
+      (h) => siteLostHosts.has(h.hostName) && opts.stretchedClusters.has(h.cluster),
+    )
+    if (stretchedSiteHostRemoved) caveats.push('caveats.siteRawSubtraction')
+  }
+
   return {
     mode: dominantMode(scenario),
     before,

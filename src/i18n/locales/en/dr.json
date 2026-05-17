@@ -46,7 +46,8 @@
   },
   "caveats": {
     "label": "Caveats",
-    "reservationHigh": "A surviving cluster's stretched reservation exceeds 80% of its physical RAM."
+    "reservationHigh": "A surviving cluster's stretched reservation exceeds 80% of its physical RAM.",
+    "siteRawSubtraction": "Site loss subtracts every host at the failed site, including hosts of declared-stretched clusters. The before/after delta counts that stretched capacity as removed; surviving-site failover is not modeled."
   },
   "empty": {
     "noSelection": "Select hosts (Server loss) or a site (Site loss) to simulate.",

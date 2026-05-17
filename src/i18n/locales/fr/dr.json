@@ -46,7 +46,8 @@
   },
   "caveats": {
     "label": "Réserves",
-    "reservationHigh": "La réservation étendue d'un cluster survivant dépasse 80% de sa RAM physique."
+    "reservationHigh": "La réservation étendue d'un cluster survivant dépasse 80% de sa RAM physique.",
+    "siteRawSubtraction": "La perte de site soustrait tous les hôtes du site en panne, y compris les hôtes des clusters déclarés étendus. Le delta avant/après comptabilise cette capacité étendue comme retirée ; le basculement sur le site survivant n'est pas modélisé."
   },
   "empty": {
     "noSelection": "Sélectionnez des hôtes (Perte de serveur) ou un site (Perte de site) pour simuler.",
