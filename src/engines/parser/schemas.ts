@@ -1,6 +1,16 @@
 import { z } from 'zod'
 import type { Cores, MHz, MiB, Sockets } from '@/engines/units'
-import type { VDatastoreRow, VHostRow, VInfoRow, VMetaDataRow, VPartitionRow } from '@/types'
+import type {
+  VDatastoreRow,
+  VDvPortRow,
+  VDvSwitchRow,
+  VHostRow,
+  VInfoRow,
+  VMetaDataRow,
+  VNetworkRow,
+  VPartitionRow,
+  VSwitchRow,
+} from '@/types'
 
 /**
  * Runtime validators for the canonical row shapes — applied at the parser
@@ -60,6 +70,10 @@ export const VInfoRowSchema: z.ZodType<VInfoRow> = z.object({
   viSdkServer: z.string().trim(),
   provisionedMib: MibSchema,
   inUseMib: MibSchema,
+  // Empty allowed — the `[datastore] vm/vm.vmx` token is absent in some
+  // exports. Do NOT `.min(1)`: that would drop legitimate path-less rows
+  // (the P5 Powerstate/Template precedent).
+  path: z.string().trim(),
 })
 
 export const VHostRowSchema: z.ZodType<VHostRow> = z.object({
@@ -98,6 +112,45 @@ export const VPartitionRowSchema: z.ZodType<VPartitionRow> = z.object({
   capacityMib: MibSchema,
   consumedMib: MibSchema,
   freeMib: MibSchema,
+})
+
+const NonNegIntSchema = z.number().int().nonnegative()
+
+export const VNetworkRowSchema: z.ZodType<VNetworkRow> = z.object({
+  vm: z.string().trim().min(1),
+  network: z.string().trim(),
+  switch: z.string().trim(),
+  adapter: z.string().trim(),
+  connected: z.string().trim(),
+  cluster: z.string().trim(),
+  host: z.string().trim(),
+})
+
+export const VSwitchRowSchema: z.ZodType<VSwitchRow> = z.object({
+  host: z.string().trim().min(1),
+  cluster: z.string().trim(),
+  switch: z.string().trim().min(1),
+  ports: NonNegIntSchema,
+  freePorts: NonNegIntSchema,
+  mtu: NonNegIntSchema,
+})
+
+export const VDvSwitchRowSchema: z.ZodType<VDvSwitchRow> = z.object({
+  switch: z.string().trim().min(1),
+  name: z.string().trim(),
+  version: z.string().trim(),
+  hostMembers: z.string().trim(),
+  ports: NonNegIntSchema,
+  vms: NonNegIntSchema,
+  maxMtu: NonNegIntSchema,
+})
+
+export const VDvPortRowSchema: z.ZodType<VDvPortRow> = z.object({
+  port: z.string().trim().min(1),
+  switch: z.string().trim(),
+  vlan: z.string().trim(),
+  activeUplink: z.string().trim(),
+  standbyUplink: z.string().trim(),
 })
 
 export const VMetaDataRowSchema: z.ZodType<VMetaDataRow> = z.object({

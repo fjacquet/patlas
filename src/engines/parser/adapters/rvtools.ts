@@ -210,6 +210,7 @@ export const adaptRvtoolsVInfo = (sheet: ParsedSheet): VInfoRow[] => {
         viSdkServer: readString(readCol(row, cols.viSdkServer)),
         provisionedMib: mib(Math.max(0, readNumber(readCol(row, cols.provisionedMib)))),
         inUseMib: mib(Math.max(0, readNumber(readCol(row, cols.inUseMib)))),
+        path: '',
       }
     })
     .filter((r) => !isInternalRow(r.vmName))

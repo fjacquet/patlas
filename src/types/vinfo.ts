@@ -50,4 +50,10 @@ export interface VInfoRow {
   provisionedMib: MiB
   /** In-use storage. RVTools "In Use MB" reinterpreted as MiB. */
   inUseMib: MiB
+  /** RVTools `vInfo.Path` — the `[datastore] vm/vm.vmx` token. Empty string
+   *  when the column is absent. The ONLY valid cluster-identity path for
+   *  blank-`Cluster name` (vSAN/host-local) datastores: the vSAN relink
+   *  (P9 D-09) parses the `[datastore]` token out of this to attribute a
+   *  datastore to the VM's cluster. */
+  path: string
 }
