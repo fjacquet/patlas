@@ -5,27 +5,43 @@
     "server": "Perte de serveur",
     "site": "Perte de site"
   },
-  "fail": {
-    "legend": "Composants à simuler en panne"
+  "server": {
+    "legend": "Simuler ces hôtes en panne",
+    "clusterStep": "Hôtes en panne dans {{cluster}}",
+    "ofM": "{{n}} sur {{m}}"
+  },
+  "site": {
+    "legend": "Simuler ce site en panne",
+    "lost": "Charge physiquement présente sur {{site}} sans cible PRA étendue — perdue : {{n}} VM · {{cpu}} · {{ram}}"
   },
   "failed": {
     "chip": "panne simulée"
   },
+  "applyPlanned": {
+    "label": "Appliquer les ratios planifiés à ce scénario",
+    "on": "Ce résultat PRA utilise les ratios de la vue planifiée, pas les ratios mesurés.",
+    "off": "Ce résultat PRA utilise l'allocation mesurée."
+  },
   "stat": {
     "clusters": "Clusters",
-    "hosts": "Hôtes"
+    "hosts": "Hôtes",
+    "vms": "VM"
   },
   "before": "Avant",
   "after": "Après",
-  "physicalRemoved": "Ressources physiques retirées",
+  "impact": {
+    "cpuLabel": "CPU physique retiré",
+    "cores": "cœurs",
+    "ramLabel": "RAM physique retirée"
+  },
   "verdict": {
     "absorbs": "absorbe",
     "tight": "juste",
     "overflows": "dépassé"
   },
   "assumptions": {
-    "title": "Hypothèses",
-    "models": "Modélise : soustraction de capacité ; respecte le mode de comptabilisation actif.",
+    "title": "Ce qui est modélisé",
+    "models": "Modélise : la soustraction du CPU et de la RAM physiques des hôtes ou du site en panne ; respecte le mode de comptabilisation actif et les ratios d'allocation choisis.",
     "doesNotModel": "Ne modélise pas : le contrôle d'admission HA, les règles d'anti-affinité, la priorité de redémarrage des VM, le split-brain de cluster étendu."
   },
   "caveats": {
@@ -33,6 +49,7 @@
     "reservationHigh": "La réservation étendue d'un cluster survivant dépasse 80% de sa RAM physique."
   },
   "empty": {
-    "noSelection": "Sélectionnez un ou plusieurs composants pour simuler une panne."
+    "noSelection": "Sélectionnez des hôtes (Perte de serveur) ou un site (Perte de site) pour simuler.",
+    "noStretched": "La perte de site nécessite au moins un cluster que vous avez déclaré étendu. Aucun n'est déclaré dans cet instantané."
   }
 }

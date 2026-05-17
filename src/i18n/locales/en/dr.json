@@ -5,27 +5,43 @@
     "server": "Server loss",
     "site": "Site loss"
   },
-  "fail": {
-    "legend": "Components to simulate as failed"
+  "server": {
+    "legend": "Simulate these hosts failed",
+    "clusterStep": "Hosts failed in {{cluster}}",
+    "ofM": "{{n}} of {{m}}"
+  },
+  "site": {
+    "legend": "Simulate this site failed",
+    "lost": "Workload physically at {{site}} with no stretched DR target — lost: {{n}} VMs · {{cpu}} · {{ram}}"
   },
   "failed": {
     "chip": "simulated failed"
   },
+  "applyPlanned": {
+    "label": "Apply planned ratios to this scenario",
+    "on": "This DR result uses the planned lens ratios, not the measured ratios.",
+    "off": "This DR result uses the measured allocation."
+  },
   "stat": {
     "clusters": "Clusters",
-    "hosts": "Hosts"
+    "hosts": "Hosts",
+    "vms": "VMs"
   },
   "before": "Before",
   "after": "After",
-  "physicalRemoved": "Physical removed",
+  "impact": {
+    "cpuLabel": "Physical CPU removed",
+    "cores": "cores",
+    "ramLabel": "Physical RAM removed"
+  },
   "verdict": {
     "absorbs": "absorbs",
     "tight": "tight",
     "overflows": "overflows"
   },
   "assumptions": {
-    "title": "Assumptions",
-    "models": "Models: capacity subtraction; respects the active accounting mode.",
+    "title": "What this models",
+    "models": "Models: physical CPU and RAM subtraction for the failed hosts or site; respects the active accounting mode and the chosen allocation ratios.",
     "doesNotModel": "Does not model: HA admission control, anti-affinity rules, VM restart priority, stretched-cluster split-brain."
   },
   "caveats": {
@@ -33,6 +49,7 @@
     "reservationHigh": "A surviving cluster's stretched reservation exceeds 80% of its physical RAM."
   },
   "empty": {
-    "noSelection": "Select one or more components to simulate a loss."
+    "noSelection": "Select hosts (Server loss) or a site (Site loss) to simulate.",
+    "noStretched": "Site loss needs at least one cluster you have declared stretched. None are declared in this snapshot."
   }
 }
