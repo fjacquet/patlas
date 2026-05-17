@@ -116,6 +116,41 @@
 - [x] **TRD-04**: User sees a delta panel showing what changed between consecutive snapshots
 - [x] **TRD-05**: User can refresh the page and confirm trends are gone (no cross-session persistence)
 
+### Storage / Network / Detailed Views + Threshold Alerting (Phase 9 — analytics-core replan)
+
+> **DERIVED 2026-05-17 (Phase 9, CONTEXT D-01..D-11 + RVTools-Analyser #10/#12/#14).**
+> No storage/network/alerting/relink IDs existed before this phase; derived here
+> following the P5/P6 re-derivation precedent. Grouping per 09-RESEARCH:
+> **STG** = storage views (#10), **NET** = network inventory (#12),
+> **DTL** = detail drills (#12), **ALR** = threshold alerting (#12/#14),
+> **VSR** = vSAN VM->datastore->cluster relink (closes the open STR-04 under-count).
+> Store is `src/store/snapshotStore.ts` (NOT `datastoreStore.ts`); the relink join
+> key is `vInfo.Path` (NOT `vDisk."Disk Path"`) — both binding empirical corrections.
+
+- [ ] **STG-01**: User's storage is rolled up by Cluster / ESX / VM / Datastore through pure engine projections that compose into the single `buildEstateView` pass (no second `useMemo`)
+- [ ] **STG-02**: User sees a consumption lens (provisioned vs in-use, incl `.vswp`+snapshots) whose totals reconcile to the estate total with no double-count of shared LUNs
+- [ ] **STG-03**: User sees a capacity lens (capacity vs used vs free) from NAA-deduped datastores, never re-summing shared-LUN capacity
+- [ ] **STG-04**: User opens a dedicated top-level "Storage" ViewToggle segment (the extended `fieldset`+`aria-pressed` idiom) and switches the two lenses via the shipped accounting-toggle idiom; primary visual = ECharts treemap (consumption) / stacked-bar (capacity) through the single SVG `<Chart>` site, with the P3 DataTable + ColumnPicker + CSV alongside
+- [ ] **STG-05**: A storage value not derivable (e.g. an unrelinkable blank-`Cluster name` datastore's cluster identity) renders a factual em-dash sentinel, never fabricated onto a cluster
+- [ ] **NET-01**: User's RVTools `vInfo.Path` is parsed (the `[datastore] vm/vm.vmx` token) without regressing the validated parser (MiB canary + existing fixtures green — the P5 D-07 regression-gated-parser-change pattern)
+- [ ] **NET-02**: User's workbook is parsed for vNetwork / vSwitch / dvSwitch / dvPort as OPTIONAL sheets — absent ⇒ collected warning + `[]`, never a throw (the shipped `vDatastore`/`vPartition` factual-degrade pattern)
+- [ ] **NET-03**: User's parsed network sheets are validated by Zod schemas at the parser boundary; invalid rows are dropped + reported, never thrown unchecked
+- [ ] **NET-04**: User sees network topology rollups (standard vSwitch, distributed dvSwitch+dvPort, uplinks, portgroup VLANs, VM→portgroup mapping) produced as a pure projection in the single `buildEstateView` pass
+- [ ] **NET-05**: User opens a dedicated top-level "Network" ViewToggle segment showing the vSwitch / dvSwitch+dvPort / vNetwork tables via the P3 DataTable idiom; when network sheets are absent the view shows a single factual "network inventory not available in this export" line — no error styling, no icon, no crash, no editorial verb
+- [ ] **DTL-01**: User clicks a datastore row and drills into a screen-fit, export-ready Datastore detail (capacity / provisioned / in-use / free, VMs-on-it, host count, threshold flag marker) with a back affordance — lifted in-app view-state (the P5 `ClusterDetail` precedent), no router, no 2nd `useMemo`
+- [ ] **DTL-02**: User clicks a VM row and drills into a screen-fit VM detail (vCPU/vRAM, disks, partitions with per-row threshold flag marker, portgroups/switches, datastores) with a back affordance
+- [ ] **DTL-03**: User clicks a host in the Hosts view and drills into a screen-fit ESX storage+network detail (datastores mounted + vSwitch/dvSwitch/uplinks per host) that augments the shipped Hosts view (does not duplicate the P5 cluster-detail drill)
+- [ ] **ALR-01**: User's disk/partition/datastore/LU threshold alerting is computed as a pure factual projection — per-row booleans + counts only, no verdict, no editorial verb, no traffic-light color (D-04)
+- [ ] **ALR-02**: User's filesystem alert fires at the configured "% used" (`consumedMib/capacityMib`, default ≥ 90 % used), the datastore alert at the configured datastore used % (default > 85 % used), the LU alert at the configured NAA-keyed-datastore used % (default > 85 %)
+- [ ] **ALR-03**: User's threshold config is held in the in-memory Zustand inputs slice (the `plannedRatios` precedent) — REPLACE-never-mutate, NO new `localStorage` key, NO URL-hash; `clearAll`/refresh restores the defaults
+- [ ] **ALR-04**: User's threshold flags compose into the single `buildEstateView` pass and are reachable through the one sanctioned `useEstateView` memo (no second `useMemo`)
+- [ ] **ALR-05**: User edits the filesystem / datastore / LU threshold percentages in an in-memory config surface (the `PlannedRatiosControl` idiom: native numeric inputs + `safeNum` on-commit fallback, no error state) and the flagged-row marker (`bg-accent-500/15` + `border-l-2 border-accent-500`, no traffic-light) updates
+- [ ] **VSR-01**: User's blank-`Cluster name` datastore is attributed to a cluster via the `vInfo.Path` VM→datastore→cluster relink — the only valid blank-cluster attribution path (`vDatastore.Hosts` is a host *count*, not a name list)
+- [ ] **VSR-02**: User's blank-cluster datastore that no VM references stays estate-only with an em-dash, never fabricated onto a cluster (the no-domain-guesses invariant)
+- [ ] **VSR-03**: User's datastore whose referencing VMs span multiple clusters is surfaced as a factual "shared across N clusters" line, excluded from single-cluster rollups, with no proportional allocation guess and no double-count (D-10)
+- [ ] **VSR-04**: User's `VInfoRow.path` schema change ripples through `VInfoRowSchema` + every `VInfoRow` test literal without regressing existing consumers (default `''`; the P5 D-07 blast-radius pattern)
+- [ ] **VSR-05**: The vSAN relink is validated against the real 75-blank-`Cluster name` workbook (`20260430_1400_allvCenters.xlsx`) asserting a non-zero relink count — the STR-04 regression guard the binding decision memory demands (unit tests alone are insufficient); the test skips gracefully when the file is absent
+
 ### Visual UX (charts as first-class)
 
 - [x] **VIZ-01**: User sees crisp SVG charts at every zoom level (Apache ECharts with `{ renderer: 'svg' }` everywhere)
@@ -262,6 +297,29 @@
 | TRD-03 | Phase 8 | Complete |
 | TRD-04 | Phase 8 | Complete |
 | TRD-05 | Phase 8 | Complete |
+| STG-01 | Phase 9 | Pending |
+| STG-02 | Phase 9 | Pending |
+| STG-03 | Phase 9 | Pending |
+| STG-04 | Phase 9 | Pending |
+| STG-05 | Phase 9 | Pending |
+| NET-01 | Phase 9 | Pending |
+| NET-02 | Phase 9 | Pending |
+| NET-03 | Phase 9 | Pending |
+| NET-04 | Phase 9 | Pending |
+| NET-05 | Phase 9 | Pending |
+| DTL-01 | Phase 9 | Pending |
+| DTL-02 | Phase 9 | Pending |
+| DTL-03 | Phase 9 | Pending |
+| ALR-01 | Phase 9 | Pending |
+| ALR-02 | Phase 9 | Pending |
+| ALR-03 | Phase 9 | Pending |
+| ALR-04 | Phase 9 | Pending |
+| ALR-05 | Phase 9 | Pending |
+| VSR-01 | Phase 9 | Pending |
+| VSR-02 | Phase 9 | Pending |
+| VSR-03 | Phase 9 | Pending |
+| VSR-04 | Phase 9 | Pending |
+| VSR-05 | Phase 9 | Pending |
 | HTM-01 | Phase 7 | Pending |
 | HTM-02 | Phase 7 | Pending |
 | HTM-03 | Phase 7 | Pending |
@@ -276,12 +334,12 @@
 
 **Coverage:**
 
-- v1 requirements: 68 total (counted: FND 5 + PAR 5 + PRV 3 + DSH 6 + VIZ 3 + INV 6 + MVC 4 + STR 4 + ALC 4 + DRS 6 + EOS 6 + TRD 5 + HTM 5 + PPT 4 + DEP 2 = 68)
-- Mapped to phases: 68 (final mapping, validated by roadmapper)
+- v1 requirements: 91 total (the original 68 + 23 derived Phase-9 IDs: STG 5 + NET 5 + DTL 3 + ALR 5 + VSR 5 = 23). Phase 9 was roadmap-marked "Requirements: TBD — re-derive in discuss-phase"; derived 2026-05-17 in plan-phase per CONTEXT D-01..D-11 + RVTools-Analyser #10/#12/#14
+- Mapped to phases: 91 (68 original + 23 Phase-9 derived)
 - Unmapped: 0
 
 **Note:** The "56 total" figure in earlier drafts was a miscount — the actual v1 requirement total is **68**. Coverage remains 100 %.
 
 ---
 *Requirements defined: 2026-05-15*
-*Last updated: 2026-05-15 after roadmap creation — traceability finalized with 7-phase mapping*
+*Last updated: 2026-05-17 — Phase 9 requirement IDs (STG/NET/DTL/ALR/VSR) derived during plan-phase per CONTEXT D-01..D-11*

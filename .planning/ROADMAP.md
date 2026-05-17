@@ -210,9 +210,21 @@ Plans:
 **NEW â analytics-core replan.** Reference = RVTools Analyser functions #10, #12, #14. Scope is bounded by **OPEN-2** (how far to mirror the dedicated-screen nav taxonomy vs the current Dashboardâ·Inventory ViewToggle) and **OPEN-3** (whether threshold alerting + a user-config surface is in this milestone) â both resolved in discuss-phase before planning.
 **Goal**: Storage views (total disk sizes by Cluster / ESX / VM / Datastore), detailed Cluster/ESX/VM/Datastore views with disk & partition **threshold alerting**, ports & switches (network) detail, and the personal-config surface for thresholds (filesystem / logical units) â all client-side, in-memory.
 **Depends on**: Phase 4, Phase 5
-**Requirements**: TBD â re-derive in discuss-phase (RVTools-Analyser #10/#12/#14; OPEN-2/3)
-**Success Criteria**: TBD â re-derive in discuss-phase
-**Plans**: TBD
+**Requirements**: STG-01..05, NET-01..05, DTL-01..03, ALR-01..05, VSR-01..05 (derived 2026-05-17 in plan-phase per CONTEXT D-01..D-11 + RVTools-Analyser #10/#12/#14; see REQUIREMENTS.md)
+**Success Criteria** (what must be TRUE):
+
+  1. A user opens a top-level "Storage" segment and sees disk sizes by Cluster/ESX/VM/Datastore under two lenses (consumption / capacity) - treemap + stacked-bar via the single SVG <Chart> site - with totals reconciling to the estate total and no shared-LUN double-count
+  2. A user opens a top-level "Network" segment and sees vSwitch / dvSwitch+dvPort / vNetwork tables; a workbook with no network sheets shows a single factual "network inventory not available" line with no crash, no icon, no editorial verb
+  3. A user clicks a datastore / VM / host and drills into a screen-fit, export-ready detail screen (the P5 ClusterDetail idiom) with a back affordance; unrelinkable blank-cluster datastores render an em-dash, never fabricated
+  4. A user edits filesystem / datastore / LU threshold percentages in an in-memory config surface (no localStorage, refresh = defaults) and flagged rows carry a factual gold marker only - no traffic-light, no editorial verb
+  5. The blank-Cluster-name datastore vSAN relink keys off vInfo.Path, resolves a non-zero count on the real 75-blank-cluster workbook (the STR-04 regression guard), surfaces shared-LUN as "shared across N clusters", and never regresses the validated parser (MiB canary green)
+  6. Every P9 projection composes in the single buildEstateView pass - no second useMemo; engines pure and >=75% covered; EN/FR i18n parity
+**Plans**: 5 plans
+  - [ ] 09-01-PLAN.md - regression-gated parser extension (vInfo.Path + vNetwork/vSwitch/dvSwitch/dvPort OPTIONAL sheets)
+  - [ ] 09-02-PLAN.md - vSAN relink + two-lens storage-by-X + network rollup pure engines
+  - [ ] 09-03-PLAN.md - in-memory thresholds slice + thresholdFlags engine + single-buildEstateView composition
+  - [ ] 09-04-PLAN.md - Storage view shell + lens toggle + threshold config + Datastore/VM detail drills
+  - [ ] 09-05-PLAN.md - Network view + ESX detail (augments Hosts) + mandatory real-file relink validation gate
 **UI hint**: yes
 **Pitfalls owned**: threshold config must not breach the privacy invariant (UI prefs only, never dataset rows); factual alerting (no editorial verbs)
 
