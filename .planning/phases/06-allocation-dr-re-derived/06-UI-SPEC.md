@@ -1,10 +1,11 @@
 ---
 phase: 6
 slug: allocation-dr-re-derived
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-05-17
+reviewed_at: 2026-05-17T00:00:00Z
 ---
 
 # Phase 6 — UI Design Contract
@@ -129,6 +130,8 @@ All strings land in BOTH `en/` and `fr/` namespaces (EN/FR parity is a hard cons
 | `Verdict` enum + `survivorVerdict` | `src/engines/drSim/allocate.ts` | REUSE for the physical survivor verdict (feed physical capacity vs surviving load). Factual-only by design — no UI restyle. |
 | Palette / `.panel` / sentinel | `src/index.css` | REUSE verbatim. No new tokens, no new component classes. |
 
+**Planning-screen focal hierarchy (screen-level):** On the single Planning screen the planned-ratios block sits ABOVE the reworked DR-sim panel, separated by the `2xl` vertical break — the user reads/sets inputs first (top), then sees the consequence (bottom). The DR result's single gold physical-impact headline figure (the evacuated/removed physical CPU+RAM total, Color reserved-item 2) is the primary visual reward after input — it is the one element the eye lands on in the result region. This stays consistent with the locked 60/30/10 + single-gold-figure rule: no second gold element is introduced (the active Planning ViewToggle segment is the only other accent use and lives in the top-level nav, not on this screen body).
+
 ---
 
 ## Interaction Contract
@@ -162,11 +165,11 @@ RECOMMENDATION: **Show the `Verdict` enum WORD alongside the physical numbers** 
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-05-17
