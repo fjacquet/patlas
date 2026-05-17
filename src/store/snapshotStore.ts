@@ -4,8 +4,7 @@ import type { Snapshot } from '@/types/snapshot'
 
 const EMPTY_SCENARIO = (): DrScenario => ({
   failedHosts: new Set(),
-  failedClusters: new Set(),
-  failedVCenters: new Set(),
+  failedSites: new Set(),
 })
 
 /**
@@ -110,8 +109,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
     set({
       scenario: {
         failedHosts: new Set(scenario.failedHosts),
-        failedClusters: new Set(scenario.failedClusters),
-        failedVCenters: new Set(scenario.failedVCenters),
+        failedSites: new Set(scenario.failedSites),
       },
     }),
 

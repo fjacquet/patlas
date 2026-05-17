@@ -219,6 +219,8 @@ export function buildEstateView(
     operationalInsights,
     clusterInsights,
     clusterDetail,
+    plannedView: null,
+    plannedDrSim: null,
   }
 }
 
@@ -257,4 +259,6 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   operationalInsights: EMPTY_INSIGHTS,
   clusterInsights: new Map(),
   clusterDetail: new Map(),
+  plannedView: null,
+  plannedDrSim: null,
 })

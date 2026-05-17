@@ -370,6 +370,21 @@ export interface EstateView {
   /** P5 per-cluster full detail projection for the drill screen
    *  (aggregate + insights), keyed by cluster name. */
   clusterDetail: Map<string, ClusterDetail>
+  /**
+   * P6 capacity-planning "what-if" projection (PLN-03/PLN-04). The
+   * estate re-aggregated under the user's PLANNED Personal Ratios — a
+   * SEPARATE, explicitly-"planned" surface, never overwriting the
+   * measured `globals`/`clusters` (D-02/D-03). `null` only in the
+   * frozen `EMPTY_VIEW`; otherwise always present (planned ratios
+   * default 4:1/1:1, D-05). Produced inside the single
+   * `buildEstateView` pass — no second `useMemo` (D-11). */
+  plannedView: { globals: GlobalSummary; clusters: ClusterAggregate[] } | null
+  /**
+   * P6 Custom Failover (D-11): the SAME `runScenario` sim re-run with
+   * the PLANNED ratios applied. Never a third DR mode and never
+   * conflated with the measured `drSim`. `null` when no scenario is
+   * marked failed or the planned ratios are not applied to DR. */
+  plannedDrSim: DrSimResult | null
 }
 
 /**
@@ -406,34 +421,48 @@ export interface ClusterDetail {
 /** Factual per-survivor headroom verdict (no color, no editorial verb). */
 export type Verdict = 'absorbs' | 'tight' | 'overflows'
 
-/** The dominant DR loss mode of a scenario (UI selector state echo). */
-export type DrMode = 'host' | 'cluster' | 'vcenter'
+/**
+ * The DR loss mode of a scenario (UI selector state echo). Phase-6
+ * re-derivation (D-12 / G3): exactly two modes — `server` (a set of
+ * failed hosts removed with their VMs) and `site` (a set of failed
+ * fault-domains removed). Cluster-loss (DRS-02) and vCenter-loss
+ * (DRS-03) are RETIRED — they were UAT-rejected.
+ */
+export type DrMode = 'server' | 'site'
 
 /**
  * Inputs-only DR what-if selection. Sets are REPLACED never mutated
  * (Zustand `Object.is`); never persisted (no hash, no localStorage).
+ * Phase-6 re-derivation (D-07/D-08): `failedHosts` drives Server loss;
+ * `failedSites` holds `faultDomain` values driving Site loss.
  */
 export interface DrScenario {
   failedHosts: Set<string>
-  failedClusters: Set<string>
-  failedVCenters: Set<string>
+  failedSites: Set<string>
 }
 
 /**
  * DR simulation result — the SHIPPED aggregation re-run on the survivor
- * row subset. Wrong DR numbers are the project's #1 risk; `confidence`
- * + `caveats` (i18n KEYS, never free text / numbers / editorial verbs)
- * are the structural disclosure mitigation (DRS-05).
+ * row subset. Wrong DR numbers are the project's #1 risk; the factual
+ * `caveats` (i18n KEYS, never free text / numbers / editorial verbs)
+ * are the structural disclosure mitigation (DRX-03). Phase-6
+ * re-derivation (D-09/D-10): impact is PHYSICAL CPU (GHz + cores) +
+ * PHYSICAL RAM removed (never vCPU); the high/med/low `confidence`
+ * grade is RETIRED entirely (the tool does not judge the user's
+ * scenario — DRX-05) while `caveats`/assumptions survive verbatim.
  */
 export interface DrSimResult {
   mode: DrMode
   before: GlobalSummary
   after: GlobalSummary
-  /** Σ failed-side allocation (the single gold accent figure). */
-  evacueeVcpu: Cores
-  evacueeVramMib: MiB
+  /** Physical CPU clock removed (before − after `physicalGhz`). The
+   *  single gold accent figure, with `physicalCpuRemovedCores`. */
+  physicalCpuRemovedGhz: GHz
+  /** Physical CPU cores removed (before − after `physicalCores`). */
+  physicalCpuRemovedCores: Cores
+  /** Physical RAM removed (before − after `physicalRamMib`). */
+  physicalRamRemovedMib: MiB
   perSurvivor: { cluster: string; verdict: Verdict }[]
-  confidence: 'high' | 'medium' | 'low'
   /** i18n key suffixes (e.g. `caveats.reservationHigh`) — never free
    *  text, never a pre-formatted number, never an editorial verb. */
   caveats: string[]

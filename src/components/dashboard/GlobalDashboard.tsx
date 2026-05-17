@@ -68,7 +68,7 @@ export function GlobalDashboard() {
   const setStretchedClusters = useSnapshotStore(selectSetStretchedClusters)
   const scenario = useSnapshotStore(selectScenario)
   const setScenario = useSnapshotStore(selectSetScenario)
-  const [drMode, setDrMode] = useState<DrMode>('host')
+  const [drMode, setDrMode] = useState<DrMode>('server')
   // RCI drill: in-app view state (like `mode`) — NOT a router, NOT a 2nd memo.
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null)
   // Toggle one cluster's stretched membership. Set is REPLACED (never

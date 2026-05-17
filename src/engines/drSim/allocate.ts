@@ -46,3 +46,27 @@ export const survivorVerdict = (
   const ram = band(c.vramAllocatedMib as number, c.capacityRamMib as number)
   return worse(cpu, ram)
 }
+
+/**
+ * PHYSICAL-basis survivor verdict (Phase-6 D-09): the DR survivor
+ * headroom judged against PHYSICAL capacity, never vCPU. Load is the
+ * physically-consumed resource (`consumedGhz`/`consumedRamMib`);
+ * capacity is the PHYSICAL host capacity NET of the stretched DR
+ * reservation (`physicalGhz − drReservedGhz`, `physicalRamMib −
+ * drReservedRamMib`) — the ratio is NOT re-derived here (the
+ * `aggregateClusters` DRY contract holds; the reservation was already
+ * baked there). Sibling to `survivorVerdict` so existing measured
+ * consumers keep their signature (minimal blast radius).
+ */
+export const survivorPhysicalVerdict = (
+  c: Pick<
+    ClusterAggregate,
+    'consumedGhz' | 'physicalGhz' | 'drReservedGhz' | 'consumedRamMib' | 'physicalRamMib' | 'drReservedRamMib'
+  >,
+): Verdict => {
+  const cpuCap = (c.physicalGhz as number) - (c.drReservedGhz as number)
+  const ramCap = (c.physicalRamMib as number) - (c.drReservedRamMib as number)
+  const cpu = band(c.consumedGhz as number, cpuCap)
+  const ram = band(c.consumedRamMib as number, ramCap)
+  return worse(cpu, ram)
+}

@@ -11,7 +11,7 @@ export interface DrSimPanelProps {
   onScenario: (s: DrScenario) => void
 }
 
-const MODES: readonly DrMode[] = ['host', 'cluster', 'vcenter']
+const MODES: readonly DrMode[] = ['server', 'site']
 
 /** Active set + replace-never-mutate toggler for the current mode. */
 const toggleIn = (set: Set<string>, value: string): Set<string> => {
@@ -63,33 +63,31 @@ export function DrSimPanel({ view, drMode, onDrMode, scenario, onScenario }: DrS
     }
   }
 
-  // The selectable components + the active failed-set for the current mode.
+  // The selectable components + the active failed-set for the current
+  // mode. Server loss = the estate's hosts; Site loss = the distinct
+  // fault-domain values declared on hosts (D-07/D-08).
   const options: { value: string; label: string }[] =
-    drMode === 'host'
+    drMode === 'server'
       ? [...new Set(view.hosts.map((h) => h.hostName))].map((v) => ({ value: v, label: v }))
-      : drMode === 'cluster'
-        ? view.clusters.map((c) => ({ value: c.cluster, label: c.cluster }))
-        : view.vcenters.map((vc) => ({ value: vc.viSdkUuid, label: vc.label }))
+      : [
+          ...new Set(
+            view.hosts.map((h) => h.faultDomain).filter((fd): fd is string => Boolean(fd)),
+          ),
+        ].map((v) => ({ value: v, label: v }))
 
-  const activeSet =
-    drMode === 'host'
-      ? scenario.failedHosts
-      : drMode === 'cluster'
-        ? scenario.failedClusters
-        : scenario.failedVCenters
+  const activeSet = drMode === 'server' ? scenario.failedHosts : scenario.failedSites
 
   const toggle = (value: string) => {
     const next = toggleIn(activeSet, value)
     onScenario({
-      failedHosts: drMode === 'host' ? next : scenario.failedHosts,
-      failedClusters: drMode === 'cluster' ? next : scenario.failedClusters,
-      failedVCenters: drMode === 'vcenter' ? next : scenario.failedVCenters,
+      failedHosts: drMode === 'server' ? next : scenario.failedHosts,
+      failedSites: drMode === 'site' ? next : scenario.failedSites,
     })
   }
 
   const summary = (g: GlobalSummary) => [
-    { label: t('mode.cluster'), value: fmtInt(g.clusterCount, loc) },
-    { label: t('mode.host'), value: fmtInt(g.hostCount, loc) },
+    { label: t('stat.clusters'), value: fmtInt(g.clusterCount, loc) },
+    { label: t('stat.hosts'), value: fmtInt(g.hostCount, loc) },
     { label: 'VMs', value: fmtInt(g.vmCount, loc) },
     { label: 'GHz', value: fmtGhzValue(g.availableGhz as number, loc) },
     { label: 'RAM MiB', value: fmtInt(g.availableRamMib as number, loc) },
@@ -182,12 +180,15 @@ export function DrSimPanel({ view, drMode, onDrMode, scenario, onScenario }: DrS
               ))}
             </div>
             <div className="min-w-[160px]">
-              <p className="text-sm text-slate-600 dark:text-slate-400">{t('evacueeTotal')}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                {t('physicalRemoved')}
+              </p>
               <p className="font-mono text-2xl font-semibold tabular-nums text-accent-500">
-                {fmtInt(drSim.evacueeVcpu as number, loc)} vCPU
+                {fmtGhzValue(drSim.physicalCpuRemovedGhz as number, loc)} GHz
               </p>
               <p className="font-mono text-sm tabular-nums text-accent-500">
-                {fmtInt(drSim.evacueeVramMib as number, loc)} MiB
+                {fmtInt(drSim.physicalCpuRemovedCores as number, loc)} cores ·{' '}
+                {fmtInt(drSim.physicalRamRemovedMib as number, loc)} MiB
               </p>
             </div>
           </div>
@@ -205,11 +206,6 @@ export function DrSimPanel({ view, drMode, onDrMode, scenario, onScenario }: DrS
               </li>
             ))}
           </ul>
-
-          <div className="flex items-baseline gap-2 text-xs text-slate-600 dark:text-slate-400">
-            <span className="font-semibold">{t('confidence.label')}</span>
-            <span>{t(`confidence.${drSim.confidence}`)}</span>
-          </div>
 
           {drSim.caveats.length > 0 && (
             <div className="text-xs text-slate-600 dark:text-slate-400">

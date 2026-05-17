@@ -2,9 +2,8 @@
   "title": "DR simulation",
   "mode": {
     "label": "Loss scenario",
-    "host": "Host loss",
-    "cluster": "Cluster loss",
-    "vcenter": "vCenter loss"
+    "server": "Server loss",
+    "site": "Site loss"
   },
   "fail": {
     "legend": "Components to simulate as failed"
@@ -12,9 +11,13 @@
   "failed": {
     "chip": "simulated failed"
   },
+  "stat": {
+    "clusters": "Clusters",
+    "hosts": "Hosts"
+  },
   "before": "Before",
   "after": "After",
-  "evacueeTotal": "Evacuee total",
+  "physicalRemoved": "Physical removed",
   "verdict": {
     "absorbs": "absorbs",
     "tight": "tight",
@@ -24,12 +27,6 @@
     "title": "Assumptions",
     "models": "Models: capacity subtraction; respects the active accounting mode.",
     "doesNotModel": "Does not model: HA admission control, anti-affinity rules, VM restart priority, stretched-cluster split-brain."
-  },
-  "confidence": {
-    "label": "Confidence",
-    "high": "high",
-    "medium": "medium",
-    "low": "low"
   },
   "caveats": {
     "label": "Caveats",
