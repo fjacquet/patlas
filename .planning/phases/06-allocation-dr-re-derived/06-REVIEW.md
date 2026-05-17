@@ -82,6 +82,7 @@ project's #1 risk (`types/estate.ts:446`), and a silent all-`overflows` planned 
 data-integrity defect.
 **Fix:** Sanitize on commit, mirroring the existing `useAllocationHash` clamp idiom (KISS, no
 new dep):
+
 ```ts
 const CPU_MIN = 1
 const RAM_MIN = 0.25
@@ -94,6 +95,7 @@ onChange={(e) => setRatios({ ...ratios, cpu: safeNum(e.target.value, CPU_MIN, ra
 // ram field:
 onChange={(e) => setRatios({ ...ratios, ram: safeNum(e.target.value, RAM_MIN, ratios.ram) })}
 ```
+
 Alternatively guard at the store boundary in `setPlannedRatios` so any caller is protected.
 
 ## Warnings
@@ -199,6 +201,6 @@ the URL-hash sliders.
 
 ---
 
-_Reviewed: 2026-05-17_
-_Reviewer: Claude (gsd-code-reviewer)_
-_Depth: standard_
+*Reviewed: 2026-05-17*
+*Reviewer: Claude (gsd-code-reviewer)*
+*Depth: standard*

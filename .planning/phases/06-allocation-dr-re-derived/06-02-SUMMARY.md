@@ -98,12 +98,13 @@ all on the 06-01 spine with zero greenfield rewrites.
 ### Auto-fixed Issues
 
 **1. [Rule 3 - Blocking] JSDoc prose tripped two literal grep acceptance gates**
+
 - **Found during:** Task 2
 - **Issue:** The url-hash gate (`grep -v '^#' … | grep -c 'useAllocationHash\|…\|localStorage'` == 0)
   and the planning-dir memo gate (`grep -rc 'useMemo' src/components/planning/` == 0) are
   literal token counts. `grep -v '^#'` only strips lines starting with a literal `#`, so
   explanatory JSDoc that *names the anti-pattern to forbid it* (`NO \`useAllocationHash\`,
-  NO localStorage` in `PlannedRatiosControl`; `no second \`useMemo\`` in `PlanningView`)
+  NO localStorage` in `PlannedRatiosControl`;`no second \`useMemo\`` in `PlanningView`)
   counted against the gate even though no such call/import exists. Same class as 06-01
   deviation #3 (JSDoc tripping a structural grep gate).
 - **Fix:** Reworded both JSDoc blocks to preserve the privacy/single-memo rationale
@@ -115,6 +116,7 @@ all on the 06-01 spine with zero greenfield rewrites.
 - **Commit:** dbb65a0
 
 **2. [Plan discretion exercised] Commit ordering Task 2 before Task 1**
+
 - The plan lists Task 1 (ViewToggle + App import of `PlanningView`) before Task 2
   (creates `PlanningView`). `App.tsx` cannot compile without `PlanningView` existing, so
   committing Task 1 first would yield a non-compiling commit. Committed the self-contained

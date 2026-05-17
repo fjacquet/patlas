@@ -37,12 +37,14 @@
 **The rule the analog establishes** (`schemas.ts` lines 5-15): Zod is applied at exactly one boundary; engines downstream never re-validate. The eos schema is the *second* such boundary (the catalogue, mirroring the parser-row boundary).
 
 **Schema-shape idiom to mirror** (`schemas.ts` lines 45-63 — `z.object` of typed fields, exported `z.ZodType<T>`-annotated const + inferred type):
+
 ```typescript
 export const VInfoRowSchema: z.ZodType<VInfoRow> = z.object({
   vmName: z.string().trim().min(1),
   // ...
 })
 ```
+
 For eos, use the exact `EosCatalogueSchema`/`Release`/`Product` shape spelled out verbatim in **RESEARCH.md §Pattern 1 (lines 178-196)** — `releases[].eolFrom` is the single standard-support date (D-04); `eoesFrom`/`isEoes` deliberately absent from the schema. Add `export type EosCatalogue = z.infer<typeof EosCatalogueSchema>` (same inferred-type idiom).
 
 **Critical:** this is the ONLY file in `src/engines/eos/` that imports `zod`. `normalizeOs.ts`/`classifyEsxi.ts`/`bucketEos.ts` stay Zod-free and receive the typed `EosCatalogue` as a parameter (RESEARCH Anti-Pattern: "Importing catalogue.json inside a pure engine").
@@ -62,6 +64,7 @@ For eos, use the exact `EosCatalogueSchema`/`Release`/`Product` shape spelled ou
 **Analog:** `src/engines/aggregation/osFamily.ts`
 
 **Header/purity idiom to mirror** (`osFamily.ts` lines 1-20):
+
 ```typescript
 /**
  * OS-family classifier (DSH-04) — pure, no deps, Zod-free. ...
@@ -103,12 +106,14 @@ export function classifyOsFamily(osConfig: string, osTools: string): OsFamily {
 **Analog:** itself — the shipped `plannedView` / `drSim` / `trends` field idiom.
 
 **Exact extension pattern** — mirror how `drSim`/`plannedView` ride the single pass (`estateView.ts` lines 212-248) and are added to the return object (lines 250-267):
+
 ```typescript
 // existing pattern (lines 250-267): one return object, each forward-compat
 // field added as `null` in EMPTY_VIEW (lines 290-307, e.g. `trends: null`,
 // `plannedView: null`).
 return { globals, clusters, hosts, /* ... */ plannedView, plannedDrSim }
 ```
+
 Add `eos` exactly as RESEARCH.md §Integration (lines 403-415) prescribes: `import { buildEosProjection }` + `import { loadEosCatalogue }` at top; inside `buildEstateView`, in the **same loop family** as the existing `for (const vm of merged.vinfo)` `classifyOsFamily` pass (lines 108-126 — it rides this existing iteration, no second pass), compute `const eos = buildEosProjection({ vinfo, vhost, catalogue: loadEosCatalogue(), today: new Date() })`; `return { ...existingFields, eos }`. Add a frozen empty `eos` to `EMPTY_VIEW` (mirror `trends: null` / `EMPTY_INSIGHTS` Object.freeze idiom, lines 270-307).
 
 **Anti-pattern (RESEARCH lines 245-247):** a second `useMemo` for eos — it composes inside the existing `buildEstateView` single pass (grep-gated single-memo invariant; see `useEstateView.ts` doc lines 14-41).
@@ -128,10 +133,12 @@ Add `eos` exactly as RESEARCH.md §Integration (lines 403-415) prescribes: `impo
 **Analog:** itself — proven twice (P5 added `'hosts'`, P6 added `'planning'`).
 
 **Exact two-line change** (`ViewToggle.tsx` lines 3-5):
+
 ```typescript
 export type AppView = 'dashboard' | 'inventory' | 'hosts' | 'planning'   // → add | 'eos'
 const VIEWS = ['dashboard', 'inventory', 'hosts', 'planning'] as const   // → add 'eos'
 ```
+
 Keep EVERYTHING else verbatim: the `<fieldset role="group">` + `biome-ignore` comment (lines 48-49 — a CI grep gate asserts the literal `role="group"` presence), `<legend className="sr-only">`, the arrow-wraparound `move()`/`onKeyDown` (lines 31-45), `aria-pressed`, `bg-accent-500 text-surface-900` active styling, `h-10` button height. The segment label comes from `t(`nav.${view}`)` (line 70) — so add `nav.eos` to BOTH locale files (next pattern).
 
 ---
@@ -141,6 +148,7 @@ Keep EVERYTHING else verbatim: the `<fieldset role="group">` + `biome-ignore` co
 **Analog:** `src/components/hosts/HostsView.tsx` (primary) + `src/components/planning/PlanningView.tsx` (error-boundary + empty-state)
 
 **Shell skeleton to copy verbatim** (`HostsView.tsx` lines 25-37, 107-114):
+
 ```tsx
 export function EosView() {
   const { t, i18n } = useTranslation('eos')   // new 'eos' namespace
@@ -157,6 +165,7 @@ export function EosView() {
 }
 const Stat = ({ label, value }: { label: string; value: string }) => ( /* lines 107-114 verbatim */ )
 ```
+
 - **Bucket strip:** reuse the `Stat` label↔value composition (`HostsView.tsx` lines 107-114) inside native `<button>` tiles (UI-SPEC §Component Inventory). `font-mono tabular-nums` for every count (`HostsView.tsx` line 79).
 - **Unknown-OS raw-string list:** copy the plain `<table className="w-full text-left text-sm">` + `<tbody className="font-mono tabular-nums">` + `break-all` cell idiom (`HostsView.tsx` lines 64-98; the `break-all` verbatim-string cell is line 85). This is the D-11 list, NOT the `DataTable` (UI-SPEC Open Item 3).
 - **Empty-state + scoped error boundary:** if needed, copy the `if (!snapshot) return <main>...</main>` early-return (`PlanningView.tsx` lines 64-77) and the `<ErrorBoundary FallbackComponent={...}>` reading only `error.message` (`PlanningView.tsx` lines 21-32, 81).
@@ -169,6 +178,7 @@ const Stat = ({ label, value }: { label: string; value: string }) => ( /* lines 
 **Analog:** `src/components/inventory/DataTable.tsx` (D-08 — 4th-context reuse, no new table)
 
 **Props contract to satisfy** (`DataTable.tsx` lines 22-28):
+
 ```typescript
 export interface DataTableProps<T> {
   data: T[]
@@ -177,6 +187,7 @@ export interface DataTableProps<T> {
   objectKind: 'vm' | 'esx' | 'datastore'   // CSV filename driver
 }
 ```
+
 Pass the selected bucket's affected entities as `data`, the existing VM/ESX `columns` defs from `src/components/inventory/columns/`, `objectKind: 'vm' | 'esx'`. Sorting/filter/column-visibility is the component's own `useState` — never a 2nd memo, never persisted (privacy). The unknown-OS bucket does NOT use this — it renders the raw-string list (UI-SPEC Open Item 3).
 
 ---
@@ -194,6 +205,7 @@ Pass the selected bucket's affected entities as `data`, the existing VM/ESX `col
 **Analog:** itself — the `activeView === 'planning' ? <PlanningView /> : ...` chain (`App.tsx` lines 38-45).
 
 **Exact one-branch insertion** (mirror lines 42-43):
+
 ```tsx
 ) : activeView === 'planning' ? (
   <PlanningView />
@@ -202,6 +214,7 @@ Pass the selected bucket's affected entities as `data`, the existing VM/ESX `col
 ) : (
   <GlobalDashboard />
 ```
+
 Plus the `import { EosView } from './components/eos/EosView'` next to the existing view imports (lines 4-9).
 
 ---
@@ -211,12 +224,14 @@ Plus the `import { EosView } from './components/eos/EosView'` next to the existi
 **Analog:** itself — `fmtInt` (lines 20-21), `fmtPercent` (lines 67-70) — the locale-param + em-dash-on-bad-input idiom.
 
 **Pattern (verified — NO date helper exists today; RESEARCH "Don't Hand-Roll" row 5):**
+
 ```typescript
 export const fmtDate = (iso: string, locale = 'fr-FR'): string => {
   const d = new Date(iso)
   return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString(locale, { /* ... */ })
 }
 ```
+
 Mirror `fmtInt` exactly: `locale` parameter (callers pass `i18n.language`), em-dash sentinel on invalid input (never `0`/"N/A" — `format.ts` lines 14, 20-21). No pre-formatted dates in i18n strings (D-03/UI-SPEC §Typography); the view calls `fmtDate` and interpolates.
 
 ---
@@ -226,9 +241,11 @@ Mirror `fmtInt` exactly: `locale` parameter (callers pass `i18n.language`), em-d
 **Analog:** `src/i18n/locales/en/inventory.json`
 
 **Structure to mirror** (`inventory.json` lines 1-45 — nested `nav`/`col`/`table` groups, `{{count}}` interpolation, no pre-formatted numbers):
+
 ```json
 { "nav": { "eos": "..." }, "view": { "heading": "..." }, "bucket": { ... }, "freshness": { ... }, "unknown": { ... } }
 ```
+
 - Add `nav.eos` to the EXISTING `inventory.json` `nav` group (lines 2-8) too — `ViewToggle` reads `t('nav.${view}', { ns: 'inventory' })` (the `useTranslation('inventory')` at `ViewToggle.tsx` line 28). Add to BOTH `en/inventory.json` and `fr/inventory.json`.
 - Create `en/eos.json` + `fr/eos.json` for the view's own strings (the `EosView` uses `useTranslation('eos')`).
 - All copy is the factual contract in **UI-SPEC.md §Copywriting Contract (lines 100-117)** — no editorial verbs; "overdue"/"at-risk" are neutral time labels only; em-dash sentinel; EN/FR parity is a hard gate.
@@ -246,26 +263,32 @@ Mirror `fmtInt` exactly: `locale` parameter (callers pass `i18n.language`), em-d
 ## Shared Patterns
 
 ### Purity / Zod-only-at-boundary
+
 **Source:** `src/engines/parser/schemas.ts` (lines 5-15 doc), `src/engines/aggregation/osFamily.ts` (lines 1-9)
 **Apply to:** all `src/engines/eos/*.ts` — `catalogueSchema.ts` is the ONLY Zod importer; `normalizeOs/classifyEsxi/bucketEos` are pure, dep-free, receive the typed catalogue as an argument. `import type` only for cross-module types.
 
 ### Single-memo / single-pass aggregation
+
 **Source:** `src/hooks/useEstateView.ts` (lines 14-41 doc, 48-57), `src/engines/aggregation/estateView.ts` (lines 108-126, 250-267)
 **Apply to:** the `eos` projection composes inside the existing `buildEstateView` pass on the existing `merged.vinfo` iteration; `EosView` is a pure presenter calling `useEstateView('active')` once. NO second `useMemo`, NO component-level recompute (grep-gated invariant).
 
 ### Em-dash "not determinable" sentinel
+
 **Source:** `src/utils/format.ts` (lines 14, 20-21), `src/engines/aggregation/estateView.ts` (lines 32-39 datastore-count idiom), `src/components/hosts/HostsView.tsx` (line 33 `txt()` helper)
 **Apply to:** ESXi patch-level EOL (D-09c — never fabricate), any non-computable lifecycle date, the new `fmtDate` on invalid input. Never `0`, never "N/A".
 
 ### Factual presentation / no-verdict (G1 lesson)
+
 **Source:** `src/components/hosts/HostsView.tsx` (lines 22-24 doc — "NEVER a lifecycle verdict; Phase 7 owns ESXi support-state"), UI-SPEC §Color (lines 76-94), §Copywriting (lines 97-117)
 **Apply to:** all bucket labels, captions, the chart palette (neutral surface/primary ramp, NOT util traffic-light), the accessible names. No editorial verbs; "overdue"/"at-risk" are neutral time labels only; no status color/icon. EN/FR parity is a hard gate.
 
 ### Privacy / no runtime network
+
 **Source:** `scripts/check-supply-chain.mjs` (whole-file rationale), CLAUDE.md privacy invariant, RESEARCH Pitfall 5
 **Apply to:** the catalogue is a build-time static import; the app NEVER fetches it at runtime (the P1 guard throws). `sync:eos` is maintainer-run, decoupled from the CI deploy job. No `localStorage` of bucket selection (ephemeral `useState`).
 
 ### View-state branch (no router)
+
 **Source:** `src/App.tsx` (lines 38-45), `src/components/ViewToggle.tsx` (lines 3-5, proven P5/P6), `src/components/planning/PlanningView.tsx` (lines 34-49 doc)
 **Apply to:** `'eos'` is a 5th `AppView`/`VIEWS` member + one `App.tsx` ternary branch + a `nav.eos` i18n key — verbatim with the P5 'hosts' / P6 'planning' precedent. No new nav component.
 

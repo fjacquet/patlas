@@ -43,6 +43,7 @@ vatlas uses Tailwind's native 4px scale. Declared values (multiples of 4):
 | 3xl | 64px | not used in this phase |
 
 Exceptions:
+
 - **Sparkline fixed height = 36px** (`style={{ height: 36 }}` on `<Chart>`). 36 is a deliberate row-height exception for the dashboard cluster-card sparkline slot (RESEARCH Pattern 3); it is a chart canvas dimension, not a layout-spacing token, and is the single non-4-multiple value in scope. Documented and intentional.
 - **Trend line chart min-height = 320px** — inherits the shipped `<Chart>` default (`style ?? { minHeight: 320 }`, Chart.tsx:101). No override.
 
@@ -76,12 +77,14 @@ Phase 8 introduces **no new color**. It consumes the shipped Midnight Executive 
 | Destructive | `--color-util-high` `oklch(58% .22 25)` (red) | **Hover-only** on the snapshot-card remove `✕` (`hover:text-util-high`, shipped `SnapshotCard` idiom). No destructive *confirmation* surface in this phase (see Copywriting). |
 
 **Accent gold reserved for (exhaustive — never "all interactive"):**
+
 1. The **active segment** of the `ViewToggle` (the shipped contract: `bg-accent-500 text-surface-900` on the selected view segment — the new `'trends'` segment follows this verbatim, no new style).
 2. The **active/selected snapshot card** ring in the sidebar (`ring-2 ring-accent-500 dark:ring-accent-400`, shipped `SnapshotCard` idiom — unchanged; the active snapshot is the D-01 latest-`capturedAt` estate).
 
 Accent is **not** applied to: trend line series, sparkline strokes, delta numbers, the warm-up indicator, the inferred-order caption, or tooltips. Those use neutral series/text tokens.
 
 **Chart color contract (TRD-02/03/04 — no verdict, no traffic-light):**
+
 - Trend line + sparkline strokes use the **Midnight Executive theme series palette** already registered on `<Chart>` (`echarts.registerTheme('midnight-executive' | '…-dark')`, Chart.tsx:45–46). No per-series semantic color, no green/orange/red on trends — a metric going up or down carries **no judgment** (PROJECT.md no-editorial-verb / no-verdict-color invariant; P7 D-00 factual-presentation precedent applies to trends and deltas).
 - `--color-util-low/mid/high` (the status ramp) is **forbidden** on any trend/delta/sparkline element — those tokens are utilization-status only and would imply a verdict on direction of change.
 - Delta sign is communicated by the **text glyph** (`+` / `−` / em-dash sentinel `—`), never by color. `+12` and `−3` are the same neutral text color.
@@ -115,10 +118,12 @@ All Phase-8 strings are **factual, no editorial verb** (PROJECT.md denylist: no 
 > This section binds the executor to shipped idioms. It is not in the base template but is required for an accurate trends contract.
 
 ### View navigation — extend, do not invent
+
 - Add `'trends'` to `AppView` and `VIEWS` in the shipped `ViewToggle.tsx`. **Do not create a new nav component.** The `<fieldset role="group">` + `<legend className="sr-only">` + `map(button aria-pressed)` idiom, the gold-active-segment style, the Arrow-Left/Right wraparound keyboard handler, and `focus-visible:ring-2 ring-primary-500` are inherited verbatim (ViewToggle.tsx:47–75). New label key `inventory:nav.trends` (EN + FR).
 - Segment ordering is the planner's call; recommend appending `trends` last (after `eos`) to preserve muscle memory for shipped segments.
 
 ### Trend chart (TRD-02) — `TrendChart.tsx` → shipped `<Chart>`
+
 - Renders through the **single shipped `<Chart>` primitive** (`option` prop only). No new chart component, no renderer change (SVG is injected by `<Chart>`, VIZ-01).
 - `xAxis:{ type:'time' }` + `series.data` as `[Date, value]` pairs — **mandatory**; `type:'category'` is forbidden as the default (Pitfall 1 / criterion 2: non-uniform real-date spacing must be visible for irregular dates e.g. 2026-01-31, 2026-02-15, 2026-03-30).
 - D-05 presentation rule (locks Open Question 1, recommendation (a)): when `view.trends.orderInferred === true`, the chart renders with `xAxis:{ type:'category' }` over the stable-ordered labels **plus** the inferred-order caption; when all points carry real distinct dates, `xAxis:{ type:'time' }`. Whole-series, never mixed — honest, no fabricated positions. Data layer always keeps real dates where known (D-05).
@@ -127,21 +132,26 @@ All Phase-8 strings are **factual, no editorial verb** (PROJECT.md denylist: no 
 - `LineChart` is **not yet registered** in `Chart.tsx`'s `echarts.use([...])` (only Bar/Pie/Gauge/Heatmap). This UI-SPEC states the line/sparkline visual contract; **the planner adds `import { LineChart } from 'echarts/charts'` + registration and re-runs `npm run check:bundle-size` (≤300 KB gz gate)** (RESEARCH gap A1 / Pitfall 2). The visual contract here does not change regardless of registration mechanics.
 
 ### Per-cluster sparkline (TRD-03) — `TrendSparkline.tsx` → same `<Chart>`
+
 - Same `<Chart>` component, `type:'line'` option with axes hidden (`xAxis/yAxis show:false`), grid collapsed full-bleed (`grid:{top:2,bottom:2,left:2,right:2}`), `showSymbol:false`, `tooltip` off, `lineStyle:{width:1.5}`, `style={{ height: 36 }}` (RESEARCH Pattern 3). One neutral stroke token, no per-cluster color.
 - Slot lives in the shipped dashboard cluster card (`dashboard/ClusterColumn.tsx`); renders **only when `view.trends` has ≥2 points** for that cluster. With <2 points the slot is absent (no placeholder box, no skeleton — matches the empty-state "state the condition" tone). Sparklines fill progressively as warm-up lands (D-02, store→memo reactive path; no per-sparkline spinner).
 
 ### Snapshot list — inline capture-date edit (D-03) + warm-up + caption
+
 - `SnapshotCard.tsx` gains an **inline-editable `capturedAt`** control replacing the read-only `snapshot.capturedAt.toLocaleDateString()` text. Interaction contract: a date input that on commit calls the **shipped `setCapturedAt` store action** (no new mutation, no local date state that bypasses the store — Pitfall 5). The edited value is the highest-priority capture-date source (D-03). Editing recomputes the series through the single memo automatically. Styling: stays within the existing `text-xs` card-meta type tier; the input inherits panel/dark-twin tokens; focus ring `focus-visible:ring-2 ring-primary-500` (project focus idiom). No accent gold on the input (accent is reserved — see Color).
 - Warm-up "trends preparing — N/M" line: rendered in `SnapshotListSidebar`'s own region (scoped, never global), `text-sm text-slate-500 dark:text-slate-400`, present only while `done < total`. State source = `useSnapshotUpload` exposing `{ done, total }`.
 - Inferred-order caption: rendered once near the trend chart and/or snapshot list when `orderInferred`, neutral `text-sm` slate caption.
 
 ### Delta panel (TRD-04) — `DeltaPanel.tsx`
+
 - A `<section className="panel">` of factual consecutive-pair rows (DD-B B1: count-deltas on existing aggregate fields — vmCount, poweredOnVms, hostCount, clusterCount, vcpuAllocated, vramAllocated→GiB, totalStorage→GiB/TiB; final visible set is the planner's pick within DD-B). Each row: label (i18n key) + signed branded number (`font-mono tabular-nums`), `—` em-dash when null on either side. No color, no traffic-light, no up/down arrow glyph, no verb. Layout mirrors the `EosView` reconcile/split caption tone for secondary factual lines.
 
 ### Layout shell — `TrendsView.tsx`
+
 - `<main className="flex-1 overflow-y-auto p-8">` wrapping an `ErrorBoundary` + `<div className="flex flex-col gap-6">` of `<section className="panel">` blocks — **verbatim `EosView` shell** (heading section → chart section → delta section). No new layout primitive.
 
 ### Accessibility (inherited contract)
+
 - All toggles/segments: `aria-pressed` + visible `focus-visible:ring-2 ring-primary-500` (project idiom — CLAUDE.md ThemeToggle/ViewToggle precedent).
 - Charts: pass an `ariaLabel` to `<Chart>` (the `aria-label` hook, Chart.tsx:62) describing the metric/series factually.
 - Error fallback: `role="alert"`.

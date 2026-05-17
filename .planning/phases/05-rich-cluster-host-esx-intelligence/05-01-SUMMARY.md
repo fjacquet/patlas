@@ -65,6 +65,7 @@ completed: 2026-05-17
 - Full suite **311/311**; tsc/biome/supply-chain/bundle green; aggregation 98% coverage; single-`useMemo`=2 (intact).
 
 ## Task Commits
+
 1. `feat(05-01)` parser extension (regression-gated) — `dcf1934`
 2. `feat(05-01)` operational-insights aggregations — (this commit)
 

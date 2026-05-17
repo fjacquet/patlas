@@ -570,7 +570,7 @@ Drop `.xlsm, .xlsb, .csv, .ods, .zip` from vsizer's list. vatlas is RVTools-`.xl
   run: node scripts/check-sheetjs-pin.mjs
 ```
 
-3. Vite base path `/vatlas/` is handled inside `vite.config.ts` — no workflow change needed there.
+1. Vite base path `/vatlas/` is handled inside `vite.config.ts` — no workflow change needed there.
 
 **Critical port-as-is sections:**
 
@@ -936,7 +936,7 @@ export const VInfoRowSchema: z.ZodType<VInfoRow> = z.object({
 const MibSchema = z.number().nonnegative().transform((n) => n as MiB)
 ```
 
-5. New schemas: `VDatastoreRowSchema`, `VPartitionRowSchema`, `VMetaDataRowSchema`.
+1. New schemas: `VDatastoreRowSchema`, `VPartitionRowSchema`, `VMetaDataRowSchema`.
 
 **Drop ClusterAggregateSchema and GlobalSummarySchema** (lines 51-118 of vsizer) — those belong to Phase 2 aggregation, not Phase 1.
 

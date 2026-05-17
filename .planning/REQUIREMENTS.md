@@ -57,7 +57,6 @@
      inventory (ports/switches) are deferred to Phase 9 — NOT Phase-4
      requirements. -->
 
-
 ### Rich Cluster / Host / ESX Intelligence (Phase 5 — analytics-core replan)
 
 - [ ] **RCI-01**: User sees RVTools-Analyser-grade operational insights (realized vCPU:pCPU overcommit, core-weighted avg CPU %, host-mem-weighted avg memory %, powered-on/off/suspended/template breakdown, provisioned-vs-in-use, datastore footprint, guest data, total cores/host-memory) at BOTH estate scope and per-cluster — every value calculated from parsed RVTools columns, nothing invented
