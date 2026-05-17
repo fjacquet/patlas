@@ -116,7 +116,7 @@ describe('aggregateClusters', () => {
     )
     expect(c.stretched).toBe(true)
     expect(c.reservedFraction).toBeCloseTo(0.5)
-    expect(c.stretchedConfidence).toBe('high')
+    expect(c.siteData).toBe('detected')
     expect(c.drReservedGhz as number).toBeCloseTo(0.5 * 8 * GHZ_PER_HOST)
     expect(c.siteACapacityGhz as number).toBeCloseTo(4 * GHZ_PER_HOST)
     expect(c.siteBCapacityGhz as number).toBeCloseTo(4 * GHZ_PER_HOST)
@@ -133,7 +133,7 @@ describe('aggregateClusters', () => {
       }),
     )
     expect(c.reservedFraction).toBeCloseTo(0.6)
-    expect(c.stretchedConfidence).toBe('high')
+    expect(c.siteData).toBe('detected')
     expect(c.drReservedGhz as number).toBeCloseTo(0.6 * 10 * GHZ_PER_HOST)
     expect(c.siteACapacityGhz as number).toBeCloseTo(6 * GHZ_PER_HOST)
     expect(c.siteBCapacityGhz as number).toBeCloseTo(4 * GHZ_PER_HOST)
@@ -150,7 +150,7 @@ describe('aggregateClusters', () => {
       }),
     )
     expect(c.reservedFraction).toBeCloseTo(0.5)
-    expect(c.stretchedConfidence).toBe('low')
+    expect(c.siteData).toBe('assumed')
     expect(c.siteACapacityGhz).toBeNull()
     expect(c.siteBCapacityGhz).toBeNull()
   })
@@ -166,7 +166,7 @@ describe('aggregateClusters', () => {
       }),
     )
     expect(c.reservedFraction).toBeCloseTo(0.5)
-    expect(c.stretchedConfidence).toBe('medium')
+    expect(c.siteData).toBe('assumed')
     expect(c.siteACapacityGhz).toBeNull()
   })
 
@@ -197,7 +197,7 @@ describe('aggregateClusters', () => {
       }),
     )
     expect(c.reservedFraction).toBeCloseTo(0.5)
-    expect(c.stretchedConfidence).toBe('high')
+    expect(c.siteData).toBe('detected')
   })
 
   it('real CL_VXB1K_CORE shape (4 Secondary + 4 UNI) → 0.5, high', () => {
@@ -214,7 +214,7 @@ describe('aggregateClusters', () => {
       }),
     )
     expect(c.reservedFraction).toBeCloseTo(0.5)
-    expect(c.stretchedConfidence).toBe('high')
+    expect(c.siteData).toBe('detected')
   })
 
   // ── ALC-04: the slider changes the verdict ONLY, never vcpuPerPcpu ────

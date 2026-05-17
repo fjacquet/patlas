@@ -168,16 +168,17 @@ export interface ClusterAggregate {
   stretched: boolean
   drReservedGhz: GHz
   /**
-   * Factual confidence in the per-site reservation, NEVER collapsing
-   * metadata absence to 'high':
-   *   - 'high'   — every host carries a fault domain AND ≥2 distinct
-   *                domains → reservation from real per-site capacity
-   *   - 'medium' — SOME hosts tagged (partial coverage) → assume
-   *                symmetric 0.5
-   *   - 'low'    — NO host tagged → cannot prove a split; assume
-   *                symmetric 0.5 (low-confidence chip shown)
+   * FACTUAL site-data discriminator (UAT G1 — the stretched flag is the
+   * user's declaration; the engine never judges it, only states where the
+   * split came from):
+   *   - 'detected' — every host carries a fault domain AND ≥2 distinct
+   *                  domains → reservation from REAL per-site capacity
+   *                  (Site A/B values populated)
+   *   - 'assumed'  — partial OR no fault-domain coverage → symmetric 0.5
+   *                  reservation, per-site values null
+   * No 'high/medium/low' verdict, no chip — that judgement was removed.
    */
-  stretchedConfidence: StretchedConfidence
+  siteData: 'detected' | 'assumed'
   /**
    * Headline reservation fraction (GHz basis) used for the UI "%" row and
    * the DR subtraction echo. `0` when not stretched. Per-resource fractions
@@ -191,9 +192,6 @@ export interface ClusterAggregate {
   siteACapacityRamMib: MiB | null
   siteBCapacityRamMib: MiB | null
 }
-
-/** Factual confidence enum for the per-site stretched reservation. */
-export type StretchedConfidence = 'high' | 'medium' | 'low'
 
 /**
  * Estate-wide rollup (ported vsizer `GlobalSummary`, active-memory field

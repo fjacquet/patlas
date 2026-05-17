@@ -31,7 +31,7 @@ const cluster = (over: Partial<ClusterAggregate>): ClusterAggregate => ({
   mhzPerVcpu: 500,
   stretched: false,
   drReservedGhz: ghz(0),
-  stretchedConfidence: 'high',
+  siteData: 'assumed',
   reservedFraction: 0,
   siteACapacityGhz: null,
   siteBCapacityGhz: null,

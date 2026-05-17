@@ -1,5 +1,5 @@
 import { cores as coresOf, ghz as ghzOf, mib } from '@/engines/units'
-import type { AccountingMode, ClusterAggregate, StretchedConfidence } from '@/types/estate'
+import type { AccountingMode, ClusterAggregate } from '@/types/estate'
 import type { VHostRow } from '@/types/vhost'
 import type { VInfoRow } from '@/types/vinfo'
 import { physicalGhz as physicalGhzOf } from './ghz'
@@ -16,13 +16,13 @@ import { aggregateVmsPerCluster } from './vinfoMerge'
  * resource is `1 / (1 − f)` (equals 2 at the symmetric f = 0.5, matching
  * the shipped V1 behaviour exactly).
  *
- * Confidence is FACTUAL and never collapses metadata absence to 'high':
- *   - every host carries a fault domain AND ≥2 distinct domains → 'high'
- *     (reservation from REAL per-site capacity; per-site values surfaced)
- *   - SOME hosts tagged (partial coverage)                      → 'medium'
- *     (assume symmetric f = 0.5; sites indeterminate → null/em-dash)
- *   - NO host tagged                                            → 'low'
- *     (cannot prove a split; assume symmetric f = 0.5; low-confidence chip)
+ * `siteData` is a FACTUAL discriminator (UAT G1 — the stretched flag is
+ * the user's declaration; the engine never judges it, only states where
+ * the split came from). NO high/medium/low verdict, NO chip:
+ *   - every host carries a fault domain AND ≥2 distinct domains
+ *       → 'detected' (reservation from REAL per-site capacity; Site A/B set)
+ *   - partial OR no fault-domain coverage
+ *       → 'assumed'  (symmetric f = 0.5; per-site values null/em-dash)
  *
  * `reservedFraction` exposed on the aggregate is the GHz-basis fraction
  * (the primary DR resource; equal across resources for homogeneous hosts).
@@ -33,7 +33,7 @@ interface Reservation {
   fGhz: number
   fRam: number
   fCores: number
-  confidence: StretchedConfidence
+  siteData: 'detected' | 'assumed'
   siteACapacityGhz: number | null
   siteBCapacityGhz: number | null
   siteACapacityRamMib: number | null
@@ -81,7 +81,7 @@ const reservationFor = (hosts: VHostRow[]): Reservation => {
       fGhz: maxFraction(ghzByFd),
       fRam: maxFraction(ramByFd),
       fCores: maxFraction(coresByFd),
-      confidence: 'high',
+      siteData: 'detected',
       siteACapacityGhz: aGhz,
       siteBCapacityGhz: bGhz,
       siteACapacityRamMib: aRam,
@@ -89,14 +89,14 @@ const reservationFor = (hosts: VHostRow[]): Reservation => {
     }
   }
 
-  // Absent or partial fault-domain coverage — assume a symmetric split.
-  // Partial coverage (some hosts tagged) is 'medium'; no data at all is
-  // 'low'. Sites cannot be determined → null (em-dash sentinel).
+  // Absent OR partial fault-domain coverage — assume a symmetric split.
+  // UAT G1: no partial/none judgement — both collapse to the single
+  // factual 'assumed'. Sites cannot be determined → null (em-dash).
   return {
     fGhz: SYMMETRIC_FRACTION,
     fRam: SYMMETRIC_FRACTION,
     fCores: SYMMETRIC_FRACTION,
-    confidence: tagged.length > 0 ? 'medium' : 'low',
+    siteData: 'assumed',
     siteACapacityGhz: null,
     siteBCapacityGhz: null,
     siteACapacityRamMib: null,
@@ -178,15 +178,15 @@ export const aggregateClusters = ({
       const physicalCores = h.physicalCores as number
 
       // Per-site, per-resource reservation (ADR-0007-EXT). Non-stretched
-      // clusters reserve nothing and report a neutral 'high'/0 (the UI
-      // gates every stretched row on `stretched`, so these are unused).
+      // clusters reserve nothing; siteData is 'assumed' but unused (the UI
+      // gates every stretched row on `stretched`).
       const res = isStretched
         ? reservationFor(hostsByCluster.get(h.cluster) ?? [])
         : ({
             fGhz: 0,
             fRam: 0,
             fCores: 0,
-            confidence: 'high',
+            siteData: 'assumed',
             siteACapacityGhz: null,
             siteBCapacityGhz: null,
             siteACapacityRamMib: null,
@@ -250,7 +250,7 @@ export const aggregateClusters = ({
         mhzPerVcpu: computeMhzPerVcpu(consumedGhz, vcpuAllocated),
         stretched: isStretched,
         drReservedGhz: ghzOf(drReservedGhz),
-        stretchedConfidence: res.confidence,
+        siteData: res.siteData,
         reservedFraction: res.fGhz,
         siteACapacityGhz: res.siteACapacityGhz === null ? null : ghzOf(res.siteACapacityGhz),
         siteBCapacityGhz: res.siteBCapacityGhz === null ? null : ghzOf(res.siteBCapacityGhz),
