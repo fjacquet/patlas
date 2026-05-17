@@ -47,6 +47,7 @@ const estate = (vinfo: VInfoRow[], vhost: VHostRow[]): MergedEstate => ({
   vinfo,
   vhost,
   vdatastore: [],
+  vpartition: [],
   vcenters: [],
 })
 

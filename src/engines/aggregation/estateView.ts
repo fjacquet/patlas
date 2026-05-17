@@ -1,15 +1,18 @@
 import { runScenario } from '@/engines/drSim'
 import type { MergedEstate } from '@/engines/snapshotMerge'
-import { mib } from '@/engines/units'
+import { cores, mib } from '@/engines/units'
 import type {
   AccountingMode,
+  ClusterDetail,
   DrScenario,
   EstateView,
+  OperationalInsights,
   OsBreakdown,
   VmDisplayRow,
 } from '@/types/estate'
 import { aggregateClusters } from './aggregateClusters'
 import { aggregateGlobals, emptySummary } from './globals'
+import { aggregateGuestData, type GuestData } from './guestData'
 import { classifyOsFamily } from './osFamily'
 import { datastoreCountByCluster, perDatastore } from './perDatastore'
 import { perEsx } from './perEsx'
@@ -113,6 +116,88 @@ export function buildEstateView(
     })
   }
 
+  // ── P5 operational insights (RCI) — estate + per-cluster, all
+  // calculated from parsed columns; runs in THIS single pass (no memo).
+  const gd = aggregateGuestData(merged.vpartition, merged.vinfo)
+  interface Acc {
+    on: number
+    off: number
+    susp: number
+    tmpl: number
+    prov: number
+    inuse: number
+  }
+  const zero = (): Acc => ({ on: 0, off: 0, susp: 0, tmpl: 0, prov: 0, inuse: 0 })
+  const estAcc = zero()
+  const accBy = new Map<string, Acc>()
+  for (const v of merged.vinfo) {
+    const a = accBy.get(v.cluster) ?? zero()
+    const bump = (t: Acc) => {
+      if (v.template) t.tmpl += 1
+      else if (v.powerState === 'poweredOn') t.on += 1
+      else if (v.powerState === 'suspended') t.susp += 1
+      else t.off += 1
+      t.prov += v.provisionedMib as number
+      t.inuse += v.inUseMib as number
+    }
+    bump(a)
+    bump(estAcc)
+    accBy.set(v.cluster, a)
+  }
+  const insightsOf = (
+    s: {
+      meanCpuRatio: number
+      meanRamRatio: number
+      physicalCores: number
+      physicalRamMib: number
+      vcpuPerPcpu: number
+    },
+    a: Acc,
+    guest: GuestData | null,
+  ): OperationalInsights => ({
+    overcommitVcpuPerPcpu: s.vcpuPerPcpu,
+    avgCpuPct: s.meanCpuRatio * 100,
+    avgMemPct: s.meanRamRatio * 100,
+    poweredOnVms: a.on,
+    poweredOffVms: a.off,
+    suspendedVms: a.susp,
+    templateVms: a.tmpl,
+    provisionedMib: mib(a.prov),
+    inUseMib: mib(a.inuse),
+    totalPhysicalCores: cores(s.physicalCores),
+    totalHostMemoryMib: mib(s.physicalRamMib),
+    guestUsedMib: guest ? guest.consumedMib : null,
+  })
+  const operationalInsights = insightsOf(
+    {
+      meanCpuRatio: globals.meanCpuRatio,
+      meanRamRatio: globals.meanRamRatio,
+      physicalCores: globals.physicalCores as number,
+      physicalRamMib: globals.physicalRamMib as number,
+      vcpuPerPcpu: globals.vcpuPerPcpu,
+    },
+    estAcc,
+    gd.estate,
+  )
+  const clusterInsights = new Map<string, OperationalInsights>()
+  const clusterDetail = new Map<string, ClusterDetail>()
+  for (const c of clusters) {
+    const guest = gd.estate === null ? null : (gd.byCluster.get(c.cluster) ?? null)
+    const ins = insightsOf(
+      {
+        meanCpuRatio: c.meanCpuRatio,
+        meanRamRatio: c.meanRamRatio,
+        physicalCores: c.physicalCores as number,
+        physicalRamMib: c.physicalRamMib as number,
+        vcpuPerPcpu: c.vcpuPerPcpu,
+      },
+      accBy.get(c.cluster) ?? zero(),
+      guest,
+    )
+    clusterInsights.set(c.cluster, ins)
+    clusterDetail.set(c.cluster, { aggregate: c, insights: ins })
+  }
+
   // DR what-if runs INSIDE this single composition (no second memo): the
   // shipped aggregation re-run on survivors. `null` when nothing failed.
   const drSim = opts?.scenario
@@ -131,8 +216,26 @@ export function buildEstateView(
     trends: null,
     vcenters: merged.vcenters.map((vc) => ({ viSdkUuid: vc.viSdkUuid, label: vc.label })),
     drSim,
+    operationalInsights,
+    clusterInsights,
+    clusterDetail,
   }
 }
+
+const EMPTY_INSIGHTS: OperationalInsights = Object.freeze({
+  overcommitVcpuPerPcpu: 0,
+  avgCpuPct: 0,
+  avgMemPct: 0,
+  poweredOnVms: 0,
+  poweredOffVms: 0,
+  suspendedVms: 0,
+  templateVms: 0,
+  provisionedMib: mib(0),
+  inUseMib: mib(0),
+  totalPhysicalCores: cores(0),
+  totalHostMemoryMib: mib(0),
+  guestUsedMib: null,
+})
 
 /**
  * The valid empty-but-typed view `useEstateView` returns when no snapshot
@@ -151,4 +254,7 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   trends: null,
   vcenters: Object.freeze([]) as never[],
   drSim: null,
+  operationalInsights: EMPTY_INSIGHTS,
+  clusterInsights: new Map(),
+  clusterDetail: new Map(),
 })

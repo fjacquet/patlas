@@ -355,6 +355,44 @@ export interface EstateView {
   /** DR what-if result. `null` when no component is marked failed
    *  (mirrors the `trends: T | null` idiom). Phase-4 DRS-01..06. */
   drSim: DrSimResult | null
+  /** P5 estate-level operational insights (RCI). */
+  operationalInsights: OperationalInsights
+  /** P5 per-cluster operational insights, keyed by cluster name. */
+  clusterInsights: Map<string, OperationalInsights>
+  /** P5 per-cluster full detail projection for the drill screen
+   *  (aggregate + insights), keyed by cluster name. */
+  clusterDetail: Map<string, ClusterDetail>
+}
+
+/**
+ * P5 operational insights — every field CALCULATED from parsed RVTools
+ * columns (calc-from-real-data; nothing invented). Used at estate scope
+ * AND per-cluster (same shape, the "globally and per-cluster" principle).
+ */
+export interface OperationalInsights {
+  /** Realized vCPU:pCPU consolidation (= `vcpuPerPcpu`). */
+  overcommitVcpuPerPcpu: number
+  /** Core-weighted mean CPU % (0..100+). */
+  avgCpuPct: number
+  /** Host-mem-weighted mean memory % (0..100+). */
+  avgMemPct: number
+  poweredOnVms: number
+  poweredOffVms: number
+  suspendedVms: number
+  templateVms: number
+  provisionedMib: MiB
+  /** Σ in-use (RVTools "In Use" already includes .vswp + snapshots). */
+  inUseMib: MiB
+  totalPhysicalCores: Cores
+  totalHostMemoryMib: MiB
+  /** In-guest disk used. `null` when no vPartition data (factual, not 0). */
+  guestUsedMib: MiB | null
+}
+
+/** P5 per-cluster drill projection (one-screen-fit detail / 1 PPTX slide). */
+export interface ClusterDetail {
+  aggregate: ClusterAggregate
+  insights: OperationalInsights
 }
 
 /** Factual per-survivor headroom verdict (no color, no editorial verb). */
