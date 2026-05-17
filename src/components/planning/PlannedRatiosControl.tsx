@@ -29,6 +29,30 @@ const PRESETS: readonly Preset[] = [
   { key: 'vdi10to1', ratios: { cpu: 10, ram: 1 } },
 ]
 
+/**
+ * Planned-ratio bounds (WR-03) — the single source of truth shared by the
+ * `<input>` `min`/`max`/`step` attributes AND the on-commit sanitizer
+ * (CR-01), so the input attributes and the guard cannot disagree on what a
+ * valid ratio is. Values mirror the now-retired measured-slider contract
+ * (`CPU_MIN=1`/`CPU_MAX=16`, `RAM_MIN=0.5`/`RAM_MAX=4`) so the planned lens
+ * stays consistent with the historical measured bounds without depending on
+ * the dead URL-hash codec (WR-01). The native `<input type="number">`
+ * `min`/`max` are NOT enforced on manual entry, so `safeNum` is the real
+ * guard: any non-finite / out-of-range value falls back to the last valid
+ * ratio (CPU 4:1 / RAM 1:1 by store default — CR-01).
+ */
+const CPU_MIN = 1
+const CPU_MAX = 16
+const RAM_MIN = 0.5
+const RAM_MAX = 4
+const CPU_STEP = 1
+const RAM_STEP = 0.25
+
+const safeNum = (raw: string, min: number, max: number, fallback: number): number => {
+  const n = Number(raw)
+  return Number.isFinite(n) && n >= min && n <= max ? n : fallback
+}
+
 const matchesPreset = (r: PlannedRatios, p: Preset): boolean =>
   r.cpu === p.ratios.cpu && r.ram === p.ratios.ram
 
@@ -68,10 +92,13 @@ export function PlannedRatiosControl() {
           {t('planned.cpuLabel')}
           <input
             type="number"
-            min={1}
-            step={1}
+            min={CPU_MIN}
+            max={CPU_MAX}
+            step={CPU_STEP}
             value={ratios.cpu}
-            onChange={(e) => setRatios({ ...ratios, cpu: Number(e.target.value) })}
+            onChange={(e) =>
+              setRatios({ ...ratios, cpu: safeNum(e.target.value, CPU_MIN, CPU_MAX, ratios.cpu) })
+            }
             aria-label={t('planned.cpuLabel')}
             className="h-9 w-20 rounded border border-slate-200 bg-white px-2 font-mono tabular-nums text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-surface-700 dark:bg-surface-900 dark:text-slate-100"
           />
@@ -81,10 +108,13 @@ export function PlannedRatiosControl() {
           {t('planned.ramLabel')}
           <input
             type="number"
-            min={0.25}
-            step={0.25}
+            min={RAM_MIN}
+            max={RAM_MAX}
+            step={RAM_STEP}
             value={ratios.ram}
-            onChange={(e) => setRatios({ ...ratios, ram: Number(e.target.value) })}
+            onChange={(e) =>
+              setRatios({ ...ratios, ram: safeNum(e.target.value, RAM_MIN, RAM_MAX, ratios.ram) })
+            }
             aria-label={t('planned.ramLabel')}
             className="h-9 w-20 rounded border border-slate-200 bg-white px-2 font-mono tabular-nums text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-surface-700 dark:bg-surface-900 dark:text-slate-100"
           />
