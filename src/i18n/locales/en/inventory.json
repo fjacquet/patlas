@@ -6,7 +6,9 @@
     "hosts": "Hosts",
     "planning": "Planning",
     "eos": "OS end-of-support",
-    "trends": "Trends"
+    "trends": "Trends",
+    "storage": "Storage",
+    "network": "Network"
   },
   "tab": {
     "label": "Object type",

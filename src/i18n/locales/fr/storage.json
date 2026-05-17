@@ -1,0 +1,39 @@
+{
+  "lens": {
+    "label": "Vue",
+    "consumption": "Consommation",
+    "capacity": "Capacité"
+  },
+  "scope": {
+    "label": "Par",
+    "cluster": "Cluster",
+    "esx": "ESX",
+    "vm": "VM",
+    "datastore": "Datastore"
+  },
+  "vsan": {
+    "sharedAcross": "Partagé entre {{count}} clusters",
+    "unattributed": "Non attribué (vSAN / local hôte)"
+  },
+  "detail": {
+    "back": "Retour",
+    "datastoreTitle": "Datastore — {{name}}",
+    "vmTitle": "VM — {{name}}",
+    "capacity": "Capacité",
+    "provisioned": "Provisionné",
+    "inUse": "Utilisé",
+    "free": "Libre",
+    "used": "Occupé",
+    "vmsOnIt": "VM sur ce datastore",
+    "hostCount": "Hôtes",
+    "cluster": "Cluster",
+    "type": "Type",
+    "vcpu": "vCPU",
+    "vram": "vRAM",
+    "disks": "Disques",
+    "partitions": "Partitions",
+    "portgroups": "Groupes de ports",
+    "switches": "Commutateurs",
+    "datastores": "Datastores"
+  }
+}

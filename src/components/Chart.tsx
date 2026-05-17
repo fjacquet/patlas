@@ -1,4 +1,11 @@
-import { BarChart, GaugeChart, HeatmapChart, LineChart, PieChart } from 'echarts/charts'
+import {
+  BarChart,
+  GaugeChart,
+  HeatmapChart,
+  LineChart,
+  PieChart,
+  TreemapChart,
+} from 'echarts/charts'
 import {
   CalendarComponent,
   DatasetComponent,
@@ -32,6 +39,7 @@ echarts.use([
   GaugeChart,
   HeatmapChart, // P7 EOS forecast timeline (SVG — VIZ-01)
   LineChart, // P8 trend line + per-cluster sparkline (SVG — VIZ-01)
+  TreemapChart, // P9 datastore-footprint consumption lens (SVG — VIZ-01/D-08)
   GridComponent,
   TooltipComponent,
   LegendComponent,

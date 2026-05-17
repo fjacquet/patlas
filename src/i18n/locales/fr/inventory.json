@@ -6,7 +6,9 @@
     "hosts": "Hôtes",
     "planning": "Planification",
     "eos": "Fin de support OS",
-    "trends": "Tendances"
+    "trends": "Tendances",
+    "storage": "Stockage",
+    "network": "Réseau"
   },
   "tab": {
     "label": "Type d'objet",
