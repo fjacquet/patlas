@@ -5,7 +5,8 @@
     "inventory": "Inventory",
     "hosts": "Hosts",
     "planning": "Planning",
-    "eos": "OS end-of-support"
+    "eos": "OS end-of-support",
+    "trends": "Trends"
   },
   "tab": {
     "label": "Object type",

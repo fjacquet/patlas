@@ -11,6 +11,7 @@ import enInventory from './locales/en/inventory.json'
 import enMvc from './locales/en/mvc.json'
 import enRci from './locales/en/rci.json'
 import enStr from './locales/en/str.json'
+import enTrends from './locales/en/trends.json'
 import enUpload from './locales/en/upload.json'
 import frAlloc from './locales/fr/alloc.json'
 import frCommon from './locales/fr/common.json'
@@ -21,6 +22,7 @@ import frInventory from './locales/fr/inventory.json'
 import frMvc from './locales/fr/mvc.json'
 import frRci from './locales/fr/rci.json'
 import frStr from './locales/fr/str.json'
+import frTrends from './locales/fr/trends.json'
 import frUpload from './locales/fr/upload.json'
 
 /**
@@ -46,6 +48,7 @@ export const NAMESPACES = [
   'dr',
   'rci',
   'eos',
+  'trends',
 ] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
@@ -61,6 +64,7 @@ export const resources = {
     dr: enDr,
     rci: enRci,
     eos: enEos,
+    trends: enTrends,
   },
   fr: {
     common: frCommon,
@@ -73,6 +77,7 @@ export const resources = {
     dr: frDr,
     rci: frRci,
     eos: frEos,
+    trends: frTrends,
   },
 } as const
 

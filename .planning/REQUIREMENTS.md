@@ -257,11 +257,11 @@
 | EOS-04 | Phase 7 | Complete |
 | EOS-05 | Phase 7 | Complete |
 | EOS-06 | Phase 7 | Complete |
-| TRD-01 | Phase 6 | Pending |
-| TRD-02 | Phase 6 | Pending |
-| TRD-03 | Phase 6 | Pending |
-| TRD-04 | Phase 6 | Pending |
-| TRD-05 | Phase 6 | Pending |
+| TRD-01 | Phase 8 | Pending |
+| TRD-02 | Phase 8 | Pending |
+| TRD-03 | Phase 8 | Pending |
+| TRD-04 | Phase 8 | Pending |
+| TRD-05 | Phase 8 | Pending |
 | HTM-01 | Phase 7 | Pending |
 | HTM-02 | Phase 7 | Pending |
 | HTM-03 | Phase 7 | Pending |

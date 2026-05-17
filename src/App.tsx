@@ -10,6 +10,7 @@ import { LanguageToggle } from './components/LanguageToggle'
 import { PlanningView } from './components/planning/PlanningView'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
 import { ThemeToggle } from './components/ThemeToggle'
+import { TrendsView } from './components/trends/TrendsView'
 import { UploadZone } from './components/UploadZone'
 import { type AppView, ViewToggle } from './components/ViewToggle'
 import { useSnapshotUpload } from './hooks/useSnapshotUpload'
@@ -44,6 +45,8 @@ function App() {
               <PlanningView />
             ) : activeView === 'eos' ? (
               <EosView />
+            ) : activeView === 'trends' ? (
+              <TrendsView />
             ) : (
               <GlobalDashboard />
             )}
