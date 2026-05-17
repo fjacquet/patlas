@@ -79,6 +79,18 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
+      # Pure read of the committed snapshot; NO network. exit 0 always —
+      # a third-party lifecycle-data outage is structurally incapable of
+      # blocking this deploy (D-02). Refresh is the maintainer-run
+      # `npm run sync:eos`, never CI. No untrusted input is used.
+      - name: EOS catalogue freshness (warn >90d — never blocks, D-02)
+        run: |
+          lv=$(node -p "require('./src/engines/eos/catalogue.json').lastVerified")
+          age=$(( ( $(date -u +%s) - $(date -u -d "$lv" +%s) ) / 86400 ))
+          echo "EOS catalogue lastVerified=$lv (age ${age}d)"
+          if [ "$age" -gt 90 ]; then echo "::warning::EOS catalogue is ${age} days old (>90) — run npm run sync:eos"; fi
+          exit 0
+
       - name: Lint
         run: npm run lint
 
