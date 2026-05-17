@@ -168,7 +168,13 @@ export function DataTable<T>({
         <table className="w-full border-collapse text-sm">
           <thead className="sticky top-0 z-10 bg-white dark:bg-surface-900">
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
+              // Header row mirrors the virtualized body row layout
+              // (`flex w-full` + per-cell `flex-1`) so header and body
+              // columns share identical widths. Without this the <thead>
+              // used content-sized table-cell widths while the <tbody>
+              // used equal flex widths → permanent header/body desync
+              // across every DataTable consumer.
+              <tr key={headerGroup.id} className="flex w-full">
                 {headerGroup.headers.map((header, idx) => {
                   const canSort = header.column.getCanSort()
                   const sorted = header.column.getIsSorted()
@@ -184,7 +190,7 @@ export function DataTable<T>({
                     <th
                       key={header.id}
                       scope="col"
-                      className={`whitespace-nowrap border-b border-slate-200 px-3 py-2 text-left font-semibold text-slate-600 dark:border-surface-700 dark:text-slate-300 ${
+                      className={`flex flex-1 items-center overflow-hidden text-ellipsis whitespace-nowrap border-b border-slate-200 px-3 py-2 text-left font-semibold text-slate-600 dark:border-surface-700 dark:text-slate-300 ${
                         idx === 0 ? 'sticky left-0 z-20 bg-white dark:bg-surface-900' : ''
                       } ${sorted ? 'text-accent-500 dark:text-accent-500' : ''}`}
                     >

@@ -48,7 +48,11 @@ export function useEstateView(mode: AccountingMode): EstateView {
   return useMemo(() => {
     const selected = [...snapshots.values()].filter((s) => selectedIds.has(s.id))
     if (selected.length === 0) return EMPTY_VIEW
-    return buildEstateView(mergeSnapshotsToEstate(selected), mode, {
+    // The single sanctioned clock-injection site (D-07): the engine is pure;
+    // the wall clock is sampled here at recompute time and threaded in. Not a
+    // memo dep — `today` is read when inputs change, not on time passing.
+    const today = new Date()
+    return buildEstateView(mergeSnapshotsToEstate(selected), mode, today, {
       stretchedClusters,
       scenario,
       plannedRatios: { cpuRatio: planned.cpu, ramRatio: planned.ram },

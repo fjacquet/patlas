@@ -4,7 +4,8 @@
     "dashboard": "Dashboard",
     "inventory": "Inventory",
     "hosts": "Hosts",
-    "planning": "Planning"
+    "planning": "Planning",
+    "eos": "OS end-of-support"
   },
   "tab": {
     "label": "Object type",
@@ -74,6 +75,7 @@
     "usedMib": "Used (MiB)",
     "usedRatio": "Used %",
     "overProvisionRatio": "Over-provision ratio",
-    "sharedDuplicateCount": "Shared copies"
+    "sharedDuplicateCount": "Shared copies",
+    "eolFrom": "End of support"
   }
 }

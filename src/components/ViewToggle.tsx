@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
-export type AppView = 'dashboard' | 'inventory' | 'hosts' | 'planning'
+export type AppView = 'dashboard' | 'inventory' | 'hosts' | 'planning' | 'eos'
 
-const VIEWS = ['dashboard', 'inventory', 'hosts', 'planning'] as const
+const VIEWS = ['dashboard', 'inventory', 'hosts', 'planning', 'eos'] as const
 
 export interface ViewToggleProps {
   value: AppView

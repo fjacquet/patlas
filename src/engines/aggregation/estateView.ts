@@ -1,10 +1,13 @@
 import { runScenario } from '@/engines/drSim'
+import { buildEosProjection } from '@/engines/eos/bucketEos'
+import { loadEosCatalogue } from '@/engines/eos/catalogue'
 import type { MergedEstate } from '@/engines/snapshotMerge'
 import { cores, mib } from '@/engines/units'
 import type {
   AccountingMode,
   ClusterDetail,
   DrScenario,
+  EosProjection,
   EstateView,
   OperationalInsights,
   OsBreakdown,
@@ -52,6 +55,11 @@ const emptyBreakdown = (): OsBreakdown => ({ windows: 0, linux: 0, other: 0 })
 export function buildEstateView(
   merged: MergedEstate,
   mode: AccountingMode,
+  /** Reference clock for the EOS forecast (D-07). Injected by the caller —
+   *  the only sanctioned site is the `useEstateView` hook boundary, which
+   *  passes the workbook-load wall clock. Required so this engine stays a
+   *  pure, deterministic function of its inputs (no in-engine clock). */
+  today: Date,
   opts?: {
     stretchedClusters?: ReadonlySet<string>
     allocRatios?: { cpuRatio: number; ramRatio: number }
@@ -247,6 +255,18 @@ export function buildEstateView(
         })
       : null
 
+  // P7 EOS forecast — composed in this single pass (no second memo site,
+  // D-00; the only memo is the `useEstateView` hook). `buildEosProjection`
+  // iterates the merged rows internally — the same operation-class as the
+  // `classifyOsFamily` vinfo pass above. `today` is the injected reference
+  // clock (D-07) — never constructed here, so this engine stays pure.
+  const eos = buildEosProjection({
+    vinfo: merged.vinfo,
+    vhost: merged.vhost,
+    catalogue: loadEosCatalogue(),
+    today,
+  })
+
   return {
     globals,
     clusters,
@@ -264,6 +284,7 @@ export function buildEstateView(
     clusterDetail,
     plannedView,
     plannedDrSim,
+    eos,
   }
 }
 
@@ -280,6 +301,33 @@ const EMPTY_INSIGHTS: OperationalInsights = Object.freeze({
   totalPhysicalCores: cores(0),
   totalHostMemoryMib: mib(0),
   guestUsedMib: null,
+})
+
+const EMPTY_EOS: EosProjection = Object.freeze({
+  reference: Object.freeze({ today: '', lastVerified: '' }),
+  partition: Object.freeze({
+    overdue: Object.freeze([]) as never[],
+    w3: Object.freeze([]) as never[],
+    w3to6: Object.freeze([]) as never[],
+    w6to9: Object.freeze([]) as never[],
+    w9to12: Object.freeze([]) as never[],
+    beyond12: Object.freeze([]) as never[],
+    unknown: Object.freeze([]) as never[],
+  }),
+  cumulative: Object.freeze({ overdue: 0, le3: 0, le6: 0, le9: 0, le12: 0, unknown: 0 }),
+  rawUnknown: Object.freeze([]) as never[],
+  esxi: Object.freeze({
+    hosts: Object.freeze([]) as never[],
+    partition: Object.freeze({
+      overdue: 0,
+      w3: 0,
+      w3to6: 0,
+      w6to9: 0,
+      w9to12: 0,
+      beyond12: 0,
+      unknown: 0,
+    }),
+  }),
 })
 
 /**
@@ -304,4 +352,5 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   clusterDetail: new Map(),
   plannedView: null,
   plannedDrSim: null,
+  eos: EMPTY_EOS,
 })

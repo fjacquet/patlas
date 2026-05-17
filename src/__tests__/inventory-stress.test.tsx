@@ -18,8 +18,9 @@ import type { Snapshot } from '@/types/snapshot'
 // Phase-4 contract: `buildEstateView` consumes the MERGED bundle. These
 // shipped tests still drive it from a single `Snapshot`; route through the
 // production merge path (single snapshot = degenerate merge case).
+const TEST_TODAY = new Date('2026-01-01T00:00:00Z')
 const buildEstateView = (snap: Snapshot, mode: AccountingMode) =>
-  buildEstateViewMerged(mergeSnapshotsToEstate([snap]), mode)
+  buildEstateViewMerged(mergeSnapshotsToEstate([snap]), mode, TEST_TODAY)
 
 /**
  * 10k-VM synthetic stress proof (ROADMAP Phase-3 success #1/#2/#4). Loads the

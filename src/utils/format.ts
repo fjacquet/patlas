@@ -114,3 +114,29 @@ export const fmtMemMb = (mb: number, locale = 'fr-FR'): string => {
   if (abs >= 1024) return `${(mb / 1024).toLocaleString(locale, opts)} GiB`
   return `${Math.round(mb).toLocaleString(locale, { maximumFractionDigits: 0 })} MiB`
 }
+
+/**
+ * Locale-aware date formatter for the bundled EOS catalogue dates (P7
+ * D-03). Takes an ISO `YYYY-MM-DD` string; returns the em-dash sentinel
+ * for any unparseable input (never `0`/"N/A" — D-00). Callers pass
+ * `i18n.language`; the `'fr-FR'` default mirrors the other formatters.
+ */
+export const fmtDate = (iso: string, locale = 'fr-FR'): string => {
+  // Parse the YYYY-MM-DD components into a LOCAL-time date. `Date.parse` would
+  // read the bare ISO date as UTC midnight, which `toLocaleDateString` then
+  // shifts back a day for UTC-negative hosts (e.g. '2026-05-17' → "May 16").
+  // The round-trip check rejects overflow (e.g. '2026-02-30') → '—' sentinel.
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
+  if (m === null) return '—'
+  const year = Number(m[1])
+  const month = Number(m[2]) - 1
+  const day = Number(m[3])
+  const date = new Date(year, month, day)
+  return date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day
+    ? '—'
+    : date.toLocaleDateString(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+}

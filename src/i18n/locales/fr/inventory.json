@@ -4,7 +4,8 @@
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
     "hosts": "Hôtes",
-    "planning": "Planification"
+    "planning": "Planification",
+    "eos": "Fin de support OS"
   },
   "tab": {
     "label": "Type d'objet",
@@ -74,6 +75,7 @@
     "usedMib": "Utilisé (Mio)",
     "usedRatio": "Utilisé %",
     "overProvisionRatio": "Ratio de surprovisionnement",
-    "sharedDuplicateCount": "Copies partagées"
+    "sharedDuplicateCount": "Copies partagées",
+    "eolFrom": "Fin de support"
   }
 }

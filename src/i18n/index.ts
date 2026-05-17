@@ -6,6 +6,7 @@ import enAlloc from './locales/en/alloc.json'
 import enCommon from './locales/en/common.json'
 import enDashboard from './locales/en/dashboard.json'
 import enDr from './locales/en/dr.json'
+import enEos from './locales/en/eos.json'
 import enInventory from './locales/en/inventory.json'
 import enMvc from './locales/en/mvc.json'
 import enRci from './locales/en/rci.json'
@@ -15,6 +16,7 @@ import frAlloc from './locales/fr/alloc.json'
 import frCommon from './locales/fr/common.json'
 import frDashboard from './locales/fr/dashboard.json'
 import frDr from './locales/fr/dr.json'
+import frEos from './locales/fr/eos.json'
 import frInventory from './locales/fr/inventory.json'
 import frMvc from './locales/fr/mvc.json'
 import frRci from './locales/fr/rci.json'
@@ -43,6 +45,7 @@ export const NAMESPACES = [
   'alloc',
   'dr',
   'rci',
+  'eos',
 ] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
@@ -57,6 +60,7 @@ export const resources = {
     alloc: enAlloc,
     dr: enDr,
     rci: enRci,
+    eos: enEos,
   },
   fr: {
     common: frCommon,
@@ -68,6 +72,7 @@ export const resources = {
     alloc: frAlloc,
     dr: frDr,
     rci: frRci,
+    eos: frEos,
   },
 } as const
 

@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Multi-vCenter Merge & Factual Labels** - REDEFINED (analytics-core replan): validated merge engine spine (kept) + per-vCenter/RVTools labels + stretched as the user's declaration with FACTUAL site-data (G1). Its allocation/DR-UI parts are superseded by Phase 6.
 - [x] **Phase 5: Rich Cluster / Host / ESX Intelligence** - NEW: deep per-cluster card + one-window ESX Summary + operational insights (realized CPU overcommit, avg CPU/mem, ESXi & hardware lifecycle, powered/off/susp/template, footprints) — COMPLETE 2026-05-17, real-file-validated
 - [x] **Phase 6: Allocation & DR (re-derived)** - NEW: realized consolidation displayed (G2) + separate capacity-planning lens (Personal Ratios + Custom Failover, OPEN-1) + DR server/site loss, physical impact (G3); reuses kept drSim engine (completed 2026-05-17)
-- [ ] **Phase 7: OS End-of-Support Forecast** - Bundled endoflife.date catalogue, 3/6/9/12-month at-risk with drill-down
+- [x] **Phase 7: OS End-of-Support Forecast** - Bundled endoflife.date catalogue, 3/6/9/12-month at-risk with drill-down
 - [ ] **Phase 8: In-Session Trends** - Multi-snapshot timelines, per-cluster sparklines, delta panel, temporal X-axis
 - [ ] **Phase 9: Storage / Network / Detailed Views + Threshold Alerting** - NEW: storage by cluster/ESX/VM/datastore, ports/switches, disk/partition threshold alerting (scope per OPEN-2/3)
 - [ ] **Phase 10: HTML + PPTX Exports & Deploy** - Self-contained HTML report, factual PPTX deck, GitHub Pages CI
@@ -171,8 +171,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 - [x] 07-01-PLAN.md — build-time catalogue spine (Zod schema, sync:eos, parse-once boundary, CI freshness)
-- [ ] 07-02-PLAN.md — pure EOS engines + real-string fixtures (normalizeOs, classifyEsxi, bucketEos)
-- [ ] 07-03-PLAN.md — EstateView wiring + 5th eos ViewToggle + EosView + EN/FR i18n
+- [x] 07-02-PLAN.md — pure EOS engines + real-string fixtures (normalizeOs, classifyEsxi, bucketEos)
+- [x] 07-03-PLAN.md — EstateView wiring + 5th eos ViewToggle + EosView + EN/FR i18n
 **UI hint**: yes
 **vsizer reuse**: nothing direct (new engine module); reuses `utils/format.ts` and `<Chart>` infrastructure from Phase 2
 **Pitfalls owned**: Moderate-6 (OS naming variants, `endoflife.date` catalogue source, lifecycle bucketing with "overdue" bucket, extended-support tiers surfaced with asterisks, `lastVerified` CI warning), Minor-4 (case-insensitive OS string matching with original preserved for display)
@@ -237,7 +237,7 @@ Phases execute in numeric order: 1 â 2 â 3 â 4 â 5 â 6 
 | 4. Multi-vCenter Merge & Factual Labels | 2/2 | Complete (re-derived) — 04-01 merge baseline + 04-05 G1 rework, real-file-validated | 2026-05-17 |
 | 5. Rich Cluster / Host / ESX Intelligence | 2/2 | Complete — data layer + UI, real-file-validated | 2026-05-17 |
 | 6. Allocation & DR (re-derived) | 3/3 | Complete   | 2026-05-17 |
-| 7. OS End-of-Support Forecast | 0/3 | Not started | - |
+| 7. OS End-of-Support Forecast | 3/3 | Complete — engines + UI, real-file-validated (UAT-approved) | 2026-05-17 |
 | 8. In-Session Trends | 0/TBD | Not started | - |
 | 9. Storage / Network / Detailed Views + Threshold Alerting | 0/TBD | Not started (NEW; scope per OPEN-2/3) | - |
 | 10. HTML + PPTX Exports & Deploy | 0/TBD | Not started | - |
