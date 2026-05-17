@@ -26,7 +26,7 @@ function App() {
     <ErrorBoundary FallbackComponent={FallbackError}>
       <div className="flex min-h-screen flex-col">
         <header className="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-3 dark:border-surface-700">
-          <h1 className="text-lg font-semibold text-slate-700 dark:text-slate-200">vatlas</h1>
+          <h1 className="text-lg font-semibold text-slate-700 dark:text-slate-200">vAtlas</h1>
           <div className="flex items-center gap-2">
             <ViewToggle value={activeView} onChange={setActiveView} />
             <LanguageToggle />
