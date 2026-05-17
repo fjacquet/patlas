@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: "05-01 COMPLETE (data layer, SUMMARY written, 311/311 green). PAUSED before 05-02 (UI plan)."
+status: planning
+stopped_at: "Phase 5 COMPLETE (data layer + UI, real-file-validated, 311/311). Next: P6 (Allocation & DR re-derived)."
 last_updated: "2026-05-17T08:02:18.704Z"
-last_activity: 2026-05-17 -- Phase 05: 05-01 done; 05-02 (UI) pending
+last_activity: 2026-05-17 -- Phase 5 complete (05-01 + 05-02); next P6
 progress:
   total_phases: 10
-  completed_phases: 4
-  total_plans: 13
-  completed_plans: 13
-  percent: 40
+  completed_phases: 5
+  total_plans: 15
+  completed_plans: 15
+  percent: 50
 ---
 
 # Project State
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** A user drops a RVTools workbook and walks away with a polished, shareable HTML report and PPTX deck describing their VMware estate — without uploading a single byte. The report is the product.
-**Current focus:** Phase 05 — rich-cluster-host-esx-intelligence
+**Current focus:** Phase 5 COMPLETE (Rich Cluster/Host/ESX Intelligence, real-file-validated). Next: P6 (Allocation & DR re-derived — UAT G2/G3 + OPEN-1 two-features).
 
 ## Current Position
 
-Phase: 05 (rich-cluster-host-esx-intelligence) — EXECUTING (05-01 done; 05-02 pending)
-Plan: 05-01 COMPLETE & committed (data layer: parser ext + operational-insights, SUMMARY written, 311/311). 05-02 (UI) NOT started.
-Status: Executing Phase 05 — resume at 05-02
-Last activity: 2026-05-17 -- 05-01 complete; paused before 05-02 (full UI plan = its own reviewable unit)
-Resume: /gsd-execute-phase 5 (05-01 has SUMMARY → skipped as done; runs 05-02 only)
+Phase: 05 (rich-cluster-host-esx-intelligence) — COMPLETE (05-01 data + 05-02 UI, real-file-validated)
+Plan: 2/2 (05-01 data layer, 05-02 UI)
+Status: P1–P5 done (10-phase re-derived roadmap); analytics-core replan on track
+Last activity: 2026-05-17 -- Phase 5 complete; next /gsd-discuss-phase 6
+Progress: [█████░░░░░] 50% (5/10 phases)
 
 Progress: [████░░░░░░] 40% (4/10 phases)
 
