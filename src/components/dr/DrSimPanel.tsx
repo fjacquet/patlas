@@ -70,9 +70,9 @@ const Stat = ({ label, value }: { label: string; value: string }) => (
  *  - The single gold accent figure is PHYSICAL CPU (GHz/cores) + PHYSICAL
  *    RAM (MiB) removed, never vCPU. Survivor verdict = the factual `Verdict`
  *    enum word + numbers, neutral text (no color/traffic-light).
- *  - The high/med/low confidence grade is RETIRED entirely (the tool does
- *    not grade the user's scenario); assumptions + caveats are kept as the
- *    factual "what this does / does not model" disclosure.
+ *  - The high/med/low scenario grade is RETIRED entirely (the tool does
+ *    not grade the user's scenario — D-10); assumptions + caveats are kept
+ *    as the factual "what this does / does not model" disclosure.
  *  - Custom Failover is a single in-panel checkbox switching the presented
  *    result between the measured `drSim` and the planned-ratios
  *    `plannedDrSim` — never a third DR mode, never conflated.
