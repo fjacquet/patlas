@@ -14,7 +14,7 @@ import { buildEstateView as buildEstateViewMerged, EMPTY_VIEW } from './estateVi
 // `today` is now an injected param, never an in-engine clock construction).
 const TEST_TODAY = new Date('2026-01-01T00:00:00Z')
 const buildEstateView = (snap: Snapshot, mode: AccountingMode) =>
-  buildEstateViewMerged(mergeSnapshotsToEstate([snap]), mode, TEST_TODAY)
+  buildEstateViewMerged(mergeSnapshotsToEstate([snap]), [snap], mode, TEST_TODAY)
 
 const host = (over: Partial<VHostRow>): VHostRow => ({
   hostName: 'esx-1',

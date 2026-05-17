@@ -2,6 +2,7 @@ import { runScenario } from '@/engines/drSim'
 import { buildEosProjection } from '@/engines/eos/bucketEos'
 import { loadEosCatalogue } from '@/engines/eos/catalogue'
 import type { MergedEstate } from '@/engines/snapshotMerge'
+import { buildTrendSeries } from '@/engines/trends'
 import { cores, mib } from '@/engines/units'
 import type {
   AccountingMode,
@@ -13,6 +14,7 @@ import type {
   OsBreakdown,
   VmDisplayRow,
 } from '@/types/estate'
+import type { Snapshot } from '@/types/snapshot'
 import { aggregateClusters } from './aggregateClusters'
 import { aggregateGlobals, emptySummary } from './globals'
 import { aggregateGuestData, type GuestData } from './guestData'
@@ -30,7 +32,9 @@ import { perEsx } from './perEsx'
  * ⇒ empty set ⇒ no reservation (the Phase-2 behaviour). The
  * NAA-deduped `perDatastore` count + first-row capacity sum feed
  * `globals.datastoreCount`/`totalStorageMib` (no double-count, Moderate-11).
- * `trends` is `null` — Phase-4 forward-compat (RESEARCH Pattern 3).
+ * `trends` is the P8 per-snapshot temporal series (`null` for < 2
+ * snapshots), composed here in this single pass from the pre-merge
+ * `selected` — never a second memo site (D-00).
  *
  * Datastore→cluster attribution: real RVTools exports DO carry a
  * `Cluster name` column on vDatastore (the earlier "A1: no cluster field"
@@ -54,6 +58,11 @@ const emptyBreakdown = (): OsBreakdown => ({ windows: 0, linux: 0, other: 0 })
  */
 export function buildEstateView(
   merged: MergedEstate,
+  /** The pre-merge selected snapshots (P8 — the temporal trend series is
+   *  per-snapshot, so it needs the snapshots BEFORE the spatial merge).
+   *  Threaded through the single pass so the whole composition stays in
+   *  one pure function and the hook stays a thin orchestrator. */
+  selected: Snapshot[],
   mode: AccountingMode,
   /** Reference clock for the EOS forecast (D-07). Injected by the caller —
    *  the only sanctioned site is the `useEstateView` hook boundary, which
@@ -267,6 +276,13 @@ export function buildEstateView(
     today,
   })
 
+  // P8 In-Session Trends — composed in THIS single pass (no second memo
+  // site, D-00; the only memo is the `useEstateView` hook). Per-snapshot
+  // temporal series from the PRE-merge `selected` (DD-A A2); `null` for
+  // < 2 snapshots (the Phase-2 degenerate case, handled inside
+  // `buildTrendSeries`). Pure — no clock, reuses the shipped aggregates.
+  const trends = buildTrendSeries(selected, mode, { stretchedClusters, allocRatios })
+
   return {
     globals,
     clusters,
@@ -276,7 +292,7 @@ export function buildEstateView(
     vmsByCluster,
     osBreakdown,
     accountingMode: mode,
-    trends: null,
+    trends,
     vcenters: merged.vcenters.map((vc) => ({ viSdkUuid: vc.viSdkUuid, label: vc.label })),
     drSim,
     operationalInsights,
