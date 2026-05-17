@@ -36,7 +36,7 @@ Configuration lives in `vitest.config.ts`. Key settings:
 - Registers `@testing-library/jest-dom/vitest` matchers.
 - Imports `../i18n` so `useTranslation()` returns real EN/FR strings, not keys.
 - Forwards jsdom's `localStorage`/`sessionStorage` onto the test global (Node 26
-  + Vitest 4 + jsdom 29 omit them from `populateGlobal`).
+  - Vitest 4 + jsdom 29 omit them from `populateGlobal`).
 - Provides a deterministic non-zero viewport (`ResizeObserver` stub,
   `offsetHeight`/`offsetWidth`/`getBoundingClientRect` overrides) so the
   `@tanstack/react-virtual` window does not collapse to zero rendered rows under
