@@ -68,19 +68,37 @@
 
 ### Allocated Resources
 
-- [ ] **ALC-01**: User can adjust CPU and RAM allocation ratios via sliders, with named presets (1:1, 4:1, 8:1, VDI 10:1)
-- [ ] **ALC-02**: User sees defaults of CPU 4:1 and RAM 1:1 on first load
-- [ ] **ALC-03**: User's chosen ratios are encoded in the URL hash only (no `localStorage` persistence)
-- [ ] **ALC-04**: User sees consolidation ratios calculated against physical cores (not hyperthreads)
+> **RE-DERIVED 2026-05-17 (Phase 6, CONTEXT D-12).** ALC-01..04 were STALE
+> against UAT G2/OPEN-1. The realized (`vCPU ÷ usable-pCPU`, `vRAM ÷ physRAM`)
+> "measured" consolidation requirement is **SATISFIED-BY-P5 — see RCI-01**
+> (calculated, estate + per-cluster, no input). Phase 6 builds NO new realized-
+> ratio UI (DRY). The capacity-planning "planned" lens (OPEN-1 (b)) is the
+> NEW, explicitly-distinct what-if surface; its requirements are PLN-01..04
+> below. The killed slider / URL-hash mechanism (old ALC-01/03) is **retired**
+> — replaced by in-memory preset+numeric on the explicitly-"planned" lens.
+
+- [ ] **PLN-01**: User opens a separate, explicitly-labelled "Capacity planning — what-if (planned)" surface (a 4th top-level ViewToggle segment) that is structurally distinct from the realized "measured" value and never overwrites or hides it (D-03/D-04)
+- [ ] **PLN-02**: User sets a Planned CPU ratio and Planned RAM ratio via named preset buttons (CPU 1:1 / 4:1 / 8:1 / VDI 10:1; RAM same pattern) that fill an editable numeric field the user can override; defaults are CPU 4:1 / RAM 1:1 (D-05) — no slider widget
+- [ ] **PLN-03**: User's planned ratios are held in-memory only (Zustand inputs slice); there is NO URL-hash codec and NO `localStorage` of planned inputs — refresh = data gone (D-06)
+- [ ] **PLN-04**: User sees the planned what-if recompute against physical cores (not hyperthreads) through the single `useEstateView` memo, with the realized "measured" reference shown read-only with a "measured" qualifier pointing at P5 Operational Insights (D-02 — never conflated)
 
 ### Disaster Recovery Simulation
 
-- [ ] **DRS-01**: User can simulate the loss of one or more ESX hosts and see survivor cluster capacity
-- [ ] **DRS-02**: User can simulate the loss of one or more entire clusters and see survivor estate capacity
-- [ ] **DRS-03**: User can simulate the loss of one or more entire vCenters and see survivor estate capacity
-- [ ] **DRS-04**: User sees an explicit assumptions panel listing what the sim DOES and DOES NOT model (HA admission control, anti-affinity, restart priority)
-- [ ] **DRS-05**: User sees a `confidence` indicator and `caveats` array on every DR result
-- [ ] **DRS-06**: User sees before/after numbers, evacuee totals, and per-survivor verdict for every DR scenario
+> **RE-DERIVED 2026-05-17 (Phase 6, CONTEXT D-12).** DRS-01..06 were STALE
+> against UAT G3. Cluster-loss (old DRS-02) and vCenter-loss (old DRS-03) are
+> **dropped**. The `confidence` high/med/low clause of old DRS-05 is **dropped**
+> (D-10 — no judgement of the user's scenario); its `caveats` + assumptions
+> clause is **kept** (Moderate-10). New IDs DRX-01..06 model exactly two modes
+> (Server + Site loss), physical impact (GHz/cores + physical RAM, never vCPU),
+> and the survivor verdict vs physical headroom. The kept `engines/drSim` engine
+> is evolved, not rewritten (ROADMAP `vsizer reuse`).
+
+- [ ] **DRX-01**: User simulates **Server loss** — both an individual named-host multi-select AND a per-cluster "N of M hosts in cluster X" quick stepper — and sees survivor cluster capacity, with the shipped reversible/neutral failed-selection UI kept (no red, no alarm icon, no confirmation dialog) (D-07/G3)
+- [ ] **DRX-02**: User simulates **Site loss** — site = the fault-domain value of clusters the user declared stretched (Site A / Site B); the engine removes that site's physical hosts; non-stretched workload physically at the lost site is surfaced as an explicit factual "lost — no DR target" line; no fault-domain metadata ⇒ symmetric 50 % split (D-08)
+- [ ] **DRX-03**: User sees the DR impact as **physical CPU removed (GHz / cores) + physical RAM removed (MiB)** — never vCPU — and the per-survivor verdict computed against **physical** headroom using the reused `Verdict` enum, rendered as a factual word + numbers with no color/traffic-light (D-09)
+- [ ] **DRX-04**: User sees an explicit assumptions panel listing what the sim DOES and DOES NOT model (kept verbatim-pattern from the shipped `assumptions.*`, content updated to the two-mode/physical model) (D-10/Moderate-10)
+- [ ] **DRX-05**: User sees a factual `caveats[]` array on every DR result (i18n key suffixes, no editorial verb, no number); there is NO `confidence` indicator anywhere (the high/med/low clause is removed entirely) (D-10)
+- [ ] **DRX-06**: User sees before/after per-survivor numbers and the evacuated total for every DR scenario; the user may toggle a single in-panel "Apply planned ratios to this scenario" affordance (Custom Failover — NOT a 3rd mode) that re-runs the same Server/Site sim with the planning lens's planned ratios, never conflated with the measured DR result (D-11/DRS-06 intent)
 
 ### OS End-of-Support Forecast
 
@@ -214,16 +232,26 @@
 | RCI-03 | Phase 5 | Pending |
 | RCI-04 | Phase 5 | Pending |
 | RCI-05 | Phase 5 | Pending |
-| ALC-01 | Phase 4 | Pending |
-| ALC-02 | Phase 4 | Pending |
-| ALC-03 | Phase 4 | Pending |
-| ALC-04 | Phase 4 | Pending |
-| DRS-01 | Phase 4 | Pending |
-| DRS-02 | Phase 4 | Pending |
-| DRS-03 | Phase 4 | Pending |
-| DRS-04 | Phase 4 | Pending |
-| DRS-05 | Phase 4 | Pending |
-| DRS-06 | Phase 4 | Pending |
+| ~~ALC-01~~ | Phase 6 | Retired — slider/URL-hash killed (G2); → PLN-02 in-memory preset+numeric |
+| ~~ALC-02~~ | Phase 6 | Re-derived → PLN-02 (CPU 4:1 / RAM 1:1 default kept) |
+| ~~ALC-03~~ | Phase 6 | Retired — URL-hash forbidden (D-06); → PLN-03 in-memory only |
+| ~~ALC-04~~ | Phase 5 | Realized ratio satisfied-by-P5 (RCI-01); planned what-if → PLN-04 |
+| PLN-01 | Phase 6 | Pending |
+| PLN-02 | Phase 6 | Pending |
+| PLN-03 | Phase 6 | Pending |
+| PLN-04 | Phase 6 | Pending |
+| ~~DRS-01~~ | Phase 6 | Re-derived → DRX-01 (Server loss) |
+| ~~DRS-02~~ | Phase 6 | Dropped — cluster-loss removed (G3) |
+| ~~DRS-03~~ | Phase 6 | Dropped — vCenter-loss removed (G3) |
+| ~~DRS-04~~ | Phase 6 | Re-derived → DRX-04 (assumptions kept) |
+| ~~DRS-05~~ | Phase 6 | Confidence clause dropped (D-10); caveats clause → DRX-05 |
+| ~~DRS-06~~ | Phase 6 | Re-derived → DRX-06 (physical before/after + Custom Failover) |
+| DRX-01 | Phase 6 | Pending |
+| DRX-02 | Phase 6 | Pending |
+| DRX-03 | Phase 6 | Pending |
+| DRX-04 | Phase 6 | Pending |
+| DRX-05 | Phase 6 | Pending |
+| DRX-06 | Phase 6 | Pending |
 | EOS-01 | Phase 5 | Pending |
 | EOS-02 | Phase 5 | Pending |
 | EOS-03 | Phase 5 | Pending |

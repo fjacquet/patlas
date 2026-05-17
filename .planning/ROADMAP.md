@@ -92,6 +92,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 > **Allocation moves to Phase 6 (UAT G2 — calculated, not slider-selected). DR modes/metric move to Phase 6 (UAT G3 — Server+Site loss, physical impact).** Requirements still owned here: MVC-01..04 (done), STR-01..03 (reworked per G1), STR-04 retired (merged into factual STR-03). The original Goal/Success/Plans text below is **superseded** by this banner and retained only as history.
 >
 > **Re-derived plans (authoritative):**
+>
 > - [x] `04-01` — multi-vCenter merge engine spine — DONE, real-file-validated, kept as baseline
 > - [x] `04-05` — G1 stretched rework: factual `siteData` (detected/assumed) replaces confidence verdict+chip; reservation math unchanged; estate "N clusters marked stretched"; merge STR-03 / drop STR-04 — DONE 2026-05-17, real-file-validated
 > - 04-02/03/04 superseded (02 math kept in 04-01 baseline; 03 allocation→P6; 04 DR→P6)
@@ -136,9 +137,20 @@ Decimal phases appear between their surrounding integers in numeric order.
 **NEW — analytics-core replan.** Supersedes original P4 allocation (04-03) + DR (04-04). Carries UAT decisions G2, G3 and the resolved OPEN-1.
 **Goal**: (a) Display the **realized** consolidation ratio (`vCPU / usable-pCPU`, `vRAM / physRAM`) as a calculated measured output — no input (G2). (b) A SEPARATE, explicitly-labelled **capacity-planning lens** accepting user **Personal Ratios (CPU/RAM) + Custom Failover** for what-if sizing (OPEN-1 resolved: two distinct features, "measured" vs "planned", never conflated, never overwriting the realized value). (c) **DR simulation** reusing the kept `engines/drSim` engine, reworked to exactly two modes — **Server loss** + **Site loss** (drop cluster/vCenter); Site = fault-domain of clusters the user declared stretched; non-stretched workload at a lost site = LOST (no DR target); impact = **physical CPU (GHz/cores) + physical RAM** removed, not vCPU; survivor verdict vs physical headroom; reversible/neutral failed-selection UI kept (G3). Custom Failover (b) reconciles with this DR model.
 **Depends on**: Phase 4, Phase 5
-**Requirements**: TBD — re-derive in discuss-phase (carries UAT G2/G3, OPEN-1; replaces ALC-01..04, DRS-01..06)
-**Success Criteria**: TBD — re-derive in discuss-phase
-**Plans**: TBD
+**Requirements**: PLN-01, PLN-02, PLN-03, PLN-04, DRX-01, DRX-02, DRX-03, DRX-04, DRX-05, DRX-06 (re-derived 2026-05-17 per CONTEXT D-12; the realized "measured" deliverable is SATISFIED-BY-P5 — RCI-01; ALC-01..04 + DRS-01..06 retired/dropped — see REQUIREMENTS.md)
+**Success Criteria** (what must be TRUE):
+
+  1. A user sees a 4th "Planning" segment in the top-level ViewToggle and opens a separate, explicitly-labelled "Capacity planning — what-if (planned)" surface that never shares a tile with the read-only "measured" realized value (P5 Operational Insights)
+  2. A user sets Planned CPU/RAM ratios via named preset buttons (CPU 1:1/4:1/8:1/VDI 10:1) that fill an editable numeric field; default CPU 4:1 / RAM 1:1; the planned what-if recomputes through the single `useEstateView` memo and persists nowhere (no URL-hash, no localStorage — refresh = data gone)
+  3. A user runs DR simulation with exactly two modes — Server loss (individual host multi-select AND per-cluster "N of M" stepper) and Site loss (declared-stretched fault-domain value; non-stretched workload at the lost site shown as an explicit factual "lost — no DR target" line)
+  4. A user sees the DR impact as physical CPU removed (GHz/cores) + physical RAM removed (MiB), never vCPU; per-survivor verdict is a neutral factual word + numbers; there is NO confidence indicator anywhere; the assumptions panel + factual caveats are kept; failed-selection stays reversible/neutral (no red, no icon, no dialog)
+  5. A user toggles a single in-panel "Apply planned ratios to this scenario" affordance (Custom Failover — not a 3rd mode) that re-runs the same Server/Site sim with the planned ratios, never conflated with the measured DR result
+  6. `engines/drSim` ships with ≥75 % Vitest coverage on the reworked two-mode/physical-impact contract; the single-`useMemo` invariant is preserved (planned projection + reworked DR result compose inside `buildEstateView`)
+**Plans**: 3 plans
+
+- [ ] 06-01-PLAN.md — Engine + contract spine: rework `drSim` to two-mode/physical-impact/no-confidence, in-memory `plannedRatios` slice, planned projection through the single memo, drSim tests rewritten ≥75%
+- [ ] 06-02-PLAN.md — Planning surface: 4th ViewToggle segment + PlanningView shell + preset+numeric in-memory PlannedRatiosControl (kills the slider/URL-hash) + Dashboard cleanup + EN/FR i18n
+- [ ] 06-03-PLAN.md — DR rework UI: two-mode DrSimPanel (Server stepper + Site picker/lost-line + physical impact + Custom-Failover toggle, confidence removed) wired into PlanningView + dr.json EN/FR + presenter test
 **UI hint**: yes
 **vsizer reuse**: keep shipped `engines/drSim/runScenario.ts` + `allocate.ts` + `aggregateClusters` per-site math — rework modes/metric, do NOT rewrite from zero
 **Pitfalls owned**: Moderate-10 (DR trust — assumptions panel + caveats, kept); G2/G3 anti-patterns (no invented ratios; DR units = server/site with physical impact)
@@ -220,7 +232,7 @@ Phases execute in numeric order: 1 â 2 â 3 â 4 â 5 â 6 
 | 3. Inventory Navigation | 3/3 | Complete | 2026-05-16 |
 | 4. Multi-vCenter Merge & Factual Labels | 2/2 | Complete (re-derived) — 04-01 merge baseline + 04-05 G1 rework, real-file-validated | 2026-05-17 |
 | 5. Rich Cluster / Host / ESX Intelligence | 2/2 | Complete — data layer + UI, real-file-validated | 2026-05-17 |
-| 6. Allocation & DR (re-derived) | 0/TBD | Not started (NEW; carries UAT G2/G3, OPEN-1) | - |
+| 6. Allocation & DR (re-derived) | 0/3 | Not started (NEW; carries UAT G2/G3, OPEN-1) | - |
 | 7. OS End-of-Support Forecast | 0/TBD | Not started | - |
 | 8. In-Session Trends | 0/TBD | Not started | - |
 | 9. Storage / Network / Detailed Views + Threshold Alerting | 0/TBD | Not started (NEW; scope per OPEN-2/3) | - |
