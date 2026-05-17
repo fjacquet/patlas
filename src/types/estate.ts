@@ -338,6 +338,53 @@ export interface TimelinePoint {
 }
 
 /**
+ * P7 OS End-of-Support projection. Defined here (not in the engine) so the
+ * types→engines import direction is preserved — `bucketEos.ts` imports these
+ * as types (no cycle). The `partition` is a DISJOINT cover whose counts
+ * reconcile to the VM entity total (D-06/D-10). `cumulative` is a derived
+ * display overlay. ESXi hosts are a SEPARATE kind, never summed with VMs
+ * (D-09b). `reference.today` is the injected workbook-load date (D-07);
+ * `EsxiHostRow.patchEol` is always the null em-dash sentinel (D-09c).
+ */
+export type EosBucketKey = 'overdue' | 'w3' | 'w3to6' | 'w6to9' | 'w9to12' | 'beyond12' | 'unknown'
+
+export interface EosRow {
+  vmName: string
+  cluster: string
+  host: string
+  /** Raw RVTools OS string, preserved verbatim (D-12). */
+  os: string
+  slug: string | null
+  version: string | null
+  eolFrom: string | null
+  bucket: EosBucketKey
+}
+
+export interface EsxiHostRow {
+  hostName: string
+  esxVersion: string
+  major: string | null
+  majorEol: string | null
+  patchEol: null
+  bucket: EosBucketKey
+}
+
+export interface EosProjection {
+  reference: { today: string; lastVerified: string }
+  partition: Record<EosBucketKey, EosRow[]>
+  cumulative: {
+    overdue: number
+    le3: number
+    le6: number
+    le9: number
+    le12: number
+    unknown: number
+  }
+  rawUnknown: { osString: string; count: number }[]
+  esxi: { hosts: EsxiHostRow[]; partition: Record<EosBucketKey, number> }
+}
+
+/**
  * The single assembled view every dashboard component and export consumes
  * (via the `useEstateView` hook — the project's only `useMemo` site).
  * Single-snapshot in Phase 2; the shape must NOT preclude multi-snapshot
@@ -385,6 +432,11 @@ export interface EstateView {
    * conflated with the measured `drSim`. `null` when no scenario is
    * marked failed or the planned ratios are not applied to DR. */
   plannedDrSim: DrSimResult | null
+  /**
+   * P7 OS End-of-Support forecast. Produced inside the single
+   * `buildEstateView` pass — no second `useMemo` (D-00). A frozen empty
+   * projection in `EMPTY_VIEW`; otherwise always present. */
+  eos: EosProjection
 }
 
 /**

@@ -114,3 +114,20 @@ export const fmtMemMb = (mb: number, locale = 'fr-FR'): string => {
   if (abs >= 1024) return `${(mb / 1024).toLocaleString(locale, opts)} GiB`
   return `${Math.round(mb).toLocaleString(locale, { maximumFractionDigits: 0 })} MiB`
 }
+
+/**
+ * Locale-aware date formatter for the bundled EOS catalogue dates (P7
+ * D-03). Takes an ISO `YYYY-MM-DD` string; returns the em-dash sentinel
+ * for any unparseable input (never `0`/"N/A" — D-00). Callers pass
+ * `i18n.language`; the `'fr-FR'` default mirrors the other formatters.
+ */
+export const fmtDate = (iso: string, locale = 'fr-FR'): string => {
+  const ms = Date.parse(iso)
+  return Number.isNaN(ms)
+    ? '—'
+    : new Date(ms).toLocaleDateString(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+}

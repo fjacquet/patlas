@@ -1,9 +1,11 @@
-import { BarChart, GaugeChart, PieChart } from 'echarts/charts'
+import { BarChart, GaugeChart, HeatmapChart, PieChart } from 'echarts/charts'
 import {
+  CalendarComponent,
   DatasetComponent,
   GridComponent,
   LegendComponent,
   TooltipComponent,
+  VisualMapComponent,
 } from 'echarts/components'
 import * as echarts from 'echarts/core'
 import { SVGRenderer } from 'echarts/renderers'
@@ -28,10 +30,13 @@ echarts.use([
   BarChart,
   PieChart,
   GaugeChart,
+  HeatmapChart, // P7 EOS forecast timeline (SVG — VIZ-01)
   GridComponent,
   TooltipComponent,
   LegendComponent,
   DatasetComponent,
+  CalendarComponent, // P7 EOS calendar-coordinate forecast
+  VisualMapComponent, // P7 heatmap neutral colour ramp (no verdict colour)
   SVGRenderer, // SVG ONLY — the canvas renderer is intentionally excluded (VIZ-01)
 ])
 

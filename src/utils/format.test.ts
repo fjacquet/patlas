@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fmtGhzValue, fmtInt, fmtMemMb, fmtPercentValue, fmtRatio } from './format'
+import { fmtDate, fmtGhzValue, fmtInt, fmtMemMb, fmtPercentValue, fmtRatio } from './format'
 
 describe('fmtInt', () => {
   it('formats locale-aware integers', () => {
@@ -53,5 +53,15 @@ describe('fmtMemMb — ADR-0010 GiB/TiB suffixes, base-2 math unchanged', () => 
   })
   it('em-dash for non-finite', () => {
     expect(fmtMemMb(Number.NaN)).toBe('—')
+  })
+})
+
+describe('fmtDate — P7 EOS catalogue dates (D-03)', () => {
+  it('formats an ISO date locale-aware', () => {
+    expect(fmtDate('2026-05-17', 'en-US')).toBe('May 17, 2026')
+  })
+  it('em-dash sentinel for an unparseable input (never 0 / N/A — D-00)', () => {
+    expect(fmtDate('not-a-date')).toBe('—')
+    expect(fmtDate('')).toBe('—')
   })
 })

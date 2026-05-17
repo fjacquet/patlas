@@ -1,8 +1,13 @@
+import type { EosBucketKey, EosProjection, EosRow, EsxiHostRow } from '@/types/estate'
 import type { VHostRow } from '@/types/vhost'
 import type { VInfoRow } from '@/types/vinfo'
 import type { EosCatalogue } from './catalogueSchema'
 import { classifyEsxi } from './classifyEsxi'
 import { normalizeOs } from './normalizeOs'
+
+// EOS projection types live in @/types/estate (types→engines direction,
+// no cycle); re-exported here so the engine module still surfaces them.
+export type { EosBucketKey, EosProjection, EosRow, EsxiHostRow } from '@/types/estate'
 
 /**
  * Lifecycle bucketer — pure, Zod-free. Receives the typed catalogue and the
@@ -24,44 +29,6 @@ import { normalizeOs } from './normalizeOs'
  * reconciliation source). ESXi hosts are classified into a SEPARATE `esxi`
  * sub-structure; host counts are never summed into the VM partition (D-09b).
  */
-
-export type EosBucketKey = 'overdue' | 'w3' | 'w3to6' | 'w6to9' | 'w9to12' | 'beyond12' | 'unknown'
-
-export interface EosRow {
-  vmName: string
-  cluster: string
-  host: string
-  /** Raw RVTools OS string, preserved verbatim (D-12). */
-  os: string
-  slug: string | null
-  version: string | null
-  eolFrom: string | null
-  bucket: EosBucketKey
-}
-
-export interface EsxiHostRow {
-  hostName: string
-  esxVersion: string
-  major: string | null
-  majorEol: string | null
-  patchEol: null
-  bucket: EosBucketKey
-}
-
-export interface EosProjection {
-  reference: { today: string; lastVerified: string }
-  partition: Record<EosBucketKey, EosRow[]>
-  cumulative: {
-    overdue: number
-    le3: number
-    le6: number
-    le9: number
-    le12: number
-    unknown: number
-  }
-  rawUnknown: { osString: string; count: number }[]
-  esxi: { hosts: EsxiHostRow[]; partition: Record<EosBucketKey, number> }
-}
 
 function isoDay(d: Date): string {
   const y = d.getUTCFullYear()
