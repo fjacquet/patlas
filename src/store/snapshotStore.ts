@@ -8,6 +8,28 @@ const EMPTY_SCENARIO = (): DrScenario => ({
 })
 
 /**
+ * P9 threshold-alerting config (D-01..D-04). `fsUsedPct` = guest filesystem
+ * used-% line; `dsUsedPct` = datastore used-% line; `luUsedPct` = NAA-keyed
+ * logical-unit used-% line (D-03: LU semantic = a second datastore-used-%
+ * line, RVTools-Analyser-class defaults; all user-editable at runtime).
+ * In-memory inputs only — never persisted.
+ */
+export interface ThresholdConfig {
+  fsUsedPct: number
+  dsUsedPct: number
+  luUsedPct: number
+}
+
+/** RVTools-Analyser-class defaults (D-03): filesystem ≥90% used, datastore
+ *  >85% used, LU >85% used. Single source of truth — reused by `clearAll`
+ *  and the `buildEstateView` opts default (plan 09-03 task 3). */
+export const DEFAULT_THRESHOLDS: ThresholdConfig = {
+  fsUsedPct: 90,
+  dsUsedPct: 85,
+  luUsedPct: 85,
+}
+
+/**
  * Multi-snapshot, inputs-only Zustand store.
  *
  * DELIBERATE DEVIATION from vsizer's `datasetStore` (ARCHITECTURE.md §5): this
@@ -57,6 +79,13 @@ interface SnapshotState {
    * localStorage, no URL-hash codec (PROJECT.md line 53 / D-06 / T-06-01).
    */
   plannedRatios: { cpu: number; ram: number }
+  /**
+   * P9 threshold-alerting config (D-01/D-02). In-memory inputs-only,
+   * REPLACED never mutated (Zustand `Object.is`); NO new localStorage key,
+   * no URL-hash — `clearAll` restores defaults so refresh == defaults
+   * restored (PAR-05 / D-02).
+   */
+  thresholds: ThresholdConfig
   addSnapshot: (s: Snapshot) => void
   removeSnapshot: (id: string) => void
   setActiveSnapshot: (id: string | null) => void
@@ -64,6 +93,7 @@ interface SnapshotState {
   setStretchedClusters: (clusters: Set<string>) => void
   setScenario: (scenario: DrScenario) => void
   setPlannedRatios: (r: { cpu: number; ram: number }) => void
+  setThresholds: (t: ThresholdConfig) => void
   renameVCenter: (id: string, label: string) => void
   setCapturedAt: (id: string, date: Date) => void
   /**
@@ -85,6 +115,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
   stretchedClusters: new Set(),
   scenario: EMPTY_SCENARIO(),
   plannedRatios: { cpu: 4, ram: 1 },
+  thresholds: { ...DEFAULT_THRESHOLDS },
 
   addSnapshot: (s) =>
     set((state) => {
@@ -136,6 +167,10 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
   // subscribers re-render; no persist, no localStorage (D-06).
   setPlannedRatios: (r) => set({ plannedRatios: { ...r } }),
 
+  // REPLACE never mutate (Zustand `Object.is`) — fresh object so
+  // subscribers re-render; no persist, no localStorage (D-02).
+  setThresholds: (t) => set({ thresholds: { ...t } }),
+
   renameVCenter: (id, label) =>
     set((state) => {
       const snap = state.snapshots.get(id)
@@ -183,6 +218,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
       stretchedClusters: new Set(),
       scenario: EMPTY_SCENARIO(),
       plannedRatios: { cpu: 4, ram: 1 },
+      thresholds: { ...DEFAULT_THRESHOLDS },
     }),
 }))
 
@@ -215,3 +251,7 @@ export const selectPlannedRatios = (s: SnapshotState): { cpu: number; ram: numbe
 export const selectSetPlannedRatios = (
   s: SnapshotState,
 ): ((r: { cpu: number; ram: number }) => void) => s.setPlannedRatios
+// P9 threshold slice (D-02). Stable refs — never construct here.
+export const selectThresholds = (s: SnapshotState): ThresholdConfig => s.thresholds
+export const selectSetThresholds = (s: SnapshotState): ((t: ThresholdConfig) => void) =>
+  s.setThresholds
