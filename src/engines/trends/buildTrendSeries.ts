@@ -25,14 +25,22 @@ const dayKey = (d: Date): string => `${d.getUTCFullYear()}-${d.getUTCMonth()}-${
 const poweredOnOf = (vinfo: { template: boolean; powerState: string }[]): number =>
   vinfo.reduce((n, v) => (!v.template && v.powerState === 'poweredOn' ? n + 1 : n), 0)
 
-/** Aggregate one same-day group through the SHIPPED engines (DRY — the
- *  exact calls `buildEstateView` makes, so counts reconcile). */
-const aggregateGroup = (
+/**
+ * Aggregate one snapshot group through the SHIPPED engines (DRY — the
+ * exact calls `buildEstateView` makes, so counts reconcile). Exported so
+ * the DD-C release path (08-02 `useSnapshotUpload`) computes the carried
+ * `releasedAggregate` with the SAME math instead of duplicating it.
+ */
+export const aggregateTrendGroup = (
   group: Snapshot[],
   mode: AccountingMode,
-  stretchedClusters: ReadonlySet<string>,
-  allocRatios: { cpuRatio: number; ramRatio: number },
+  opts: {
+    stretchedClusters?: ReadonlySet<string>
+    allocRatios?: { cpuRatio: number; ramRatio: number }
+  } = {},
 ): { headline: TrendHeadline; byCluster: Map<string, TrendHeadline> } => {
+  const stretchedClusters = opts.stretchedClusters ?? new Set<string>()
+  const allocRatios = opts.allocRatios ?? { cpuRatio: 4, ramRatio: 1 }
   const merged = mergeSnapshotsToEstate(group)
   const clusters = aggregateClusters({
     vinfo: merged.vinfo,
@@ -131,7 +139,7 @@ export const buildTrendSeries = (
             headline: released.releasedAggregate.headline,
             byCluster: released.releasedAggregate.byCluster,
           }
-        : aggregateGroup(group, mode, stretchedClusters, allocRatios)
+        : aggregateTrendGroup(group, mode, { stretchedClusters, allocRatios })
     // `group` is non-empty by construction (dated groups have >=1 member;
     // inferred points are single-snapshot). Earliest capturedAt represents
     // the day; no clock is constructed here (engine purity).
