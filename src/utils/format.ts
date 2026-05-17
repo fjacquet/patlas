@@ -122,10 +122,19 @@ export const fmtMemMb = (mb: number, locale = 'fr-FR'): string => {
  * `i18n.language`; the `'fr-FR'` default mirrors the other formatters.
  */
 export const fmtDate = (iso: string, locale = 'fr-FR'): string => {
-  const ms = Date.parse(iso)
-  return Number.isNaN(ms)
+  // Parse the YYYY-MM-DD components into a LOCAL-time date. `Date.parse` would
+  // read the bare ISO date as UTC midnight, which `toLocaleDateString` then
+  // shifts back a day for UTC-negative hosts (e.g. '2026-05-17' → "May 16").
+  // The round-trip check rejects overflow (e.g. '2026-02-30') → '—' sentinel.
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
+  if (m === null) return '—'
+  const year = Number(m[1])
+  const month = Number(m[2]) - 1
+  const day = Number(m[3])
+  const date = new Date(year, month, day)
+  return date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day
     ? '—'
-    : new Date(ms).toLocaleDateString(locale, {
+    : date.toLocaleDateString(locale, {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
