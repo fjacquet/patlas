@@ -1,0 +1,1540 @@
+{
+  "lastVerified": "2026-05-17",
+  "products": {
+    "esxi": {
+      "name": "esxi",
+      "releases": [
+        {
+          "name": "9.0",
+          "label": "9.0",
+          "releaseDate": "2025-06-17",
+          "isEol": false,
+          "eolFrom": null,
+          "isMaintained": true
+        },
+        {
+          "name": "8.0",
+          "label": "8.0",
+          "releaseDate": "2022-10-11",
+          "isEol": false,
+          "eolFrom": "2027-10-11",
+          "isMaintained": true
+        },
+        {
+          "name": "7.0",
+          "label": "7.0",
+          "releaseDate": "2020-04-02",
+          "isEol": true,
+          "eolFrom": "2025-10-02",
+          "isMaintained": false
+        },
+        {
+          "name": "6.7",
+          "label": "6.7",
+          "releaseDate": "2018-04-17",
+          "isEol": true,
+          "eolFrom": "2022-10-15",
+          "isMaintained": false
+        },
+        {
+          "name": "6.5",
+          "label": "6.5",
+          "releaseDate": "2016-11-15",
+          "isEol": true,
+          "eolFrom": "2022-10-15",
+          "isMaintained": false
+        },
+        {
+          "name": "6.0",
+          "label": "6.0",
+          "releaseDate": "2015-03-12",
+          "isEol": true,
+          "eolFrom": "2020-03-12",
+          "isMaintained": false
+        },
+        {
+          "name": "5.5",
+          "label": "5.5",
+          "releaseDate": "2013-09-19",
+          "isEol": true,
+          "eolFrom": "2018-09-19",
+          "isMaintained": false
+        },
+        {
+          "name": "5.1",
+          "label": "5.1",
+          "releaseDate": "2012-08-27",
+          "isEol": true,
+          "eolFrom": "2016-08-24",
+          "isMaintained": false
+        },
+        {
+          "name": "5.0",
+          "label": "5.0",
+          "releaseDate": "2011-07-12",
+          "isEol": true,
+          "eolFrom": "2016-08-24",
+          "isMaintained": false
+        }
+      ]
+    },
+    "rhel": {
+      "name": "rhel",
+      "releases": [
+        {
+          "name": "10",
+          "label": "10 (Upcoming ELS)",
+          "releaseDate": "2025-05-20",
+          "isEol": false,
+          "eolFrom": "2035-05-31",
+          "isMaintained": true
+        },
+        {
+          "name": "9",
+          "label": "9 (Upcoming ELS)",
+          "releaseDate": "2022-05-18",
+          "isEol": false,
+          "eolFrom": "2032-05-31",
+          "isMaintained": true
+        },
+        {
+          "name": "8",
+          "label": "8 (Upcoming ELS)",
+          "releaseDate": "2019-05-07",
+          "isEol": false,
+          "eolFrom": "2029-05-31",
+          "isMaintained": true
+        },
+        {
+          "name": "7",
+          "label": "7 (ELS)",
+          "releaseDate": "2014-06-10",
+          "isEol": true,
+          "eolFrom": "2024-06-30",
+          "isMaintained": true
+        },
+        {
+          "name": "6",
+          "label": "6 (ELS)",
+          "releaseDate": "2010-11-10",
+          "isEol": true,
+          "eolFrom": "2020-11-30",
+          "isMaintained": false
+        },
+        {
+          "name": "5",
+          "label": "5 (ELS)",
+          "releaseDate": "2007-03-15",
+          "isEol": true,
+          "eolFrom": "2017-03-31",
+          "isMaintained": false
+        },
+        {
+          "name": "4",
+          "label": "4",
+          "releaseDate": "2005-02-15",
+          "isEol": true,
+          "eolFrom": "2012-02-29",
+          "isMaintained": false
+        }
+      ]
+    },
+    "oracle-linux": {
+      "name": "oracle-linux",
+      "releases": [
+        {
+          "name": "10",
+          "label": "10",
+          "releaseDate": "2025-06-26",
+          "isEol": false,
+          "eolFrom": null,
+          "isMaintained": true
+        },
+        {
+          "name": "9",
+          "label": "9",
+          "releaseDate": "2022-07-06",
+          "isEol": false,
+          "eolFrom": "2032-06-30",
+          "isMaintained": true
+        },
+        {
+          "name": "8",
+          "label": "8",
+          "releaseDate": "2019-07-19",
+          "isEol": false,
+          "eolFrom": "2029-07-31",
+          "isMaintained": true
+        },
+        {
+          "name": "7",
+          "label": "7",
+          "releaseDate": "2014-07-23",
+          "isEol": true,
+          "eolFrom": "2024-12-31",
+          "isMaintained": true
+        },
+        {
+          "name": "6",
+          "label": "6",
+          "releaseDate": "2011-02-12",
+          "isEol": true,
+          "eolFrom": "2021-03-31",
+          "isMaintained": false
+        }
+      ]
+    },
+    "windows-server": {
+      "name": "windows-server",
+      "releases": [
+        {
+          "name": "2025",
+          "label": "Windows Server 2025 (LTSC)",
+          "releaseDate": "2024-11-01",
+          "isEol": false,
+          "eolFrom": "2034-10-10",
+          "isMaintained": true
+        },
+        {
+          "name": "23h2-ac",
+          "label": "Windows Server 23H2 AC",
+          "releaseDate": "2023-10-24",
+          "isEol": true,
+          "eolFrom": "2025-10-24",
+          "isMaintained": false
+        },
+        {
+          "name": "2022",
+          "label": "Windows Server 2022 (LTSC)",
+          "releaseDate": "2021-08-18",
+          "isEol": false,
+          "eolFrom": "2031-10-14",
+          "isMaintained": true
+        },
+        {
+          "name": "20h2-sac",
+          "label": "Windows Server 20H2 SAC",
+          "releaseDate": "2020-10-20",
+          "isEol": true,
+          "eolFrom": "2022-08-09",
+          "isMaintained": false
+        },
+        {
+          "name": "2004-sac",
+          "label": "Windows Server 2004 SAC",
+          "releaseDate": "2020-05-27",
+          "isEol": true,
+          "eolFrom": "2021-12-14",
+          "isMaintained": false
+        },
+        {
+          "name": "1909-sac",
+          "label": "Windows Server 1909 SAC",
+          "releaseDate": "2019-11-12",
+          "isEol": true,
+          "eolFrom": "2021-05-11",
+          "isMaintained": false
+        },
+        {
+          "name": "1903-sac",
+          "label": "Windows Server 1903 SAC",
+          "releaseDate": "2019-05-21",
+          "isEol": true,
+          "eolFrom": "2020-12-08",
+          "isMaintained": false
+        },
+        {
+          "name": "1809-sac",
+          "label": "Windows Server 1809 SAC",
+          "releaseDate": "2018-11-13",
+          "isEol": true,
+          "eolFrom": "2020-11-10",
+          "isMaintained": false
+        },
+        {
+          "name": "2019",
+          "label": "Windows Server 2019 (LTSC)",
+          "releaseDate": "2018-11-13",
+          "isEol": false,
+          "eolFrom": "2029-01-09",
+          "isMaintained": true
+        },
+        {
+          "name": "1803-sac",
+          "label": "Windows Server 1803 SAC",
+          "releaseDate": "2018-04-30",
+          "isEol": true,
+          "eolFrom": "2019-11-12",
+          "isMaintained": false
+        },
+        {
+          "name": "1709-sac",
+          "label": "Windows Server 1709 SAC",
+          "releaseDate": "2017-10-17",
+          "isEol": true,
+          "eolFrom": "2019-04-09",
+          "isMaintained": false
+        },
+        {
+          "name": "2016",
+          "label": "Windows Server 2016 (LTSC)",
+          "releaseDate": "2016-10-15",
+          "isEol": false,
+          "eolFrom": "2027-01-12",
+          "isMaintained": true
+        },
+        {
+          "name": "2012-r2",
+          "label": "Windows Server 2012 R2 (LTSC)",
+          "releaseDate": "2013-11-25",
+          "isEol": true,
+          "eolFrom": "2023-10-10",
+          "isMaintained": true
+        },
+        {
+          "name": "2012",
+          "label": "Windows Server 2012 (LTSC)",
+          "releaseDate": "2012-10-30",
+          "isEol": true,
+          "eolFrom": "2023-10-10",
+          "isMaintained": true
+        },
+        {
+          "name": "2008-r2-sp1",
+          "label": "Windows Server 2008 R2 SP1 (LTSC)",
+          "releaseDate": "2011-02-22",
+          "isEol": true,
+          "eolFrom": "2020-01-14",
+          "isMaintained": false
+        },
+        {
+          "name": "2008-sp2",
+          "label": "Windows Server 2008 SP2 (LTSC)",
+          "releaseDate": "2009-04-29",
+          "isEol": true,
+          "eolFrom": "2020-01-14",
+          "isMaintained": false
+        },
+        {
+          "name": "2003-sp2",
+          "label": "Windows Server 2003 SP2 (LTSC)",
+          "releaseDate": "2007-03-13",
+          "isEol": true,
+          "eolFrom": "2015-07-14",
+          "isMaintained": false
+        },
+        {
+          "name": "2003-sp1",
+          "label": "Windows Server 2003 SP1",
+          "releaseDate": "2005-03-30",
+          "isEol": true,
+          "eolFrom": "2009-04-14",
+          "isMaintained": false
+        },
+        {
+          "name": "2003",
+          "label": "Windows Server 2003 (LTSC)",
+          "releaseDate": "2003-04-24",
+          "isEol": true,
+          "eolFrom": "2007-04-10",
+          "isMaintained": false
+        },
+        {
+          "name": "2000",
+          "label": "Windows Server 2000 (LTSC)",
+          "releaseDate": "2000-02-17",
+          "isEol": true,
+          "eolFrom": "2010-07-13",
+          "isMaintained": false
+        }
+      ]
+    },
+    "windows": {
+      "name": "windows",
+      "releases": [
+        {
+          "name": "11-26h1-e",
+          "label": "11 26H1 (E)",
+          "releaseDate": "2026-02-10",
+          "isEol": false,
+          "eolFrom": "2029-03-13",
+          "isMaintained": true
+        },
+        {
+          "name": "11-26h1-w",
+          "label": "11 26H1 (W)",
+          "releaseDate": "2026-02-10",
+          "isEol": false,
+          "eolFrom": "2028-03-14",
+          "isMaintained": true
+        },
+        {
+          "name": "11-25h2-e",
+          "label": "11 25H2 (E)",
+          "releaseDate": "2025-09-30",
+          "isEol": false,
+          "eolFrom": "2028-10-10",
+          "isMaintained": true
+        },
+        {
+          "name": "11-25h2-w",
+          "label": "11 25H2 (W)",
+          "releaseDate": "2025-09-30",
+          "isEol": false,
+          "eolFrom": "2027-10-12",
+          "isMaintained": true
+        },
+        {
+          "name": "11-24h2-iot-lts",
+          "label": "11 24H2 IoT (LTS)",
+          "releaseDate": "2024-10-01",
+          "isEol": false,
+          "eolFrom": "2034-10-10",
+          "isMaintained": true
+        },
+        {
+          "name": "11-24h2-e-lts",
+          "label": "11 24H2 (E) (LTS)",
+          "releaseDate": "2024-10-01",
+          "isEol": false,
+          "eolFrom": "2029-10-09",
+          "isMaintained": true
+        },
+        {
+          "name": "11-24h2-e",
+          "label": "11 24H2 (E)",
+          "releaseDate": "2024-10-01",
+          "isEol": false,
+          "eolFrom": "2027-10-12",
+          "isMaintained": true
+        },
+        {
+          "name": "11-24h2-w",
+          "label": "11 24H2 (W)",
+          "releaseDate": "2024-10-01",
+          "isEol": false,
+          "eolFrom": "2026-10-13",
+          "isMaintained": true
+        },
+        {
+          "name": "11-23h2-e",
+          "label": "11 23H2 (E)",
+          "releaseDate": "2023-10-31",
+          "isEol": false,
+          "eolFrom": "2026-11-10",
+          "isMaintained": true
+        },
+        {
+          "name": "11-23h2-w",
+          "label": "11 23H2 (W)",
+          "releaseDate": "2023-10-31",
+          "isEol": true,
+          "eolFrom": "2025-11-11",
+          "isMaintained": false
+        },
+        {
+          "name": "10-22h2",
+          "label": "10 22H2",
+          "releaseDate": "2022-10-18",
+          "isEol": true,
+          "eolFrom": "2025-10-14",
+          "isMaintained": true
+        },
+        {
+          "name": "11-22h2-e",
+          "label": "11 22H2 (E)",
+          "releaseDate": "2022-09-20",
+          "isEol": true,
+          "eolFrom": "2025-10-14",
+          "isMaintained": false
+        },
+        {
+          "name": "11-22h2-w",
+          "label": "11 22H2 (W)",
+          "releaseDate": "2022-09-20",
+          "isEol": true,
+          "eolFrom": "2024-10-08",
+          "isMaintained": false
+        },
+        {
+          "name": "10-21h2-iot-lts",
+          "label": "10 21H2 IoT (LTS)",
+          "releaseDate": "2021-11-16",
+          "isEol": false,
+          "eolFrom": "2032-01-13",
+          "isMaintained": true
+        },
+        {
+          "name": "10-21h2-e-lts",
+          "label": "10 21H2 (E) (LTS)",
+          "releaseDate": "2021-11-16",
+          "isEol": false,
+          "eolFrom": "2027-01-12",
+          "isMaintained": true
+        },
+        {
+          "name": "10-21h2-e",
+          "label": "10 21H2 (E)",
+          "releaseDate": "2021-11-16",
+          "isEol": true,
+          "eolFrom": "2024-06-11",
+          "isMaintained": false
+        },
+        {
+          "name": "10-21h2-w",
+          "label": "10 21H2 (W)",
+          "releaseDate": "2021-11-16",
+          "isEol": true,
+          "eolFrom": "2023-06-13",
+          "isMaintained": false
+        },
+        {
+          "name": "11-21h2-e",
+          "label": "11 21H2 (E)",
+          "releaseDate": "2021-10-04",
+          "isEol": true,
+          "eolFrom": "2024-10-08",
+          "isMaintained": false
+        },
+        {
+          "name": "11-21h2-w",
+          "label": "11 21H2 (W)",
+          "releaseDate": "2021-10-04",
+          "isEol": true,
+          "eolFrom": "2023-10-10",
+          "isMaintained": false
+        },
+        {
+          "name": "10-21h1",
+          "label": "10 21H1",
+          "releaseDate": "2021-05-18",
+          "isEol": true,
+          "eolFrom": "2022-12-13",
+          "isMaintained": false
+        },
+        {
+          "name": "10-20h2-e",
+          "label": "10 20H2 (E)",
+          "releaseDate": "2020-10-20",
+          "isEol": true,
+          "eolFrom": "2023-05-09",
+          "isMaintained": false
+        },
+        {
+          "name": "10-20h2-w",
+          "label": "10 20H2 (W)",
+          "releaseDate": "2020-10-20",
+          "isEol": true,
+          "eolFrom": "2022-05-10",
+          "isMaintained": false
+        },
+        {
+          "name": "10-2004",
+          "label": "10 2004",
+          "releaseDate": "2020-05-27",
+          "isEol": true,
+          "eolFrom": "2021-12-14",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1909-e",
+          "label": "10 1909 (E)",
+          "releaseDate": "2019-11-12",
+          "isEol": true,
+          "eolFrom": "2022-05-10",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1909-w",
+          "label": "10 1909 (W)",
+          "releaseDate": "2019-11-12",
+          "isEol": true,
+          "eolFrom": "2021-05-11",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1903",
+          "label": "10 1903",
+          "releaseDate": "2019-05-21",
+          "isEol": true,
+          "eolFrom": "2020-12-08",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1809-e-lts",
+          "label": "10 1809 (E) (LTS)",
+          "releaseDate": "2018-11-13",
+          "isEol": false,
+          "eolFrom": "2029-01-09",
+          "isMaintained": true
+        },
+        {
+          "name": "10-1809-e",
+          "label": "10 1809 (E)",
+          "releaseDate": "2018-11-13",
+          "isEol": true,
+          "eolFrom": "2021-05-11",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1809-w",
+          "label": "10 1809 (W)",
+          "releaseDate": "2018-11-13",
+          "isEol": true,
+          "eolFrom": "2020-11-10",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1803-e",
+          "label": "10 1803 (E)",
+          "releaseDate": "2018-04-30",
+          "isEol": true,
+          "eolFrom": "2021-05-11",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1803-w",
+          "label": "10 1803 (W)",
+          "releaseDate": "2018-04-30",
+          "isEol": true,
+          "eolFrom": "2019-11-12",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1709-e",
+          "label": "10 1709 (E)",
+          "releaseDate": "2017-10-17",
+          "isEol": true,
+          "eolFrom": "2020-10-13",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1709-w",
+          "label": "10 1709 (W)",
+          "releaseDate": "2017-10-17",
+          "isEol": true,
+          "eolFrom": "2019-04-09",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1703-e",
+          "label": "10 1703 (E)",
+          "releaseDate": "2017-04-11",
+          "isEol": true,
+          "eolFrom": "2019-10-08",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1703-w",
+          "label": "10 1703 (W)",
+          "releaseDate": "2017-04-11",
+          "isEol": true,
+          "eolFrom": "2018-10-09",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1607-e-lts",
+          "label": "10 1607 (E) (LTS)",
+          "releaseDate": "2016-08-02",
+          "isEol": false,
+          "eolFrom": "2026-10-13",
+          "isMaintained": true
+        },
+        {
+          "name": "10-1607-e",
+          "label": "10 1607 (E)",
+          "releaseDate": "2016-08-02",
+          "isEol": true,
+          "eolFrom": "2019-04-09",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1607-w",
+          "label": "10 1607 (W)",
+          "releaseDate": "2016-08-02",
+          "isEol": true,
+          "eolFrom": "2018-04-10",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1511",
+          "label": "10 1511",
+          "releaseDate": "2015-11-10",
+          "isEol": true,
+          "eolFrom": "2017-10-10",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1507-e-lts",
+          "label": "10 1507 (E) (LTS)",
+          "releaseDate": "2015-07-29",
+          "isEol": true,
+          "eolFrom": "2025-10-14",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1507",
+          "label": "10 1507",
+          "releaseDate": "2015-07-29",
+          "isEol": true,
+          "eolFrom": "2017-05-09",
+          "isMaintained": false
+        },
+        {
+          "name": "10-1507-iot",
+          "label": "10 1507 IOT",
+          "releaseDate": "2015-04-29",
+          "isEol": true,
+          "eolFrom": "2020-11-10",
+          "isMaintained": false
+        },
+        {
+          "name": "8.1",
+          "label": "8.1",
+          "releaseDate": "2013-11-13",
+          "isEol": true,
+          "eolFrom": "2023-01-10",
+          "isMaintained": false
+        },
+        {
+          "name": "8",
+          "label": "8",
+          "releaseDate": "2012-10-30",
+          "isEol": true,
+          "eolFrom": "2016-01-12",
+          "isMaintained": false
+        },
+        {
+          "name": "7-sp1",
+          "label": "7 SP1",
+          "releaseDate": "2011-02-22",
+          "isEol": true,
+          "eolFrom": "2020-01-14",
+          "isMaintained": false
+        },
+        {
+          "name": "6-sp2",
+          "label": "Vista SP2",
+          "releaseDate": "2009-04-29",
+          "isEol": true,
+          "eolFrom": "2017-04-11",
+          "isMaintained": false
+        },
+        {
+          "name": "5-sp3",
+          "label": "XP SP3",
+          "releaseDate": "2008-04-21",
+          "isEol": true,
+          "eolFrom": "2014-04-08",
+          "isMaintained": false
+        }
+      ]
+    },
+    "centos": {
+      "name": "centos",
+      "releases": [
+        {
+          "name": "8",
+          "label": "8",
+          "releaseDate": "2019-09-24",
+          "isEol": true,
+          "eolFrom": "2021-12-31",
+          "isMaintained": false
+        },
+        {
+          "name": "7",
+          "label": "7",
+          "releaseDate": "2014-07-07",
+          "isEol": true,
+          "eolFrom": "2024-06-30",
+          "isMaintained": false
+        },
+        {
+          "name": "6",
+          "label": "6",
+          "releaseDate": "2011-07-10",
+          "isEol": true,
+          "eolFrom": "2020-11-30",
+          "isMaintained": false
+        },
+        {
+          "name": "5",
+          "label": "5",
+          "releaseDate": "2007-04-12",
+          "isEol": true,
+          "eolFrom": "2017-03-31",
+          "isMaintained": false
+        }
+      ]
+    },
+    "debian": {
+      "name": "debian",
+      "releases": [
+        {
+          "name": "13",
+          "label": "13 (Trixie)",
+          "releaseDate": "2025-08-09",
+          "isEol": false,
+          "eolFrom": "2028-08-09",
+          "isMaintained": true
+        },
+        {
+          "name": "12",
+          "label": "12 (Bookworm)",
+          "releaseDate": "2023-06-10",
+          "isEol": false,
+          "eolFrom": "2026-06-10",
+          "isMaintained": true
+        },
+        {
+          "name": "11",
+          "label": "11 (Bullseye)",
+          "releaseDate": "2021-08-14",
+          "isEol": true,
+          "eolFrom": "2024-08-14",
+          "isMaintained": true
+        },
+        {
+          "name": "10",
+          "label": "10 (Buster)",
+          "releaseDate": "2019-07-06",
+          "isEol": true,
+          "eolFrom": "2022-09-10",
+          "isMaintained": false
+        },
+        {
+          "name": "9",
+          "label": "9 (Stretch)",
+          "releaseDate": "2017-06-17",
+          "isEol": true,
+          "eolFrom": "2020-07-18",
+          "isMaintained": false
+        },
+        {
+          "name": "8",
+          "label": "8 (Jessie)",
+          "releaseDate": "2015-04-25",
+          "isEol": true,
+          "eolFrom": "2018-06-17",
+          "isMaintained": false
+        },
+        {
+          "name": "7",
+          "label": "7 (Wheezy)",
+          "releaseDate": "2013-05-04",
+          "isEol": true,
+          "eolFrom": "2016-04-25",
+          "isMaintained": false
+        },
+        {
+          "name": "6",
+          "label": "6 (Squeeze)",
+          "releaseDate": "2011-02-06",
+          "isEol": true,
+          "eolFrom": "2014-05-31",
+          "isMaintained": false
+        },
+        {
+          "name": "5",
+          "label": "5 (Lenny)",
+          "releaseDate": "2009-02-14",
+          "isEol": true,
+          "eolFrom": "2012-02-06",
+          "isMaintained": false
+        },
+        {
+          "name": "4",
+          "label": "4 (Etch)",
+          "releaseDate": "2007-04-08",
+          "isEol": true,
+          "eolFrom": "2010-02-15",
+          "isMaintained": false
+        },
+        {
+          "name": "3.1",
+          "label": "3.1 (Sarge)",
+          "releaseDate": "2005-06-06",
+          "isEol": true,
+          "eolFrom": "2008-03-31",
+          "isMaintained": false
+        },
+        {
+          "name": "3.0",
+          "label": "3.0 (Woody)",
+          "releaseDate": "2002-07-19",
+          "isEol": true,
+          "eolFrom": "2006-06-30",
+          "isMaintained": false
+        },
+        {
+          "name": "2.2",
+          "label": "2.2 (Potato)",
+          "releaseDate": "2000-08-15",
+          "isEol": true,
+          "eolFrom": "2003-06-30",
+          "isMaintained": false
+        },
+        {
+          "name": "2.1",
+          "label": "2.1 (Slink)",
+          "releaseDate": "1999-03-09",
+          "isEol": true,
+          "eolFrom": "2000-09-30",
+          "isMaintained": false
+        },
+        {
+          "name": "2.0",
+          "label": "2.0 (Hamm)",
+          "releaseDate": "1998-07-24",
+          "isEol": true,
+          "eolFrom": "1999-02-15",
+          "isMaintained": false
+        },
+        {
+          "name": "1.3",
+          "label": "1.3 (Bo)",
+          "releaseDate": "1997-07-02",
+          "isEol": true,
+          "eolFrom": "1998-12-08",
+          "isMaintained": false
+        },
+        {
+          "name": "1.2",
+          "label": "1.2 (Rex)",
+          "releaseDate": "1996-12-12",
+          "isEol": true,
+          "eolFrom": "1997-10-23",
+          "isMaintained": false
+        },
+        {
+          "name": "1.1",
+          "label": "1.1 (Buzz)",
+          "releaseDate": "1996-06-17",
+          "isEol": true,
+          "eolFrom": "1996-12-12",
+          "isMaintained": false
+        }
+      ]
+    },
+    "ubuntu": {
+      "name": "ubuntu",
+      "releases": [
+        {
+          "name": "26.04",
+          "label": "26.04 'Resolute Raccoon' (LTS)",
+          "releaseDate": "2026-04-23",
+          "isEol": false,
+          "eolFrom": "2031-04-30",
+          "isMaintained": true
+        },
+        {
+          "name": "25.10",
+          "label": "25.10 'Questing Quokka'",
+          "releaseDate": "2025-10-09",
+          "isEol": false,
+          "eolFrom": "2026-07-01",
+          "isMaintained": true
+        },
+        {
+          "name": "25.04",
+          "label": "25.04 'Plucky Puffin'",
+          "releaseDate": "2025-04-17",
+          "isEol": true,
+          "eolFrom": "2026-01-17",
+          "isMaintained": false
+        },
+        {
+          "name": "24.10",
+          "label": "24.10 'Oracular Oriole'",
+          "releaseDate": "2024-10-10",
+          "isEol": true,
+          "eolFrom": "2025-07-10",
+          "isMaintained": false
+        },
+        {
+          "name": "24.04",
+          "label": "24.04 'Noble Numbat' (LTS)",
+          "releaseDate": "2024-04-25",
+          "isEol": false,
+          "eolFrom": "2029-05-31",
+          "isMaintained": true
+        },
+        {
+          "name": "23.10",
+          "label": "23.10 'Mantic Minotaur'",
+          "releaseDate": "2023-10-12",
+          "isEol": true,
+          "eolFrom": "2024-07-12",
+          "isMaintained": false
+        },
+        {
+          "name": "23.04",
+          "label": "23.04 'Lunar Lobster'",
+          "releaseDate": "2023-04-20",
+          "isEol": true,
+          "eolFrom": "2024-01-20",
+          "isMaintained": false
+        },
+        {
+          "name": "22.10",
+          "label": "22.10 'Kinetic Kudu'",
+          "releaseDate": "2022-10-20",
+          "isEol": true,
+          "eolFrom": "2023-07-20",
+          "isMaintained": false
+        },
+        {
+          "name": "22.04",
+          "label": "22.04 'Jammy Jellyfish' (LTS)",
+          "releaseDate": "2022-04-21",
+          "isEol": false,
+          "eolFrom": "2027-04-01",
+          "isMaintained": true
+        },
+        {
+          "name": "21.10",
+          "label": "21.10 'Impish Indri'",
+          "releaseDate": "2021-10-14",
+          "isEol": true,
+          "eolFrom": "2022-07-14",
+          "isMaintained": false
+        },
+        {
+          "name": "21.04",
+          "label": "21.04 'Hirsute Hippo'",
+          "releaseDate": "2021-04-22",
+          "isEol": true,
+          "eolFrom": "2022-01-20",
+          "isMaintained": false
+        },
+        {
+          "name": "20.10",
+          "label": "20.10 'Groovy Gorilla'",
+          "releaseDate": "2020-10-22",
+          "isEol": true,
+          "eolFrom": "2021-07-22",
+          "isMaintained": false
+        },
+        {
+          "name": "20.04",
+          "label": "20.04 'Focal Fossa' (LTS)",
+          "releaseDate": "2020-04-23",
+          "isEol": true,
+          "eolFrom": "2025-05-31",
+          "isMaintained": true
+        },
+        {
+          "name": "19.10",
+          "label": "19.10 'Eoan Ermine'",
+          "releaseDate": "2019-10-17",
+          "isEol": true,
+          "eolFrom": "2020-07-06",
+          "isMaintained": false
+        },
+        {
+          "name": "19.04",
+          "label": "19.04 'Disco Dingo'",
+          "releaseDate": "2019-04-18",
+          "isEol": true,
+          "eolFrom": "2020-01-23",
+          "isMaintained": false
+        },
+        {
+          "name": "18.10",
+          "label": "18.10 'Cosmic Cuttlefish'",
+          "releaseDate": "2018-10-18",
+          "isEol": true,
+          "eolFrom": "2019-07-18",
+          "isMaintained": false
+        },
+        {
+          "name": "18.04",
+          "label": "18.04 'Bionic Beaver' (LTS)",
+          "releaseDate": "2018-04-26",
+          "isEol": true,
+          "eolFrom": "2023-05-31",
+          "isMaintained": true
+        },
+        {
+          "name": "17.10",
+          "label": "17.10 'Artful Aardvark'",
+          "releaseDate": "2017-10-19",
+          "isEol": true,
+          "eolFrom": "2018-07-19",
+          "isMaintained": false
+        },
+        {
+          "name": "17.04",
+          "label": "17.04 'Zesty Zapus'",
+          "releaseDate": "2017-04-13",
+          "isEol": true,
+          "eolFrom": "2018-01-13",
+          "isMaintained": false
+        },
+        {
+          "name": "16.10",
+          "label": "16.10 'Yakkety Yak'",
+          "releaseDate": "2016-10-13",
+          "isEol": true,
+          "eolFrom": "2017-07-20",
+          "isMaintained": false
+        },
+        {
+          "name": "16.04",
+          "label": "16.04 'Xenial Xerus' (LTS)",
+          "releaseDate": "2016-04-21",
+          "isEol": true,
+          "eolFrom": "2021-04-02",
+          "isMaintained": false
+        },
+        {
+          "name": "15.10",
+          "label": "15.10 'Wily Werewolf'",
+          "releaseDate": "2015-10-22",
+          "isEol": true,
+          "eolFrom": "2016-07-28",
+          "isMaintained": false
+        },
+        {
+          "name": "15.04",
+          "label": "15.04 'Vivid Vervet'",
+          "releaseDate": "2015-04-23",
+          "isEol": true,
+          "eolFrom": "2016-02-04",
+          "isMaintained": false
+        },
+        {
+          "name": "14.10",
+          "label": "14.10 'Utopic Unicorn'",
+          "releaseDate": "2014-10-23",
+          "isEol": true,
+          "eolFrom": "2015-07-23",
+          "isMaintained": false
+        },
+        {
+          "name": "14.04",
+          "label": "14.04 'Trusty Tahr' (LTS)",
+          "releaseDate": "2014-04-17",
+          "isEol": true,
+          "eolFrom": "2019-04-02",
+          "isMaintained": false
+        },
+        {
+          "name": "13.10",
+          "label": "13.10 'Saucy Salamander'",
+          "releaseDate": "2013-10-17",
+          "isEol": true,
+          "eolFrom": "2014-07-17",
+          "isMaintained": false
+        },
+        {
+          "name": "13.04",
+          "label": "13.04 'Raring Ringtail'",
+          "releaseDate": "2013-04-25",
+          "isEol": true,
+          "eolFrom": "2014-01-27",
+          "isMaintained": false
+        },
+        {
+          "name": "12.10",
+          "label": "12.10 'Quantal Quetzal'",
+          "releaseDate": "2012-10-18",
+          "isEol": true,
+          "eolFrom": "2014-05-16",
+          "isMaintained": false
+        },
+        {
+          "name": "12.04",
+          "label": "12.04 'Precise Pangolin' (LTS)",
+          "releaseDate": "2012-04-26",
+          "isEol": true,
+          "eolFrom": "2017-04-28",
+          "isMaintained": false
+        },
+        {
+          "name": "11.10",
+          "label": "11.10 'Oneiric Ocelot'",
+          "releaseDate": "2011-10-13",
+          "isEol": true,
+          "eolFrom": "2013-05-09",
+          "isMaintained": false
+        },
+        {
+          "name": "11.04",
+          "label": "11.04 'Natty Narwhal'",
+          "releaseDate": "2011-04-28",
+          "isEol": true,
+          "eolFrom": "2012-10-28",
+          "isMaintained": false
+        },
+        {
+          "name": "10.10",
+          "label": "10.10 'Maverick Meerkat'",
+          "releaseDate": "2010-10-10",
+          "isEol": true,
+          "eolFrom": "2012-04-10",
+          "isMaintained": false
+        },
+        {
+          "name": "10.04",
+          "label": "10.04 'Lucid Lynx' (LTS)",
+          "releaseDate": "2010-04-29",
+          "isEol": true,
+          "eolFrom": "2013-05-09",
+          "isMaintained": false
+        },
+        {
+          "name": "9.10",
+          "label": "9.10 'Karmic Koala'",
+          "releaseDate": "2009-10-29",
+          "isEol": true,
+          "eolFrom": "2011-04-30",
+          "isMaintained": false
+        },
+        {
+          "name": "9.04",
+          "label": "9.04 'Jaunty Jackalope'",
+          "releaseDate": "2009-04-23",
+          "isEol": true,
+          "eolFrom": "2010-10-23",
+          "isMaintained": false
+        },
+        {
+          "name": "8.10",
+          "label": "8.10 'Intrepid Ibex'",
+          "releaseDate": "2008-10-30",
+          "isEol": true,
+          "eolFrom": "2010-04-30",
+          "isMaintained": false
+        },
+        {
+          "name": "8.04",
+          "label": "8.04 'Hardy Heron' (LTS)",
+          "releaseDate": "2008-04-24",
+          "isEol": true,
+          "eolFrom": "2013-05-09",
+          "isMaintained": false
+        },
+        {
+          "name": "7.10",
+          "label": "7.10 'Gutsy Gibbon'",
+          "releaseDate": "2007-10-18",
+          "isEol": true,
+          "eolFrom": "2009-04-18",
+          "isMaintained": false
+        },
+        {
+          "name": "7.04",
+          "label": "7.04 'Feisty Fawn'",
+          "releaseDate": "2007-04-19",
+          "isEol": true,
+          "eolFrom": "2008-10-19",
+          "isMaintained": false
+        },
+        {
+          "name": "6.10",
+          "label": "6.10 'Edgy Eft'",
+          "releaseDate": "2006-10-26",
+          "isEol": true,
+          "eolFrom": "2008-04-26",
+          "isMaintained": false
+        },
+        {
+          "name": "6.06",
+          "label": "6.06 'Dapper Drake' (LTS)",
+          "releaseDate": "2006-08-10",
+          "isEol": true,
+          "eolFrom": "2011-06-01",
+          "isMaintained": false
+        },
+        {
+          "name": "5.10",
+          "label": "5.10 'Breezy Badger'",
+          "releaseDate": "2005-10-13",
+          "isEol": true,
+          "eolFrom": "2007-04-13",
+          "isMaintained": false
+        },
+        {
+          "name": "5.04",
+          "label": "5.04 'Hoary Hedgehog'",
+          "releaseDate": "2005-04-08",
+          "isEol": true,
+          "eolFrom": "2006-10-31",
+          "isMaintained": false
+        },
+        {
+          "name": "4.10",
+          "label": "4.10 'Warty Warthog'",
+          "releaseDate": "2004-10-20",
+          "isEol": true,
+          "eolFrom": "2006-04-30",
+          "isMaintained": false
+        }
+      ]
+    },
+    "sles": {
+      "name": "sles",
+      "releases": [
+        {
+          "name": "16.0",
+          "label": "16.0",
+          "releaseDate": "2025-11-04",
+          "isEol": false,
+          "eolFrom": "2027-11-30",
+          "isMaintained": true
+        },
+        {
+          "name": "15.7",
+          "label": "15.7",
+          "releaseDate": "2025-06-17",
+          "isEol": false,
+          "eolFrom": "2031-07-31",
+          "isMaintained": true
+        },
+        {
+          "name": "15.6",
+          "label": "15.6",
+          "releaseDate": "2024-06-26",
+          "isEol": true,
+          "eolFrom": "2025-12-31",
+          "isMaintained": true
+        },
+        {
+          "name": "15.5",
+          "label": "15.5",
+          "releaseDate": "2023-06-20",
+          "isEol": true,
+          "eolFrom": "2024-12-31",
+          "isMaintained": true
+        },
+        {
+          "name": "15.4",
+          "label": "15.4",
+          "releaseDate": "2022-06-21",
+          "isEol": true,
+          "eolFrom": "2023-12-31",
+          "isMaintained": true
+        },
+        {
+          "name": "15.3",
+          "label": "15.3",
+          "releaseDate": "2021-06-22",
+          "isEol": true,
+          "eolFrom": "2022-12-31",
+          "isMaintained": false
+        },
+        {
+          "name": "15.2",
+          "label": "15.2",
+          "releaseDate": "2020-07-21",
+          "isEol": true,
+          "eolFrom": "2021-12-31",
+          "isMaintained": false
+        },
+        {
+          "name": "12.5",
+          "label": "12.5",
+          "releaseDate": "2019-12-09",
+          "isEol": true,
+          "eolFrom": "2024-10-31",
+          "isMaintained": true
+        },
+        {
+          "name": "15.1",
+          "label": "15.1",
+          "releaseDate": "2019-06-24",
+          "isEol": true,
+          "eolFrom": "2021-01-31",
+          "isMaintained": false
+        },
+        {
+          "name": "12.4",
+          "label": "12.4",
+          "releaseDate": "2018-12-12",
+          "isEol": true,
+          "eolFrom": "2020-06-30",
+          "isMaintained": false
+        },
+        {
+          "name": "15.0",
+          "label": "15.0",
+          "releaseDate": "2018-07-16",
+          "isEol": true,
+          "eolFrom": "2019-12-31",
+          "isMaintained": false
+        },
+        {
+          "name": "12.3",
+          "label": "12.3",
+          "releaseDate": "2017-09-07",
+          "isEol": true,
+          "eolFrom": "2019-06-30",
+          "isMaintained": false
+        },
+        {
+          "name": "12.2",
+          "label": "12.2",
+          "releaseDate": "2016-11-08",
+          "isEol": true,
+          "eolFrom": "2018-03-31",
+          "isMaintained": false
+        },
+        {
+          "name": "12.1",
+          "label": "12.1",
+          "releaseDate": "2015-12-15",
+          "isEol": true,
+          "eolFrom": "2017-05-31",
+          "isMaintained": false
+        },
+        {
+          "name": "11.4",
+          "label": "11.4",
+          "releaseDate": "2015-07-15",
+          "isEol": true,
+          "eolFrom": "2019-03-31",
+          "isMaintained": false
+        },
+        {
+          "name": "12.0",
+          "label": "12.0",
+          "releaseDate": "2014-10-27",
+          "isEol": true,
+          "eolFrom": "2016-06-30",
+          "isMaintained": false
+        },
+        {
+          "name": "11.3",
+          "label": "11.3",
+          "releaseDate": "2013-07-01",
+          "isEol": true,
+          "eolFrom": "2016-01-31",
+          "isMaintained": false
+        },
+        {
+          "name": "11.2",
+          "label": "11.2",
+          "releaseDate": "2012-02-29",
+          "isEol": true,
+          "eolFrom": "2014-01-31",
+          "isMaintained": false
+        },
+        {
+          "name": "10.4",
+          "label": "10.4",
+          "releaseDate": "2011-04-12",
+          "isEol": true,
+          "eolFrom": "2013-07-31",
+          "isMaintained": false
+        },
+        {
+          "name": "11.1",
+          "label": "11.1",
+          "releaseDate": "2010-06-02",
+          "isEol": true,
+          "eolFrom": "2012-08-31",
+          "isMaintained": false
+        },
+        {
+          "name": "10.3",
+          "label": "10.3",
+          "releaseDate": "2009-10-12",
+          "isEol": true,
+          "eolFrom": "2011-10-11",
+          "isMaintained": false
+        },
+        {
+          "name": "11.0",
+          "label": "11.0",
+          "releaseDate": "2009-03-24",
+          "isEol": true,
+          "eolFrom": "2010-12-31",
+          "isMaintained": false
+        },
+        {
+          "name": "10.2",
+          "label": "10.2",
+          "releaseDate": "2008-05-19",
+          "isEol": true,
+          "eolFrom": "2010-04-11",
+          "isMaintained": false
+        },
+        {
+          "name": "10.1",
+          "label": "10.1",
+          "releaseDate": "2007-06-18",
+          "isEol": true,
+          "eolFrom": "2008-11-30",
+          "isMaintained": false
+        },
+        {
+          "name": "10.0",
+          "label": "10.0",
+          "releaseDate": "2006-07-17",
+          "isEol": true,
+          "eolFrom": "2007-12-31",
+          "isMaintained": false
+        }
+      ]
+    },
+    "almalinux": {
+      "name": "almalinux",
+      "releases": [
+        {
+          "name": "10",
+          "label": "AlmaLinux OS 10",
+          "releaseDate": "2025-05-27",
+          "isEol": false,
+          "eolFrom": "2035-05-31",
+          "isMaintained": true
+        },
+        {
+          "name": "9",
+          "label": "AlmaLinux OS 9",
+          "releaseDate": "2022-05-26",
+          "isEol": false,
+          "eolFrom": "2032-05-31",
+          "isMaintained": true
+        },
+        {
+          "name": "8",
+          "label": "AlmaLinux OS 8",
+          "releaseDate": "2021-03-30",
+          "isEol": false,
+          "eolFrom": "2029-03-01",
+          "isMaintained": true
+        }
+      ]
+    },
+    "rocky-linux": {
+      "name": "rocky-linux",
+      "releases": [
+        {
+          "name": "10",
+          "label": "10",
+          "releaseDate": "2025-06-11",
+          "isEol": false,
+          "eolFrom": "2035-05-31",
+          "isMaintained": true
+        },
+        {
+          "name": "9",
+          "label": "9",
+          "releaseDate": "2022-07-14",
+          "isEol": false,
+          "eolFrom": "2032-05-31",
+          "isMaintained": true
+        },
+        {
+          "name": "8",
+          "label": "8",
+          "releaseDate": "2021-05-01",
+          "isEol": false,
+          "eolFrom": "2029-05-31",
+          "isMaintained": true
+        }
+      ]
+    }
+  }
+}
