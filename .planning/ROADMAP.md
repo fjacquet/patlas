@@ -170,7 +170,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   6. `engines/eos/` ships with â¥75 % Vitest coverage including the RHEL-8-four-variants and Oracle-Linux-three-variants normalization tests
 **Plans**: 3 plans
 
-- [ ] 07-01-PLAN.md — build-time catalogue spine (Zod schema, sync:eos, parse-once boundary, CI freshness)
+- [x] 07-01-PLAN.md — build-time catalogue spine (Zod schema, sync:eos, parse-once boundary, CI freshness)
 - [ ] 07-02-PLAN.md — pure EOS engines + real-string fixtures (normalizeOs, classifyEsxi, bucketEos)
 - [ ] 07-03-PLAN.md — EstateView wiring + 5th eos ViewToggle + EosView + EN/FR i18n
 **UI hint**: yes

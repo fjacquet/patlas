@@ -107,7 +107,7 @@
 - [ ] **EOS-03**: User can click a bucket to drill into the affected VM list
 - [ ] **EOS-04**: User sees ESX hosts classified by build → support state, including patch-level and major-version EOS
 - [ ] **EOS-05**: User sees an "unknown OS" bucket when a VM's OS string cannot be matched to the catalogue (rather than silently dropped)
-- [ ] **EOS-06**: User sees a `lastVerified` date on the EOS catalogue (refreshed at CI build time from endoflife.date)
+- [x] **EOS-06**: User sees a `lastVerified` date on the EOS catalogue (refreshed at CI build time from endoflife.date)
 
 ### In-Session Trends
 
@@ -257,7 +257,7 @@
 | EOS-03 | Phase 5 | Pending |
 | EOS-04 | Phase 5 | Pending |
 | EOS-05 | Phase 5 | Pending |
-| EOS-06 | Phase 5 | Pending |
+| EOS-06 | Phase 5 | Complete |
 | TRD-01 | Phase 6 | Pending |
 | TRD-02 | Phase 6 | Pending |
 | TRD-03 | Phase 6 | Pending |
