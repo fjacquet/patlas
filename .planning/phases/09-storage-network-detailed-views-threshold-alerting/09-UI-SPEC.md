@@ -48,6 +48,7 @@ Declared values (Tailwind v4 default 4px-base scale; all multiples of 4 — ship
 | 3xl | 64px | — | Reserved; not expected in Phase 9 (screen-fit detail screens forbid large vertical gaps) |
 
 Exceptions:
+
 - **`p-0.5` (2px)** on the segmented-control wrapper — shipped `ViewToggle`/`AccountingModeToggle`/
   `PlannedRatiosControl` border padding. This is a locked existing idiom; reuse verbatim, do not "fix" to 4px.
 - **`py-1.5` (6px)** detail metric-row padding — shipped `ClusterDetail.Row`; the screen-fit
@@ -72,6 +73,7 @@ in the shipped `.label` component class — treat as the label exception, do not
 | Caption / factual note | 12px | 400 | 1.5 | `text-[12px] font-normal` (or `text-xs`) | Factual captions, em-dash-sentinel notes, "shared across N clusters" line, degrade message, threshold echo line (shipped `PlannedRatiosControl.echo`) |
 
 Rules:
+
 - Metric/numeric values ALWAYS `font-mono tabular-nums` (shipped invariant — column alignment).
 - No pre-formatted numbers in i18n strings; numbers injected via `fmt*` helpers from `@/utils/format`
   with the active locale (shipped invariant; EN/FR parity).
@@ -94,6 +96,7 @@ All values are existing `src/index.css` `@theme` custom properties. Every color 
 | Destructive | none | **No destructive actions in Phase 9** (in-memory config edit is non-destructive & reversible; refresh restores defaults). Leave unused |
 
 **Accent (gold) reserved for — explicit closed list (do not extend):**
+
 1. The active **top-level `ViewToggle`** segment (shipped rule — `bg-accent-500 text-surface-900`).
    This now includes the two new `Storage` and `Network` segments by extension. No change to the rule.
 2. The **threshold flag marker**: flagged-row left rule + faint row tint + count badge
@@ -102,6 +105,7 @@ All values are existing `src/index.css` `@theme` custom properties. Every color 
 3. The shipped single DR headline figure (P6) — out of Phase 9 scope, listed for completeness.
 
 **Explicitly FORBIDDEN for Phase 9 (D-04, locked):**
+
 - NO traffic-light / red-amber-green on threshold flags.
 - `--color-util-low/-mid/-high` (green/orange/red) MUST NOT be used for threshold alerting.
   They remain reserved for the shipped utilization gauges only (status, not judgment) and do not
@@ -120,15 +124,17 @@ All values are existing `src/index.css` `@theme` custom properties. Every color 
 > Every item below has a shipped precedent cited from 09-RESEARCH.md.
 
 ### LC-1 — ViewToggle extension (D-05)
+
 - Extend `src/components/ViewToggle.tsx` `AppView` union + `VIEWS` array IN PLACE with
   `'storage'` then `'network'` (order: `dashboard·inventory·hosts·planning·eos·trends·storage·network`).
 - NO new nav component. Idiom unchanged: `<fieldset role="group">` + `<legend className="sr-only">`
-  + `map(button aria-pressed)`, Arrow Left/Right/Up/Down wraparound, `focus-visible:ring-2
+  - `map(button aria-pressed)`, Arrow Left/Right/Up/Down wraparound, `focus-visible:ring-2
   ring-primary-500`, active segment `bg-accent-500 text-surface-900` (the existing rule — gold).
 - i18n: add `nav.storage` / `nav.network` to the **`inventory`** namespace (BOTH `en/` + `fr/`) —
   ViewToggle reads `nav.*` from `inventory` (verified, line 28). No editorial verbs.
 
 ### LC-2 — Storage view shell IA (D-07/D-08)
+
 - Top row: a Storage-by-X scope control (Cluster · ESX · VM · Datastore) AND the storage-**lens**
   toggle, both as the shipped `<fieldset role="group"> + aria-pressed` segmented idiom (LC-5).
 - Lens A (consumption: provisioned vs in-use incl `.vswp`+snapshots): primary visual =
@@ -144,6 +150,7 @@ All values are existing `src/index.css` `@theme` custom properties. Every color 
   `—`, never fabricated onto a cluster.
 
 ### LC-3 — Network view shell IA (D-11)
+
 - Sections: vSwitch (standard) table, dvSwitch (distributed) + dvPort table, vNetwork
   (VM→portgroup/VLAN) table — all via the P3 `DataTable` idiom (same `inventory:col.<id>` rule).
 - **Optional-sheet factual degrade:** when `vNetwork`/`vSwitch`/`dvSwitch` are absent (the real
@@ -153,6 +160,7 @@ All values are existing `src/index.css` `@theme` custom properties. Every color 
   NO crash, NO editorial verb. Mirrors the shipped `vDatastore`/`vPartition` empty pattern.
 
 ### LC-4 — Three click-drill detail screens (D-06, the P5 `ClusterDetail` precedent)
+
 - Pattern: lifted in-app view-state (NOT a router, NOT a 2nd `useMemo`). Drill state lives in the
   Storage/Network view shell (the way `GlobalDashboard` owns the cluster-detail selection), not in
   `App.tsx`. Props shape: `{ detail, onBack }` (copy `ClusterDetail` verbatim).
@@ -179,6 +187,7 @@ All values are existing `src/index.css` `@theme` custom properties. Every color 
   (native `<button>` or `role` + Enter/Space — match the shipped clickable-card pattern).
 
 ### LC-5 — Storage-lens toggle (D-07, the `AccountingModeToggle` idiom)
+
 - Reuse `AccountingModeToggle`'s structure verbatim; change the union to
   `'consumption' | 'capacity'` and the i18n namespace to `storage`. Active segment
   `bg-primary-600 text-white` (NOT accent — accent stays reserved per §Color). Keep the literal
@@ -186,6 +195,7 @@ All values are existing `src/index.css` `@theme` custom properties. Every color 
   `focus-visible:ring-2 ring-primary-500`.
 
 ### LC-6 — Threshold flag visual treatment (D-04, FACTUAL ONLY — locked)
+
 - Flagged table row: faint tint `bg-accent-500/15` + left rule `border-l-2 border-accent-500`
   (carries both dark+light; gold = factual marker per `index.css`). NO red, NO icon, NO verdict text.
 - Count badge (e.g. on a section header / Datastore detail): pill
@@ -198,6 +208,7 @@ All values are existing `src/index.css` `@theme` custom properties. Every color 
   literally (grep-gate gotcha).
 
 ### LC-7 — Threshold config control placement & interaction (D-01..D-03, the `PlannedRatiosControl` precedent)
+
 - A single `<section className="panel flex flex-col gap-4">` titled via `<h2 text-xl font-semibold>`
   living **within the Storage view shell** (top, above the table — co-located with the data it
   governs; also surfaced compactly on the Network/detail surfaces only if the same slice value is
@@ -218,6 +229,7 @@ All values are existing `src/index.css` `@theme` custom properties. Every color 
   resets to defaults; refresh = defaults restored). NO new persistence surface.
 
 ### LC-8 — Charts (D-08, single `<Chart>` SVG site)
+
 - Both treemap and stacked-bar render through the one sanctioned `src/components/Chart.tsx`
   (SVG renderer mandated; option built by a pure selector off the memoized `EstateView`).
 - Container = a `.panel` (secondary surface). Watch `npm run check:bundle-size`

@@ -5,6 +5,7 @@
 **Confidence:** HIGH (all parser/relink claims empirically verified against the two real RVTools workbooks on this machine; UI/engine claims verified against shipped source; ECharts API verified via Context7)
 
 <user_constraints>
+
 ## User Constraints (from 09-CONTEXT.md)
 
 ### Locked Decisions
@@ -37,6 +38,7 @@ LU/logical-unit default threshold value (D-03); exact tile/column ordering + EN/
 </user_constraints>
 
 <phase_requirements>
+
 ## Phase Requirements
 
 P9 requirement IDs do not exist yet and MUST be derived by the planner (mirror the P5/P6 re-derivation pattern, update the Traceability table). The capability surface below is grouped so REQ-IDs map cleanly. Suggested ID stems (planner decides final): **STG-** (storage views #10), **NET-** (network inventory #12), **DTL-** (detail drills #12), **ALR-** (threshold alerting #12/#14), **VSR-** (vSAN relink — closes the open STR-04).
@@ -349,6 +351,7 @@ File: 20260430_1400_allvCenters.xlsx
   Unrelinkable (no VM references them): 42 — stay estate-only, em-dash, NOT fabricated
   NAA(Address) dedupe: 165 distinct, 0 NAA→multiple-name collisions, 1/67 blank ds has empty NAA
 ```
+
 (Counts differ slightly between "75 rows" and "67/75 distinct names" because some blank-cluster datastore names repeat across rows; dedupe on `naa ?? name` collapses them — the existing Moderate-11 rule, unchanged.)
 
 ### ECharts treemap option shape (D-08 consumption lens)
@@ -393,6 +396,7 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos','trends','storag
 | ECharts registry: bar/pie/gauge/heatmap/line | + treemap | This phase (D-08) | One-line `echarts.use([...])` addition in `Chart.tsx`; re-check bundle gate |
 
 **Deprecated/outdated:**
+
 - The `splitHosts`/`hostClusterMap` path in `perDatastore.ts` (Pitfall-6 attempt) is **correct but inert on real data** per the binding memory. P9's `vInfo.Path` relink supersedes it as the effective attribution path. Do not delete the old code (it is safe and never mis-attributes); add the new path alongside and ensure no double-attribution (a datastore resolved by `vInfo.Path` should not also be counted via the inert `Hosts` path — it won't be, since `Hosts` is numeric and `splitHosts` yields nothing, but assert this).
 
 ## Assumptions Log
@@ -436,6 +440,7 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos','trends','storag
 ## Validation Architecture
 
 ### Test Framework
+
 | Property | Value |
 |----------|-------|
 | Framework | Vitest `^4.1.2` + `@testing-library/react` `^16.3.2` (jsdom default) |
@@ -444,6 +449,7 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos','trends','storag
 | Full suite command | `npm run test:run && npm run test:coverage` (engines/ gated ≥75 %) |
 
 ### Phase Requirements → Test Map (planner derives final REQ-IDs)
+
 | Group | Behavior | Test Type | Automated Command | File Exists? |
 |-------|----------|-----------|-------------------|-------------|
 | Parser ext | MiB canary still 102400 (no regression) | unit | `npm run test:run -- canary` | ✅ shipped (`canary.test.ts`) |
@@ -459,11 +465,13 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos','trends','storag
 | UI | Datastore/VM/ESX detail drill renders + back; factual, no editorial verb | component | `npm run test:run -- StorageView` | ❌ Wave 0 |
 
 ### Sampling Rate
+
 - **Per task commit:** `npm run test:run -- <changed-area>` (RTK: `rtk vitest`)
 - **Per wave merge:** `npm run test:run` (full) + `npm run typecheck` + `npx @biomejs/biome check .`
 - **Phase gate:** full suite green + the **real-file relink test green on `20260430_1400_allvCenters.xlsx`** + manual real-file check of both workbooks (full + trimmed) before `/gsd-verify-work`.
 
 ### Wave 0 Gaps
+
 - [ ] `src/engines/aggregation/vsanRelink.test.ts` — synthetic + **real-file** relink (the STR-04 guard)
 - [ ] `src/engines/aggregation/storageByX.test.ts` — two-lens, no double-count
 - [ ] `src/engines/aggregation/thresholdFlags.test.ts` — default + edited thresholds
@@ -516,6 +524,7 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos','trends','storag
 ## Sources
 
 ### Primary (HIGH confidence)
+
 - **Real RVTools workbooks inspected this session** (authoritative ground truth):
   - `~/Library/CloudStorage/OneDrive-Home/20260430_1400_allvCenters.xlsx` — 27 sheets, exact headers for vNetwork/vSwitch/vPort/dvSwitch/dvPort/vDisk/vPartition/vDatastore/vInfo; 75 blank-cluster datastores; relink validated (25/67 resolve, 1 shared-LUN, 42 unrelinkable).
   - `~/Downloads/RVTools_export_all_2026-01-07_10.23.35.xlsx` — 8 sheets, NO network sheets (the factual-degrade case), `RVTools_tab*` naming.
@@ -524,14 +533,17 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos','trends','storag
 - `.planning/` docs: 09-CONTEXT.md, 05-CONTEXT.md, REQUIREMENTS.md, ANALYTICS-CORE-REPLAN.md, the `rvtools-vdatastore-hosts-is-count` memory.
 
 ### Secondary (MEDIUM confidence)
+
 - git history (`git log -- src/components/ViewToggle.tsx`) — confirms one-commit-per-segment precedent (P5/P6/P7/P8).
 
 ### Tertiary (LOW confidence)
+
 - RVTools 3.10/3.11/4.0 network-sheet column names (no 3.x export available on this machine) — assumed similar to 4.x; mitigated by alias arrays (A1/A2).
 
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack: HIGH — no new deps; every reuse verified in shipped source; ECharts treemap verified via Context7.
 - Parser/relink data model: HIGH — empirically validated against the two real workbooks; the `vInfo.Path` correction is the load-bearing finding.
 - Architecture/patterns: HIGH — every pattern has a shipped precedent read this session.
