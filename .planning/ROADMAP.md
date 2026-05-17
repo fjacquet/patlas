@@ -194,7 +194,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 **Wave 1**
-- [ ] 08-01-PLAN.md — pure trends engine (DD-A A2 per-date aggregation, DD-B B1 deltas, D-05 ordinal, DD-C carry) composed into the single buildEstateView pass
+- [x] 08-01-PLAN.md — pure trends engine (DD-A A2 per-date aggregation, DD-B B1 deltas, D-05 ordinal, DD-C carry) composed into the single buildEstateView pass
 - [ ] 08-02-PLAN.md — releaseRawRows store mutation + latest-first non-blocking warm-up + LineChart registration/bundle re-gate
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -246,6 +246,6 @@ Phases execute in numeric order: 1 Ã¢ÂÂ 2 Ã¢ÂÂ 3 Ã¢ÂÂ 4 
 | 5. Rich Cluster / Host / ESX Intelligence | 2/2 | Complete â data layer + UI, real-file-validated | 2026-05-17 |
 | 6. Allocation & DR (re-derived) | 3/3 | Complete   | 2026-05-17 |
 | 7. OS End-of-Support Forecast | 3/3 | Complete â engines + UI, real-file-validated (UAT-approved) | 2026-05-17 |
-| 8. In-Session Trends | 0/TBD | Not started | - |
+| 8. In-Session Trends | 1/3 | In Progress|  |
 | 9. Storage / Network / Detailed Views + Threshold Alerting | 0/TBD | Not started (NEW; scope per OPEN-2/3) | - |
 | 10. HTML + PPTX Exports & Deploy | 0/TBD | Not started | - |
