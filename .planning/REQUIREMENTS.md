@@ -104,7 +104,7 @@
 
 - [x] **EOS-01**: User sees an EOS forecast view with at-risk counts at +3, +6, +9, +12 months
 - [x] **EOS-02**: User sees an "overdue" bucket for VMs/hosts on already-EOS OSes (RHEL 7, Windows Server 2012 R2, ESXi 7.0, etc.)
-- [ ] **EOS-03**: User can click a bucket to drill into the affected VM list
+- [x] **EOS-03**: User can click a bucket to drill into the affected VM list
 - [x] **EOS-04**: User sees ESX hosts classified by build → support state, including patch-level and major-version EOS
 - [x] **EOS-05**: User sees an "unknown OS" bucket when a VM's OS string cannot be matched to the catalogue (rather than silently dropped)
 - [x] **EOS-06**: User sees a `lastVerified` date on the EOS catalogue (refreshed at CI build time from endoflife.date)
@@ -254,7 +254,7 @@
 | DRX-06 | Phase 6 | Complete |
 | EOS-01 | Phase 7 | Complete |
 | EOS-02 | Phase 7 | Complete |
-| EOS-03 | Phase 7 | Pending |
+| EOS-03 | Phase 7 | Complete |
 | EOS-04 | Phase 7 | Complete |
 | EOS-05 | Phase 7 | Complete |
 | EOS-06 | Phase 7 | Complete |
