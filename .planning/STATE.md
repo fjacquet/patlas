@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 5 context gathered (Rich Cluster/Host/ESX Intelligence)
-last_updated: "2026-05-17T07:47:28.756Z"
-last_activity: 2026-05-17 -- Phase 5 context gathered; next = /gsd-plan-phase 5
+status: executing
+stopped_at: "05-01 Task 1 committed (parser extension, green). PAUSED before 05-01 Task 2 (operational-insights aggregations)."
+last_updated: "2026-05-17T08:02:18.704Z"
+last_activity: 2026-05-17 -- Phase 05 executing — 05-01 T1 done, T2 pending
 progress:
   total_phases: 10
   completed_phases: 4
@@ -21,14 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** A user drops a RVTools workbook and walks away with a polished, shareable HTML report and PPTX deck describing their VMware estate — without uploading a single byte. The report is the product.
-**Current focus:** Phase 5 (Rich Cluster/Host/ESX Intelligence) context gathered (OPEN-2 resolved). Next: `/gsd-plan-phase 5`. OPEN-3 resolves in the P9 discussion.
+**Current focus:** Phase 05 — rich-cluster-host-esx-intelligence
 
 ## Current Position
 
-Phase: 04 — COMPLETE (re-derived: 04-01 merge spine baseline + 04-05 G1 factual stretched)
-Plan: 2/2 (04-01 baseline, 04-05 G1 rework)
-Status: P1–P4 done (10-phase re-derived roadmap); analytics-core replan on track
-Last activity: 2026-05-17 -- 04-05 G1 stretched rework complete, real-file-validated
+Phase: 05 (rich-cluster-host-esx-intelligence) — EXECUTING (paused mid-05-01)
+Plan: 05-01 — Task 1 DONE & committed (parser extension, regression green); Task 2 PENDING (operational-insights aggregations). Then 05-02 (UI) not started.
+Status: Executing Phase 05 — resume at 05-01 Task 2
+Last activity: 2026-05-17 -- 05-01 T1 committed; paused before T2 (large engine + UI work remaining)
+Resume: /gsd-execute-phase 5 (05-01 has no SUMMARY yet → safe-resume gate will offer resume-from-Task-2; 04-05 pattern)
 
 Progress: [████░░░░░░] 40% (4/10 phases)
 
