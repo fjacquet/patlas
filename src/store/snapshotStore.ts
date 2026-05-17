@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { DrScenario } from '@/types/estate'
-import type { Snapshot } from '@/types/snapshot'
+import type { ReleasedTrendAggregate, Snapshot } from '@/types/snapshot'
 
 const EMPTY_SCENARIO = (): DrScenario => ({
   failedHosts: new Set(),
@@ -66,6 +66,15 @@ interface SnapshotState {
   setPlannedRatios: (r: { cpu: number; ram: number }) => void
   renameVCenter: (id: string, label: string) => void
   setCapturedAt: (id: string, date: Date) => void
+  /**
+   * DD-C (Critical-5): drop a snapshot's raw row arrays for GC when > 4
+   * snapshots are loaded, carrying its already-computed `releasedAggregate`
+   * so its trend point survives. Inputs-only, REPLACE-never-mutate;
+   * in-memory only, no spill to any browser storage (the surviving
+   * aggregate is the only remaining input fact for that point — A3
+   * resolved reading). Never called for the active/latest snapshot.
+   */
+  releaseRawRows: (id: string, releasedAggregate: ReleasedTrendAggregate) => void
   clearAll: () => void
 }
 
@@ -142,6 +151,23 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
       if (!snap) return {}
       const next = new Map(state.snapshots)
       next.set(id, { ...snap, capturedAt: date })
+      return { snapshots: next }
+    }),
+
+  releaseRawRows: (id, releasedAggregate) =>
+    set((state) => {
+      const snap = state.snapshots.get(id)
+      if (!snap) return {}
+      const next = new Map(state.snapshots)
+      next.set(id, {
+        ...snap,
+        vinfo: [],
+        vhost: [],
+        vdatastore: [],
+        vpartition: [],
+        rawReleased: true,
+        releasedAggregate,
+      })
       return { snapshots: next }
     }),
 
