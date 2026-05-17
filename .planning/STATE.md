@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Phase 4 context gathered (re-derived; analytics-core replan)
+stopped_at: Phase 4 re-derived COMPLETE (04-05 G1 rework, real-file-validated)
 last_updated: "2026-05-17T07:13:39.148Z"
-last_activity: 2026-05-17 -- Phase 4 context re-gathered (discuss-phase, analytics-core replan)
+last_activity: 2026-05-17 -- Phase 4 re-derived complete (04-05 G1 stretched rework); next P5
 progress:
   total_phases: 10
-  completed_phases: 3
-  total_plans: 12
-  completed_plans: 12
-  percent: 30
+  completed_phases: 4
+  total_plans: 13
+  completed_plans: 13
+  percent: 40
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** A user drops a RVTools workbook and walks away with a polished, shareable HTML report and PPTX deck describing their VMware estate — without uploading a single byte. The report is the product.
-**Current focus:** Analytics-core replan — ROADMAP re-derived (10 phases). Next: discuss/plan re-derived P4 (G1 stretched rework) and new P5/P6, with OPEN-2/3 to resolve.
+**Current focus:** Phase 4 re-derived COMPLETE (merge baseline + G1 stretched rework, real-file-validated). Next: P5 (Rich Cluster/Host/ESX Intelligence) — discuss/plan; OPEN-2/3 resolve in P5/P9 discussions.
 
 ## Current Position
 
-Phase: 04 — RE-DERIVED (merge engine spine kept & validated; G1 stretched rework + allocation/DR moved to P5/P6 pending)
-Plan: replan applied — phase plans TBD (re-derive in discuss-phase)
-Status: replanning (analytics-core); P1-P3 + 04-01 merge baseline shipped
-Last activity: 2026-05-16 -- ROADMAP restructured 7→10; ANALYTICS-CORE-REPLAN.md is the canonical input
+Phase: 04 — COMPLETE (re-derived: 04-01 merge spine baseline + 04-05 G1 factual stretched)
+Plan: 2/2 (04-01 baseline, 04-05 G1 rework)
+Status: P1–P4 done (10-phase re-derived roadmap); analytics-core replan on track
+Last activity: 2026-05-17 -- 04-05 G1 stretched rework complete, real-file-validated
 
-Progress: [███░░░░░░░] 30% (3/10 phases; P4 re-derived)
+Progress: [████░░░░░░] 40% (4/10 phases)
 
 ## Performance Metrics
 

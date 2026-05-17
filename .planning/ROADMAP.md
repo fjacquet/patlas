@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation & Invariants** - Bootstrap, parser-in-Worker, privacy guard, branded units, immutable snapshot store (completed 2026-05-15)
 - [x] **Phase 2: Aggregation & Global Dashboard** - Single-snapshot cluster aggregates + ECharts-driven dashboard with three accounting modes
 - [x] **Phase 3: Inventory Navigation** - Virtualised cluster â ESX â VM tree with sortable/filterable tables and CSV export (completed 2026-05-16)
-- [~] **Phase 4: Multi-vCenter Merge & Factual Labels** - REDEFINED (analytics-core replan): validated merge engine spine (kept) + per-vCenter/RVTools labels + stretched as the user's declaration with FACTUAL site-data (G1). Its allocation/DR-UI parts are superseded by Phase 6.
+- [x] **Phase 4: Multi-vCenter Merge & Factual Labels** - REDEFINED (analytics-core replan): validated merge engine spine (kept) + per-vCenter/RVTools labels + stretched as the user's declaration with FACTUAL site-data (G1). Its allocation/DR-UI parts are superseded by Phase 6.
 - [ ] **Phase 5: Rich Cluster / Host / ESX Intelligence** - NEW: deep per-cluster card + one-window ESX Summary + operational insights (realized CPU overcommit, avg CPU/mem, ESXi & hardware lifecycle, powered/off/susp/template, footprints)
 - [ ] **Phase 6: Allocation & DR (re-derived)** - NEW: realized consolidation displayed (G2) + separate capacity-planning lens (Personal Ratios + Custom Failover, OPEN-1) + DR server/site loss, physical impact (G3); reuses kept drSim engine
 - [ ] **Phase 7: OS End-of-Support Forecast** - Bundled endoflife.date catalogue, 3/6/9/12-month at-risk with drill-down
@@ -93,7 +93,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 >
 > **Re-derived plans (authoritative):**
 > - [x] `04-01` — multi-vCenter merge engine spine — DONE, real-file-validated, kept as baseline
-> - [ ] `04-05` — G1 stretched rework: factual `siteData` (detected/assumed) replaces confidence verdict+chip; reservation math unchanged; estate "N clusters marked stretched"; merge STR-03 / drop STR-04
+> - [x] `04-05` — G1 stretched rework: factual `siteData` (detected/assumed) replaces confidence verdict+chip; reservation math unchanged; estate "N clusters marked stretched"; merge STR-03 / drop STR-04 — DONE 2026-05-17, real-file-validated
 > - 04-02/03/04 superseded (02 math kept in 04-01 baseline; 03 allocation→P6; 04 DR→P6)
 
 **Goal**: Turn vatlas from a single-snapshot viewer into the analytics atlas â merge N RVTools workbooks into one logical estate keyed on `(VI SDK UUID, vm_bios_uuid)` (never silent merge on names), surface the Ãtendu/Stretched pill with per-site reservation math and a `confidence` indicator, expose CPU/RAM allocation sliders with named presets and URL-hash-only persistence, and ship the three DR simulation modes (host loss, cluster loss, vCenter loss) with an explicit assumptions panel and `caveats` array. This is the phase where the engine spine becomes the product â every later capability (EOS, trends, exports) reads the merged estate, not raw snapshots.
@@ -215,7 +215,7 @@ Phases execute in numeric order: 1 â 2 â 3 â 4 â 5 â 6 
 | 1. Foundation & Invariants | 5/5 | Complete   | 2026-05-15 |
 | 2. Aggregation & Global Dashboard | 3/3 | Complete   | 2026-05-16 |
 | 3. Inventory Navigation | 3/3 | Complete | 2026-05-16 |
-| 4. Multi-vCenter Merge & Factual Labels | 1/2 | Re-derived — 04-01 baseline done; 04-05 (G1 rework) planned, pending execution | - |
+| 4. Multi-vCenter Merge & Factual Labels | 2/2 | Complete (re-derived) — 04-01 merge baseline + 04-05 G1 rework, real-file-validated | 2026-05-17 |
 | 5. Rich Cluster / Host / ESX Intelligence | 0/TBD | Not started (NEW) | - |
 | 6. Allocation & DR (re-derived) | 0/TBD | Not started (NEW; carries UAT G2/G3, OPEN-1) | - |
 | 7. OS End-of-Support Forecast | 0/TBD | Not started | - |
