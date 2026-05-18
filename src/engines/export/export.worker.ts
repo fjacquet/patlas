@@ -39,6 +39,26 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
     )
     const optBundle = buildChartBundle(view, trends, req.locale)
 
+    // The strings bag is the RAW i18n bundle (getResourceBundle does not
+    // interpolate). Resolve `{{token}}` placeholders here — the worker is
+    // the only place that has view counts + capture date + locale together
+    // (engines stay pure; they receive final strings). Fixes the literal
+    // `{{vcenters}}`/`{{captureDate}}` on the title slide + report footer.
+    const bcp47 = req.locale === 'fr' ? 'fr-FR' : 'en-US'
+    const fmtN = (n: number): string =>
+      Number.isFinite(n) ? n.toLocaleString(bcp47, { maximumFractionDigits: 0 }) : '—'
+    const vars: Record<string, string> = {
+      vcenters: view.vcenters.map((v) => v.label).join(' · '),
+      clusters: fmtN(view.globals.clusterCount),
+      hosts: fmtN(view.globals.hostCount),
+      vms: fmtN(view.globals.vmCount),
+      captureDate: new Date(req.active.capturedAt).toLocaleDateString(bcp47),
+    }
+    const strings: typeof req.strings = {}
+    for (const [k, v] of Object.entries(req.strings)) {
+      strings[k] = v.replace(/\{\{(\w+)\}\}/g, (m, key) => vars[key] ?? m)
+    }
+
     let bytes: ArrayBuffer
     if (req.kind === 'html') {
       // HTML inlines SVG directly — feed each per-cluster slot the REAL
@@ -48,7 +68,7 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
         const opt = optBundle.perCluster.get(slot.cluster)
         if (opt) charts.set(slot.id, chartToSvg(opt, CHART_W, CHART_H))
       }
-      const html = assembleHtml({ view, trends, charts, strings: req.strings, locale: req.locale })
+      const html = assembleHtml({ view, trends, charts, strings, locale: req.locale })
       bytes = new TextEncoder().encode(html).buffer
     } else {
       // PPTX: PowerPoint can't render SVG → rasterize every chart to PNG
@@ -68,7 +88,7 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
 
       // pptxgenjs evaluated lazily AFTER the window shim above.
       const { buildPptx } = await import('./pptx/builder')
-      bytes = await buildPptx(view, trends, req.strings, req.locale, {
+      bytes = await buildPptx(view, trends, strings, req.locale, {
         charts,
         // Active snapshot's real capture date for the D-03 title slide.
         capturedAt: new Date(req.active.capturedAt).toISOString().slice(0, 10),
