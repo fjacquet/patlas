@@ -40,8 +40,9 @@ describe('chartSvgToPng — PowerPoint-safe raster', () => {
       h: 3.4,
     })
     expect(captured).toHaveLength(1)
-    expect(captured[0].data.startsWith('image/png;base64,')).toBe(true)
-    expect(captured[0].data).not.toContain('svg+xml')
+    const [img] = captured
+    expect(img?.data.startsWith('image/png;base64,')).toBe(true)
+    expect(img?.data).not.toContain('svg+xml')
   })
 
   it('chartSvg.ts source never constructs an image/svg+xml payload', () => {
