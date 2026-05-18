@@ -3,7 +3,7 @@ status: complete
 phase: 09-storage-network-detailed-views-threshold-alerting
 source: [09-01-SUMMARY.md, 09-02-SUMMARY.md, 09-03-SUMMARY.md, 09-04-SUMMARY.md, 09-05-SUMMARY.md]
 started: 2026-05-18T00:00:00Z
-updated: 2026-05-18T07:30:00Z
+updated: 2026-05-18T08:15:00Z
 ---
 
 ## Current Test
@@ -22,9 +22,8 @@ result: pass
 
 ### 3. Storage View — lens / scope / charts
 expected: StorageView shows a scope control (Cluster · ESX · VM · Datastore) and a Consumption/Capacity lens toggle. Consumption lens renders an ECharts treemap (navy shade ramp, drill breadcrumb); Capacity lens renders a stacked bar (used/free). A DataTable with column picker + CSV export sits below. Switching scope/lens updates the chart and table.
-result: issue
-reported: "Treemap + Capacity stacked-bar + scope (Cluster/ESX/VM/Datastore) + lens toggle + DataTable (column picker, CSV, branded GiB/TiB units) all render and function correctly. Genuine MINOR defect: ECharts logs 3 '[ECharts] oklch(...) is an illegal color, fallback to #000000' warnings. Root cause = src/theme/echartsTheme.ts hardcodes the palette as oklch() strings on a false documented assumption ('the ECharts SVG renderer accepts any CSS color string'); the bundled zrender color parser does NOT support oklch() and substitutes #000000 for the global series palette (PRIMARY_500/PRIMARY_300/SURFACE_200). Pre-existing PHASE-2 defect (echartsTheme.ts introduced in feat(02-01)); app-wide (all charts), not Phase-9-specific — P9's treemap/bar merely also consume the broken palette. Charts still render/usable; color-fidelity deviation from UI-SPEC LC-8/Color."
-severity: minor
+result: pass
+note: "Treemap + Capacity stacked-bar + scope (Cluster/ESX/VM/Datastore) + lens toggle + DataTable (column picker, CSV, branded GiB/TiB units) all render and function correctly. The oklch→#000000 minor defect found in first-pass (pre-existing Phase-2: src/theme/echartsTheme.ts emitted oklch() palette strings zrender cannot parse) was FIXED INLINE this session: the 9 palette constants converted to accurate sRGB hex (exact OKLCH→sRGB of the index.css values), false doc-comment corrected, existing echartsTheme.test.ts updated to assert the parseable hex. Verified: typecheck clean, full suite 409/409, and in-browser 0 ECharts color warnings on the dashboard AND the Storage treemap (heaviest palette consumer) — treemap now renders the navy --color-primary ramp per UI-SPEC LC-8."
 
 ### 4. Threshold config + factual flag markers
 expected: A "Thresholds" panel with three editable number inputs (filesystem %, datastore %, LU %) and a factual echo line restating the active thresholds. Rows/datastores over threshold get a faint gold tint + gold left rule + a count badge — NO red, NO warning icon, NO verdict words. Editing a threshold updates flags live; refresh restores defaults (no persistence).
@@ -54,29 +53,31 @@ result: pass
 ## Summary
 
 total: 9
-passed: 8
-issues: 1
+passed: 9
+issues: 0
 pending: 0
 skipped: 0
 blocked: 0
 
 ## Gaps
 
-# NOTE: The test-4 "blocker" recorded in first-pass testing was DISPROVEN on
-# diagnosis — it was a UAT-harness Vite-full-reload artifact, not a product
-# defect. Test 4 is a PASS (see its note). No blocker gap remains.
+# Both first-pass issues resolved this session:
+#  - Test-4 "blocker" DISPROVEN — UAT-harness Vite-full-reload artifact, not a
+#    product defect. Test 4 = PASS (see its note).
+#  - Test-3 oklch minor (pre-existing Phase-2) FIXED INLINE + verified. RESOLVED.
+# No open gaps. Phase 9 UAT clean: 9/9 pass.
 
-- truth: "Treemap and stacked-bar chart fills derive from the navy --color-primary-* scale (UI-SPEC LC-8 / Color contract); chart colors render as specified, not a #000000 fallback"
-  status: failed
-  reason: "ECharts logs 3 '[ECharts] oklch(...) is an illegal color, fallback to #000000' warnings on every chart. The Midnight Executive palette is emitted to ECharts as oklch() strings; the bundled zrender color parser does not support oklch() and substitutes black for the global series palette. Charts still render and are usable — color-fidelity deviation from UI-SPEC LC-8/Color, not a functional break."
+- truth: "Treemap/stacked-bar chart fills derive from the navy --color-primary-* scale (UI-SPEC LC-8 / Color); chart colors render as specified, not a #000000 fallback"
+  status: resolved
+  reason: "Pre-existing Phase-2 defect: src/theme/echartsTheme.ts emitted the Midnight Executive palette as oklch() strings; the bundled zrender color parser supports hex/rgb(a)/hsl(a)/named only, so oklch() fell back to #000000 app-wide (P9's treemap/bar surfaced it). Never caught because P2–P8 chart tests run in jsdom (no real SVG paint) + no prior live-browser pass."
   severity: minor
   test: 3
-  root_cause: "src/theme/echartsTheme.ts lines 9-29: palette constants (PRIMARY_500/300/200, SURFACE_200/700/800, UTIL_LOW/MID/HIGH) are hardcoded oklch() strings on the explicit but FALSE documented assumption 'the ECharts SVG renderer accepts any CSS color string, so we emit the same oklch values verbatim'. zrender's CSS color parser (bundled echarts) supports hex/rgb(a)/hsl(a)/named only — oklch() → #000000 fallback. Pre-existing Phase-2 defect (file introduced in commit feat(02-01)); affects ALL app charts, surfaced now because P9 added the treemap/stacked-bar. Never caught because P2-P8 chart tests run in jsdom (no real SVG paint) and there was no prior live-browser verification."
+  root_cause: "echartsTheme.ts palette constants hardcoded as oklch() on a false doc-comment claim that the ECharts SVG renderer accepts any CSS color string. Introduced in commit feat(02-01) (Phase 2)."
+  resolution: "Fixed inline (user-approved 'fix colors only'): converted the 9 palette constants to accurate sRGB hex via standard OKLCH→OKLab→linear-sRGB→gamma math (PRIMARY_500 #3245b7 / 300 #819ae9 / 200 #b0c2f9, SURFACE_200 #d4d8de / 700 #232933 / 800 #11161f, UTIL_LOW #4aa342 / MID #ef8700 / HIGH #df202e), corrected the doc-comment, updated echartsTheme.test.ts to assert the parseable hex. Verified: typecheck clean, vitest 409/409, in-browser 0 ECharts color warnings on dashboard + Storage treemap, treemap renders the navy ramp."
   artifacts:
     - path: "src/theme/echartsTheme.ts"
-      issue: "Palette constants are oklch() strings; doc-comment falsely claims ECharts accepts any CSS color string. zrender cannot parse oklch → #000000."
-  missing:
-    - "Convert the 9 oklch palette constants in echartsTheme.ts to their accurate sRGB hex/rgb equivalents (zrender-parseable), preserving the Midnight Executive values. Fix the doc-comment's false claim."
-    - "Add a guard that fails the build/test if a chart theme color is not zrender-parseable (regression gate; jsdom tests miss this)."
-  debug_session: "inline (this UAT session) — see test-4 note + test-3 reported"
-  cross_phase: "echartsTheme.ts is a Phase-2 (VIZ-03) foundational file; fix changes chart colors app-wide, not just Phase 9. Scope decision is the user's."
+      issue: "FIXED — oklch() constants → accurate sRGB hex; doc-comment corrected."
+    - path: "src/theme/echartsTheme.test.ts"
+      issue: "FIXED — assertions updated from the buggy oklch strings to the corrected hex."
+  missing: []
+  debug_session: "inline (this UAT session)"
