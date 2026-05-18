@@ -23,14 +23,13 @@ result: pass
 ### 3. Storage View — lens / scope / charts
 expected: StorageView shows a scope control (Cluster · ESX · VM · Datastore) and a Consumption/Capacity lens toggle. Consumption lens renders an ECharts treemap (navy shade ramp, drill breadcrumb); Capacity lens renders a stacked bar (used/free). A DataTable with column picker + CSV export sits below. Switching scope/lens updates the chart and table.
 result: issue
-reported: "Treemap + scope (Cluster/ESX/VM/Datastore) + lens toggle + DataTable (column picker, CSV, branded GiB/TiB units) all render and function. But ECharts logs 3 'illegal color, fallback to #000000' warnings for oklch() tokens — the chart fills are not consuming the navy --color-primary ramp as the UI-SPEC LC-8/Color contract requires (oklch CSS custom properties are not ECharts-parseable)."
+reported: "Treemap + Capacity stacked-bar + scope (Cluster/ESX/VM/Datastore) + lens toggle + DataTable (column picker, CSV, branded GiB/TiB units) all render and function correctly. Genuine MINOR defect: ECharts logs 3 '[ECharts] oklch(...) is an illegal color, fallback to #000000' warnings. Root cause = src/theme/echartsTheme.ts hardcodes the palette as oklch() strings on a false documented assumption ('the ECharts SVG renderer accepts any CSS color string'); the bundled zrender color parser does NOT support oklch() and substitutes #000000 for the global series palette (PRIMARY_500/PRIMARY_300/SURFACE_200). Pre-existing PHASE-2 defect (echartsTheme.ts introduced in feat(02-01)); app-wide (all charts), not Phase-9-specific — P9's treemap/bar merely also consume the broken palette. Charts still render/usable; color-fidelity deviation from UI-SPEC LC-8/Color."
 severity: minor
 
 ### 4. Threshold config + factual flag markers
 expected: A "Thresholds" panel with three editable number inputs (filesystem %, datastore %, LU %) and a factual echo line restating the active thresholds. Rows/datastores over threshold get a faint gold tint + gold left rule + a count badge — NO red, NO warning icon, NO verdict words. Editing a threshold updates flags live; refresh restores defaults (no persistence).
-result: issue
-reported: "Panel, 3 inputs, echo line, and factual count line all present and CORRECT; single-step arrow-key edit updates the echo + count live (85→84 ⇒ 11→21 datastores) with no verdict words. BUT: replacing a threshold value the normal way (select-all then type a new number, then blur/Tab) DELETES THE ENTIRE LOADED ESTATE and resets the app to the upload screen — reproducible and deterministic, no console error. Data loss on a routine field edit; unrecoverable without re-upload (no persistence)."
-severity: blocker
+result: pass
+note: "Panel, 3 inputs, echo line, factual count line all correct. Both single-step arrow-key AND full select-all-replace edits update echo + count live with no verdict words and NO data loss. The apparent 'data wipe on threshold replace' reported during first-pass testing was a UAT-HARNESS ARTIFACT, not a product defect: the test harness wrote files (screenshots → project root, .gitignore, .planning/09-UAT.md) into the Vite-watched root, triggering a debounced Vite dev-server FULL PAGE RELOAD that landed on the next interaction. A reload re-runs the module-scoped `new Map()` store and remounts App (App-local useState('dashboard') reset) — the app's intended privacy-by-construction 'refresh = data gone'. Proven three ways: (1) logical — App-local state cannot reset via any Zustand action, only remount/reload; (2) code — clearAll has zero callers, setThresholds is a safe shallow merge, safeNum guards correctly (Number('')===0 is in-range); (3) empirical — identical full-replace+Tab with ZERO root-dir file writes preserved the dataset and applied the threshold correctly (echo 'Datastore > 50 %', count recomputed to 92)."
 
 ### 5. Datastore detail drill
 expected: Clicking a datastore row opens a screen-fit detail screen: title + back affordance (← Back), metric rows for capacity / provisioned / in-use / free, the VMs on that datastore, host count, and a threshold flag marker if over. No internal scroll (fits one screen). Back returns to StorageView.
@@ -55,30 +54,29 @@ result: pass
 ## Summary
 
 total: 9
-passed: 7
-issues: 2
+passed: 8
+issues: 1
 pending: 0
 skipped: 0
 blocked: 0
 
 ## Gaps
 
-- truth: "Editing a threshold value updates flags live; the loaded estate is preserved (in-memory thresholds slice, REPLACE-never-mutate, no destructive side-effect — UI-SPEC LC-7)"
-  status: failed
-  reason: "User reported: replacing a threshold value (select-all + type new number + blur/Tab) deletes the entire loaded estate and resets the app to the upload screen. Reproducible TWICE deterministically, no console error. Single-step arrow-key edits work correctly (live echo + count update, no data loss) — the defect is specific to committing a transiently-blanked / full-replace value. Likely the safeNum/on-commit path for an empty or invalid intermediate value triggers a clearAll-style reset that also drops the in-memory snapshot Map (no persistence ⇒ unrecoverable). ADDITIONAL OBSERVATION: one further unattributed full-state reset occurred once during plain view navigation (VM detail → Network) with NO threshold interaction — suggests the destructive state-clear path may be reachable beyond the threshold input alone; diagnosis should investigate the shared store-reset trigger, not only the number-input on-commit handler. UI-SPEC LC-7 requires invalid input to fall back to last-valid with NO destructive side-effect."
-  severity: blocker
-  test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+# NOTE: The test-4 "blocker" recorded in first-pass testing was DISPROVEN on
+# diagnosis — it was a UAT-harness Vite-full-reload artifact, not a product
+# defect. Test 4 is a PASS (see its note). No blocker gap remains.
 
-- truth: "Treemap and stacked-bar chart fills derive from the navy --color-primary-* scale (UI-SPEC LC-8 / Color contract); chart colors render as specified, not a fallback"
+- truth: "Treemap and stacked-bar chart fills derive from the navy --color-primary-* scale (UI-SPEC LC-8 / Color contract); chart colors render as specified, not a #000000 fallback"
   status: failed
-  reason: "User reported: ECharts logs 3 '[ECharts] oklch(...) is an illegal color, fallback to #000000' warnings on the Storage treemap. The navy/gold design tokens are defined as oklch() CSS custom properties which ECharts cannot parse, so affected series colors fall back to black instead of the mandated navy --color-primary ramp. Chart still renders and is usable; this is a color-fidelity deviation from the spec, not a functional break."
+  reason: "ECharts logs 3 '[ECharts] oklch(...) is an illegal color, fallback to #000000' warnings on every chart. The Midnight Executive palette is emitted to ECharts as oklch() strings; the bundled zrender color parser does not support oklch() and substitutes black for the global series palette. Charts still render and are usable — color-fidelity deviation from UI-SPEC LC-8/Color, not a functional break."
   severity: minor
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "src/theme/echartsTheme.ts lines 9-29: palette constants (PRIMARY_500/300/200, SURFACE_200/700/800, UTIL_LOW/MID/HIGH) are hardcoded oklch() strings on the explicit but FALSE documented assumption 'the ECharts SVG renderer accepts any CSS color string, so we emit the same oklch values verbatim'. zrender's CSS color parser (bundled echarts) supports hex/rgb(a)/hsl(a)/named only — oklch() → #000000 fallback. Pre-existing Phase-2 defect (file introduced in commit feat(02-01)); affects ALL app charts, surfaced now because P9 added the treemap/stacked-bar. Never caught because P2-P8 chart tests run in jsdom (no real SVG paint) and there was no prior live-browser verification."
+  artifacts:
+    - path: "src/theme/echartsTheme.ts"
+      issue: "Palette constants are oklch() strings; doc-comment falsely claims ECharts accepts any CSS color string. zrender cannot parse oklch → #000000."
+  missing:
+    - "Convert the 9 oklch palette constants in echartsTheme.ts to their accurate sRGB hex/rgb equivalents (zrender-parseable), preserving the Midnight Executive values. Fix the doc-comment's false claim."
+    - "Add a guard that fails the build/test if a chart theme color is not zrender-parseable (regression gate; jsdom tests miss this)."
+  debug_session: "inline (this UAT session) — see test-4 note + test-3 reported"
+  cross_phase: "echartsTheme.ts is a Phase-2 (VIZ-03) foundational file; fix changes chart colors app-wide, not just Phase 9. Scope decision is the user's."
