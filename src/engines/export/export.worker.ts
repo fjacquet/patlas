@@ -4,10 +4,10 @@
 // same-origin Vite-bundled resvg wasm fetch below is allowed, any
 // non-same-origin attempt throws). Mirrors parser.worker.ts.
 import '../../privacy/fetchGuard'
-// pptxgenjs touches `window` at module-eval; a worker has none. Shim
-// BEFORE the (dynamic) pptx import so eval succeeds (10-SPIKE-DECISION:
-// pptxgenjs runs in the worker — the spike proved this with this shim).
-;(globalThis as unknown as { window?: unknown }).window ??= globalThis
+// SECOND: the worker `window` shim — MUST precede every heavy import below
+// (ESM hoists imports above any statement, so an inline shim runs too late;
+// react-dom/server / zrender / pptxgenjs read `window` at module-eval).
+import './workerEnv'
 
 import type { EChartsOption } from 'echarts/types/dist/shared'
 import { buildExportView } from './buildExportView'

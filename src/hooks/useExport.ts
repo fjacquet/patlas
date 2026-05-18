@@ -37,7 +37,10 @@ export function exportFilename(
 let worker: Worker | null = null
 const getWorker = (): Worker => {
   if (!worker) {
-    worker = new Worker(new URL('@/engines/export/export.worker.ts', import.meta.url), {
+    // Relative path (NOT the @/ alias) — Vite's worker static-analysis
+    // resolves `new URL('./x', import.meta.url)` literally, matching the
+    // shipped parseInWorker.ts pattern. An alias here fails to bundle.
+    worker = new Worker(new URL('../engines/export/export.worker.ts', import.meta.url), {
       type: 'module',
     })
   }
