@@ -103,8 +103,22 @@ export function useExport(): { run: (kind: ExportKind) => Promise<void>; busy: b
       const toastId = toast.loading(strings['toast.progress'] ?? 'Generating report…')
       const w = getWorker()
       await new Promise<void>((resolve) => {
-        const onMessage = (e: MessageEvent<ExportResponse>) => {
+        // A worker script/runtime failure fires 'error'/'messageerror',
+        // NOT 'message' — without these the promise would hang forever and
+        // `busy`/the loading toast would never clear (CodeRabbit
+        // useExport.ts:131). Tear down listeners on whichever fires first.
+        const cleanup = () => {
           w.removeEventListener('message', onMessage)
+          w.removeEventListener('error', onFail)
+          w.removeEventListener('messageerror', onFail)
+        }
+        const onFail = () => {
+          cleanup()
+          toast.error(strings['toast.error'] ?? 'Export did not complete.', { id: toastId })
+          resolve()
+        }
+        const onMessage = (e: MessageEvent<ExportResponse>) => {
+          cleanup()
           if (e.data.kind === 'ok') {
             const url = URL.createObjectURL(new Blob([e.data.bytes]))
             const a = document.createElement('a')
@@ -125,6 +139,8 @@ export function useExport(): { run: (kind: ExportKind) => Promise<void>; busy: b
           resolve()
         }
         w.addEventListener('message', onMessage)
+        w.addEventListener('error', onFail)
+        w.addEventListener('messageerror', onFail)
         w.postMessage(req)
       })
       setBusy(false)

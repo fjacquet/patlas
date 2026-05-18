@@ -24,7 +24,15 @@ let wasmReady: Promise<unknown> | null = null
 /** Process-global single-shot init; memoised so parallel/repeat calls do
  *  not throw "Already initialized". */
 async function ensureWasm(source: WasmSource): Promise<void> {
-  if (!wasmReady) wasmReady = initWasm(source)
+  // Reset the memo on failure so a transient initWasm error (e.g. a
+  // momentary asset fetch hiccup) does not permanently poison every future
+  // export with a forever-rejected promise (CodeRabbit — chartSvg.ts:29).
+  if (!wasmReady) {
+    wasmReady = initWasm(source).catch((e) => {
+      wasmReady = null
+      throw e
+    })
+  }
   await wasmReady
 }
 
@@ -40,11 +48,16 @@ export async function chartSvgToPng(
 ): Promise<Uint8Array> {
   await ensureWasm(wasmSource)
   const r = new Resvg(svg, { fitTo: { mode: 'width', value: width } })
-  const rendered = r.render()
-  const png = rendered.asPng()
-  rendered.free()
-  r.free()
-  return png
+  // try/finally so a render()/asPng() throw still frees the wasm-backed
+  // Resvg + RenderedImage handles (CodeRabbit — chartSvg.ts:47 leak).
+  let rendered: ReturnType<typeof r.render> | null = null
+  try {
+    rendered = r.render()
+    return rendered.asPng()
+  } finally {
+    rendered?.free()
+    r.free()
+  }
 }
 
 /** Chunked base64 of raw bytes — worker/browser safe (no Buffer, no

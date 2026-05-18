@@ -34,6 +34,10 @@ export interface BuildPptxOpts {
   renderClusterChart?: (cluster: ClusterAggregate) => Promise<Uint8Array | undefined>
   /** CPU-Ready rows; when present & non-empty the conditional annex emits. */
   contentionRows?: ReadonlyArray<ContentionRow>
+  /** The active snapshot's capture date (ISO `YYYY-MM-DD`), injected by
+   *  plan-05's worker from `req.active.capturedAt`. Used verbatim on the
+   *  D-03 title slide — NOT the vCenter label (CodeRabbit — builder.ts:59). */
+  capturedAt?: string
 }
 
 export async function buildPptx(
@@ -47,7 +51,6 @@ export async function buildPptx(
   pptx.defineLayout({ name: 'WIDE', width: 13.333, height: 7.5 })
   pptx.layout = 'WIDE'
 
-  const captured = view.vcenters.length > 0 ? (view.vcenters[0]?.label ?? '') : ''
   addTitleSlide(
     pptx,
     {
@@ -55,7 +58,7 @@ export async function buildPptx(
       clusterCount: view.globals.clusterCount,
       hostCount: view.globals.hostCount,
       vmCount: view.globals.vmCount,
-      capturedAt: captured,
+      capturedAt: opts.capturedAt ?? '',
     },
     strings,
     locale,

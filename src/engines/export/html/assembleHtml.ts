@@ -23,7 +23,11 @@ type Locale = 'en' | 'fr'
 /** slotId → trusted ECharts-SSR SVG string (from `chartToSvg`). */
 export type ChartMap = ReadonlyMap<string, string>
 
-const SLOT_RE = /<div data-chart-slot="([^"]+)" class="chart-slot"><\/div>/g
+// Tolerate attribute order / extra attributes / whitespace (a future
+// React/renderToStaticMarkup change must not silently drop charts —
+// CodeRabbit assembleHtml.ts:49). Still scoped to an EMPTY <div…></div>
+// carrying data-chart-slot, so it never swallows nested content.
+const SLOT_RE = /<div\b[^>]*\bdata-chart-slot="([^"]+)"[^>]*><\/div>/g
 
 export interface AssembleInput {
   view: EstateView

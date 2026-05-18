@@ -80,6 +80,9 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
             CHART_H,
             wasmSource(),
           ),
+        // Active snapshot's real capture date for the D-03 title slide
+        // (NOT a vCenter label — CodeRabbit builder.ts:59).
+        capturedAt: new Date(req.active.capturedAt).toISOString().slice(0, 10),
       })
     }
 
