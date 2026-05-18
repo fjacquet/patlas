@@ -2,5 +2,58 @@
   "title": {
     "identity": "{{vcenters}} · {{clusters}} clusters · {{hosts}} hôtes · {{vms}} VMs · capturé le {{captureDate}}",
     "generated": "Généré par vatlas — synthèse factuelle du parc"
+  },
+  "overview": {
+    "title": "Vue d'ensemble du parc",
+    "vms": "VM",
+    "hosts": "Hôtes",
+    "clusters": "Clusters",
+    "vcpuPerPcpu": "vCPU : pCPU",
+    "os": "Familles d'OS",
+    "cpu": "CPU moyen %",
+    "mem": "Mémoire moyenne %"
+  },
+  "cluster": {
+    "subtitle": "Détail du cluster",
+    "hosts": "Hôtes",
+    "vms": "VM",
+    "vcpuPerPcpu": "vCPU : pCPU",
+    "datastores": "Datastores",
+    "cpu": "Utilisation CPU"
+  },
+  "eos": {
+    "title": "Prévision de fin de support des OS",
+    "overdue": "En retard",
+    "le3": "≤ 3 mois",
+    "le6": "≤ 6 mois",
+    "le9": "≤ 9 mois",
+    "le12": "≤ 12 mois",
+    "unknown": "Inconnu",
+    "byBucket": "Par fenêtre de support"
+  },
+  "dr": {
+    "title": "Simulation PRA",
+    "none": "Aucun scénario PRA sélectionné.",
+    "cpuRemovedCores": "Cœurs phys. retirés",
+    "ramRemovedMib": "RAM phys. retirée (Gio)",
+    "survivors": "Clusters survivants",
+    "beforeAfter": "Capacité physique avant / après"
+  },
+  "trends": {
+    "title": "Tendances de session",
+    "points": "Points de la chronologie",
+    "deltas": "Deltas",
+    "series": "Nombre de VM sur les snapshots"
+  },
+  "inventory": {
+    "title": "Synthèse d'inventaire",
+    "vms": "Lignes VM",
+    "hosts": "Hôtes",
+    "clusters": "Clusters",
+    "datastores": "Datastores",
+    "os": "Familles d'OS"
+  },
+  "contention": {
+    "title": "CPU Ready (annexe)"
   }
 }
