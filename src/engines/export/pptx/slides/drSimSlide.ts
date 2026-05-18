@@ -1,45 +1,49 @@
 /**
- * Phase 10 — DR scenario physical-impact slide (P6 DrSimResult). Factual
- * physical CPU/RAM removed + survivor count; a factual "no scenario" line
- * when drSim is null. No verdict language.
+ * Phase 10 — DR scenario physical-impact: KPI cards + before/after bar
+ * (real chart). Factual "no scenario" note when drSim is null. No verdict
+ * language.
  */
 import type PptxGenJS from 'pptxgenjs'
 import type { DrSimResult } from '@/types/estate'
 import type { ExportStrings } from '../../types'
 import { type ExportLocale, pptxNumber } from '../format'
-import { PPTX_THEME, SLIDE } from '../theme'
-import { addHeading, addMetricList } from './_layout'
+import { addChartPanel, addHeader, addKpiRow, addNote, CONTENT_W, M } from './_layout'
 
 export function addDrSimSlide(
   pptx: PptxGenJS,
   drSim: DrSimResult | null,
+  chartPng: Uint8Array | undefined,
   strings: ExportStrings,
   locale: ExportLocale,
 ): void {
   const s = pptx.addSlide()
-  addHeading(s, strings['dr.title'] ?? 'DR results')
+  const y = addHeader(s, strings['dr.title'] ?? 'DR results')
   if (drSim === null) {
-    s.addText(strings['dr.none'] ?? 'No DR scenario selected.', {
-      ...PPTX_THEME.body,
-      x: SLIDE.margin,
-      y: 1.3,
-      w: SLIDE.w - SLIDE.margin * 2,
-      h: 0.4,
-    })
+    addNote(s, strings['dr.none'] ?? 'No DR scenario selected.', y)
     return
   }
-  addMetricList(s, [
-    {
-      label: strings['dr.cpuRemovedCores'] ?? 'Physical cores removed',
-      value: pptxNumber(Number(drSim.physicalCpuRemovedCores), locale),
-    },
-    {
-      label: strings['dr.ramRemovedMib'] ?? 'Physical RAM removed (MiB)',
-      value: pptxNumber(Number(drSim.physicalRamRemovedMib), locale),
-    },
-    {
-      label: strings['dr.survivors'] ?? 'Survivor clusters',
-      value: pptxNumber(drSim.perSurvivor.length, locale),
-    },
-  ])
+  const y2 = addKpiRow(
+    s,
+    [
+      {
+        label: strings['dr.cpuRemovedCores'] ?? 'Phys. cores removed',
+        value: pptxNumber(Number(drSim.physicalCpuRemovedCores), locale),
+      },
+      {
+        label: strings['dr.ramRemovedMib'] ?? 'Phys. RAM removed (GiB)',
+        value: pptxNumber(Math.round(Number(drSim.physicalRamRemovedMib) / 1024), locale),
+      },
+      {
+        label: strings['dr.survivors'] ?? 'Survivor clusters',
+        value: pptxNumber(drSim.perSurvivor.length, locale),
+      },
+    ],
+    y,
+  )
+  addChartPanel(
+    s,
+    chartPng,
+    { x: M, y: y2, w: CONTENT_W, h: 7.15 - y2 },
+    strings['dr.beforeAfter'] ?? 'Physical capacity before / after',
+  )
 }
