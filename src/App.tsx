@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Toaster } from 'sonner'
 import { GlobalDashboard } from './components/dashboard/GlobalDashboard'
+import { ExportButtons } from './components/ExportButtons'
 import { EosView } from './components/eos/EosView'
 import { FallbackError } from './components/FallbackError'
 import { HostsView } from './components/hosts/HostsView'
@@ -32,6 +33,7 @@ function App() {
           <h1 className="text-lg font-semibold text-slate-700 dark:text-slate-200">vAtlas</h1>
           <div className="flex items-center gap-2">
             <ViewToggle value={activeView} onChange={setActiveView} />
+            {hasSnapshots ? <ExportButtons /> : null}
             <LanguageToggle />
             <ThemeToggle />
           </div>
