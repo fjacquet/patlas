@@ -7,6 +7,7 @@ import { FallbackError } from './components/FallbackError'
 import { HostsView } from './components/hosts/HostsView'
 import { InventoryView } from './components/inventory/InventoryView'
 import { LanguageToggle } from './components/LanguageToggle'
+import { NetworkView } from './components/network/NetworkView'
 import { PlanningView } from './components/planning/PlanningView'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
 import { StorageView } from './components/storage/StorageView'
@@ -50,6 +51,8 @@ function App() {
               <TrendsView />
             ) : activeView === 'storage' ? (
               <StorageView />
+            ) : activeView === 'network' ? (
+              <NetworkView />
             ) : (
               <GlobalDashboard />
             )}

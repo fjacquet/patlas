@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useEstateView } from '@/hooks/useEstateView'
 import type { EsxAggregate } from '@/types/estate'
 import { fmtInt, fmtPercentValue } from '@/utils/format'
+import { EsxDetail } from './EsxDetail'
 
 /** Group hosts by cluster, preserving the engine's stable order. */
 const byCluster = (hosts: EsxAggregate[]): Map<string, EsxAggregate[]> => {
@@ -29,8 +31,28 @@ export function HostsView() {
   const oi = view.operationalInsights
   const grouped = byCluster(view.hosts)
   const na = t('na')
+  // P9 LC-4: ESX storage+network drill — lifted in-Hosts view-state (the
+  // GlobalDashboard cluster-drill precedent). NOT a router, NOT a 2nd memo,
+  // NOT App.tsx state, NOT a duplicate of the P5 cluster-detail drill.
+  const [drilledHost, setDrilledHost] = useState<string | null>(null)
 
   const txt = (s: string) => (s === '' ? na : s)
+
+  const host = drilledHost ? view.hosts.find((x) => x.hostName === drilledHost) : undefined
+  if (host) {
+    return (
+      <EsxDetail
+        detail={{
+          host,
+          vswitches: view.network.vswitches.filter((s) => s.host === host.hostName),
+          dvswitches: view.network.dvswitches.filter((dv) =>
+            dv.hostMembers.includes(host.hostName),
+          ),
+        }}
+        onBack={() => setDrilledHost(null)}
+      />
+    )
+  }
 
   return (
     <main className="flex-1 overflow-y-auto p-8">
@@ -82,7 +104,15 @@ export function HostsView() {
                       key={h.hostName}
                       className="border-t border-slate-100 dark:border-surface-800"
                     >
-                      <td className="break-all py-1 pr-4 font-sans">{h.hostName}</td>
+                      <td className="break-all py-1 pr-4 font-sans">
+                        <button
+                          type="button"
+                          onClick={() => setDrilledHost(h.hostName)}
+                          className="text-left text-primary-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-400"
+                        >
+                          {h.hostName}
+                        </button>
+                      </td>
                       <td className="py-1 pr-4">{fmtInt(h.cores as number, loc)}</td>
                       <td className="py-1 pr-4">{fmtInt(h.memoryMib as number, loc)}</td>
                       <td className="py-1 pr-4">{fmtPercentValue(h.cpuRatio * 100, loc)}</td>

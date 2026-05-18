@@ -79,6 +79,15 @@
     "usedRatio": "Used %",
     "overProvisionRatio": "Over-provision ratio",
     "sharedDuplicateCount": "Shared copies",
-    "eolFrom": "End of support"
+    "eolFrom": "End of support",
+    "switch": "Switch",
+    "ports": "Ports",
+    "freePorts": "Free ports",
+    "mtu": "MTU",
+    "version": "Version",
+    "hostMembers": "Host members",
+    "vms": "VMs",
+    "maxMtu": "Max MTU",
+    "network": "Portgroup"
   }
 }
