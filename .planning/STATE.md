@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-05-15)
 
 ## Current Position
 
-Phase: 09 — COMPLETE
+Phase: 10 — COMPLETE
 Plan: 5 of 5
-Status: Phase 09 complete
-Last activity: 2026-05-18 -- Phase 09 marked complete
-Phase progress: [██████████] 100% (3/3 plans)
-Project progress: [███████░░░] 70% (7/10 phases)
+Status: Milestone v1.0 complete — released v1.0.0, deployed to fjacquet.github.io/vatlas/
+Last activity: 2026-05-18 -- v1.0.0 tagged + GitHub Release + Pages deploy green
+Phase progress: [██████████] 100% (5/5 plans)
+Project progress: [██████████] 100% (10/10 phases)
 
 ## Performance Metrics
 

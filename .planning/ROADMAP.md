@@ -220,11 +220,11 @@ Plans:
   5. The blank-Cluster-name datastore vSAN relink keys off vInfo.Path, resolves a non-zero count on the real 75-blank-cluster workbook (the STR-04 regression guard), surfaces shared-LUN as "shared across N clusters", and never regresses the validated parser (MiB canary green)
   6. Every P9 projection composes in the single buildEstateView pass - no second useMemo; engines pure and >=75% covered; EN/FR i18n parity
 **Plans**: 5 plans
-  - [ ] 09-01-PLAN.md - regression-gated parser extension (vInfo.Path + vNetwork/vSwitch/dvSwitch/dvPort OPTIONAL sheets)
-  - [ ] 09-02-PLAN.md - vSAN relink + two-lens storage-by-X + network rollup pure engines
-  - [ ] 09-03-PLAN.md - in-memory thresholds slice + thresholdFlags engine + single-buildEstateView composition
-  - [ ] 09-04-PLAN.md - Storage view shell + lens toggle + threshold config + Datastore/VM detail drills
-  - [ ] 09-05-PLAN.md - Network view + ESX detail (augments Hosts) + mandatory real-file relink validation gate
+  - [x] 09-01-PLAN.md - regression-gated parser extension (vInfo.Path + vNetwork/vSwitch/dvSwitch/dvPort OPTIONAL sheets)
+  - [x] 09-02-PLAN.md - vSAN relink + two-lens storage-by-X + network rollup pure engines
+  - [x] 09-03-PLAN.md - in-memory thresholds slice + thresholdFlags engine + single-buildEstateView composition
+  - [x] 09-04-PLAN.md - Storage view shell + lens toggle + threshold config + Datastore/VM detail drills
+  - [x] 09-05-PLAN.md - Network view + ESX detail (augments Hosts) + mandatory real-file relink validation gate
 **UI hint**: yes
 **Pitfalls owned**: threshold config must not breach the privacy invariant (UI prefs only, never dataset rows); factual alerting (no editorial verbs)
 
@@ -244,11 +244,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 10-01-PLAN.md — Wave-0 spike: SVG→PNG-without-DOM rasterizer + pptxgenjs-in-worker decision (gates PPTX charts)
-- [ ] 10-02-PLAN.md — Export spine: pure D-08 buildExportView (A2 test) + DOM-free ECharts SSR chartToSvg + report/pptx i18n + key-parity gate
-- [ ] 10-03-PLAN.md — HTML report engine: renderReport tree + inlineAssets/CSP/size-budget + assembleHtml (10k-fixture ceiling)
-- [ ] 10-04-PLAN.md — PPTX engine: theme/format(FR U+202F→U+00A0)/primitives/chartSvg + 8 slides + builder golden snapshot
-- [ ] 10-05-PLAN.md — Worker entry + useExport + ExportButtons + App wiring + DEP-01/02 verification + human-verify gate
+- [x] 10-01-PLAN.md — Wave-0 spike: SVG→PNG-without-DOM rasterizer + pptxgenjs-in-worker decision (gates PPTX charts)
+- [x] 10-02-PLAN.md — Export spine: pure D-08 buildExportView (A2 test) + DOM-free ECharts SSR chartToSvg + report/pptx i18n + key-parity gate
+- [x] 10-03-PLAN.md — HTML report engine: renderReport tree + inlineAssets/CSP/size-budget + assembleHtml (10k-fixture ceiling)
+- [x] 10-04-PLAN.md — PPTX engine: theme/format(FR U+202F→U+00A0)/primitives/chartSvg + 8 slides + builder golden snapshot
+- [x] 10-05-PLAN.md — Worker entry + useExport + ExportButtons + App wiring + DEP-01/02 verification + human-verify gate
 **UI hint**: yes
 **vsizer reuse**: `engines/export/pptx/builder.ts` (port + extend); `engines/export/pptx/slides/*.ts` title/overview/cluster/contention (port unchanged); `engines/export/pptx/primitives/*.ts` (port unchanged); `src/i18n/` scaffolding (port + add `inventory`, `eos`, `dr`, `trends`, `report` namespaces); `.github/workflows/static.yml` (port + tweak `base: '/vatlas/'`); new files `engines/export/html/renderReport.tsx`, `inlineAssets.ts`, `renderCharts.ts`, `assembleHtml.ts`, `engines/export/pptx/slides/eosSlide.ts`, `drSimSlide.ts`, `trendsSlide.ts`, `inventorySlide.ts`, `primitives/chartSvg.ts`
 **Pitfalls owned**: Moderate-2 (French locale U+202F Ã¢ÂÂ U+00A0 substitution for PPTX, centralized formatters, no pre-formatted numbers in translation strings), Moderate-7 (HTML report self-hosted subset fonts as base64 `@font-face`, no external references, CSP meta in exported HTML, inline SVG charts via `chart.renderToSVGString()`, anchor-id namespacing per snapshot, < 5 MB / < 15 MB size budget), Moderate-8 (pptxgenjs `pptxText` wrapper for autoFit/control-char/font-overflow, `pptxSafeFormat` for locale, golden-PPTX snapshot CI test), Minor-7 (i18n FRÃ¢ÂÂEN key-diff CI gate)
