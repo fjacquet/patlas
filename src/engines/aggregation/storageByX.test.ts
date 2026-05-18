@@ -43,6 +43,7 @@ const NO_VSAN: VsanRelinkResult = {
   attributed: new Map(),
   shared: new Map(),
   unrelinkable: new Set(),
+  datastoreVms: new Map(),
 }
 
 describe('storageByX — two lenses, reconcile to estate (D-07/D-08)', () => {
@@ -99,6 +100,7 @@ describe('storageByX — two lenses, reconcile to estate (D-07/D-08)', () => {
       attributed: new Map([['BLANK_DS', 'CL_RELINKED']]),
       shared: new Map(),
       unrelinkable: new Set(),
+      datastoreVms: new Map(),
     }
     const out = storageByX(
       {
@@ -117,6 +119,7 @@ describe('storageByX — two lenses, reconcile to estate (D-07/D-08)', () => {
       attributed: new Map(),
       shared: new Map([['SHARED_DS', 3]]),
       unrelinkable: new Set(),
+      datastoreVms: new Map(),
     }
     const out = storageByX(
       {

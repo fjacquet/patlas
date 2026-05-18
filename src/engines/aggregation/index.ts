@@ -4,6 +4,7 @@
  */
 export { aggregateClusters } from './aggregateClusters'
 export { CONTENTION_THRESHOLDS, TOP_N_DEFAULT } from './contention'
+export { buildDatastoreDetail, buildVmDetail } from './detailIndex'
 export { buildEstateView, EMPTY_VIEW } from './estateView'
 export { consumedGhz, physicalGhz } from './ghz'
 export { aggregateGlobals, emptySummary } from './globals'

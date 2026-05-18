@@ -97,4 +97,18 @@ describe('relinkBlankClusterDatastores — vInfo.Path attribution (D-09)', () =>
     )
     expect(res.attributed.get('naa.6000')).toBe('CL_1')
   })
+
+  it('exposes datastoreVms (sorted unique VM names per datastore name) — single source', () => {
+    const res = relinkBlankClusterDatastores(
+      [
+        vm({ vmName: 'z', path: '[DS_A] z/z.vmx', cluster: 'CL_1' }),
+        vm({ vmName: 'a', path: '[DS_A] a/a.vmx', cluster: 'CL_1' }),
+        vm({ vmName: 'a', path: '[DS_A] a/a.vmx', cluster: 'CL_1' }),
+        vm({ vmName: 'b', path: '[DS_B] b/b.vmx', cluster: 'CL_2' }),
+      ],
+      [],
+    )
+    expect(res.datastoreVms.get('DS_A')).toEqual(['a', 'z'])
+    expect(res.datastoreVms.get('DS_B')).toEqual(['b'])
+  })
 })

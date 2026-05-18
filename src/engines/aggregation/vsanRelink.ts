@@ -44,6 +44,11 @@ export interface VsanRelinkResult {
   /** dedupeKeys of blank-cluster datastores no VM references — estate-only,
    *  caller renders an em-dash (no fabricated cluster). */
   unrelinkable: Set<string>
+  /** datastore NAME (the `[token]`) → sorted unique VM names that reference
+   *  it via `vInfo.Path`. The SAME path parse (single source, no new join) —
+   *  the DatastoreDetail "VMs on it" list (LC-4). Covers ALL datastores a
+   *  VM references, not only blank-cluster ones. */
+  datastoreVms: Map<string, string[]>
 }
 
 /**
@@ -55,18 +60,28 @@ export const relinkBlankClusterDatastores = (
   vinfo: VInfoRow[],
   vdatastore: VDatastoreRow[],
 ): VsanRelinkResult => {
-  // datastore NAME (the bracket token) → set of clusters that reference it
+  // datastore NAME (the bracket token) → set of clusters / set of VM names
+  // that reference it (SAME path parse — single source).
   const dsToClusters = new Map<string, Set<string>>()
+  const dsToVmSet = new Map<string, Set<string>>()
   for (const vm of vinfo) {
     const m = (vm.path ?? '').match(BRACKET)
     if (!m?.[1]) continue // unparseable Path ⇒ skip, factual (no error)
     const ds = m[1].trim()
+    if (ds === '') continue
+    if (vm.vmName.trim() !== '') {
+      const vset = dsToVmSet.get(ds) ?? new Set<string>()
+      vset.add(vm.vmName.trim())
+      dsToVmSet.set(ds, vset)
+    }
     const cl = vm.cluster.trim()
-    if (ds === '' || cl === '') continue
+    if (cl === '') continue
     const set = dsToClusters.get(ds) ?? new Set<string>()
     set.add(cl)
     dsToClusters.set(ds, set)
   }
+  const datastoreVms = new Map<string, string[]>()
+  for (const [ds, vset] of dsToVmSet) datastoreVms.set(ds, [...vset].sort())
 
   const attributed = new Map<string, string>()
   const shared = new Map<string, number>()
@@ -90,5 +105,5 @@ export const relinkBlankClusterDatastores = (
     }
   }
 
-  return { attributed, shared, unrelinkable }
+  return { attributed, shared, unrelinkable, datastoreVms }
 }

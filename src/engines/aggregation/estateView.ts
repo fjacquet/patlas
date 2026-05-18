@@ -16,6 +16,7 @@ import type {
 } from '@/types/estate'
 import type { Snapshot } from '@/types/snapshot'
 import { aggregateClusters } from './aggregateClusters'
+import { buildDatastoreDetail, buildVmDetail } from './detailIndex'
 import { aggregateGlobals, emptySummary } from './globals'
 import { aggregateGuestData, type GuestData } from './guestData'
 import { networkRollup } from './network'
@@ -130,11 +131,10 @@ export function buildEstateView(
   const vsan = relinkBlankClusterDatastores(merged.vinfo, merged.vdatastore)
   const storage = storageByX(merged, mode, vsan)
   const network = networkRollup(merged)
-  const flags = computeThresholdFlags(
-    merged.vpartition,
-    datastores,
-    opts?.thresholds ?? DEFAULT_THRESHOLDS,
-  )
+  const thresholds = opts?.thresholds ?? DEFAULT_THRESHOLDS
+  const flags = computeThresholdFlags(merged.vpartition, datastores, thresholds)
+  const datastoreDetail = buildDatastoreDetail(datastores, merged.vdatastore, vsan, thresholds)
+  const vmDetail = buildVmDetail(merged, thresholds)
 
   // OS breakdown — global + per-cluster. `other` is always present even
   // at 0 (a real, visible donut bucket). The accounting mode does not
@@ -325,6 +325,8 @@ export function buildEstateView(
     vsan,
     network,
     flags,
+    datastoreDetail,
+    vmDetail,
   }
 }
 
@@ -390,6 +392,7 @@ const EMPTY_VSAN = Object.freeze({
   attributed: new Map<string, string>(),
   shared: new Map<string, number>(),
   unrelinkable: new Set<string>(),
+  datastoreVms: new Map<string, string[]>(),
 })
 
 const EMPTY_NETWORK = Object.freeze({
@@ -433,4 +436,6 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   vsan: EMPTY_VSAN,
   network: EMPTY_NETWORK,
   flags: EMPTY_FLAGS,
+  datastoreDetail: new Map(),
+  vmDetail: new Map(),
 })

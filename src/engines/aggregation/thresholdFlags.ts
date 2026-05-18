@@ -50,18 +50,22 @@ export interface ThresholdFlags {
   counts: { fs: number; ds: number; lu: number }
 }
 
+/**
+ * Shared filesystem over-line predicate (DRY — used by
+ * `computeThresholdFlags` AND the per-VM partition flag in `detailIndex`).
+ * `capacityMib === 0` ⇒ `false` (not derivable; never divide by zero).
+ */
+export const fsOver = (consumedMib: number, capacityMib: number, fsUsedPct: number): boolean =>
+  capacityMib !== 0 && consumedMib / capacityMib >= fsUsedPct / 100
+
 export const computeThresholdFlags = (
   vpartition: VPartitionRow[],
   datastores: DatastoreAggregate[],
   thresholds: ThresholdInput,
 ): ThresholdFlags => {
-  const fsLine = thresholds.fsUsedPct / 100
-
-  const fsFlagged = vpartition.map((p) => {
-    const cap = p.capacityMib as number
-    if (cap === 0) return false // not derivable — never divide by zero
-    return (p.consumedMib as number) / cap >= fsLine
-  })
+  const fsFlagged = vpartition.map((p) =>
+    fsOver(p.consumedMib as number, p.capacityMib as number, thresholds.fsUsedPct),
+  )
 
   const dsFlagged = datastores.map((d) => d.usedRatio * 100 > thresholds.dsUsedPct)
   const luFlagged = datastores.map((d) => d.usedRatio * 100 > thresholds.luUsedPct)

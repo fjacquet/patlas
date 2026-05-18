@@ -524,6 +524,15 @@ export interface EstateView {
    * driven by the in-memory thresholds slice; no verdict/severity/
    * colour. Same single-pass origin. */
   flags: ThresholdFlags
+  /**
+   * P9 LC-4 per-datastore drill projection, keyed by the `naa ?? name`
+   * datastore key. Produced in the single `buildEstateView` pass — no
+   * second `useMemo`. Empty `Map` in `EMPTY_VIEW`. */
+  datastoreDetail: Map<string, DatastoreDetailEntry>
+  /**
+   * P9 LC-4 per-VM drill projection, keyed by VM name. Same single-pass
+   * origin; empty `Map` in `EMPTY_VIEW`. */
+  vmDetail: Map<string, VmDetailEntry>
 }
 
 /**
@@ -555,6 +564,61 @@ export interface OperationalInsights {
 export interface ClusterDetail {
   aggregate: ClusterAggregate
   insights: OperationalInsights
+}
+
+/**
+ * P9 LC-4 per-datastore drill projection. Every value calculated upstream
+ * in the single `buildEstateView` pass; `hostCount` is `null` (em-dash)
+ * when the RVTools `Hosts` count is absent (factual — never fabricated).
+ * `dsFlagged`/`luFlagged` are the factual threshold markers (no verdict).
+ */
+export interface DatastoreDetailEntry {
+  key: string
+  name: string
+  type: string
+  capacityMib: MiB
+  freeMib: MiB
+  usedMib: MiB
+  provisionedMib: MiB
+  usedRatio: number
+  sharedDuplicateCount: number
+  /** RVTools `vDatastore.Hosts` is a COUNT (binding memory); `null` when
+   *  the column is absent/non-numeric → em-dash, never fabricated. */
+  hostCount: number | null
+  /** VM names referencing this datastore via `vInfo.Path` (single source —
+   *  the relink's `datastoreVms`). Empty when none/​not derivable. */
+  vms: string[]
+  dsFlagged: boolean
+  luFlagged: boolean
+}
+
+/** P9 LC-4 per-VM partition row (factual flag marker, no verdict). */
+export interface VmPartitionEntry {
+  disk: string
+  capacityMib: MiB
+  consumedMib: MiB
+  freeMib: MiB
+  flagged: boolean
+}
+
+/**
+ * P9 LC-4 per-VM drill projection. Calculated upstream in the single
+ * `buildEstateView` pass; not-derivable lists are empty (caller renders
+ * the em-dash sentinel), never fabricated.
+ */
+export interface VmDetailEntry {
+  vmName: string
+  cluster: string
+  host: string
+  os: string
+  vcpu: Cores
+  vramMib: MiB
+  provisionedMib: MiB
+  inUseMib: MiB
+  poweredOn: boolean
+  partitions: VmPartitionEntry[]
+  portgroups: { network: string; switch: string }[]
+  datastores: string[]
 }
 
 /** Factual per-survivor headroom verdict (no color, no editorial verb). */
