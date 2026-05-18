@@ -6,6 +6,7 @@
  * jsdom with a clear message rather than a cryptic ReferenceError.
  */
 import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
@@ -19,6 +20,11 @@ import {
 
 const W = 800
 const H = 480
+
+// Node-fs wasm bytes injected into the (browser-safe) spike module — the
+// module itself never imports node:* (keeps `tsc -b` / the app build green).
+const require = createRequire(import.meta.url)
+const wasmBytes = readFileSync(require.resolve('@resvg/resvg-wasm/index_bg.wasm'))
 
 describe('Phase 10 spike — ECharts SSR (DOM-free) SVG source', () => {
   it('treemap renders a non-empty SVG string with no DOM', () => {
@@ -38,7 +44,7 @@ describe('Phase 10 spike — ECharts SSR (DOM-free) SVG source', () => {
 describe('Phase 10 spike — candidate A: @resvg/resvg-wasm (no DOM)', () => {
   it('rasterizes the treemap SVG to a valid PNG byte array', async () => {
     const svg = renderChartSvg(treemapOption(), W, H)
-    const png = await svgToPngResvg(svg, W, H)
+    const png = await svgToPngResvg(svg, W, H, wasmBytes)
     expect(png).toBeInstanceOf(Uint8Array)
     expect(png.length).toBeGreaterThan(1000)
     expect(isPng(png)).toBe(true) // 0x89 0x50 0x4E 0x47 …
@@ -46,7 +52,7 @@ describe('Phase 10 spike — candidate A: @resvg/resvg-wasm (no DOM)', () => {
 
   it('rasterizes the heatmap SVG to a valid PNG byte array', async () => {
     const svg = renderChartSvg(heatmapOption(), W, H)
-    const png = await svgToPngResvg(svg, W, H)
+    const png = await svgToPngResvg(svg, W, H, wasmBytes)
     expect(png.length).toBeGreaterThan(1000)
     expect(isPng(png)).toBe(true)
   })

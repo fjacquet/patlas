@@ -132,35 +132,38 @@ export function renderChartSvg(option: EChartsOption, width: number, height: num
 
 // --- Candidate (A): @resvg/resvg-wasm — WASM, no DOM ------------------------
 
+/**
+ * A source of the resvg wasm binary. `initWasm` accepts BufferSource | Response
+ * | Promise of either. The bytes are INJECTED by the caller so this module
+ * stays browser/worker-safe (no `node:*` import in app-compiled code): the
+ * jsdom test supplies node-fs bytes; plans 02/04 will supply a bundled
+ * `new URL('…/index_bg.wasm', import.meta.url)` fetch — never a network fetch
+ * of a remote host (privacy invariant).
+ */
+export type WasmSource = BufferSource | Promise<BufferSource> | Response | Promise<Response>
+
 let wasmReady: Promise<unknown> | null = null
 
 /** initWasm is process-global and single-shot; memoise so repeat calls (and
- *  parallel test cases) don't throw "Already initialized". The wasm binary
- *  is read from the installed package (bundled, never fetched — privacy). */
-async function ensureWasm(): Promise<void> {
-  if (!wasmReady) {
-    // node/vitest path: resolve the package's wasm and hand initWasm the
-    // bytes. No `document`/`window`/`fetch` — pure node fs + wasm.
-    const { readFileSync } = await import('node:fs')
-    const { createRequire } = await import('node:module')
-    const require = createRequire(import.meta.url)
-    const wasmPath = require.resolve('@resvg/resvg-wasm/index_bg.wasm')
-    wasmReady = initWasm(readFileSync(wasmPath))
-  }
+ *  parallel test cases) don't throw "Already initialized". */
+async function ensureWasm(source: WasmSource): Promise<void> {
+  if (!wasmReady) wasmReady = initWasm(source)
   await wasmReady
 }
 
 /**
  * Option A: rasterize an SVG string to PNG bytes with NO DOM. Worker-safe.
  * Returns the `chartSvgToPng(svg,width,height)` shape plans 02/04 implement
- * against if this candidate is chosen.
+ * against if this candidate is chosen. `wasmSource` is injected (see
+ * WasmSource) so the module never statically imports `node:*`.
  */
 export async function svgToPngResvg(
   svg: string,
   width: number,
   _height: number,
+  wasmSource: WasmSource,
 ): Promise<Uint8Array> {
-  await ensureWasm()
+  await ensureWasm(wasmSource)
   const r = new Resvg(svg, { fitTo: { mode: 'width', value: width } })
   const rendered = r.render()
   const png = rendered.asPng()
