@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: OS End-of-Support Forecast** - Bundled endoflife.date catalogue, 3/6/9/12-month at-risk with drill-down
 - [x] **Phase 8: In-Session Trends** - Multi-snapshot timelines, per-cluster sparklines, delta panel, temporal X-axis (completed 2026-05-17)
 - [x] **Phase 9: Storage / Network / Detailed Views + Threshold Alerting** - NEW: storage by cluster/ESX/VM/datastore, ports/switches, disk/partition threshold alerting (scope per OPEN-2/3) — 5/5 plans, real-file STR-04 gate passed (executed 2026-05-18)
-- [ ] **Phase 10: HTML + PPTX Exports & Deploy** - Self-contained HTML report, factual PPTX deck, GitHub Pages CI
+- [x] **Phase 10: HTML + PPTX Exports & Deploy** - Self-contained HTML report, factual PPTX deck, GitHub Pages CI
 
 ## Phase Details
 
@@ -269,4 +269,4 @@ Phases execute in numeric order: 1 Ã¢ÂÂ 2 Ã¢ÂÂ 3 Ã¢ÂÂ 4 
 | 7. OS End-of-Support Forecast | 3/3 | Complete â engines + UI, real-file-validated (UAT-approved) | 2026-05-17 |
 | 8. In-Session Trends | 3/3 | Complete   | 2026-05-17 |
 | 9. Storage / Network / Detailed Views + Threshold Alerting | 5/5 | Complete — engine+UI, real-file STR-04 gate passed | 2026-05-18 |
-| 10. HTML + PPTX Exports & Deploy | 0/TBD | Not started | - |
+| 10. HTML + PPTX Exports & Deploy | 5/5 | Complete — engines+worker+UI, self-verified HTML+PPTX, DEP confirmed | 2026-05-18 |
