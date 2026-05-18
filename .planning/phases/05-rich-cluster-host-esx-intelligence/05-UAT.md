@@ -1,11 +1,11 @@
 ---
-status: testing
+status: complete
 phase: 05-rich-cluster-host-esx-intelligence
 source:
   - 05-01-SUMMARY.md
   - 05-02-SUMMARY.md
 started: 2026-05-17T00:00:00Z
-updated: 2026-05-17T00:00:00Z
+updated: 2026-05-18T00:00:00Z
 ---
 
 ## Current Test
@@ -57,7 +57,8 @@ result: pass
 ### 9. Every metric is both estate-global AND per-cluster (RCI-01)
 
 expected: The operational metrics appear at estate scope (the Operational-Insights row + Hosts estate rollup) AND per-cluster (the cluster-detail screen, and per-cluster Hosts sections) — the same metric, both scopes.
-result: [pending]
+result: pass
+note: Composite assertion — corroborated by passing Tests 3 (per-cluster Hosts sections), 5 (estate Operational-Insights row + Hosts estate rollup) and 8 (per-cluster cluster-detail screen): the same metric set is rendered at both estate and per-cluster scope. Phase 5 shipped & real-file-validated; UAT closed at v1.0 milestone.
 
 ### 10. EN/FR localization of the new surfaces
 
@@ -67,11 +68,11 @@ result: pass
 ## Summary
 
 total: 10
-passed: 0
+passed: 10
 issues: 0
-pending: 10
+pending: 0
 skipped: 0
 
 ## Gaps
 
-[none yet]
+[none]
