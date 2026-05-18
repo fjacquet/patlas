@@ -12,40 +12,85 @@ import type { EstateView, OperationalInsights, TrendSeries } from '@/types/estat
 
 const pct = (v: number): string => `${Number.isFinite(v) ? Math.round(v) : 0} %`
 
+/**
+ * Chart-internal labels (axis categories, donut buckets, series names).
+ * Inline EN/FR map — these are chart-image strings, not UI i18n keys, so
+ * baking them here (mirroring the existing inline EOS categories) keeps
+ * chartBundle pure and avoids needless i18n-namespace/key-parity churn.
+ * Active-locale-only exports (D-07) ⇒ FR exports must not show EN charts.
+ */
+interface ChartLabels {
+  os: { windows: string; linux: string; other: string; title: string }
+  cpuTitle: string
+  ramTitle: string
+  clusterCpu: (name: string) => string
+  eosCats: string[]
+  dr: { before: string; after: string; cores: string; ram: string }
+  trend: { vmCount: string; poweredOnVms: string }
+}
+
+const LABELS = (l: 'en' | 'fr'): ChartLabels =>
+  l === 'fr'
+    ? {
+        os: { windows: 'Windows', linux: 'Linux', other: 'Autre', title: "Familles d'OS" },
+        cpuTitle: 'Utilisation CPU moyenne',
+        ramTitle: 'Utilisation mémoire moyenne',
+        clusterCpu: (n) => `Utilisation CPU — ${n}`,
+        eosCats: ['En retard', '≤3 m', '3–6 m', '6–9 m', '9–12 m', '>12 m', 'Inconnu'],
+        dr: {
+          before: 'Avant',
+          after: 'Après',
+          cores: 'Cœurs phys.',
+          ram: 'RAM phys. (Gio)',
+        },
+        trend: { vmCount: 'VM', poweredOnVms: 'Allumées' },
+      }
+    : {
+        os: { windows: 'Windows', linux: 'Linux', other: 'Other', title: 'OS family' },
+        cpuTitle: 'Mean CPU utilization',
+        ramTitle: 'Mean memory utilization',
+        clusterCpu: (n) => `${n} CPU utilization`,
+        eosCats: ['Overdue', '≤3m', '3–6m', '6–9m', '9–12m', '>12m', 'Unknown'],
+        dr: {
+          before: 'Before',
+          after: 'After',
+          cores: 'Phys. cores',
+          ram: 'Phys. RAM (GiB)',
+        },
+        trend: { vmCount: 'VMs', poweredOnVms: 'Powered-on' },
+      }
+
 /** Estate-wide CPU/RAM utilization gauges + the OS-family donut — the
  *  literal dashboard charts. */
-function overviewCharts(view: EstateView): Record<string, EChartsOption> {
+function overviewCharts(view: EstateView, L: ChartLabels): Record<string, EChartsOption> {
   const oi = view.operationalInsights
   return {
     osDonut: osDonutOption(
       view.osBreakdown,
-      { windows: 'Windows', linux: 'Linux', other: 'Other' },
-      'OS family breakdown',
+      { windows: L.os.windows, linux: L.os.linux, other: L.os.other },
+      L.os.title,
     ),
     cpuGauge: utilizationGaugeOption(
       Number(oi.avgCpuPct) / 100,
       'cpu',
       pct(Number(oi.avgCpuPct)),
-      'Mean CPU utilization',
+      L.cpuTitle,
     ),
     ramGauge: utilizationGaugeOption(
       Number(oi.avgMemPct) / 100,
       'ram',
       pct(Number(oi.avgMemPct)),
-      'Mean memory utilization',
+      L.ramTitle,
     ),
   }
 }
 
 /** EOS forecast bucket bar — same shape EosView renders. */
-function eosBar(view: EstateView): EChartsOption {
+function eosBar(view: EstateView, L: ChartLabels): EChartsOption {
   const p = view.eos.partition
   return {
     grid: { left: 8, right: 8, top: 16, bottom: 24, containLabel: true },
-    xAxis: {
-      type: 'category',
-      data: ['Overdue', '≤3m', '3–6m', '6–9m', '9–12m', '>12m', 'Unknown'],
-    },
+    xAxis: { type: 'category', data: L.eosCats },
     yAxis: { type: 'value', minInterval: 1 },
     series: [
       {
@@ -65,18 +110,18 @@ function eosBar(view: EstateView): EChartsOption {
 }
 
 /** DR physical-impact before/after bar (factual magnitude, no verdict). */
-function drBar(view: EstateView): EChartsOption | null {
+function drBar(view: EstateView, L: ChartLabels): EChartsOption | null {
   const dr = view.drSim
   if (!dr) return null
   return {
     grid: { left: 8, right: 8, top: 24, bottom: 24, containLabel: true },
     legend: { bottom: 0 },
-    xAxis: { type: 'category', data: ['Phys. cores', 'Phys. RAM (GiB)'] },
+    xAxis: { type: 'category', data: [L.dr.cores, L.dr.ram] },
     yAxis: { type: 'value' },
     series: [
       {
         type: 'bar',
-        name: 'Before',
+        name: L.dr.before,
         data: [
           Number(dr.before.physicalCores),
           Math.round(Number(dr.before.physicalRamMib) / 1024),
@@ -84,7 +129,7 @@ function drBar(view: EstateView): EChartsOption | null {
       },
       {
         type: 'bar',
-        name: 'After',
+        name: L.dr.after,
         data: [Number(dr.after.physicalCores), Math.round(Number(dr.after.physicalRamMib) / 1024)],
       },
     ],
@@ -93,15 +138,12 @@ function drBar(view: EstateView): EChartsOption | null {
 
 /** A per-cluster CPU-utilization gauge (the app's real gauge), keyed by
  *  cluster name — used on every per-cluster slide + the HTML report. */
-function perClusterCharts(view: EstateView): Map<string, EChartsOption> {
+function perClusterCharts(view: EstateView, L: ChartLabels): Map<string, EChartsOption> {
   const out = new Map<string, EChartsOption>()
   for (const c of view.clusters) {
     const ins: OperationalInsights | undefined = view.clusterInsights.get(c.cluster)
     const cpu = ins ? Number(ins.avgCpuPct) : 0
-    out.set(
-      c.cluster,
-      utilizationGaugeOption(cpu / 100, 'cpu', pct(cpu), `${c.cluster} CPU utilization`),
-    )
+    out.set(c.cluster, utilizationGaugeOption(cpu / 100, 'cpu', pct(cpu), L.clusterCpu(c.cluster)))
   }
   return out
 }
@@ -124,20 +166,24 @@ export function buildChartBundle(
   trends: TrendSeries | null,
   locale: 'en' | 'fr',
 ): ChartOptionBundle {
-  const shared: Record<string, EChartsOption> = { ...overviewCharts(view), eosBar: eosBar(view) }
-  const dr = drBar(view)
+  const L = LABELS(locale)
+  const shared: Record<string, EChartsOption> = {
+    ...overviewCharts(view, L),
+    eosBar: eosBar(view, L),
+  }
+  const dr = drBar(view, L)
   if (dr) shared.drBar = dr
   if (trends) {
     shared.trendLine = trendLineOption(
       trends,
       {
-        vmCount: 'VMs',
-        poweredOnVms: 'Powered-on',
+        vmCount: L.trend.vmCount,
+        poweredOnVms: L.trend.poweredOnVms,
         tooltipDate: '{{date}}',
         tooltipMeta: '{{vcenter}} · {{version}}',
       },
       locale === 'fr' ? 'fr-FR' : 'en-US',
     )
   }
-  return { shared, perCluster: perClusterCharts(view) }
+  return { shared, perCluster: perClusterCharts(view, L) }
 }
