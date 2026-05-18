@@ -227,6 +227,20 @@ function Report({ view, trends, strings, locale }: RenderReportInput): React.Rea
  * no Zustand, no i18next. The result still carries `data-chart-slot`
  * placeholders — `assembleHtml` splices the trusted chart SVGs in.
  */
+/**
+ * The ordered chart slots `<Report>` emits — the SAME sort (vmCount desc) +
+ * top-N + `c-{i}-{slug}` id derivation used in the tree. The export worker
+ * uses this to build the `assembleHtml` ChartMap (and the PPTX per-cluster
+ * raster) with ids that exactly match the placeholders — single source of
+ * truth, never re-derived elsewhere.
+ */
+export function exportChartSlots(view: EstateView): ReadonlyArray<{ id: string; cluster: string }> {
+  return [...view.clusters]
+    .sort((a, b) => b.vmCount - a.vmCount)
+    .slice(0, TOP_N_CLUSTERS)
+    .map((c, i) => ({ id: anchorId(i, c.cluster), cluster: c.cluster }))
+}
+
 export function renderReport(input: RenderReportInput): string {
   return renderToStaticMarkup(<Report {...input} />)
 }
