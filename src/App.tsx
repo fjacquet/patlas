@@ -9,6 +9,7 @@ import { InventoryView } from './components/inventory/InventoryView'
 import { LanguageToggle } from './components/LanguageToggle'
 import { PlanningView } from './components/planning/PlanningView'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
+import { StorageView } from './components/storage/StorageView'
 import { ThemeToggle } from './components/ThemeToggle'
 import { TrendsView } from './components/trends/TrendsView'
 import { UploadZone } from './components/UploadZone'
@@ -47,6 +48,8 @@ function App() {
               <EosView />
             ) : activeView === 'trends' ? (
               <TrendsView />
+            ) : activeView === 'storage' ? (
+              <StorageView />
             ) : (
               <GlobalDashboard />
             )}
