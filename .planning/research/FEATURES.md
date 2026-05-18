@@ -120,7 +120,9 @@ bool, where applicable). Confidence: HIGH for shape (verified via Swagger docs a
 [endoflife.date/docs/api/v1/](https://endoflife.date/docs/api/v1/)).
 
 **Important caveat:** The API is officially in **Beta** as of mid-2026 (see [issue
-# 2066](https://github.com/endoflife-date/endoflife.date/issues/2066)). Breaking changes are
+
+# 2066](<https://github.com/endoflife-date/endoflife.date/issues/2066>)). Breaking changes are
+
 possible. **Mitigation:** vatlas bundles a *snapshot* of the JSON at CI build time
 (`scripts/sync-eos-catalogue.ts`) rather than fetching at runtime. This:
 

@@ -10,6 +10,7 @@ Deep per-cluster/host/ESX intelligence + a new "Hosts" ViewToggle segment + a dr
 ## Feasibility findings (the CONTEXT flags — resolved)
 
 ### F-1 — Powerstate (on/off/suspended): FEASIBLE, low-risk
+
 `src/engines/parser/adapters/rvtools.ts:56` already aliases the RVTools
 column: `poweredOn: ['powerstate','power state','état','status']`, read at
 `:184` and collapsed `=== 'poweredon'` → boolean `VInfoRow.poweredOn`.
@@ -21,6 +22,7 @@ mapping change: parse the raw cell to a `'poweredOn' | 'poweredOff' |
 **Decision: extend, keep `poweredOn` as a derived accessor.**
 
 ### F-2 — Template flag: FEASIBLE, additive
+
 Not currently aliased. RVTools vInfo carries a fixed `Template`
 (TRUE/FALSE) column. Add `template: ['template']` alias + `VInfoRow.template:
 boolean` + schema. The parser already returns `''` for absent columns and
@@ -28,6 +30,7 @@ the empty-cell→default preprocessor is established (Minor-3) → graceful if
 a legacy export lacks it (factual: counts 0 templates).
 
 ### F-3 — Guest data via vPartition: FEASIBLE, already wired
+
 `adaptRvtoolsVPartition` (`rvtools.ts:236`) + `VPartitionRowSchema`
 (`schemas.ts:90`) already parse the sheet; it is OPTIONAL with a collected
 warning when absent (`:344 "guest-disk views will be empty"`). Guest-data
@@ -36,17 +39,20 @@ aggregation is a new pure engine reduction over `snapshot.vpartition`.
 renders the factual em-dash/"not available", never invented.
 
 ### F-4 — ESX model/vendor + ESXi version: present on vHost path
+
 `VHostRow` carries host capacity fields; RVTools vHost has `Model`,
 `Vendor`, `ESX Version` columns (fixed schema). Add aliases + `VHostRow`
 fields (additive, same pattern). Shown as PLAIN TEXT only — NO lifecycle
 verdict (vendor EOS not in RVTools; ESXi support-state is Phase 7).
 
 ### F-5 — Datastore footprint incl .vswp+snapshots / provisioned-vs-in-use
+
 Derivable now: `VInfoRow.provisionedMib` / `inUseMib` already parsed
 (RVTools "In Use" already includes vswp+snapshots — matches the
 RVTools-Analyser framing). No parser change; pure aggregation.
 
 ### F-6 — Realized overcommit / avg CPU%·mem% weighted / totals
+
 All derivable from shipped `aggregateClusters`/`perEsx`/`vHost`/`vInfo`
 (physical cores, speed, memory, cpuRatio, ramRatio, vCPU). `vcpuPerPcpu`
 already computed (G2). New metrics are pure additions to the aggregation

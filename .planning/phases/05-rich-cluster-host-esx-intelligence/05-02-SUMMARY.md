@@ -70,6 +70,7 @@ completed: 2026-05-17
 - Full suite **311/311**, tsc/biome/supply-chain/bundle green.
 
 ## Task Commits
+
 1. `feat(05-02)` ViewToggle + App + HostsView + rci/nav i18n
 2. `feat(05-02)` OperationalInsights row + ClusterColumn drill + ClusterDetail + REQUIREMENTS
 
@@ -78,6 +79,7 @@ completed: 2026-05-17
 ## Real-File UAT (mandatory — feedback_real_file_uat)
 
 Throwaway harness vs real `allvCenters.xlsx` (deleted; never committed):
+
 - Estate: overcommit **1.58**, avg CPU **27.8 %**, avg mem **39.9 %**, power **1373 on / 43 off / 0 susp / 30 templates** (exact Powerstate enum + Template working), guest data **400 921 803 MiB** (real vPartition — present, not an invented 0).
 - **19 clusterInsights == 19 clusterDetail** (every cluster covered, estate + per-cluster principle).
 - Host sample: model `UCSB-B200-M6`, vendor `Cisco Systems Inc`, ESXi `VMware ESXi 8.0.3 build-25067014`, faultDomain `""`, poweredOnVms `20` — factual text, no verdict.

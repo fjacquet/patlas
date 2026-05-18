@@ -1,7 +1,9 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useEstateView } from '@/hooks/useEstateView'
 import { useSnapshotUpload } from '@/hooks/useSnapshotUpload'
 import { useSnapshotStore } from '@/store/snapshotStore'
+import { fmtInt } from '@/utils/format'
 import { SnapshotCard } from './SnapshotCard'
 import { UploadZone } from './UploadZone'
 
@@ -16,11 +18,16 @@ import { UploadZone } from './UploadZone'
  */
 export function SnapshotListSidebar() {
   const { t } = useTranslation('upload')
+  const { t: tTrends, i18n } = useTranslation('trends')
+  const loc = i18n.language
   const snapshots = useSnapshotStore((s) => s.snapshots)
   const activeId = useSnapshotStore((s) => s.activeSnapshotId)
   const setActive = useSnapshotStore((s) => s.setActiveSnapshot)
   const remove = useSnapshotStore((s) => s.removeSnapshot)
-  const { upload, isUploading } = useSnapshotUpload()
+  const { upload, isUploading, done, total } = useSnapshotUpload()
+  // Plain prop off the single memo (no new memo) — drives the factual
+  // D-05 inferred-order caption.
+  const trends = useEstateView('active').trends
 
   const sorted = useMemo(
     () => [...snapshots.values()].sort((a, b) => a.capturedAt.getTime() - b.capturedAt.getTime()),
@@ -33,6 +40,14 @@ export function SnapshotListSidebar() {
       aria-label={t('snapshots.list')}
     >
       <UploadZone onFiles={upload} disabled={isUploading} variant="compact" />
+      {done < total && (
+        <p className="text-sm text-slate-500 dark:text-slate-400" role="status">
+          {tTrends('warmup', { done: fmtInt(done, loc), total: fmtInt(total, loc) })}
+        </p>
+      )}
+      {trends?.orderInferred && (
+        <p className="text-sm text-slate-500 dark:text-slate-400">{tTrends('orderInferred')}</p>
+      )}
       {sorted.length === 0 ? (
         <p className="text-xs text-slate-500 dark:text-slate-400">{t('snapshots.empty')}</p>
       ) : (

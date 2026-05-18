@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useSnapshotStore } from '@/store/snapshotStore'
 import type { Snapshot } from '@/types/snapshot'
 
 export interface SnapshotCardProps {
@@ -8,17 +9,36 @@ export interface SnapshotCardProps {
   onRemove: () => void
 }
 
+/** Date → `yyyy-mm-dd` for the native date input (local calendar day). */
+const toInputDate = (d: Date): string => {
+  if (Number.isNaN(d.getTime())) return ''
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
 /**
  * One sidebar entry per loaded snapshot. Shows filename, vCenter label,
- * capture date (FND-05), RVTools version, and row counts. Clicking selects it
- * as the active snapshot; the ✕ removes it without selecting.
+ * RVTools version (criterion 6), row counts, and an INLINE-EDITABLE
+ * capture date (D-03). The edit commits straight to the shipped
+ * `setCapturedAt` store action — NO new mutation, NO local date state that
+ * bypasses the store (Pitfall 5: a bypass means the chart will not
+ * reorder); the trend series recomputes through the single memo
+ * automatically. When the snapshot's raw rows were released (DD-C) the
+ * factual released note shows and it cannot be picked as the active
+ * estate (its rows are gone).
  *
- * Every color utility carries its `dark:` counterpart (CLAUDE.md class-strategy
- * dark mode — a missing pair would render invisibly in one theme).
+ * Every color utility carries its `dark:` counterpart (CLAUDE.md
+ * class-strategy dark mode — a missing pair renders invisibly in one
+ * theme).
  */
 export function SnapshotCard({ snapshot, active, onClick, onRemove }: SnapshotCardProps) {
   const { t } = useTranslation('upload')
   const { t: tMvc } = useTranslation('mvc')
+  const { t: tTrends } = useTranslation('trends')
+  const setCapturedAt = useSnapshotStore((s) => s.setCapturedAt)
+  const released = snapshot.rawReleased === true
   const clusterCount = new Set(snapshot.vinfo.map((v) => v.cluster)).size
 
   // MVC-04: a single RVTools 4.x workbook can embed N vCenters — the count
@@ -36,15 +56,25 @@ export function SnapshotCard({ snapshot, active, onClick, onRemove }: SnapshotCa
     snapshot.vMetaData.find((m) => m.rvtoolsVersion != null)?.rvtoolsVersion ??
     snapshot.rvtoolsVersion
 
+  const onDateChange = (value: string): void => {
+    if (value === '') return
+    const next = new Date(value)
+    if (!Number.isNaN(next.getTime())) setCapturedAt(snapshot.id, next)
+  }
+
   return (
     <li className="relative">
       <button
         type="button"
+        disabled={released}
         className={
-          'panel block w-full cursor-pointer text-left text-xs transition ' +
-          (active
-            ? 'ring-2 ring-accent-500 dark:ring-accent-400'
-            : 'hover:bg-slate-50 dark:hover:bg-surface-800')
+          'panel block w-full text-left text-xs transition ' +
+          (released
+            ? 'cursor-not-allowed opacity-70'
+            : 'cursor-pointer ' +
+              (active
+                ? 'ring-2 ring-accent-500 dark:ring-accent-400'
+                : 'hover:bg-slate-50 dark:hover:bg-surface-800'))
         }
         onClick={onClick}
         aria-pressed={active}
@@ -55,10 +85,6 @@ export function SnapshotCard({ snapshot, active, onClick, onRemove }: SnapshotCa
         <p className="mt-1 text-slate-500 dark:text-slate-400">
           <span>
             {t('snapshots.card.vCenterLabel')}: {snapshot.vCenterLabel}
-          </span>
-          {' · '}
-          <span>
-            {t('snapshots.card.capturedAt')}: {snapshot.capturedAt.toLocaleDateString()}
           </span>
         </p>
         <p className="mt-1 text-[12px] font-normal text-slate-500 dark:text-slate-400">
@@ -85,6 +111,24 @@ export function SnapshotCard({ snapshot, active, onClick, onRemove }: SnapshotCa
           })}
         </p>
       </button>
+
+      <div className="mt-1 flex items-center gap-2 px-3 pb-3 text-xs text-slate-500 dark:text-slate-400">
+        <label htmlFor={`cap-${snapshot.id}`}>{t('snapshots.card.capturedAt')}:</label>
+        <input
+          id={`cap-${snapshot.id}`}
+          type="date"
+          value={toInputDate(snapshot.capturedAt)}
+          onChange={(e) => onDateChange(e.target.value)}
+          className="rounded border border-slate-200 bg-white px-1 py-0.5 text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-surface-700 dark:bg-surface-900 dark:text-slate-200"
+        />
+      </div>
+
+      {released && (
+        <p className="px-3 pb-3 text-xs text-slate-500 dark:text-slate-400">
+          {tTrends('released')}
+        </p>
+      )}
+
       <button
         type="button"
         onClick={onRemove}

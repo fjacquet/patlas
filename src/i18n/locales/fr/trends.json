@@ -1,0 +1,23 @@
+{
+  "heading": "Tendances en session",
+  "empty": "Chargez 2 instantanés ou plus pour voir les tendances.",
+  "warmup": "Tendances en préparation — {{done}}/{{total}}",
+  "orderInferred": "Certaines dates de capture n'ont pas pu être déterminées ; les points sont affichés dans l'ordre de chargement, pas sur un axe temporel réel.",
+  "released": "Lignes brutes libérées pour limiter la mémoire ; le point de tendance de cet instantané est conservé.",
+  "error": "Les tendances n'ont pas pu être affichées : {{message}}",
+  "axisDate": "{{date}}",
+  "delta": {
+    "heading": "Évolution entre instantanés consécutifs",
+    "vmCount": "VM",
+    "poweredOnVms": "VM sous tension",
+    "hostCount": "Hôtes",
+    "clusterCount": "Clusters",
+    "vcpuAllocated": "vCPU alloués",
+    "vramAllocated": "vRAM allouée (Gio)",
+    "totalStorage": "Stockage (Gio)"
+  },
+  "tooltip": {
+    "date": "Date de capture : {{date}}",
+    "meta": "{{vcenter}} / RVTools {{version}}"
+  }
+}

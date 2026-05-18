@@ -10,13 +10,15 @@ import { MIDNIGHT_EXECUTIVE_DARK, MIDNIGHT_EXECUTIVE_LIGHT } from './echartsThem
 //   resolved, not aliased to light).
 // - Axis/grid label color is the slate token (never pure black/white) in both.
 
-// Concrete token values resolved from src/index.css @theme (oklch) + Tailwind
-// slate defaults — the theme emits these exact strings.
-const PRIMARY_500 = 'oklch(45% 0.18 270)'
-const PRIMARY_300 = 'oklch(70% 0.12 270)'
-const PRIMARY_200 = 'oklch(82% 0.08 270)'
-const SURFACE_200 = 'oklch(88% 0.01 260)'
-const SURFACE_700 = 'oklch(28% 0.02 260)'
+// Concrete token values: accurate sRGB hex conversions of the src/index.css
+// @theme oklch() tokens — the theme MUST emit zrender-parseable hex (an
+// oklch() string falls back to #000000 in the bundled ECharts renderer), so
+// these expectations also guard that no token regresses to a raw oklch string.
+const PRIMARY_500 = '#3245b7' // oklch(45% 0.18 270)
+const PRIMARY_300 = '#819ae9' // oklch(70% 0.12 270)
+const PRIMARY_200 = '#b0c2f9' // oklch(82% 0.08 270)
+const SURFACE_200 = '#d4d8de' // oklch(88% 0.01 260)
+const SURFACE_700 = '#232933' // oklch(28% 0.02 260)
 
 describe('MIDNIGHT_EXECUTIVE_LIGHT', () => {
   it('is an exported object', () => {

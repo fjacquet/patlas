@@ -2,11 +2,15 @@ import { cores, mhz, mib, sockets } from '@/engines/units'
 import type {
   ParseError,
   VDatastoreRow,
+  VDvPortRow,
+  VDvSwitchRow,
   VHostRow,
   VInfoRow,
   VMetaDataRow,
+  VNetworkRow,
   VPartitionRow,
   VPowerState,
+  VSwitchRow,
 } from '@/types'
 import type { ParsedSheet, ParsedWorkbook } from '../parseXlsx'
 import {
@@ -75,6 +79,50 @@ export const VINFO_COLS = {
   // alias-drift fix.
   provisionedMib: ['provisioned mib', 'provisioned mb', 'provisioned (mb)', 'provisioned'],
   inUseMib: ['in use mib', 'in use mb', 'in use (mb)', 'consumed'],
+  // P9 D-09: the `[datastore] vm/vm.vmx` token — the ONLY blank-`Cluster
+  // name` datastore→cluster identity path. Empty when absent (factual).
+  path: ['path'],
+} as const
+
+// ── P9 D-11: OPTIONAL network sheets ───────────────────────────────────────
+// Real RVTools 4.x headers (09-RESEARCH §Code Examples). 3.x drift is
+// defended with conservative aliases (Assumption A1); exact-normalized,
+// longest spelling first (the rvtools.ts convention).
+const VNETWORK_COLS = {
+  vm: ['vm', 'vm name', 'name'],
+  network: ['network', 'port group', 'portgroup'],
+  switch: ['switch', 'virtual switch', 'vswitch'],
+  adapter: ['adapter', 'nic', 'nic label'],
+  connected: ['connected', 'connectivity'],
+  cluster: ['cluster', 'grappe'],
+  host: ['host', 'host name', 'hostname'],
+} as const
+
+const VSWITCH_COLS = {
+  host: ['host', 'host name', 'hostname'],
+  cluster: ['cluster', 'grappe'],
+  switch: ['switch', 'virtual switch', 'vswitch'],
+  ports: ['# ports', 'num ports', 'ports'],
+  freePorts: ['free ports', '# free ports'],
+  mtu: ['mtu'],
+} as const
+
+const VDVSWITCH_COLS = {
+  switch: ['switch', 'dvswitch'],
+  name: ['name'],
+  version: ['version'],
+  hostMembers: ['host members', 'hosts', '# hosts'],
+  ports: ['# ports', 'num ports', 'ports'],
+  vms: ['# vms', 'num vms', 'vms'],
+  maxMtu: ['max mtu', 'mtu'],
+} as const
+
+const VDVPORT_COLS = {
+  port: ['port', 'portgroup', 'port group'],
+  switch: ['switch', 'dvswitch'],
+  vlan: ['vlan', 'vlan id'],
+  activeUplink: ['active uplink', 'active uplinks'],
+  standbyUplink: ['standby uplink', 'standby uplinks'],
 } as const
 
 const VHOST_COLS = {
@@ -210,6 +258,7 @@ export const adaptRvtoolsVInfo = (sheet: ParsedSheet): VInfoRow[] => {
         viSdkServer: readString(readCol(row, cols.viSdkServer)),
         provisionedMib: mib(Math.max(0, readNumber(readCol(row, cols.provisionedMib)))),
         inUseMib: mib(Math.max(0, readNumber(readCol(row, cols.inUseMib)))),
+        path: readString(readCol(row, cols.path)),
       }
     })
     .filter((r) => !isInternalRow(r.vmName))
@@ -271,6 +320,74 @@ export const adaptRvtoolsVPartition = (sheet: ParsedSheet): VPartitionRow[] => {
     .filter((r) => !isInternalRow(r.vmName))
 }
 
+// P9 D-11: counts are plain non-negative integers — NEVER mib()/MibSchema.
+const nonNegInt = (v: unknown): number => Math.max(0, Math.trunc(readNumber(v)))
+
+export const adaptRvtoolsVNetwork = (sheet: ParsedSheet): VNetworkRow[] => {
+  const cols = mapColumns(sheet.headers, VNETWORK_COLS)
+  return sheet.rows
+    .map(
+      (row): VNetworkRow => ({
+        vm: readString(readCol(row, cols.vm)),
+        network: readString(readCol(row, cols.network)),
+        switch: readString(readCol(row, cols.switch)),
+        adapter: readString(readCol(row, cols.adapter)),
+        connected: readString(readCol(row, cols.connected)),
+        cluster: readString(readCol(row, cols.cluster)),
+        host: readString(readCol(row, cols.host)),
+      }),
+    )
+    .filter((r) => !isInternalRow(r.vm))
+}
+
+export const adaptRvtoolsVSwitch = (sheet: ParsedSheet): VSwitchRow[] => {
+  const cols = mapColumns(sheet.headers, VSWITCH_COLS)
+  return sheet.rows
+    .map(
+      (row): VSwitchRow => ({
+        host: readString(readCol(row, cols.host)),
+        cluster: readString(readCol(row, cols.cluster)),
+        switch: readString(readCol(row, cols.switch)),
+        ports: nonNegInt(readCol(row, cols.ports)),
+        freePorts: nonNegInt(readCol(row, cols.freePorts)),
+        mtu: nonNegInt(readCol(row, cols.mtu)),
+      }),
+    )
+    .filter((r) => !isInternalRow(r.host))
+}
+
+export const adaptRvtoolsDvSwitch = (sheet: ParsedSheet): VDvSwitchRow[] => {
+  const cols = mapColumns(sheet.headers, VDVSWITCH_COLS)
+  return sheet.rows
+    .map(
+      (row): VDvSwitchRow => ({
+        switch: readString(readCol(row, cols.switch)),
+        name: readString(readCol(row, cols.name)),
+        version: readString(readCol(row, cols.version)),
+        hostMembers: readString(readCol(row, cols.hostMembers)),
+        ports: nonNegInt(readCol(row, cols.ports)),
+        vms: nonNegInt(readCol(row, cols.vms)),
+        maxMtu: nonNegInt(readCol(row, cols.maxMtu)),
+      }),
+    )
+    .filter((r) => !isInternalRow(r.switch))
+}
+
+export const adaptRvtoolsDvPort = (sheet: ParsedSheet): VDvPortRow[] => {
+  const cols = mapColumns(sheet.headers, VDVPORT_COLS)
+  return sheet.rows
+    .map(
+      (row): VDvPortRow => ({
+        port: readString(readCol(row, cols.port)),
+        switch: readString(readCol(row, cols.switch)),
+        vlan: readString(readCol(row, cols.vlan)),
+        activeUplink: readString(readCol(row, cols.activeUplink)),
+        standbyUplink: readString(readCol(row, cols.standbyUplink)),
+      }),
+    )
+    .filter((r) => !isInternalRow(r.port))
+}
+
 /**
  * Adapt the RVTools `vMetaData` sheet to a per-vCenter entry list.
  *
@@ -327,6 +444,10 @@ export const adaptRvtools = (
   vhost: VHostRow[]
   vdatastore: VDatastoreRow[]
   vpartition: VPartitionRow[]
+  vnetwork: VNetworkRow[]
+  vswitch: VSwitchRow[]
+  dvswitch: VDvSwitchRow[]
+  dvport: VDvPortRow[]
   vmetadata: VMetaDataRow
   warnings: ParseError[]
 } => {
@@ -377,12 +498,55 @@ export const adaptRvtools = (
     })
   }
 
+  // P9 D-11: the four network sheets are OPTIONAL. Absent ⇒ collected
+  // warning + [] (factual-degrade) — NEVER the REQUIRED-sheet parseError()
+  // path. A real 8-sheet export has none of these (09-RESEARCH Pitfall 1).
+  const netSheet = findSheet(workbook, ['vnetwork', 'rvtools_tabvnetwork'])
+  if (!netSheet) {
+    warnings.push({
+      sheet: 'vNetwork',
+      kind: 'missing-sheet',
+      message: 'optional sheet vNetwork absent — network inventory will be empty',
+    })
+  }
+
+  const swSheet = findSheet(workbook, ['vswitch', 'rvtools_tabvswitch'])
+  if (!swSheet) {
+    warnings.push({
+      sheet: 'vSwitch',
+      kind: 'missing-sheet',
+      message: 'optional sheet vSwitch absent — network inventory will be empty',
+    })
+  }
+
+  const dvswSheet = findSheet(workbook, ['dvswitch', 'rvtools_tabdvswitch'])
+  if (!dvswSheet) {
+    warnings.push({
+      sheet: 'dvSwitch',
+      kind: 'missing-sheet',
+      message: 'optional sheet dvSwitch absent — network inventory will be empty',
+    })
+  }
+
+  const dvportSheet = findSheet(workbook, ['dvport', 'rvtools_tabdvport'])
+  if (!dvportSheet) {
+    warnings.push({
+      sheet: 'dvPort',
+      kind: 'missing-sheet',
+      message: 'optional sheet dvPort absent — network inventory will be empty',
+    })
+  }
+
   return {
     // vinfoSheet/vhostSheet are non-null here: parseError() returns `never`.
     vinfo: adaptRvtoolsVInfo(vinfoSheet as ParsedSheet),
     vhost: adaptRvtoolsVHost(vhostSheet as ParsedSheet),
     vdatastore: dsSheet ? adaptRvtoolsVDatastore(dsSheet) : [],
     vpartition: partSheet ? adaptRvtoolsVPartition(partSheet) : [],
+    vnetwork: netSheet ? adaptRvtoolsVNetwork(netSheet) : [],
+    vswitch: swSheet ? adaptRvtoolsVSwitch(swSheet) : [],
+    dvswitch: dvswSheet ? adaptRvtoolsDvSwitch(dvswSheet) : [],
+    dvport: dvportSheet ? adaptRvtoolsDvPort(dvportSheet) : [],
     vmetadata: metaSheet ? adaptRvtoolsVMetaData(metaSheet) : { entries: [] },
     warnings,
   }

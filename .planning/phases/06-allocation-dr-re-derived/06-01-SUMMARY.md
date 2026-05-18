@@ -57,7 +57,7 @@ rewrites.
 - **Task 1** — `DrMode = 'server' | 'site'`; `DrScenario = { failedHosts, failedSites }`;
   `DrSimResult` now exposes `physicalCpuRemovedGhz`/`physicalCpuRemovedCores`/
   `physicalRamRemovedMib` (branded, before−after physical), `confidence` removed, `caveats`
-  + `perSurvivor` kept. `runScenario` strips the cluster/vCenter paths, adds the
+  - `perSurvivor` kept. `runScenario` strips the cluster/vCenter paths, adds the
   fault-domain site filter, and computes the per-survivor verdict against physical headroom
   via the new `survivorPhysicalVerdict` sibling in `allocate.ts`.
 - **Task 2** — `plannedRatios: { cpu, ram }` in-memory Zustand slice (default 4:1/1:1),
@@ -87,6 +87,7 @@ rewrites.
 ### Auto-fixed Issues
 
 **1. [Rule 3 - Blocking] UI consumers had to compile for Task 1's tsc gate**
+
 - **Found during:** Task 1
 - **Issue:** The DR contract change broke `DrSimPanel.tsx` and `GlobalDashboard.tsx`
   (3-mode array, `failedClusters`/`failedVCenters`/`confidence`/`evacueeVcpu` references),
@@ -102,6 +103,7 @@ rewrites.
 - **Commit:** bd8422d
 
 **2. [Plan discretion exercised] survivorPhysicalVerdict as a sibling**
+
 - The plan's Task 1 action explicitly left "add a physical-basis verdict variant or feed
   physical fields through this same signature" to executor discretion (minimal blast
   radius, document choice). Chose a **sibling** `survivorPhysicalVerdict` so the existing
@@ -109,6 +111,7 @@ rewrites.
 - **Commit:** bd8422d
 
 **3. [Doc-only] runScenario JSDoc reworded to satisfy the grep gate intent**
+
 - The Task 1 acceptance grep (`grep -v '^#'`) does not strip JS comments, so the literal
   word "confidence" in the D-10 rationale JSDoc tripped the gate. Reworded the doc to
   "high/med/low scenario grade is RETIRED" — preserves the rationale, satisfies the gate's

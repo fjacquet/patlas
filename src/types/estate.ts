@@ -1,4 +1,12 @@
-import type { Cores, GHz, MHz, MiB, Sockets } from '@/engines/units'
+// P9 view-model result shapes. Type-only (erased) imports from the pure
+// aggregation engines — no runtime coupling, no cycle (the engines import
+// their input types from here; these are produced in the single
+// `buildEstateView` pass and surfaced on `EstateView`).
+import type { NetworkRollup } from '@/engines/aggregation/network'
+import type { StorageByX } from '@/engines/aggregation/storageByX'
+import type { ThresholdFlags } from '@/engines/aggregation/thresholdFlags'
+import type { VsanRelinkResult } from '@/engines/aggregation/vsanRelink'
+import type { Cores, GHz, GiB, MHz, MiB, Sockets } from '@/engines/units'
 
 /**
  * Estate aggregate types — ported from vsizer `types/cluster.ts` +
@@ -328,13 +336,68 @@ export interface OsBreakdown {
 }
 
 /**
- * Phase-4 forward-compat placeholder. The field EXISTS on `EstateView`
- * (typed `TimelinePoint[] | null`) and is `null` in Phase 2 — Phase 4
- * populates it without changing the dashboard component contract.
+ * P8 In-Session Trends. The headline metrics tracked across snapshots —
+ * a `Pick` of the shipped `GlobalSummary`/`OperationalInsights` fields
+ * (calc-from-real-data; every value is the shipped aggregate, never a new
+ * derivation). Branded units preserved (no raw `* 1.048576`).
  */
-export interface TimelinePoint {
-  capturedAt: Date
+export interface TrendHeadline {
   vmCount: number
+  poweredOnVms: number
+  hostCount: number
+  clusterCount: number
+  vcpuAllocated: Cores
+  vramAllocatedMib: MiB
+  totalStorageMib: MiB
+}
+
+/**
+ * One timeline point (DD-A A2 — one `capturedAt` calendar day; same-day
+ * multi-vCenter files are spatially merged via the shipped merge engine
+ * first, so the point's counts reconcile with the dashboard for that day).
+ * `metadata` is an array — a merged point legitimately spans multiple
+ * vCenters (criterion 6). `ordinal` is non-null only for D-05
+ * undeterminable-date points (positioned by stable load order, never a
+ * fabricated Date).
+ */
+export interface TrendPoint {
+  date: Date
+  ordinal: number | null
+  metadata: { vCenterLabel: string; rvtoolsVersion: string }[]
+  headline: TrendHeadline
+  byCluster: Map<string, TrendHeadline>
+}
+
+/**
+ * Signed difference between two consecutive points' headlines (DD-B B1 —
+ * count-deltas on existing aggregate fields; branded units via the shipped
+ * converters). A field is `null` when either side is `null` (presentation
+ * of the em-dash sentinel is the UI layer's job, not the engine's).
+ */
+export interface TrendDelta {
+  from: Date
+  to: Date
+  vmCount: number
+  poweredOnVms: number
+  hostCount: number
+  clusterCount: number
+  vcpuAllocated: number
+  vramAllocatedGib: GiB
+  totalStorageGib: GiB
+}
+
+/**
+ * The temporal trend projection. Produced inside the single
+ * `buildEstateView` pass (composed there, never in a component or a
+ * separate memoised hook — the one sanctioned memo is the
+ * `useEstateView` boundary). `null` when fewer than 2 snapshots are
+ * selected (the Phase-2 degenerate case). `orderInferred` drives the
+ * factual D-05 caption when any point is ordinal-positioned.
+ */
+export interface TrendSeries {
+  points: TrendPoint[]
+  deltas: TrendDelta[]
+  orderInferred: boolean
 }
 
 /**
@@ -403,8 +466,11 @@ export interface EstateView {
   /** Estate-wide OS breakdown. */
   osBreakdown: OsBreakdown
   accountingMode: AccountingMode
-  /** Phase-4 forward-compat — always `null` in Phase 2. */
-  trends: TimelinePoint[] | null
+  /**
+   * P8 In-Session Trends. Produced inside the single `buildEstateView`
+   * pass (composed there, never in a component or a separate memoised
+   * hook). `null` when fewer than 2 snapshots are selected. */
+  trends: TrendSeries | null
   /** Distinct vCenters in the merged estate (DR vCenter-loss picker). */
   vcenters: { viSdkUuid: string; label: string }[]
   /** DR what-if result. `null` when no component is marked failed
@@ -437,6 +503,36 @@ export interface EstateView {
    * `buildEstateView` pass — no second `useMemo` (D-00). A frozen empty
    * projection in `EMPTY_VIEW`; otherwise always present. */
   eos: EosProjection
+  /**
+   * P9 storage-by-X (D-07/D-08) — two-lens (consumption + capacity)
+   * rollups by Cluster/ESX/VM/Datastore. Produced inside the single
+   * `buildEstateView` pass — no second `useMemo`. Frozen-empty in
+   * `EMPTY_VIEW`; otherwise always present. */
+  storage: StorageByX
+  /**
+   * P9 vSAN / blank-`Cluster name` relink result (D-09/D-10) —
+   * attributed / shared-across-N / unrelinkable maps keyed by the
+   * `naa ?? name` datastore key. Same single-pass origin. */
+  vsan: VsanRelinkResult
+  /**
+   * P9 network topology rollup (D-11) — vSwitch/dvSwitch/portgroup/
+   * uplink aggregates; empty when the OPTIONAL network sheets were
+   * absent (factual-degrade). Same single-pass origin. */
+  network: NetworkRollup
+  /**
+   * P9 threshold flags (D-01/D-04) — factual per-row booleans + counts
+   * driven by the in-memory thresholds slice; no verdict/severity/
+   * colour. Same single-pass origin. */
+  flags: ThresholdFlags
+  /**
+   * P9 LC-4 per-datastore drill projection, keyed by the `naa ?? name`
+   * datastore key. Produced in the single `buildEstateView` pass — no
+   * second `useMemo`. Empty `Map` in `EMPTY_VIEW`. */
+  datastoreDetail: Map<string, DatastoreDetailEntry>
+  /**
+   * P9 LC-4 per-VM drill projection, keyed by VM name. Same single-pass
+   * origin; empty `Map` in `EMPTY_VIEW`. */
+  vmDetail: Map<string, VmDetailEntry>
 }
 
 /**
@@ -468,6 +564,61 @@ export interface OperationalInsights {
 export interface ClusterDetail {
   aggregate: ClusterAggregate
   insights: OperationalInsights
+}
+
+/**
+ * P9 LC-4 per-datastore drill projection. Every value calculated upstream
+ * in the single `buildEstateView` pass; `hostCount` is `null` (em-dash)
+ * when the RVTools `Hosts` count is absent (factual — never fabricated).
+ * `dsFlagged`/`luFlagged` are the factual threshold markers (no verdict).
+ */
+export interface DatastoreDetailEntry {
+  key: string
+  name: string
+  type: string
+  capacityMib: MiB
+  freeMib: MiB
+  usedMib: MiB
+  provisionedMib: MiB
+  usedRatio: number
+  sharedDuplicateCount: number
+  /** RVTools `vDatastore.Hosts` is a COUNT (binding memory); `null` when
+   *  the column is absent/non-numeric → em-dash, never fabricated. */
+  hostCount: number | null
+  /** VM names referencing this datastore via `vInfo.Path` (single source —
+   *  the relink's `datastoreVms`). Empty when none/​not derivable. */
+  vms: string[]
+  dsFlagged: boolean
+  luFlagged: boolean
+}
+
+/** P9 LC-4 per-VM partition row (factual flag marker, no verdict). */
+export interface VmPartitionEntry {
+  disk: string
+  capacityMib: MiB
+  consumedMib: MiB
+  freeMib: MiB
+  flagged: boolean
+}
+
+/**
+ * P9 LC-4 per-VM drill projection. Calculated upstream in the single
+ * `buildEstateView` pass; not-derivable lists are empty (caller renders
+ * the em-dash sentinel), never fabricated.
+ */
+export interface VmDetailEntry {
+  vmName: string
+  cluster: string
+  host: string
+  os: string
+  vcpu: Cores
+  vramMib: MiB
+  provisionedMib: MiB
+  inUseMib: MiB
+  poweredOn: boolean
+  partitions: VmPartitionEntry[]
+  portgroups: { network: string; switch: string }[]
+  datastores: string[]
 }
 
 /** Factual per-survivor headroom verdict (no color, no editorial verb). */

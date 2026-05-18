@@ -31,3 +31,7 @@ src/__fixtures__/rvtools-inventory-10k.xlsx
 *.sln
 *.sw?
 .env
+
+# Tooling scratch dirs (Playwright MCP captures, Serena cache) — never commit
+.playwright-mcp/
+.serena/

@@ -295,6 +295,7 @@ const sparkOption: EChartsOption = {
 **Recommendation: A2.** It is the only option where the timeline-point VM count equals the dashboard VM count for that month (counts-must-reconcile hard constraint), and it reuses `mergeSnapshotsToEstate` so Phase-4 semantics compose with the temporal axis instead of fighting it. Each point carries `metadata: { vCenterLabel, rvtoolsVersion }[]` — an array, because a merged point legitimately spans multiple vCenters (criterion 6 says "each snapshot's vCenter label and RVTools version in the snapshot list"; the per-point tooltip lists all contributing vCenters/versions). The active estate (D-01, latest date) is just the most-recent point's underlying merge — same data, no duplication.
 
 **Data flow (exact):** inside `buildTrendSeries(selected, mode, opts)`:
+
 1. resolve date per snapshot (already on `Snapshot.capturedAt`);
 2. `groupByDay(selected)` → `Map<dayKey, Snapshot[]>`;
 3. for each group: `mergeSnapshotsToEstate(group)` → `aggregateClusters` + `aggregateGlobals` (same calls `buildEstateView` makes for the active estate);
@@ -333,36 +334,42 @@ Not applicable — P8 is greenfield feature work (new engine module + new view +
 ## Common Pitfalls
 
 ### Pitfall 1: Category axis silently passes review then fails criterion 2
+
 **What goes wrong:** A dev wires `xAxis:{type:'category', data: dateStrings}`; it "looks like" a date axis but spaces points evenly by index. 2026-01-31 and 2026-03-30 appear equidistant.
 **Why:** category axis is index-positioned by design. [CITED: echarts-doc]
 **How to avoid:** mandate `xAxis:{type:'time'}` + `[Date,value]` data pairs; add a Vitest/assertion on the built option that `xAxis.type === 'time'` for the real-date case.
 **Warning signs:** uniform tick spacing for known-irregular fixture dates.
 
 ### Pitfall 2: `LineChart` not registered → blank chart at runtime
+
 **What goes wrong:** `Chart.tsx` `echarts.use([...])` lacks `LineChart`; a line option renders nothing (no error in some builds).
 **Why:** tree-shaken ECharts only renders registered series. [VERIFIED: Chart.tsx registers Bar/Pie/Gauge/Heatmap only; CITED: echarts-doc tree-shaking — explicit chart import required]
 **How to avoid:** add `import { LineChart } from 'echarts/charts'` + include in `echarts.use([...])`; re-run `npm run check:bundle-size` (≤300 KB gz gate). LineChart is small; budget should hold but must be verified.
 **Warning signs:** empty `<svg>`, no console error.
 
 ### Pitfall 3: Second-memo grep gate trips on a doc-comment
+
 **What goes wrong:** a comment in `buildTrendSeries` or `TrendsView` explains "no second useMemo here" containing the literal token; the grep gate / security hook fails the build.
 **Why:** CLAUDE.md gotcha — `grep -c "<token>" == 0` plan gates and the security hook match doc-comments too.
 **How to avoid:** phrase absence comments WITHOUT the literal token (e.g. "the single sanctioned memo hook is the only one — see useEstateView"); never write the React-memo-hook token in a trends comment.
 **Warning signs:** CI gate failure naming a comment line.
 
 ### Pitfall 4: Released-snapshot trend point loses its numbers (DD-C correctness)
+
 **What goes wrong:** rows emptied for an old snapshot; next memo pass recomputes `buildTrendSeries` from current rows → that point's aggregate is now 0/absent.
 **Why:** trends are recomputed every pass from live rows; releasing rows removes the source.
 **How to avoid:** carry the released point's already-computed aggregate as frozen input metadata on the released `Snapshot` (`releasedAggregate`); `buildTrendSeries` uses it instead of re-aggregating absent rows. Dedicated Vitest case.
 **Warning signs:** trend line drops to 0 for the oldest months after the 5th snapshot loads.
 
 ### Pitfall 5: Capture-date edit doesn't reorder the timeline
+
 **What goes wrong:** user edits a date in the sidebar; the chart doesn't move.
 **Why:** the edit must flow through `setCapturedAt` (REPLACES the Map) so the single memo recomputes; if a component holds a local copy it won't.
 **How to avoid:** D-03 wiring uses `setCapturedAt` exactly (no local date state that bypasses the store); `buildTrendSeries` keys points off `Snapshot.capturedAt` so a store change re-sorts. [VERIFIED: setCapturedAt REPLACES Map → memo dep `snapshots` changes → recompute]
 **Warning signs:** stale point position after edit.
 
 ### Pitfall 6: Background drain blocks the first paint
+
 **What goes wrong:** keeping the blocking `for await` and just reordering still serializes 12 parses before the dashboard shows.
 **Why:** awaiting the whole batch blocks the `isUploading`/render path.
 **How to avoid:** `addSnapshot` the latest file, then continue draining WITHOUT the caller awaiting the rest (background promise chain); the dashboard renders off the first `addSnapshot`. [VERIFIED: useSnapshotUpload.ts is currently fully-awaited blocking — this is the change]
@@ -453,6 +460,7 @@ const stableOrder = [...selected].sort(
 ## Sources
 
 ### Primary (HIGH confidence)
+
 - Codebase (VERIFIED by direct read): `src/hooks/useEstateView.ts`, `src/engines/aggregation/estateView.ts` + `globals.ts` + barrel `index.ts`, `src/engines/snapshotMerge/mergeSnapshotsToEstate.ts` + `index.ts`, `src/store/snapshotStore.ts`, `src/hooks/useSnapshotUpload.ts`, `src/engines/parser/captureDate.ts`, `src/components/Chart.tsx` + `SnapshotCard.tsx` + `SnapshotListSidebar.tsx` + `ViewToggle.tsx` + `App.tsx`, `src/types/estate.ts` + `snapshot.ts`, `src/engines/units/converters.ts`, `src/utils/format.ts`, `package.json`, `.planning/config.json`.
 - ECharts official docs via Context7 `/apache/echarts-doc` (CITED):
   - `en/option/component/axis-common.md` — axis `type: 'value'|'category'|'time'|'log'`.
@@ -462,14 +470,17 @@ const stableOrder = [...selected].sort(
 - Planning docs (VERIFIED): `08-CONTEXT.md`, `REQUIREMENTS.md` §In-Session Trends, `ROADMAP.md` ###Phase 8 + Phase 2/4, `04-CONTEXT.md`, project `CLAUDE.md`.
 
 ### Secondary (MEDIUM confidence)
+
 - ECharts v6 time-axis API parity with v5: asserted by the project's own `CLAUDE.md` charting note ("v6 tree-shaking + `SVGRenderer` import paths unchanged from v5") cross-referenced with the v5 time-axis doc. No v6-specific breaking change found.
 
 ### Tertiary (LOW confidence)
+
 - None relied upon. (No WebSearch needed — every claim is codebase- or official-docs-grounded.)
 
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack: HIGH — zero new deps; every module verified by direct read.
 - Architecture (single-memo composition, DD-A/B/C): HIGH — the P5/P6/P7 in-file precedent for "compose in the single pass, new pure module, no second memo" is verified verbatim in `estateView.ts`; DD recommendations follow directly from shipped types/engines.
 - ECharts temporal axis (TRD-02): HIGH — CITED from official ECharts docs; the one execution risk (LineChart registration + bundle gate) is flagged as A1.

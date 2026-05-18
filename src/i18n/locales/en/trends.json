@@ -1,0 +1,23 @@
+{
+  "heading": "In-session trends",
+  "empty": "Load 2 or more snapshots to see trends.",
+  "warmup": "Trends preparing — {{done}}/{{total}}",
+  "orderInferred": "Some capture dates could not be determined; points are shown in load order, not on a real time axis.",
+  "released": "Raw rows released to cap memory; this snapshot's trend point is retained.",
+  "error": "Trends could not be rendered: {{message}}",
+  "axisDate": "{{date}}",
+  "delta": {
+    "heading": "Change between consecutive snapshots",
+    "vmCount": "VMs",
+    "poweredOnVms": "Powered-on VMs",
+    "hostCount": "Hosts",
+    "clusterCount": "Clusters",
+    "vcpuAllocated": "vCPU allocated",
+    "vramAllocated": "vRAM allocated (GiB)",
+    "totalStorage": "Storage (GiB)"
+  },
+  "tooltip": {
+    "date": "Capture date: {{date}}",
+    "meta": "{{vcenter}} / RVTools {{version}}"
+  }
+}

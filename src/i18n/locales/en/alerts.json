@@ -1,0 +1,18 @@
+{
+  "config": {
+    "heading": "Thresholds",
+    "fs": "Filesystem used %",
+    "ds": "Datastore used %",
+    "lu": "LU used %",
+    "echo": "Filesystem ≥ {{fs}}% · Datastore > {{ds}}% · LU > {{lu}}%"
+  },
+  "fs": {
+    "count": "{{count}} partitions ≥ {{pct}}% used"
+  },
+  "ds": {
+    "count": "{{count}} datastores > {{pct}}% used"
+  },
+  "lu": {
+    "count": "{{count}} logical units > {{pct}}% used"
+  }
+}

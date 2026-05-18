@@ -11,16 +11,23 @@ export type {
   OperationalInsights,
   OsBreakdown,
   OsFamily,
-  TimelinePoint,
   TopReadinessVm,
+  TrendDelta,
+  TrendHeadline,
+  TrendPoint,
+  TrendSeries,
 } from './estate'
 export type {
   ParseError,
   Snapshot,
   VDatastoreRow,
+  VDvPortRow,
+  VDvSwitchRow,
   VMetaDataEntry,
   VMetaDataRow,
+  VNetworkRow,
   VPartitionRow,
+  VSwitchRow,
 } from './snapshot'
 export type { VHostRow } from './vhost'
 export type { VInfoRow, VPowerState } from './vinfo'

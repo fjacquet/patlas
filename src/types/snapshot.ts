@@ -1,6 +1,20 @@
 import type { Bytes, MiB } from '@/engines/units'
+import type { TrendHeadline } from './estate'
 import type { VHostRow } from './vhost'
 import type { VInfoRow } from './vinfo'
+
+/**
+ * The aggregated trend facts that SURVIVE when a snapshot's raw rows are
+ * released (DD-C / Critical-5). Once the rows are gone this is the only
+ * remaining INPUT fact for that timeline point — not a cached derivation
+ * of live state (A3 resolved interpretation). In-memory only; never
+ * persisted (privacy invariant). Populated by the `releaseRawRows` store
+ * mutation (plan 08-02); consumed by `buildTrendSeries` (plan 08-01).
+ */
+export interface ReleasedTrendAggregate {
+  headline: TrendHeadline
+  byCluster: Map<string, TrendHeadline>
+}
 
 /**
  * A single parsed RVTools workbook, normalized to vatlas' canonical shape.
@@ -36,7 +50,29 @@ export interface Snapshot {
   vhost: VHostRow[]
   vdatastore: VDatastoreRow[]
   vpartition: VPartitionRow[]
+  /** RVTools `vNetwork` rows (VM→portgroup). `[]` when the OPTIONAL sheet
+   *  is absent — never undefined (P9 D-11 factual-degrade). */
+  vnetwork: VNetworkRow[]
+  /** RVTools `vSwitch` rows (standard switches). `[]` when absent. */
+  vswitch: VSwitchRow[]
+  /** RVTools `dvSwitch` rows (distributed switches). `[]` when absent. */
+  dvswitch: VDvSwitchRow[]
+  /** RVTools `dvPort` rows (distributed portgroups). `[]` when absent. */
+  dvport: VDvPortRow[]
   parseErrors: ParseError[]
+  /**
+   * DD-C: `true` once this snapshot's raw rows have been released to cap
+   * memory when > 4 snapshots are loaded. The active/latest snapshot is
+   * never released. Set by `releaseRawRows` (plan 08-02).
+   */
+  rawReleased?: boolean
+  /**
+   * The surviving aggregated trend facts for a released snapshot. `null`/
+   * absent while raw rows are present; populated by `releaseRawRows` so
+   * `buildTrendSeries` keeps the point without re-aggregating absent rows
+   * (DD-C / Pitfall 4).
+   */
+  releasedAggregate?: ReleasedTrendAggregate | null
 }
 
 /** A datastore row from the RVTools `vDatastore` sheet. */
@@ -69,6 +105,84 @@ export interface VPartitionRow {
   capacityMib: MiB
   consumedMib: MiB
   freeMib: MiB
+}
+
+/**
+ * A VM→portgroup row from the RVTools `vNetwork` sheet. Plain strings; no
+ * branded units. Empty string when a column is absent. (P9 D-11.)
+ */
+export interface VNetworkRow {
+  /** RVTools `vNetwork.VM`. */
+  vm: string
+  /** RVTools `vNetwork.Network` — the portgroup name. */
+  network: string
+  /** RVTools `vNetwork.Switch` — the owning vSwitch/dvSwitch name. */
+  switch: string
+  /** RVTools `vNetwork.Adapter` — the virtual NIC adapter type. */
+  adapter: string
+  /** RVTools `vNetwork.Connected` (raw text, e.g. `True`/`False`). */
+  connected: string
+  /** RVTools `vNetwork.Cluster`. */
+  cluster: string
+  /** RVTools `vNetwork.Host`. */
+  host: string
+}
+
+/**
+ * A standard-switch row from the RVTools `vSwitch` sheet. Port counts are
+ * plain non-negative numbers (NOT MiB-branded). (P9 D-11.)
+ */
+export interface VSwitchRow {
+  /** RVTools `vSwitch.Host`. */
+  host: string
+  /** RVTools `vSwitch.Cluster`. */
+  cluster: string
+  /** RVTools `vSwitch.Switch` — the standard vSwitch name. */
+  switch: string
+  /** RVTools `vSwitch.# Ports`. */
+  ports: number
+  /** RVTools `vSwitch.Free Ports`. */
+  freePorts: number
+  /** RVTools `vSwitch.MTU`. */
+  mtu: number
+}
+
+/**
+ * A distributed-switch row from the RVTools `dvSwitch` sheet. Counts are
+ * plain non-negative numbers (NOT MiB-branded). (P9 D-11.)
+ */
+export interface VDvSwitchRow {
+  /** RVTools `dvSwitch.Switch`. */
+  switch: string
+  /** RVTools `dvSwitch.Name`. */
+  name: string
+  /** RVTools `dvSwitch.Version`. */
+  version: string
+  /** RVTools `dvSwitch.Host members`. */
+  hostMembers: string
+  /** RVTools `dvSwitch.# Ports`. */
+  ports: number
+  /** RVTools `dvSwitch.# VMs`. */
+  vms: number
+  /** RVTools `dvSwitch.Max MTU`. */
+  maxMtu: number
+}
+
+/**
+ * A distributed-portgroup row from the RVTools `dvPort` sheet. Empty string
+ * when a column is absent. (P9 D-11.)
+ */
+export interface VDvPortRow {
+  /** RVTools `dvPort.Port` — the distributed portgroup name. */
+  port: string
+  /** RVTools `dvPort.Switch` — the owning dvSwitch name. */
+  switch: string
+  /** RVTools `dvPort.VLAN` (raw text — can be a range or trunk spec). */
+  vlan: string
+  /** RVTools `dvPort.Active Uplink`. */
+  activeUplink: string
+  /** RVTools `dvPort.Standby Uplink`. */
+  standbyUplink: string
 }
 
 /**

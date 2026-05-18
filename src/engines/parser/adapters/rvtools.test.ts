@@ -391,11 +391,38 @@ describe('optional-sheet adapters', () => {
         mkSheet('vDatastore', ['Name', 'Capacity MB', 'Free MB'], [['ds', 100, 50]]),
         mkSheet('vPartition', ['VM', 'Disk', 'Capacity MB'], [['vm-a', '/', 10]]),
         mkSheet('vMetaData', ['Property', 'Value'], [['RVTools Version', '4.4.0']]),
+        // P9 D-11: the four network sheets are now also OPTIONAL — include
+        // them so "all optional sheets present ⇒ zero warnings" still holds.
+        mkSheet(
+          'vNetwork',
+          ['VM', 'Network', 'Switch', 'Adapter', 'Connected', 'Cluster', 'Host'],
+          [['vm-a', 'PG-A', 'vSwitch0', 'vmxnet3', 'True', 'C1', 'esx-1']],
+        ),
+        mkSheet(
+          'vSwitch',
+          ['Host', 'Cluster', 'Switch', '# Ports', 'Free Ports', 'MTU'],
+          [['esx-1', 'C1', 'vSwitch0', 128, 100, 1500]],
+        ),
+        mkSheet(
+          'dvSwitch',
+          ['Switch', 'Name', 'Version', 'Host members', '# Ports', '# VMs', 'Max MTU'],
+          [['DVS', 'prod-dvs', '8.0.0', 'esx-1, esx-2', 512, 40, 9000]],
+        ),
+        mkSheet(
+          'dvPort',
+          ['Port', 'Switch', 'VLAN', 'Active Uplink', 'Standby Uplink'],
+          [['dvpg-10', 'DVS', '10', 'uplink1', 'uplink2']],
+        ),
       ),
     )
     expect(out.vdatastore).toHaveLength(1)
     expect(out.vpartition).toHaveLength(1)
     expect(out.vmetadata.entries[0]?.rvtoolsVersion).toBe('4.4.0')
+    expect(out.vnetwork).toHaveLength(1)
+    expect(out.vnetwork[0]?.network).toBe('PG-A')
+    expect(out.vswitch[0]?.ports).toBe(128)
+    expect(out.dvswitch[0]?.maxMtu).toBe(9000)
+    expect(out.dvport[0]?.vlan).toBe('10')
     expect(out.warnings).toHaveLength(0)
   })
 })
@@ -526,5 +553,102 @@ describe('P5 — Powerstate enum / Template / host model·vendor·ESX version', 
     expect(bare[0]?.model).toBe('')
     expect(bare[0]?.vendor).toBe('')
     expect(bare[0]?.esxVersion).toBe('')
+  })
+})
+
+// P9 D-11 / D-09: additive coverage — network sheets present, network sheets
+// absent (factual-degrade, no throw), and the vInfo.path round-trip. Does NOT
+// touch the MiB canary (canary.test.ts is byte-unchanged).
+describe('P9: network sheets present', () => {
+  const out = adaptRvtools(
+    workbook(
+      mkSheet('vInfo', VINFO_FULL, [baseRow]),
+      mkSheet('vHost', VHOST_FULL, [vhostRow]),
+      mkSheet(
+        'vNetwork',
+        ['VM', 'Network', 'Switch', 'Adapter', 'Connected', 'Cluster', 'Host'],
+        [['vm-a', 'PG-Prod', 'vSwitch0', 'vmxnet3', 'True', 'cluster-a', 'host-a']],
+      ),
+      mkSheet(
+        'vSwitch',
+        ['Host', 'Cluster', 'Switch', '# Ports', 'Free Ports', 'MTU'],
+        [['host-a', 'cluster-a', 'vSwitch0', 128, 96, 1500]],
+      ),
+      mkSheet(
+        'dvSwitch',
+        ['Switch', 'Name', 'Version', 'Host members', '# Ports', '# VMs', 'Max MTU'],
+        [['DVS-1', 'prod-dvs', '8.0.0', 'host-a, host-b', 512, 40, 9000]],
+      ),
+      mkSheet(
+        'dvPort',
+        ['Port', 'Switch', 'VLAN', 'Active Uplink', 'Standby Uplink'],
+        [['dvpg-10', 'DVS-1', '10', 'uplink1', 'uplink2']],
+      ),
+    ),
+  )
+
+  it('adapts vNetwork rows with the expected field values', () => {
+    expect(out.vnetwork).toHaveLength(1)
+    expect(out.vnetwork[0]).toMatchObject({
+      vm: 'vm-a',
+      network: 'PG-Prod',
+      switch: 'vSwitch0',
+      adapter: 'vmxnet3',
+      connected: 'True',
+      cluster: 'cluster-a',
+      host: 'host-a',
+    })
+  })
+
+  it('adapts switch/port counts as plain numbers (NOT MiB-branded)', () => {
+    expect(out.vswitch[0]?.ports).toBe(128)
+    expect(out.vswitch[0]?.freePorts).toBe(96)
+    expect(out.vswitch[0]?.mtu).toBe(1500)
+    expect(typeof out.vswitch[0]?.ports).toBe('number')
+    expect(out.dvswitch[0]?.ports).toBe(512)
+    expect(out.dvswitch[0]?.vms).toBe(40)
+    expect(out.dvswitch[0]?.maxMtu).toBe(9000)
+    expect(out.dvport[0]).toMatchObject({ port: 'dvpg-10', switch: 'DVS-1', vlan: '10' })
+  })
+
+  it('emits no missing-sheet warning for the network sheets when all are present', () => {
+    const missingNet = out.warnings.filter((w) => w.kind === 'missing-sheet').map((w) => w.sheet)
+    expect(missingNet).not.toContain('vNetwork')
+    expect(missingNet).not.toContain('vSwitch')
+    expect(missingNet).not.toContain('dvSwitch')
+    expect(missingNet).not.toContain('dvPort')
+  })
+})
+
+describe('P9: network sheets absent — factual-degrade, no throw', () => {
+  it('yields four empty arrays + a missing-sheet warning per absent network sheet, no throw', () => {
+    const out = adaptRvtools(
+      workbook(mkSheet('vInfo', VINFO_FULL, [baseRow]), mkSheet('vHost', VHOST_FULL, [vhostRow])),
+    )
+    expect(out.vnetwork).toHaveLength(0)
+    expect(out.vswitch).toHaveLength(0)
+    expect(out.dvswitch).toHaveLength(0)
+    expect(out.dvport).toHaveLength(0)
+    const missing = new Set(
+      out.warnings.filter((w) => w.kind === 'missing-sheet').map((w) => w.sheet),
+    )
+    expect(missing.has('vNetwork')).toBe(true)
+    expect(missing.has('vSwitch')).toBe(true)
+    expect(missing.has('dvSwitch')).toBe(true)
+    expect(missing.has('dvPort')).toBe(true)
+  })
+})
+
+describe('P9 D-09: vInfo.path round-trip', () => {
+  it('round-trips the [datastore] vm/vm.vmx token from the Path column', () => {
+    const rows = adaptRvtoolsVInfo(
+      mkSheet('vInfo', [...VINFO_FULL, 'Path'], [[...baseRow, '[DS_X] vm-a/vm-a.vmx']]),
+    )
+    expect(rows[0]?.path).toBe('[DS_X] vm-a/vm-a.vmx')
+  })
+
+  it('defaults path to "" when the Path column is absent', () => {
+    const rows = adaptRvtoolsVInfo(mkSheet('vInfo', VINFO_FULL, [baseRow]))
+    expect(rows[0]?.path).toBe('')
   })
 })

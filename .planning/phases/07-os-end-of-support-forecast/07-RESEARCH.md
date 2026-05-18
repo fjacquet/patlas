@@ -5,6 +5,7 @@
 **Confidence:** HIGH
 
 <user_constraints>
+
 ## User Constraints (from CONTEXT.md)
 
 ### Locked Decisions
@@ -38,6 +39,7 @@ Bundling mechanism (D-01); exact build-failure semantics within outage-never-blo
 </user_constraints>
 
 <phase_requirements>
+
 ## Phase Requirements
 
 | ID | Description | Research Support |
@@ -75,6 +77,7 @@ Key findings: (1) endoflife.date **v1 is GA and stable** (`schema_version: 1.2.1
 ## Standard Stack
 
 ### Core
+
 | Library | Version | Purpose | Why Standard |
 |---------|---------|---------|--------------|
 | Zod | `^4.4.3` (already in repo) | Validate the bundled catalogue at the build/validation boundary | Project's boundary-validation tool; mirrors `src/engines/parser/schemas.ts`. `[VERIFIED: package.json]` |
@@ -82,6 +85,7 @@ Key findings: (1) endoflife.date **v1 is GA and stable** (`schema_version: 1.2.1
 | `@tanstack/react-table` + `react-virtual` (via shipped `DataTable`) | shipped P3 | Bucket→entity drill | D-08 reuse; `objectKind: 'vm' \| 'esx'` already supported. `[VERIFIED: src/components/inventory/DataTable.csv.test.tsx]` |
 
 ### Supporting
+
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
 | Node built-in `fetch` (Node 24) | runtime: build only | `scripts/sync-eos.mjs` to fetch the catalogue | Build-time only; CI uses Node 24 (`.github/workflows/static.yml`). Never shipped to the browser. `[VERIFIED: static.yml node-version: '24']` |
@@ -91,12 +95,14 @@ No new runtime dependencies. The catalogue snapshot is committed JSON; the only 
 **Installation:** none — no `npm install`. (Adding a network/HTTP client lib would be unnecessary; Node 24 `fetch` is built in. `[VERIFIED: Node 24 has global fetch]`)
 
 ### Alternatives Considered
+
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
 | Committed JSON snapshot + `npm run sync:eos` | CI build-step fetch (fetch at every deploy) | **Rejected as default.** CI fetch couples every deploy to a third-party's uptime; D-02 says outage must never block deploy, and the cleanest structural guarantee of that is "deploy never fetches at all". Snapshot is deterministic, reviewable in PR diff, reproducible offline. The maintainer runs `sync:eos` deliberately; CI only validates. |
 | endoflife.date v1 API | endoflife.date legacy v0 (`/api/{product}.json`) | v0 still works but is **superseded**; v1 (`schema_version 1.2.1`) is GA, richer (`isEol`/`isMaintained`/`eolFrom`/labels). Use v1. `[VERIFIED: live query 2026-05-17]` |
 
 **Version verification (endoflife.date API, queried live 2026-05-17):**
+
 - `https://endoflife.date/api/v1/` → `{"schema_version":"1.2.1", ... "result":[{products},{categories},{tags}]}` `[VERIFIED: live curl]`
 - `https://endoflife.date/api/v1/products/` → `total: 455` products `[VERIFIED: live curl]`
 - Each product: `https://endoflife.date/api/v1/products/{slug}/` → `{ schema_version, generated_at, result: { name, releases: [...] } }` `[VERIFIED: live curl]`
@@ -151,6 +157,7 @@ APP RUNTIME (NO network — privacy guard throws on any non-same-origin fetch):
 ```
 
 ### Recommended Project Structure
+
 ```
 src/engines/eos/
 ├── catalogue.json          # committed snapshot: { lastVerified, products }
@@ -172,8 +179,10 @@ src/components/eos/EosView.tsx   # presenter (App view-state branch)
 Coverage note: `vitest.config.ts` already gates `src/engines/**/*.ts` at 75% lines/functions/branches/statements globally. **No config change needed** — `src/engines/eos/` is auto-gated the moment files land. `catalogue.json` is data, not `.ts`, so it does not enter coverage. `[VERIFIED: vitest.config.ts L21-33]`
 
 ### Pattern 1: Zod only at the catalogue boundary (mirrors parser)
+
 **What:** `catalogue.ts` is the single place `catalogue.json` is read and Zod-validated, exactly like `src/engines/parser/schemas.ts` validates parsed rows. `normalizeOs.ts`/`bucketEos.ts`/`classifyEsxi.ts` are pure and Zod-free and receive the already-typed `EosCatalogue` as an argument.
 **When to use:** always for this phase (D-01 hard constraint; engines-stay-pure invariant).
+
 ```typescript
 // src/engines/eos/catalogueSchema.ts  — Source: schema VERIFIED live from endoflife.date/api/v1 2026-05-17
 import { z } from 'zod'
@@ -196,8 +205,10 @@ export type EosCatalogue = z.infer<typeof EosCatalogueSchema>
 ```
 
 ### Pattern 2: Normalizer = product-slug detector + version extractor (DRY-composed with osFamily.ts)
+
 **What:** `osFamily.ts` already does the windows/linux/other 3-way split (it is NOT the EOS normalizer — its own header says so). The EOS normalizer is a finer classifier that returns an endoflife.date `(slug, version)` pair. It should **call `classifyOsFamily` first** as a coarse gate / fallback signal (DRY — do not re-implement the windows/linux regexes), then run a slug-specific regex bank.
 **When to use:** every VM OS string and the ESXi version string.
+
 ```typescript
 // src/engines/eos/normalizeOs.ts  (pattern sketch — pure, Zod-free)
 // Match order matters: most specific slug first; "Other ... Linux" and "Other (64-bit)"
@@ -226,8 +237,10 @@ export function normalizeOs(raw: string): { slug: string; version: string | null
 ```
 
 ### Pattern 3: Disjoint partition for reconciliation, cumulative tiles for display (Open Item 2)
+
 **What:** The engine produces a **disjoint partition** (`overdue | ≤+3 | (+3,+6] | (+6,+9] | (+9,+12] | beyond12 | unknown`) whose counts sum exactly to the entity total. The bucket-strip UI displays **cumulative** tiles (`Within 3 / 6 / 9 / 12 months`) derived from the disjoint partition. The reconciliation line is computed from the **disjoint** partition, never the cumulative sum (cumulative double-counts by design — overlapping windows).
 **When to use:** the `bucketEos` engine output shape.
+
 ```typescript
 // EosProjection shape (the new EstateView.eos field)
 interface EosProjection {
@@ -242,6 +255,7 @@ interface EosProjection {
 ```
 
 ### Anti-Patterns to Avoid
+
 - **Importing `catalogue.json` inside a pure engine function.** The JSON import + Zod parse happen ONCE in `catalogue.ts` (the boundary). `bucketEos`/`normalizeOs` receive the typed catalogue as a parameter. Importing JSON into the pure engine breaks the engines-stay-pure / Zod-only-at-boundary invariant.
 - **A second `useMemo` for the EOS projection.** It composes inside the existing `buildEstateView` single pass (D-00; grep-gated single-memo invariant).
 - **Summing ESXi host count + VM count into one bucket total** (D-09b). If a unified timeline is chosen, the count in each tile/label is split by entity kind ("VMs: n · ESXi hosts: m").
@@ -278,36 +292,42 @@ interface EosProjection {
 ## Common Pitfalls
 
 ### Pitfall 1: ESXi patch-level EOL does not exist in the catalogue
+
 **What goes wrong:** EOS-04 asks for "patch-level and major-version" classification; a planner may assume endoflife.date exposes per-build EOL and design a lookup that silently returns `null` or, worse, fabricates a date.
 **Why it happens:** The requirement text implies patch granularity; the catalogue only has major-version `eolFrom`.
 **How to avoid:** Confirmed via live query — ESXi v1 `releases` are `["9.0","8.0","7.0","6.7",...]` with `eolFrom` per major (`8.0 → 2027-10-11`, `7.0 → 2025-10-02`); there is **no** patch/build EOL field (the `latest` object is "newest build", not an EOL). D-09c explicitly anticipates this: classify against **major-version EOL**, and for patch/update level emit the **em-dash sentinel** (never a fabricated date). The build string (`build-24674464`) is still surfaced **factually as plain text** (do not regress P5's plain-text presentation, D-09a). `[VERIFIED: live curl /api/v1/products/esxi/ 2026-05-17]`
 **Warning signs:** Any code path that maps an ESXi build number to a date. There is no such mapping in the data.
 
 ### Pitfall 2: RVTools OS strings are a controlled vocabulary, not free text — but versionless "Other" forms are real
+
 **What goes wrong:** Treating the OS column as arbitrary free text leads to over-engineering; conversely, assuming every string carries a version leads to mis-bucketing.
 **Why it happens:** RVTools emits the vCenter guest-OS dropdown vocabulary. Harvested real space (from the 3 real fixtures + sample): 45 distinct `osConfig`, 44 distinct `osTools`. Dominant forms are `"Microsoft Windows Server YYYY (64-bit)"`, `"Red Hat Enterprise Linux N (64-bit)"`, `"CentOS N (64-bit)"`, `"Debian GNU/Linux N (64-bit)"`, `"SUSE Linux Enterprise N (64-bit)"`, `"Ubuntu Linux (64-bit)"`. But there are genuinely **versionless / un-mappable** forms that MUST land in the first-class unknown bucket, not be force-fit: `"Other (64-bit)"`, `"Other 3.x or later Linux (64-bit)"`, `"Other 2.6.x Linux (64-bit)"`, `"VMware Photon OS (64-bit)"`, `"FreeBSD (32-bit)"`, `"FortiManager-VM64 v7.4.6-build2588 ..."`, `"Microsoft Windows 2000"`. `osTools` can also be empty → fall back to `osConfig` (mirror `classifyOsFamily`'s `(osConfig||osTools)` precedence, but note `VmDisplayRow.os` uses `osTools||osConfig`).
 **How to avoid:** Regex bank keyed on slug; anything that does not match a slug-with-resolvable-version → unknown (D-10), raw string preserved verbatim (D-12), occurrence-counted (D-11). Target <5% unknown on a ≥50-string fixture (success criterion 5) — achievable because the matchable forms (Windows Server, RHEL, CentOS, Debian, SLES) dominate the count distribution; the unknown residue is the long tail of "Other ... Linux" and appliance strings, which is the correct, honest result.
 **Warning signs:** A regex that tries to extract a version from `"Other 3.x or later Linux (64-bit)"` (`3.x` is not a catalogue version). `"Ubuntu Linux (64-bit)"` has no version in RVTools → it is **legitimately unknown** for EOL purposes (endoflife.date Ubuntu keys on `24.04` etc., which RVTools does not provide) — count it unknown, do not guess.
 
 ### Pitfall 3: CentOS "4/5/6/7" multi-version strings
+
 **What goes wrong:** `"CentOS 4/5 (64-bit)"`, `"CentOS 4/5/6/7 (64-bit)"`, `"CentOS 4/5/6 (64-bit)"` are real (harvested). A naive `\d+` captures `4`.
 **Why it happens:** vCenter collapses several guest-OS generations into one dropdown entry.
 **How to avoid:** This is a planner decision (D-06-adjacent). Recommended: a multi-version string is **not determinable to a single EOL** → treat as **unknown** (honest; never silently pick the oldest or newest — that would fabricate a verdict, violating D-00). Surface it verbatim in the unknown list so the maintainer sees the signal. Document the choice in the plan.
 **Warning signs:** A bucket count that moves depending on whether you read the first or last digit of `4/5/6/7`.
 
 ### Pitfall 4: Wall-clock-coupled buckets must be computed from `today`, not capture date
+
 **What goes wrong:** Reusing the snapshot's `capturedAt` (which the codebase already extracts, `parser/captureDate.ts`) as the bucketing reference.
 **Why it happens:** It is the "more reproducible" choice and is right there in the data.
 **How to avoid:** D-07 is explicit and user-accepted: reference = **TODAY (workbook-load date)**. "Overdue" = `eolFrom < today`. The view must surface "Forecast computed as of {today}" so the wall-clock coupling is honest. `today` enters the engine as an injected parameter (pure function — do NOT call `new Date()` inside the engine; pass it in from the boundary so tests are deterministic).
 **Warning signs:** `new Date()` inside `bucketEos.ts`; a test that breaks tomorrow.
 
 ### Pitfall 5: A third-party outage blocking the deploy
+
 **What goes wrong:** A CI step fetches endoflife.date at deploy time; endoflife.date is down; the GitHub Pages deploy fails.
 **Why it happens:** "Freshness" instinct → fetch at build.
 **How to avoid:** D-02 hard rule. The recommended architecture makes this **structurally impossible**: CI deploy NEVER fetches; it only Zod-validates the committed `catalogue.json` and emits a `::warning::` (never `exit 1`) if `today - lastVerified > 90d`. The `sync:eos` script (maintainer-run, not in the deploy path) MAY `exit 1` on fetch failure / bad shape so a bad snapshot is never committed — but that failure is local/PR-time, decoupled from deploy.
 **Warning signs:** Any `curl`/`fetch` to `endoflife.date` inside `.github/workflows/static.yml`'s build job.
 
 ### Pitfall 6: ESXi guest-OS rows vs real ESXi hosts
+
 **What goes wrong:** `osConfig`/`osTools` themselves sometimes contain `"VMware ESXi 6.5 or later"`, `"VMware ESXi 6.x"`, `"VMware ESXi 8.0 or later"` (harvested — these are nested-ESXi *VMs*). Counting these as "ESXi hosts" conflates VM and host cardinality (violates D-09b).
 **Why it happens:** Nested virtualization shows ESXi as a guest OS string on a VM row.
 **How to avoid:** ESXi-host classification consumes **`vhost.esxVersion`** (the real host), never the VM `osConfig`. A VM whose guest OS is "VMware ESXi …" is just a VM — bucket it by its (likely unknown / versionless) guest string, in the VM partition, never in the host count.
@@ -316,6 +336,7 @@ interface EosProjection {
 ## Code Examples
 
 ### endoflife.date v1 — real records (VERIFIED live 2026-05-17)
+
 ```jsonc
 // GET https://endoflife.date/api/v1/products/esxi/  → result.releases[ ... ]
 { "name": "8.0", "label": "8.0", "releaseDate": "2022-10-11",
@@ -344,6 +365,7 @@ interface EosProjection {
 ```
 
 ### Real OS-string fixture (harvested from `tests/fixtures/` — put in `src/engines/eos/fixtures/real-os-strings.ts`)
+
 ```typescript
 // 50+ REAL distinct strings harvested 2026-05-17 from the three real RVTools
 // fixtures + rvtools-sample.xlsx (vInfo "OS according to the configuration file"
@@ -397,6 +419,7 @@ export const REAL_ESX_VERSIONS = [
 ```
 
 ### Integration: attach `eos` to EstateView inside the existing single pass
+
 ```typescript
 // src/engines/aggregation/estateView.ts  — add ONE field, NO new memo (D-00).
 // catalogue is parsed ONCE at the boundary (catalogue.ts) and passed in.
@@ -415,6 +438,7 @@ return { ...existingFields, eos }   // EstateView gains `eos: EosProjection`
 ```
 
 ### App view-state branch (mirror P6 'planning' exactly)
+
 ```tsx
 // src/components/ViewToggle.tsx — EXTEND (verbatim P5/P6 pattern):
 export type AppView = 'dashboard' | 'inventory' | 'hosts' | 'planning' | 'eos'
@@ -429,6 +453,7 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos'] as const
 ```
 
 ### CI freshness warning (warn-only — never blocks deploy, D-02)
+
 ```yaml
 # .github/workflows/static.yml — add AFTER "Type check", BEFORE "Build".
 # Pure read of the committed snapshot; NO network. exit 0 always.
@@ -449,6 +474,7 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos'] as const
 | Runtime fetch of a lifecycle API | Build-time-baked, Zod-validated, source-controlled snapshot | This phase (privacy invariant) | No runtime network is structurally enforced (P1 guard throws); freshness is a maintainer/CI concern, not a runtime one. |
 
 **Deprecated/outdated:**
+
 - endoflife.date v0 endpoints — still served but superseded by v1; do not target v0.
 
 ## Assumptions Log
@@ -482,6 +508,7 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos'] as const
 ## Validation Architecture
 
 ### Test Framework
+
 | Property | Value |
 |----------|-------|
 | Framework | Vitest `^4.1.2` |
@@ -492,6 +519,7 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos'] as const
 `src/engines/eos/` is **auto-gated at ≥75%** by the existing `src/engines/**/*.ts` coverage include — **no `vitest.config.ts` change needed** (EOS-06 satisfied structurally; verified L21-33). `catalogue.json` is data, not `.ts` — outside coverage.
 
 ### Phase Requirements → Test Map
+
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
 | EOS-01/02/03 | disjoint partition reconciles to entity total; +3/6/9/12 + overdue + unknown present | unit | `npx vitest run src/engines/eos/bucketEos.test.ts` | ❌ Wave 0 |
@@ -503,11 +531,13 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos'] as const
 | D-12 | original RVTools string preserved verbatim through matching | unit | included in `normalizeOs.test.ts` | ❌ Wave 0 |
 
 ### Sampling Rate
+
 - **Per task commit:** `npx vitest run src/engines/eos`
 - **Per wave merge:** `npm run test:run`
 - **Phase gate:** full suite green + coverage gate (`npm run test:coverage`) before `/gsd-verify-work`
 
 ### Wave 0 Gaps
+
 - [ ] `src/engines/eos/fixtures/real-os-strings.ts` — the harvested ≥50-string + ESX fixture (content provided above; copy verbatim)
 - [ ] `src/engines/eos/normalizeOs.test.ts` — RHEL-8×4, Oracle-Linux×3, <5%-unknown, D-12 verbatim, multi-version-CentOS→unknown (A3)
 - [ ] `src/engines/eos/classifyEsxi.test.ts` — 8.0.3 build → major 8.0; 7.0 → overdue; patch em-dash
@@ -521,6 +551,7 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos'] as const
 > `security_enforcement` not explicitly false in config; included. This phase's only security-relevant surface is supply-chain/privacy.
 
 ### Applicable ASVS Categories
+
 | ASVS Category | Applies | Standard Control |
 |---------------|---------|-----------------|
 | V2 Authentication | no | endoflife.date is public/unauth; no secrets. |
@@ -531,6 +562,7 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos'] as const
 | V10 Malicious Code / Supply Chain | yes | `catalogue.json` is a committed, PR-reviewable artifact; `sync:eos` fetches over HTTPS from a single known host; no new npm runtime dep (no new supply-chain surface). The privacy guard (P1) ensures the app itself never fetches it at runtime. |
 
 ### Known Threat Patterns for this stack
+
 | Pattern | STRIDE | Standard Mitigation |
 |---------|--------|---------------------|
 | Poisoned/tampered catalogue snapshot | Tampering | Zod schema validation at the boundary (build fails on bad shape); committed JSON reviewed in PR diff; single trusted HTTPS source. |
@@ -540,20 +572,24 @@ const VIEWS = ['dashboard','inventory','hosts','planning','eos'] as const
 ## Sources
 
 ### Primary (HIGH confidence)
+
 - endoflife.date v1 API — **queried live 2026-05-17**: `/api/v1/` (`schema_version 1.2.1`), `/api/v1/products/` (`total 455`), `/api/v1/products/{esxi,rhel,oracle-linux,windows-server,windows,centos,debian,ubuntu,sles,almalinux,rocky-linux}/` — exact field names (`releases[].name/label/releaseDate/isEol/eolFrom/isMaintained`, paid-tier `isEoes/eoesFrom`), ESXi major-only granularity, product slugs + release keying.
 - Repo (grep/Read, this session): `src/engines/aggregation/osFamily.ts`, `estateView.ts`, `src/types/{vinfo,vhost,estate}.ts`, `src/components/ViewToggle.tsx`, `src/App.tsx`, `src/hooks/useEstateView.ts`, `src/utils/format.ts` (no date helper), `vitest.config.ts` (coverage include + thresholds), `.github/workflows/static.yml`, `scripts/check-supply-chain.mjs`, `package.json`.
 - RVTools OS-string space — **harvested live 2026-05-17** via SheetJS from `tests/fixtures/RVTools_export_all_2026-01-07…`, `…2026-01-14…`, `…2026-04-17…-MOM-vCenter.xlsx`, `rvtools-sample.xlsx` (45 distinct osConfig, 44 distinct osTools, 4 distinct ESX Version).
 - `07-CONTEXT.md` (D-00..D-12), `07-UI-SPEC.md`, `.planning/REQUIREMENTS.md` (EOS-01..06; stale Phase-5 coverage row), `.planning/ROADMAP.md` Phase 7.
 
 ### Secondary (MEDIUM confidence)
+
 - WebFetch of endoflife.date ESXi page (corroborated by the live curl — agreement increases confidence to HIGH on ESXi granularity).
 
 ### Tertiary (LOW confidence)
+
 - Oracle Linux RVTools string forms (A2) — training knowledge; not present in the real fixtures (flagged in Assumptions Log).
 
 ## Metadata
 
 **Confidence breakdown:**
+
 - endoflife.date schema / slugs / ESXi granularity: HIGH — live-queried, cross-checked WebFetch.
 - OS-string space / normalizer feasibility: HIGH — harvested from the actual real fixtures.
 - Bundling/CI architecture: HIGH — verified against the real `static.yml` + scripts pattern.

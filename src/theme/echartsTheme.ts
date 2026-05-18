@@ -6,10 +6,12 @@
  * Phase 2 adds NO new palette tokens) into ECharts theme objects, per the
  * UI-SPEC §Color "Chart series → token mapping" table.
  *
- * The tokens in `index.css` are `oklch(...)` strings; the ECharts SVG
- * renderer accepts any CSS color string, so we emit the same oklch values
- * verbatim (no conversion — fidelity over reformatting). Tailwind `slate-*`
- * defaults are resolved to their canonical hex (axis/grid text only — never
+ * The tokens in `index.css` are `oklch(...)` strings, but zrender (the
+ * renderer ECharts bundles) parses only hex / rgb(a) / hsl(a) / named —
+ * an `oklch()` string silently falls back to `#000000`. So each token is
+ * emitted as its sRGB hex equivalent (accurate OKLCH→sRGB conversion of the
+ * exact `index.css` values — same color, parseable form). Tailwind `slate-*`
+ * defaults are likewise their canonical hex (axis/grid text only — never
  * pure black/white, per the UI-SPEC contrast contract).
  *
  * Both variants are registered once at module load by `<Chart>`:
@@ -18,15 +20,18 @@
  */
 
 // --- Concrete token values resolved from src/index.css @theme ---------------
-const PRIMARY_500 = 'oklch(45% 0.18 270)'
-const PRIMARY_300 = 'oklch(70% 0.12 270)'
-const PRIMARY_200 = 'oklch(82% 0.08 270)'
-const SURFACE_200 = 'oklch(88% 0.01 260)'
-const SURFACE_700 = 'oklch(28% 0.02 260)'
-const SURFACE_800 = 'oklch(20% 0.02 260)'
-const UTIL_LOW = 'oklch(64% 0.16 142)' // green
-const UTIL_MID = 'oklch(72% 0.18 65)' // orange
-const UTIL_HIGH = 'oklch(58% 0.22 25)' // red
+// sRGB hex = accurate OKLCH→sRGB conversion of the exact index.css oklch()
+// values (zrender cannot parse oklch — it would fall back to #000000). The
+// original oklch source is kept in the trailing comment as the source of truth.
+const PRIMARY_500 = '#3245b7' // oklch(45% 0.18 270)
+const PRIMARY_300 = '#819ae9' // oklch(70% 0.12 270)
+const PRIMARY_200 = '#b0c2f9' // oklch(82% 0.08 270)
+const SURFACE_200 = '#d4d8de' // oklch(88% 0.01 260)
+const SURFACE_700 = '#232933' // oklch(28% 0.02 260)
+const SURFACE_800 = '#11161f' // oklch(20% 0.02 260)
+const UTIL_LOW = '#4aa342' // oklch(64% 0.16 142) — green
+const UTIL_MID = '#ef8700' // oklch(72% 0.18 65) — orange
+const UTIL_HIGH = '#df202e' // oklch(58% 0.22 25) — red
 
 // Tailwind default slate scale (axis/grid/label text — never pure b/w).
 const SLATE_500 = '#64748b'

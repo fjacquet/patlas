@@ -60,7 +60,7 @@ describe('Phase 1 end-to-end smoke: drop → parse → render', () => {
 
   it('renders the hero UploadZone when no snapshots are loaded', () => {
     render(<App />)
-    expect(screen.queryByText(/vatlas/)).not.toBeNull()
+    expect(screen.queryByText(/vAtlas/)).not.toBeNull()
     expect(screen.queryAllByRole('button').length).toBeGreaterThan(0)
   })
 

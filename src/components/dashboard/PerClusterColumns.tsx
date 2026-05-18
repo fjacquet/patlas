@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import type { ClusterAggregate, OsBreakdown } from '@/types/estate'
+import type { ClusterAggregate, OsBreakdown, TrendSeries } from '@/types/estate'
 import { ClusterColumn } from './ClusterColumn'
 
 const EMPTY_OS: OsBreakdown = { windows: 0, linux: 0, other: 0 }
@@ -12,6 +12,8 @@ export interface PerClusterColumnsProps {
   onToggleStretched: (cluster: string) => void
   /** Forwarded to each column's drill affordance (RCI cluster detail). */
   onSelectCluster: (cluster: string) => void
+  /** P8 trend series, forwarded to each column for its sparkline. */
+  trends?: TrendSeries | null
 }
 
 /**
@@ -26,6 +28,7 @@ export function PerClusterColumns({
   vmsByCluster,
   onToggleStretched,
   onSelectCluster,
+  trends,
 }: PerClusterColumnsProps) {
   const { t } = useTranslation('dashboard')
 
@@ -42,6 +45,7 @@ export function PerClusterColumns({
             os={vmsByCluster.get(cluster.cluster) ?? EMPTY_OS}
             onToggleStretched={onToggleStretched}
             onSelectCluster={onSelectCluster}
+            trends={trends}
           />
         ))}
       </div>

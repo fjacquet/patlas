@@ -7,9 +7,12 @@ import { FallbackError } from './components/FallbackError'
 import { HostsView } from './components/hosts/HostsView'
 import { InventoryView } from './components/inventory/InventoryView'
 import { LanguageToggle } from './components/LanguageToggle'
+import { NetworkView } from './components/network/NetworkView'
 import { PlanningView } from './components/planning/PlanningView'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
+import { StorageView } from './components/storage/StorageView'
 import { ThemeToggle } from './components/ThemeToggle'
+import { TrendsView } from './components/trends/TrendsView'
 import { UploadZone } from './components/UploadZone'
 import { type AppView, ViewToggle } from './components/ViewToggle'
 import { useSnapshotUpload } from './hooks/useSnapshotUpload'
@@ -26,7 +29,7 @@ function App() {
     <ErrorBoundary FallbackComponent={FallbackError}>
       <div className="flex min-h-screen flex-col">
         <header className="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-3 dark:border-surface-700">
-          <h1 className="text-lg font-semibold text-slate-700 dark:text-slate-200">vatlas</h1>
+          <h1 className="text-lg font-semibold text-slate-700 dark:text-slate-200">vAtlas</h1>
           <div className="flex items-center gap-2">
             <ViewToggle value={activeView} onChange={setActiveView} />
             <LanguageToggle />
@@ -44,6 +47,12 @@ function App() {
               <PlanningView />
             ) : activeView === 'eos' ? (
               <EosView />
+            ) : activeView === 'trends' ? (
+              <TrendsView />
+            ) : activeView === 'storage' ? (
+              <StorageView />
+            ) : activeView === 'network' ? (
+              <NetworkView />
             ) : (
               <GlobalDashboard />
             )}

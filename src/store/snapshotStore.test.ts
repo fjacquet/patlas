@@ -2,7 +2,14 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { Snapshot } from '@/types/snapshot'
-import { selectActiveSnapshot, selectHasSnapshots, useSnapshotStore } from './snapshotStore'
+import {
+  DEFAULT_THRESHOLDS,
+  selectActiveSnapshot,
+  selectHasSnapshots,
+  selectSetThresholds,
+  selectThresholds,
+  useSnapshotStore,
+} from './snapshotStore'
 
 // Minimal Snapshot factory — the store does not inspect row contents, only
 // identity + the two fields the mutators touch (vCenterLabel, capturedAt).
@@ -21,6 +28,10 @@ const makeSnapshot = (id: string, overrides: Partial<Snapshot> = {}): Snapshot =
     vhost: [],
     vdatastore: [],
     vpartition: [],
+    vnetwork: [],
+    vswitch: [],
+    dvswitch: [],
+    dvport: [],
     parseErrors: [],
     ...overrides,
   }) as unknown as Snapshot
@@ -158,6 +169,33 @@ describe('snapshotStore', () => {
     expect(selectActiveSnapshot(useSnapshotStore.getState())?.id).toBe('a')
     useSnapshotStore.getState().setActiveSnapshot('ghost')
     expect(selectActiveSnapshot(useSnapshotStore.getState())).toBeNull()
+  })
+
+  it('P9 thresholds: defaults to the RVTools-Analyser-class values (D-03)', () => {
+    expect(selectThresholds(useSnapshotStore.getState())).toEqual(DEFAULT_THRESHOLDS)
+    expect(DEFAULT_THRESHOLDS).toEqual({ fsUsedPct: 90, dsUsedPct: 85, luUsedPct: 85 })
+  })
+
+  it('P9 thresholds: setThresholds REPLACES with a fresh object (Object.is fires)', () => {
+    const before = selectThresholds(useSnapshotStore.getState())
+    selectSetThresholds(useSnapshotStore.getState())({
+      fsUsedPct: 80,
+      dsUsedPct: 75,
+      luUsedPct: 70,
+    })
+    const after = selectThresholds(useSnapshotStore.getState())
+    expect(after).toEqual({ fsUsedPct: 80, dsUsedPct: 75, luUsedPct: 70 })
+    expect(after).not.toBe(before)
+  })
+
+  it('P9 thresholds: clearAll restores the defaults (refresh == defaults)', () => {
+    selectSetThresholds(useSnapshotStore.getState())({
+      fsUsedPct: 50,
+      dsUsedPct: 50,
+      luUsedPct: 50,
+    })
+    useSnapshotStore.getState().clearAll()
+    expect(selectThresholds(useSnapshotStore.getState())).toEqual(DEFAULT_THRESHOLDS)
   })
 
   it('PAR-05: store module does not import persistence middleware', () => {

@@ -1,6 +1,13 @@
 import { create } from 'zustand'
+import { DEFAULT_THRESHOLDS, type ThresholdInput } from '@/engines/aggregation/thresholdFlags'
 import type { DrScenario } from '@/types/estate'
-import type { Snapshot } from '@/types/snapshot'
+import type { ReleasedTrendAggregate, Snapshot } from '@/types/snapshot'
+
+/** Store-public alias of the pure-engine threshold shape (single source of
+ *  truth lives in `engines/aggregation/thresholdFlags`). Re-exported so
+ *  existing store consumers keep importing it from here. */
+export type ThresholdConfig = ThresholdInput
+export { DEFAULT_THRESHOLDS }
 
 const EMPTY_SCENARIO = (): DrScenario => ({
   failedHosts: new Set(),
@@ -57,6 +64,13 @@ interface SnapshotState {
    * localStorage, no URL-hash codec (PROJECT.md line 53 / D-06 / T-06-01).
    */
   plannedRatios: { cpu: number; ram: number }
+  /**
+   * P9 threshold-alerting config (D-01/D-02). In-memory inputs-only,
+   * REPLACED never mutated (Zustand `Object.is`); NO new localStorage key,
+   * no URL-hash — `clearAll` restores defaults so refresh == defaults
+   * restored (PAR-05 / D-02).
+   */
+  thresholds: ThresholdConfig
   addSnapshot: (s: Snapshot) => void
   removeSnapshot: (id: string) => void
   setActiveSnapshot: (id: string | null) => void
@@ -64,8 +78,18 @@ interface SnapshotState {
   setStretchedClusters: (clusters: Set<string>) => void
   setScenario: (scenario: DrScenario) => void
   setPlannedRatios: (r: { cpu: number; ram: number }) => void
+  setThresholds: (t: ThresholdConfig) => void
   renameVCenter: (id: string, label: string) => void
   setCapturedAt: (id: string, date: Date) => void
+  /**
+   * DD-C (Critical-5): drop a snapshot's raw row arrays for GC when > 4
+   * snapshots are loaded, carrying its already-computed `releasedAggregate`
+   * so its trend point survives. Inputs-only, REPLACE-never-mutate;
+   * in-memory only, no spill to any browser storage (the surviving
+   * aggregate is the only remaining input fact for that point — A3
+   * resolved reading). Never called for the active/latest snapshot.
+   */
+  releaseRawRows: (id: string, releasedAggregate: ReleasedTrendAggregate) => void
   clearAll: () => void
 }
 
@@ -76,6 +100,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
   stretchedClusters: new Set(),
   scenario: EMPTY_SCENARIO(),
   plannedRatios: { cpu: 4, ram: 1 },
+  thresholds: { ...DEFAULT_THRESHOLDS },
 
   addSnapshot: (s) =>
     set((state) => {
@@ -127,6 +152,10 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
   // subscribers re-render; no persist, no localStorage (D-06).
   setPlannedRatios: (r) => set({ plannedRatios: { ...r } }),
 
+  // REPLACE never mutate (Zustand `Object.is`) — fresh object so
+  // subscribers re-render; no persist, no localStorage (D-02).
+  setThresholds: (t) => set({ thresholds: { ...t } }),
+
   renameVCenter: (id, label) =>
     set((state) => {
       const snap = state.snapshots.get(id)
@@ -145,6 +174,27 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
       return { snapshots: next }
     }),
 
+  releaseRawRows: (id, releasedAggregate) =>
+    set((state) => {
+      const snap = state.snapshots.get(id)
+      if (!snap) return {}
+      const next = new Map(state.snapshots)
+      next.set(id, {
+        ...snap,
+        vinfo: [],
+        vhost: [],
+        vdatastore: [],
+        vpartition: [],
+        vnetwork: [],
+        vswitch: [],
+        dvswitch: [],
+        dvport: [],
+        rawReleased: true,
+        releasedAggregate,
+      })
+      return { snapshots: next }
+    }),
+
   clearAll: () =>
     set({
       snapshots: new Map(),
@@ -153,6 +203,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
       stretchedClusters: new Set(),
       scenario: EMPTY_SCENARIO(),
       plannedRatios: { cpu: 4, ram: 1 },
+      thresholds: { ...DEFAULT_THRESHOLDS },
     }),
 }))
 
@@ -185,3 +236,7 @@ export const selectPlannedRatios = (s: SnapshotState): { cpu: number; ram: numbe
 export const selectSetPlannedRatios = (
   s: SnapshotState,
 ): ((r: { cpu: number; ram: number }) => void) => s.setPlannedRatios
+// P9 threshold slice (D-02). Stable refs — never construct here.
+export const selectThresholds = (s: SnapshotState): ThresholdConfig => s.thresholds
+export const selectSetThresholds = (s: SnapshotState): ((t: ThresholdConfig) => void) =>
+  s.setThresholds

@@ -24,6 +24,7 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   viSdkServer: 'vc-a.local',
   provisionedMib: mib(0),
   inUseMib: mib(0),
+  path: '',
   ...over,
 })
 
@@ -48,6 +49,10 @@ const estate = (vinfo: VInfoRow[], vhost: VHostRow[]): MergedEstate => ({
   vhost,
   vdatastore: [],
   vpartition: [],
+  vnetwork: [],
+  vswitch: [],
+  dvswitch: [],
+  dvport: [],
   vcenters: [],
 })
 

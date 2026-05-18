@@ -7,6 +7,7 @@ import {
   selectSelectedSnapshotIds,
   selectSnapshots,
   selectStretchedClusters,
+  selectThresholds,
   useSnapshotStore,
 } from '@/store/snapshotStore'
 import type { AccountingMode, EstateView } from '@/types/estate'
@@ -45,6 +46,7 @@ export function useEstateView(mode: AccountingMode): EstateView {
   const stretchedClusters = useSnapshotStore(selectStretchedClusters)
   const scenario = useSnapshotStore(selectScenario)
   const planned = useSnapshotStore(selectPlannedRatios)
+  const thresholds = useSnapshotStore(selectThresholds)
   return useMemo(() => {
     const selected = [...snapshots.values()].filter((s) => selectedIds.has(s.id))
     if (selected.length === 0) return EMPTY_VIEW
@@ -52,10 +54,20 @@ export function useEstateView(mode: AccountingMode): EstateView {
     // the wall clock is sampled here at recompute time and threaded in. Not a
     // memo dep — `today` is read when inputs change, not on time passing.
     const today = new Date()
-    return buildEstateView(mergeSnapshotsToEstate(selected), mode, today, {
+    return buildEstateView(mergeSnapshotsToEstate(selected), selected, mode, today, {
       stretchedClusters,
       scenario,
       plannedRatios: { cpuRatio: planned.cpu, ramRatio: planned.ram },
+      thresholds,
     })
-  }, [snapshots, selectedIds, stretchedClusters, scenario, mode, planned.cpu, planned.ram])
+  }, [
+    snapshots,
+    selectedIds,
+    stretchedClusters,
+    scenario,
+    mode,
+    planned.cpu,
+    planned.ram,
+    thresholds,
+  ])
 }

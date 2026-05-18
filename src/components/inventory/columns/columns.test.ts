@@ -11,7 +11,7 @@ import type { Snapshot } from '@/types/snapshot'
 // production merge path (single snapshot = degenerate merge case).
 const TEST_TODAY = new Date('2026-01-01T00:00:00Z')
 const buildEstateView = (snap: Snapshot, mode: AccountingMode) =>
-  buildEstateViewMerged(mergeSnapshotsToEstate([snap]), mode, TEST_TODAY)
+  buildEstateViewMerged(mergeSnapshotsToEstate([snap]), [snap], mode, TEST_TODAY)
 
 import type { VHostRow } from '@/types/vhost'
 import type { VInfoRow } from '@/types/vinfo'
@@ -135,6 +135,7 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   viSdkServer: '',
   provisionedMib: mib(40_960),
   inUseMib: mib(20_480),
+  path: '',
   ...over,
 })
 
@@ -188,6 +189,10 @@ const sharedLunSnapshot = (): Snapshot => ({
     },
   ],
   vpartition: [],
+  vnetwork: [],
+  vswitch: [],
+  dvswitch: [],
+  dvport: [],
   parseErrors: [],
 })
 

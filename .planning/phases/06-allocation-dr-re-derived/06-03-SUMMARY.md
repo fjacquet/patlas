@@ -99,6 +99,7 @@ placeholder), and reworked `dr.json` EN/FR with parity — closing the final Pha
 ### Auto-fixed Issues
 
 **1. [Rule 3 - Blocking] Import + JSDoc prose trip literal `grep -c` acceptance gates**
+
 - **Found during:** Task 1 (confidence), Task 2 (useEstateView)
 - **Issue:** Two acceptance gates are literal token counts. Task 1's
   `grep -v '^#' DrSimPanel.tsx | grep -c 'confidence...'` == 0 was tripped by the JSDoc
@@ -118,6 +119,7 @@ placeholder), and reworked `dr.json` EN/FR with parity — closing the final Pha
 - **Commits:** a151fca (T1), 61bfcf2 (T2), a5f0dd4 (JSDoc reword)
 
 **2. [Plan discretion exercised] `caveats.siteSymmetric` not added**
+
 - The plan's Task 3 says "extend `caveats.*` content for the two-mode/physical model".
   The frozen 06-01 `runScenario` only ever pushes `caveats.reservationHigh`. `caveats`
   are i18n KEY suffixes emitted by the engine; adding an i18n key the engine can never
@@ -127,6 +129,7 @@ placeholder), and reworked `dr.json` EN/FR with parity — closing the final Pha
 - **Commit:** 4c12fb8
 
 **3. [Plan discretion exercised] Site picker = radio (single fault-domain) semantics**
+
 - D-08 locks "pick a site (stretched fault-domain)". Implemented as single-selection
   radio inputs; re-picking the same site clears it (reversible/neutral, no destructive
   styling — kept G3 idiom). Within the locked intent; the exact widget was executor
@@ -142,7 +145,7 @@ a held-unused forward-reference). Phase 6 is complete.
 ## Threat Flags
 
 None. This plan adds no network/auth/file/schema surface — it is a pure presenter rework
-+ in-memory store reads. T-06-10..T-06-13 mitigations hold: zero `confidence` tokens in
+- in-memory store reads. T-06-10..T-06-13 mitigations hold: zero `confidence` tokens in
 the panel + zero `confidence.*` keys (T-06-10); physical labels, no `vCPU`/`evacueeVcpu`
 leakage, em-dash sentinel idiom retained (T-06-11); the Apply-planned toggle switches
 between two distinct engine results, asserted exclusive by the presenter test (T-06-12);

@@ -1,0 +1,18 @@
+{
+  "config": {
+    "heading": "Seuils",
+    "fs": "Système de fichiers utilisé %",
+    "ds": "Datastore utilisé %",
+    "lu": "LU utilisé %",
+    "echo": "Système de fichiers ≥ {{fs}} % · Datastore > {{ds}} % · LU > {{lu}} %"
+  },
+  "fs": {
+    "count": "{{count}} partitions ≥ {{pct}} % utilisés"
+  },
+  "ds": {
+    "count": "{{count}} datastores > {{pct}} % utilisés"
+  },
+  "lu": {
+    "count": "{{count}} unités logiques > {{pct}} % utilisées"
+  }
+}
