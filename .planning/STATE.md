@@ -4,10 +4,10 @@ milestone: v1.0
 milestone_name: milestone
 status: completed
 stopped_at: Phase 10 COMPLETE (5/5) — HTML+PPTX export loop shipped & self-verified, DEP confirmed
-last_updated: "2026-05-18T13:09:46.548Z"
-last_activity: 2026-05-18 -- Phase 09 marked complete
+last_updated: "2026-05-18T20:58:40.256Z"
+last_activity: 2026-05-18 -- v1.0.0 tagged + GitHub Release + Pages deploy green
 progress:
-  total_phases: 10
+  total_phases: 11
   completed_phases: 10
   total_plans: 37
   completed_plans: 37
@@ -72,6 +72,10 @@ Project progress: [██████████] 100% (10/10 phases)
 | Phase 08 P03 | 41min | 4 tasks | 18 files |
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 11 added: Report and deck gap closure (v1.0 audit F-2/F-1): Phase 9 analytics into HTML report + PPTX deck; resolve dead plannedView; reconcile traceability
 
 ### Decisions
 

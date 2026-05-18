@@ -270,3 +270,13 @@ Phases execute in numeric order: 1 Ã¢ÂÂ 2 Ã¢ÂÂ 3 Ã¢ÂÂ 4 
 | 8. In-Session Trends | 3/3 | Complete   | 2026-05-17 |
 | 9. Storage / Network / Detailed Views + Threshold Alerting | 5/5 | Complete — engine+UI, real-file STR-04 gate passed | 2026-05-18 |
 | 10. HTML + PPTX Exports & Deploy | 5/5 | Complete — engines+worker+UI, self-verified HTML+PPTX, DEP confirmed | 2026-05-18 |
+
+### Phase 11: Report and deck gap closure — surface Phase 9 storage network threshold analytics in HTML report and PPTX deck, resolve dead plannedView, reconcile traceability
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 10
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 11 to break down)
