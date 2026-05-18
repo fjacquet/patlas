@@ -1,7 +1,7 @@
 {
   "name": "vatlas",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "Drop your RVTools export, get a navigable visual atlas of your VMware estate. 100% client-side.",
   "scripts": {
