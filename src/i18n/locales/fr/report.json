@@ -1,0 +1,16 @@
+{
+  "action": {
+    "html": "Exporter HTML",
+    "pptx": "Exporter PPTX",
+    "ariaHtml": "Exporter le rapport du parc en fichier HTML autonome",
+    "ariaPptx": "Exporter le rapport du parc en présentation PPTX"
+  },
+  "toast": {
+    "progress": "Génération du rapport…",
+    "success": "Rapport prêt — {{filename}}",
+    "error": "L'export ne s'est pas terminé. Les données sont inchangées — ouvrez la console du navigateur pour le détail, puis réessayez."
+  },
+  "footer": {
+    "methodology": "Généré par vatlas — synthèse factuelle du parc. Source : export RVTools, capturé le {{captureDate}}. Les chiffres reflètent l'instantané actif uniquement."
+  }
+}

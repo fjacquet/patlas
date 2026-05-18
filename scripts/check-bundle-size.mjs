@@ -59,7 +59,26 @@ if (!existsSync(ASSETS_DIR)) {
 
 const jsChunks = readdirSync(ASSETS_DIR).filter((f) => f.endsWith('.js'))
 
+// The gate targets the INITIAL ECharts payload (ROADMAP Phase-2 #5 /
+// T-02-02 — a non-tree-shaken barrel in the shipped page bundle). Web
+// Worker chunks (`*.worker-<hash>.js`) are CODE-SPLIT and lazily fetched
+// only when their feature runs (e.g. the Phase-10 export worker, fetched
+// on an export click — never on initial paint). They legitimately bundle
+// echarts SSR + pptxgenjs + react-dom/server and exceed 300 KiB by design;
+// their tree-shaking is independently enforced by the renderCharts/spike
+// no-`from 'echarts'`-barrel grep gates. Excluding them here keeps the
+// initial-bundle protection intact without false-failing a deliberate
+// lazy worker (P9→P10: export.worker is the first echarts-bearing worker).
+const isWorkerChunk = (file) => /\.worker-[^/]*\.js$/.test(file)
+
 const echartsChunks = jsChunks
+  .filter((file) => {
+    if (isWorkerChunk(file)) {
+      console.log(`check-bundle-size: skipping lazy worker chunk ${file} (not initial bundle)`)
+      return false
+    }
+    return true
+  })
   .map((file) => {
     const bytes = readFileSync(join(ASSETS_DIR, file))
     return { file, bytes }

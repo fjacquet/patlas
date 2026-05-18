@@ -23,12 +23,14 @@
     "sync:eos": "node scripts/sync-eos.mjs"
   },
   "dependencies": {
+    "@resvg/resvg-wasm": "^2.6.2",
     "@tanstack/react-table": "8.21.3",
     "@tanstack/react-virtual": "3.13.24",
     "echarts": "^6.0.0",
     "echarts-for-react": "^3.0.6",
     "i18next": "^26.2.0",
     "i18next-browser-languagedetector": "^8.2.1",
+    "pptxgenjs": "^4.0.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-error-boundary": "^6.1.1",

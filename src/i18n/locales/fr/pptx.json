@@ -1,0 +1,6 @@
+{
+  "title": {
+    "identity": "{{vcenters}} · {{clusters}} clusters · {{hosts}} hôtes · {{vms}} VMs · capturé le {{captureDate}}",
+    "generated": "Généré par vatlas — synthèse factuelle du parc"
+  }
+}
