@@ -11,7 +11,9 @@ import enEos from './locales/en/eos.json'
 import enInventory from './locales/en/inventory.json'
 import enMvc from './locales/en/mvc.json'
 import enNetwork from './locales/en/network.json'
+import enPptx from './locales/en/pptx.json'
 import enRci from './locales/en/rci.json'
+import enReport from './locales/en/report.json'
 import enStorage from './locales/en/storage.json'
 import enStr from './locales/en/str.json'
 import enTrends from './locales/en/trends.json'
@@ -25,7 +27,9 @@ import frEos from './locales/fr/eos.json'
 import frInventory from './locales/fr/inventory.json'
 import frMvc from './locales/fr/mvc.json'
 import frNetwork from './locales/fr/network.json'
+import frPptx from './locales/fr/pptx.json'
 import frRci from './locales/fr/rci.json'
+import frReport from './locales/fr/report.json'
 import frStorage from './locales/fr/storage.json'
 import frStr from './locales/fr/str.json'
 import frTrends from './locales/fr/trends.json'
@@ -58,6 +62,8 @@ export const NAMESPACES = [
   'storage',
   'alerts',
   'network',
+  'report',
+  'pptx',
 ] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
@@ -77,6 +83,8 @@ export const resources = {
     storage: enStorage,
     alerts: enAlerts,
     network: enNetwork,
+    report: enReport,
+    pptx: enPptx,
   },
   fr: {
     common: frCommon,
@@ -93,6 +101,8 @@ export const resources = {
     storage: frStorage,
     alerts: frAlerts,
     network: frNetwork,
+    report: frReport,
+    pptx: frPptx,
   },
 } as const
 
