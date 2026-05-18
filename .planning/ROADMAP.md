@@ -241,7 +241,14 @@ Plans:
   4. A user opens both the HTML report and the PPTX deck and confirms they carry factual numbers only (no editorial recommendations Ã¢ÂÂ i18n string lint enforces "recommend/should/poor/good" denylist)
   5. A user accesses vatlas at `https://fjacquet.github.io/vatlas/` and confirms every UI string is available in both FR and EN (CI key-diff gate prevents drift), with light/dark theme working
   6. The CI pipeline runs typecheck Ã¢ÂÂ lint Ã¢ÂÂ test Ã¢ÂÂ build Ã¢ÂÂ deploy on every push to `main`, with the SheetJS tarball pinning verified and the telemetry-package denylist enforced
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — Wave-0 spike: SVG→PNG-without-DOM rasterizer + pptxgenjs-in-worker decision (gates PPTX charts)
+- [ ] 10-02-PLAN.md — Export spine: pure D-08 buildExportView (A2 test) + DOM-free ECharts SSR chartToSvg + report/pptx i18n + key-parity gate
+- [ ] 10-03-PLAN.md — HTML report engine: renderReport tree + inlineAssets/CSP/size-budget + assembleHtml (10k-fixture ceiling)
+- [ ] 10-04-PLAN.md — PPTX engine: theme/format(FR U+202F→U+00A0)/primitives/chartSvg + 8 slides + builder golden snapshot
+- [ ] 10-05-PLAN.md — Worker entry + useExport + ExportButtons + App wiring + DEP-01/02 verification + human-verify gate
 **UI hint**: yes
 **vsizer reuse**: `engines/export/pptx/builder.ts` (port + extend); `engines/export/pptx/slides/*.ts` title/overview/cluster/contention (port unchanged); `engines/export/pptx/primitives/*.ts` (port unchanged); `src/i18n/` scaffolding (port + add `inventory`, `eos`, `dr`, `trends`, `report` namespaces); `.github/workflows/static.yml` (port + tweak `base: '/vatlas/'`); new files `engines/export/html/renderReport.tsx`, `inlineAssets.ts`, `renderCharts.ts`, `assembleHtml.ts`, `engines/export/pptx/slides/eosSlide.ts`, `drSimSlide.ts`, `trendsSlide.ts`, `inventorySlide.ts`, `primitives/chartSvg.ts`
 **Pitfalls owned**: Moderate-2 (French locale U+202F Ã¢ÂÂ U+00A0 substitution for PPTX, centralized formatters, no pre-formatted numbers in translation strings), Moderate-7 (HTML report self-hosted subset fonts as base64 `@font-face`, no external references, CSP meta in exported HTML, inline SVG charts via `chart.renderToSVGString()`, anchor-id namespacing per snapshot, < 5 MB / < 15 MB size budget), Moderate-8 (pptxgenjs `pptxText` wrapper for autoFit/control-char/font-overflow, `pptxSafeFormat` for locale, golden-PPTX snapshot CI test), Minor-7 (i18n FRÃ¢ÂÂEN key-diff CI gate)
