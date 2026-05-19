@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 ## Current Position
 
-Phase: v2.0 code-complete (6/6) — UAT + milestone audit pending
+Phase: 18 — PPTX vsizer-parity rebuild (in progress: 18-01 done)
 Plan: —
-Status: All phases 12–17 implemented, tested (502), committed
-Last activity: 2026-05-19 — Phase 17 done: PPTX overhaul (commit feat(17-01)). Nav revised to LEFT per user (fix(14-01)).
+Status: Phases 12–17 done; Phase 18 added (deck not on par w/ vsizer). 18-01 cluster slide rebuilt + title dedup; 18-02/03/04 remaining.
+Last activity: 2026-05-19 — Phase 18-01: cluster slide → vsizer parity, brand-free (commit feat(18-01)). 502 tests green.
 
 ## Performance Metrics
 
@@ -125,7 +125,12 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 
 ## Operator Next Steps
 
-1. **Playwright UAT (consolidated)** — verify offline boot (P13), LEFT nav placement (P14), KPI-tile dashboard + cluster zoom (P15), Capacity Planning visual return (P16), and regenerate the canary PPTX to eyeball P17. Artifacts under `.playwright-mcp/` ONLY (Vite-reload trap).
-2. **Milestone audit** (`/gsd-audit-milestone`) then `/gsd-complete-milestone`.
-3. Follow-up polish: ClusterColumn KPI-tile (UIX-02 remainder); PPT-02 remaining slide types; swap hand-authored icons for the icons-project render_icon exact set once that MCP is enabled (icon prop is the stable seam).
+1. **Phase 18 continuation** (the deck rebuild the user is waiting on):
+   - 18-02 titleSlide → vsizer style (eyebrow + big title + navy bottom KPI tiles).
+   - 18-03 port overview/storage/network/eos/dr/trends/inventory/planned onto the new `primitives/draw.ts` for consistent density; planned slide → Phase-16 headroom parity.
+   - 18-04 simplify app-side stretched-cluster management to match vsizer (read `/Users/fjacquet/Projects/vsizer` stretched toggle vs vatlas `setStretchedClusters`/StretchedPill).
+   - Reference decks for comparison: vsizer `~/Downloads/RVTools_export_all_2026-01-07_10_23_35_vsizer.pptx`; vatlas current `~/Downloads/vatlas_spvspherevc11_*.pptx`.
+2. **Consolidated Playwright UAT** — offline boot (P13), LEFT nav (P14), KPI tiles (P15), planning visual (P16), regenerate + eyeball the deck (P17/P18). Artifacts under `.playwright-mcp/` ONLY (Vite-reload trap).
+3. **Milestone audit** (`/gsd-audit-milestone`) then `/gsd-complete-milestone`.
+4. Polish: ClusterColumn KPI-tile (UIX-02 remainder); swap hand-authored icons for the icons-project render_icon set once that MCP is enabled.
 - Carry-forward (post-Phase-15, consolidated): Phases 13–15 visual/offline Playwright UAT (artifacts under .playwright-mcp/ only — Vite-reload trap); ClusterColumn KPI-tile polish (UIX-02 remainder); swap hand-authored icons for the icons-project render_icon exact set once that MCP is enabled (icon prop is the stable seam — no API change).

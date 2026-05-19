@@ -3,9 +3,19 @@
 ## Milestones
 
 - ✅ **v1.0 RVTools Atlas (MVP)** — Phases 1–11 (shipped 2026-05-19) — full detail: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
-- ⏳ **v2.0 Offline-Capable, Redesigned, Better Deck** — Phases 12–17
+- ⏳ **v2.0 Offline-Capable, Redesigned, Better Deck** — Phases 12–18
 
 ## v2.0 — Offline-Capable, Redesigned, Better Deck
+
+### Phase 18 — PPTX vsizer-parity rebuild + stretched UX (added 2026-05-19)
+
+User found the deck "worthless / not on par with the website" vs the vsizer reference deck. Diagnosis: vatlas's pptx slide builders surface a fraction of the EstateView and lack vsizer's designed layout. Decision: port vsizer's proven slide design **brand-free** (vatlas UI-SPEC §Color — navy/gold/grey, NO verdict green/orange/red); make stretched-cluster handling as simple as vsizer's.
+
+- [x] **18-01 Cluster slide** — rebuilt to vsizer parity (draw primitives, 5 KPI cards, CPU/RAM utilization blocks w/ peak + min/mean/max, KEY FIGURES banner, provenance footer, simple stretched suffix); slide-1 vCenter duplication fixed; cluster i18n EN/FR canonicalised. 502 green. `feat(18-01)`.
+- [ ] **18-02 Title slide** — vsizer-style (eyebrow + big title + navy bottom KPI tiles).
+- [ ] **18-03 Overview + remaining slides** — storage/network/eos/dr/trends/inventory/planned ported onto the draw primitives for consistent density (planned slide → Phase-16 headroom parity).
+- [ ] **18-04 Stretched-management UX** — align the app-side stretched-cluster declaration to vsizer's simplicity (investigate vsizer's toggle vs vatlas `setStretchedClusters`/StretchedPill).
+- Carry: regenerate a real deck and visually UAT vs the vsizer reference.
 
 Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQUIREMENTS.md](REQUIREMENTS.md)
 
