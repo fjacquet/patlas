@@ -7,10 +7,10 @@ last_updated: "2026-05-19T17:24:48.952Z"
 last_activity: 2026-05-19
 progress:
   total_phases: 6
-  completed_phases: 2
-  total_plans: 2
-  completed_plans: 2
-  percent: 33
+  completed_phases: 3
+  total_plans: 3
+  completed_plans: 3
+  percent: 50
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 ## Current Position
 
-Phase: 14 — Navigation IA: right-side vertical menu (next)
+Phase: 15 — Visual redesign: KPI tile system (next)
 Plan: —
-Status: Phases 12–13 complete; starting Phase 14
-Last activity: 2026-05-19 — Phase 13 done: installable offline PWA (commit feat(13-01)). Carry: Phase 13 offline-runtime Playwright UAT pending.
+Status: Phases 12–14 complete (50%); starting Phase 15
+Last activity: 2026-05-19 — Phase 14 done: right-side vertical nav (commit feat(14-01)). Carry: Phases 13–14 visual/offline Playwright UAT pending.
 
 ## Performance Metrics
 
@@ -124,5 +124,5 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 
 ## Operator Next Steps
 
-- Phase 14 (inline): move ViewToggle from header to a right-side vertical rail before the drop zone (App.tsx layout + ViewToggle orientation, keep role=group/aria-pressed/arrow-key)
-- Carry-forward: Phase 13 offline-boot Playwright UAT (artifacts under .playwright-mcp/ only — Vite-reload trap)
+- Phase 15 (inline): vendor ~15 icons from /Users/fjacquet/Projects/icons (its render_icon MCP not connected this session — may need it enabled or pick equivalents) → src/components/icons/; StatTile+TileSection; refactor GlobalSummaryCard/OperationalInsights/ClusterColumn/ClusterDetail to grouped KPI-tile sections (vsizer reference)
+- Carry-forward: Phases 13–14 visual/offline Playwright UAT (artifacts under .playwright-mcp/ only — Vite-reload trap)

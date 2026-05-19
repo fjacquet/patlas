@@ -15,9 +15,9 @@ Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQU
 - [x] **Phase 13: Installable, fully-offline PWA** (PWA-01..04) — *depends on 12* — 2026-05-19
   - Goal: installable + works fully offline via an audited precache-only SW; updates never silently wipe a loaded estate.
   - Success: build emits `sw.js` + `manifest.webmanifest` (scope `/vatlas/`, 4 icons); SW guard-first + precache-only (no runtime route bundled); smart-update unit-tested; bundle-size + build + 494-suite green (commit `feat(13-01)`). ⚠ Offline hard-reload runtime UAT (Playwright, browser) still pending — structurally + gate + unit verified only.
-- [ ] **Phase 14: Navigation IA — right-side vertical menu** (NAV-01)
+- [x] **Phase 14: Navigation IA — right-side vertical menu** (NAV-01) — 2026-05-19
   - Goal: primary nav is a right rail before the drop zone, keyboard/ARIA preserved.
-  - Success: nav rail in loaded + empty states; ViewToggle tests adapted green; EN/FR unchanged.
+  - Success: right-side `<nav>` rail in the loaded layout; ViewToggle gains opt-in vertical orientation; keyboard/ARIA/role=group preserved; ViewToggle tests adapted + new vertical test; EN/FR unchanged; 495-suite + build green (commit `feat(14-01)`). ⚠ Visual placement UAT pending.
 - [ ] **Phase 15: Visual redesign — KPI tile system** (UIX-01..03) — *depends on 14*
   - Goal: dashboard + cluster zoom become grouped icon/color KPI tiles matching the vsizer reference.
   - Success: tiles in light+dark; values identical to v1.0; vendored same-origin icons; key-parity + bundle-size green.
@@ -52,9 +52,9 @@ Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQU
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 RVTools Atlas (MVP) | 1–11 | 43/43 | ✅ Complete — released & deployed | 2026-05-19 |
-| v2.0 Offline-Capable, Redesigned, Better Deck | 12–17 | 2/6 | ⏳ In progress (Phases 12–13 ✓) | — |
+| v2.0 Offline-Capable, Redesigned, Better Deck | 12–17 | 3/6 | ⏳ In progress (Phases 12–14 ✓) | — |
 
 Full v1.0 phase detail (goals, success criteria, requirements, pitfalls) is archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md). Requirements archived in [milestones/v1.0-REQUIREMENTS.md](milestones/v1.0-REQUIREMENTS.md). Audit: [milestones/v1.0-MILESTONE-AUDIT.md](milestones/v1.0-MILESTONE-AUDIT.md).
 
 ---
-*v1.0 shipped 2026-05-19. v2.0 started 2026-05-19 — Phases 12 (governance) + 13 (PWA) ✓. Phase 14 (right-side nav) next. Carry: Phase 13 offline runtime UAT pending.*
+*v1.0 shipped 2026-05-19. v2.0 started 2026-05-19 — Phases 12 (governance) + 13 (PWA) + 14 (right-side nav) ✓. Phase 15 (KPI-tile redesign) next. Carry: visual/offline Playwright UAT for Phases 13–14 pending.*
