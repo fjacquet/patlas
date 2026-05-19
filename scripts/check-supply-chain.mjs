@@ -86,8 +86,11 @@ function firstCodeLine(source) {
 
 function importsGuardFirst(swSource) {
   const first = firstCodeLine(swSource)
-  // `import './privacy/fetchGuard'` with single or double quotes, optional `;`.
-  return new RegExp(`^import\\s+['"]${GUARD_IMPORT.replace(/[.]/g, '\\.')}['"];?$`).test(first)
+  // `import './privacy/fetchGuard'` — single or double quotes, optional `;`,
+  // optional trailing `// …` line comment (the established worker convention,
+  // see src/engines/parser/parser.worker.ts).
+  const path = GUARD_IMPORT.replace(/[.]/g, '\\.')
+  return new RegExp(`^import\\s+['"]${path}['"];?\\s*(//.*)?$`).test(first)
 }
 
 /**

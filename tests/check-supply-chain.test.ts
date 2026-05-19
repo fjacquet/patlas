@@ -9,6 +9,8 @@ const CLEAN_PKG = {
 const GUARD_FIRST = `import './privacy/fetchGuard'\nimport { precacheAndRoute } from 'workbox-precaching'\n`
 const GUARD_FIRST_WITH_COMMENTS = `// SW entry — ADR-0001 exception\n/* block\n   comment */\n\nimport './privacy/fetchGuard'\nimport { precacheAndRoute } from 'workbox-precaching'\n`
 const GUARD_NOT_FIRST = `import { precacheAndRoute } from 'workbox-precaching'\nimport './privacy/fetchGuard'\n`
+// Established worker convention: webworker ref + guard import with trailing comment.
+const GUARD_FIRST_WORKER_STYLE = `/// <reference lib="webworker" />\nimport './privacy/fetchGuard' // ADR-0001 SW exception — guard-first\nimport { precacheAndRoute } from 'workbox-precaching'\n`
 
 describe('evaluateSupplyChain', () => {
   it('passes a clean package with no service worker', () => {
@@ -86,6 +88,14 @@ describe('evaluateSupplyChain', () => {
     const r = evaluateSupplyChain({
       pkg: { devDependencies: { 'vite-plugin-pwa': '^1' } },
       swSource: GUARD_FIRST_WITH_COMMENTS,
+    })
+    expect(r.ok).toBe(true)
+  })
+
+  it('accepts the established worker convention (webworker ref + trailing comment)', () => {
+    const r = evaluateSupplyChain({
+      pkg: { devDependencies: { 'vite-plugin-pwa': '^1' } },
+      swSource: GUARD_FIRST_WORKER_STYLE,
     })
     expect(r.ok).toBe(true)
   })

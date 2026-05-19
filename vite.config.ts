@@ -2,12 +2,55 @@ import { resolve } from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
   // Base path for GitHub Pages deployment (https://fjacquet.github.io/vatlas/)
   base: '/vatlas/',
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    // ADR-0001 SW exception — injectManifest (our audited src/sw.ts, not a
+    // generated black box), precache-only, prompt-style update. We register
+    // manually in src/pwa/registerSW.ts so `injectRegister` is null. Scope and
+    // start_url derive from `base` (/vatlas/) and are pinned in the manifest.
+    VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      registerType: 'prompt',
+      injectRegister: null,
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,svg,png,woff,woff2,json}'],
+      },
+      manifest: {
+        name: 'vAtlas',
+        short_name: 'vAtlas',
+        description: 'RVTools → atlas of your VMware estate (100% client-side)',
+        id: '/vatlas/',
+        scope: '/vatlas/',
+        start_url: '/vatlas/',
+        display: 'standalone',
+        theme_color: '#11161f',
+        background_color: '#11161f',
+        icons: [
+          { src: 'favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+          { src: 'pwa-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'pwa-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          {
+            src: 'pwa-maskable-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+      },
+      // No SW in `npm run dev` — the privacy/UAT story stays simple; the SW is
+      // exercised via `npm run build && npm run preview`.
+      devOptions: { enabled: false },
+    }),
+  ],
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),

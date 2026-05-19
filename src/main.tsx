@@ -12,6 +12,11 @@ import App from './App.tsx'
 // keys synchronously on the first paint.
 import './i18n'
 import './index.css'
+// PWA registration — imported AFTER the privacy guard (it must stay the first
+// import). registerSW uses navigator.serviceWorker, not fetch, so the guard
+// does not block it; the SW is same-origin and precache-only (ADR-0001
+// SW exception).
+import { registerPwa } from './pwa/registerSW'
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('vatlas: missing #root element in index.html')
@@ -21,3 +26,5 @@ createRoot(rootEl).render(
     <App />
   </StrictMode>,
 )
+
+registerPwa()
