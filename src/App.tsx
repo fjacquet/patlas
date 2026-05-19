@@ -39,6 +39,13 @@ function App() {
         </header>
         {hasSnapshots ? (
           <div className="flex flex-1 overflow-hidden">
+            {/* Improvement 1: primary navigation is a vertical rail (was a
+                top-bar strip). Conventional LEFT placement — far-left
+                column, before the snapshot sidebar + drop zone.
+                Keyboard/ARIA unchanged. */}
+            <nav className="flex w-56 shrink-0 flex-col gap-3 overflow-y-auto border-r border-slate-200 p-4 dark:border-surface-700">
+              <ViewToggle value={activeView} onChange={setActiveView} orientation="vertical" />
+            </nav>
             <SnapshotListSidebar />
             {activeView === 'inventory' ? (
               <InventoryView />
@@ -57,11 +64,6 @@ function App() {
             ) : (
               <GlobalDashboard />
             )}
-            {/* Improvement 1: primary navigation is a right-side vertical
-                rail (was a top-bar strip). Keyboard/ARIA unchanged. */}
-            <nav className="flex w-56 shrink-0 flex-col gap-3 overflow-y-auto border-l border-slate-200 p-4 dark:border-surface-700">
-              <ViewToggle value={activeView} onChange={setActiveView} orientation="vertical" />
-            </nav>
           </div>
         ) : (
           <main className="flex flex-1 items-center justify-center p-8">
