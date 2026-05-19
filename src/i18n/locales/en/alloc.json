@@ -35,6 +35,19 @@
     "clusterDelta": "Per-cluster delta",
     "colCluster": "Cluster",
     "colMeasured": "Measured",
-    "colPlanned": "Planned"
+    "colPlanned": "Planned",
+    "headroomTitle": "vCPU headroom — measured vs planned",
+    "capMeasured": "vCPU capacity (measured)",
+    "capPlanned": "vCPU capacity (planned)",
+    "vcpuDemand": "vCPU allocated (demand)",
+    "ramCapMeasured": "vRAM capacity (measured)",
+    "ramCapPlanned": "vRAM capacity (planned)",
+    "ramDemand": "vRAM allocated (demand)",
+    "headroom": "Headroom",
+    "seriesCapacity": "Capacity",
+    "seriesDemand": "Allocated",
+    "catMeasured": "Measured",
+    "catPlanned": "Planned",
+    "axisCores": "Cores"
   }
 }
