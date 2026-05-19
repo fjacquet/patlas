@@ -55,5 +55,36 @@
   },
   "contention": {
     "title": "CPU Ready (annexe)"
+  },
+  "storage": {
+    "title": "Stockage",
+    "byCluster": "Stockage par cluster",
+    "provisioned": "Provisionné (Gio)",
+    "inUse": "Utilisé (Gio)",
+    "capacity": "Capacité (Gio)",
+    "flagged": "Datastores signalés",
+    "colCluster": "Cluster",
+    "colProvisioned": "Provisionné",
+    "colInUse": "Utilisé",
+    "vsanShared": "Partagé sur {{n}} clusters"
+  },
+  "network": {
+    "title": "Réseau",
+    "vswitches": "vSwitches",
+    "dvswitches": "dvSwitches",
+    "portgroups": "Groupes de ports",
+    "vnetwork": "Adjacences VM"
+  },
+  "planned": {
+    "title": "Parc planifié vs mesuré",
+    "none": "—",
+    "vcpuMeasured": "vCPU:pCPU mesuré",
+    "vcpuPlanned": "vCPU:pCPU planifié",
+    "vmMeasured": "VM mesurées",
+    "vmPlanned": "VM planifiées",
+    "clusterDelta": "Écart par cluster",
+    "colCluster": "Cluster",
+    "colMeasured": "Mesuré",
+    "colPlanned": "Planifié"
   }
 }
