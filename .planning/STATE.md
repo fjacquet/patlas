@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 ## Current Position
 
-Phase: 18 — PPTX vsizer-parity rebuild (18-01, 18-02 done; 18-03/04 remaining)
+Phase: 18 — PPTX vsizer-parity rebuild (18-01/02 done; 18-03 in progress; 18-04 pending)
 Plan: —
-Status: cluster slide + title slide + overview readability now vsizer-grade, VISUALLY VERIFIED via soffice render. Remaining: storage/network/eos/dr/trends/inventory/planned slides (18-03); app-side stretched UX (18-04).
-Last activity: 2026-05-19 — Phase 18-02: vsizer-style title + pptxMemMib readable GiB/TiB (commit feat(18-02)). 502 tests green.
+Status: VISUALLY VERIFIED (soffice render) vsizer-grade: cluster, title, overview, Planned (Phase-16 headroom), Storage (table). Remaining 18-03: network (all-zeros → factual absent), dr (barren → stretched summary), eos/inventory (plain). 18-04: app-side stretched UX.
+Last activity: 2026-05-19 — Phase 18-03: Planned headroom parity + Storage table (commit feat(18-03)). 502 tests green.
 
 ## Performance Metrics
 
@@ -126,8 +126,8 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 ## Operator Next Steps
 
 1. **Phase 18 continuation** (the deck rebuild the user is waiting on):
-   - 18-02 titleSlide → vsizer style (eyebrow + big title + navy bottom KPI tiles).
-   - 18-03 port overview/storage/network/eos/dr/trends/inventory/planned onto the new `primitives/draw.ts` for consistent density; planned slide → Phase-16 headroom parity.
+   - ✅ 18-01 cluster · ✅ 18-02 title + overview · ✅ 18-03 Planned + Storage (all visually verified via soffice render).
+   - 18-03 remaining: networkSlide (empty rollup → factual "optional vNetwork/vSwitch sheets absent" not 4 zeros); drSimSlide (no-scenario → estate stretched-cluster DR reservation summary); eos/inventory density polish.
    - 18-04 simplify app-side stretched-cluster management to match vsizer (read `/Users/fjacquet/Projects/vsizer` stretched toggle vs vatlas `setStretchedClusters`/StretchedPill).
    - Reference decks for comparison: vsizer `~/Downloads/RVTools_export_all_2026-01-07_10_23_35_vsizer.pptx`; vatlas current `~/Downloads/vatlas_spvspherevc11_*.pptx`.
 2. **Consolidated Playwright UAT** — offline boot (P13), LEFT nav (P14), KPI tiles (P15), planning visual (P16), regenerate + eyeball the deck (P17/P18). Artifacts under `.playwright-mcp/` ONLY (Vite-reload trap).
