@@ -1,6 +1,6 @@
 {
   "title": {
-    "identity": "{{vcenters}} · {{clusters}} clusters · {{hosts}} hôtes · {{vms}} VMs · capturé le {{captureDate}}",
+    "identity": "{{clusters}} clusters · {{hosts}} hôtes · {{vms}} VMs · capturé le {{captureDate}}",
     "generated": "Généré par vatlas — synthèse factuelle du parc"
   },
   "overview": {
@@ -20,18 +20,32 @@
     "inUse": "Utilisé (Mio)"
   },
   "cluster": {
-    "subtitle": "Détail du cluster",
-    "hosts": "Hôtes",
-    "vms": "VM",
-    "vcpuPerPcpu": "vCPU : pCPU",
-    "datastores": "Datastores",
-    "cpu": "Utilisation CPU",
-    "cores": "Cœurs physiques",
-    "ghz": "GHz physiques",
-    "ram": "Mémoire hôte (Mio)",
-    "capVcpu": "Capacité vCPU",
-    "capRam": "Capacité vRAM (Mio)",
-    "vcpuAlloc": "vCPU alloué"
+    "stretched": "Étendu",
+    "drReserved": "Réservé PRA",
+    "hostsWord": "hôtes",
+    "vmsWord": "VM",
+    "coresWord": "cœurs",
+    "ramWord": "RAM",
+    "readyLine": "CPU Ready : {{mean}} % moyen · {{max}} % max · {{count}} VM > {{thr}} %",
+    "readyUnavailable": "CPU Ready : indisponible (source : RVTools)",
+    "cpuMean": "CPU moyen",
+    "ramMean": "RAM moyen",
+    "ghzUsedPhys": "GHz utilisés / phys.",
+    "mhzPerVcpu": "réels par vCPU alloué",
+    "vcpuPerPcpu": "vCPU par cœur physique",
+    "min": "Min",
+    "mean": "Moyen",
+    "max": "Max",
+    "cpuTitle": "CPU — utilisation moyenne",
+    "ramTitle": "RAM — utilisation moyenne",
+    "consumedOf": "consommés sur",
+    "keyFigures": "DONNÉES CLÉS",
+    "vcpuAlloc": "vCPU alloué",
+    "reservedCap": "Capacité réservée (vCPU × horloge)",
+    "consumedGhz": "GHz consommés",
+    "availableGhz": "GHz disponibles",
+    "ramAvailable": "RAM disponible",
+    "footer": "Source : RVTools — vHost (% CPU/RAM, Speed × Cores, Memory) + vInfo (vCPUs, Memory)"
   },
   "eos": {
     "title": "Prévision de fin de support des OS",

@@ -166,9 +166,13 @@ describe('buildPptx — golden structural snapshot', () => {
     expect(txt).toContain('Avg CPU %')
     expect(txt).toContain('Physical cores')
     expect(txt).toContain('In use (MiB)')
-    // Cluster second KPI row
-    expect(txt).toContain('Physical GHz')
-    expect(txt).toContain('vCPU capacity')
+    // Cluster slide (Phase 18 vsizer-parity rebuild): rich layout.
+    // ASCII-only substrings (the zip is latin1-decoded — multibyte
+    // em-dash titles like "CPU — mean utilization" won't match here).
+    expect(txt).toContain('KEY FIGURES')
+    expect(txt).toContain('GHz consumed')
+    expect(txt).toContain('GHz available')
     expect(txt).toContain('vCPU allocated')
+    expect(txt).toContain('Reserved capacity')
   })
 })
