@@ -12,9 +12,9 @@ Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQU
 - [x] **Phase 12: Privacy governance — ADR-0001 SW exception + supply-chain gate** (GOV-01, GOV-02) — 2026-05-19
   - Goal: land the reviewable privacy-policy change (no app behavior change) before any SW code.
   - Success: `check:supply-chain` passes with the workbox allowlist; a `sw.ts` missing the guard import fails the gate; ADR-0001 + PITFALLS Critical-2 amended and consistent. ✓ (9/9 gate tests, tsc+biome green, commit `feat(12-01)`)
-- [ ] **Phase 13: Installable, fully-offline PWA** (PWA-01..04) — *depends on 12*
+- [x] **Phase 13: Installable, fully-offline PWA** (PWA-01..04) — *depends on 12* — 2026-05-19
   - Goal: installable + works fully offline via an audited precache-only SW; updates never silently wipe a loaded estate.
-  - Success: build emits `sw.js` + `manifest.webmanifest` (scope `/vatlas/`); offline hard-reload renders; SW first line imports the guard; bundle-size + build green.
+  - Success: build emits `sw.js` + `manifest.webmanifest` (scope `/vatlas/`, 4 icons); SW guard-first + precache-only (no runtime route bundled); smart-update unit-tested; bundle-size + build + 494-suite green (commit `feat(13-01)`). ⚠ Offline hard-reload runtime UAT (Playwright, browser) still pending — structurally + gate + unit verified only.
 - [ ] **Phase 14: Navigation IA — right-side vertical menu** (NAV-01)
   - Goal: primary nav is a right rail before the drop zone, keyboard/ARIA preserved.
   - Success: nav rail in loaded + empty states; ViewToggle tests adapted green; EN/FR unchanged.
@@ -52,9 +52,9 @@ Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQU
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 RVTools Atlas (MVP) | 1–11 | 43/43 | ✅ Complete — released & deployed | 2026-05-19 |
-| v2.0 Offline-Capable, Redesigned, Better Deck | 12–17 | 1/6 | ⏳ In progress (Phase 12 ✓) | — |
+| v2.0 Offline-Capable, Redesigned, Better Deck | 12–17 | 2/6 | ⏳ In progress (Phases 12–13 ✓) | — |
 
 Full v1.0 phase detail (goals, success criteria, requirements, pitfalls) is archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md). Requirements archived in [milestones/v1.0-REQUIREMENTS.md](milestones/v1.0-REQUIREMENTS.md). Audit: [milestones/v1.0-MILESTONE-AUDIT.md](milestones/v1.0-MILESTONE-AUDIT.md).
 
 ---
-*v1.0 shipped 2026-05-19. v2.0 (Offline-Capable, Redesigned, Better Deck) started 2026-05-19 — Phases 12–17 (GOV/PWA/NAV/UIX/PLN/PPT). Phase 12 next.*
+*v1.0 shipped 2026-05-19. v2.0 started 2026-05-19 — Phases 12 (governance) + 13 (PWA) ✓. Phase 14 (right-side nav) next. Carry: Phase 13 offline runtime UAT pending.*

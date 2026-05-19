@@ -7,10 +7,10 @@ last_updated: "2026-05-19T17:24:48.952Z"
 last_activity: 2026-05-19
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
-  percent: 17
+  completed_phases: 2
+  total_plans: 2
+  completed_plans: 2
+  percent: 33
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 ## Current Position
 
-Phase: 13 — Installable, fully-offline PWA (next)
+Phase: 14 — Navigation IA: right-side vertical menu (next)
 Plan: —
-Status: Phase 12 complete (GOV-01/02); starting Phase 13
-Last activity: 2026-05-19 — Phase 12 done: ADR-0001 SW exception + narrowed/strengthened supply-chain gate (commit feat(12-01))
+Status: Phases 12–13 complete; starting Phase 14
+Last activity: 2026-05-19 — Phase 13 done: installable offline PWA (commit feat(13-01)). Carry: Phase 13 offline-runtime Playwright UAT pending.
 
 ## Performance Metrics
 
@@ -124,4 +124,5 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 
 ## Operator Next Steps
 
-- Phase 13 (inline): add vite-plugin-pwa injectManifest + src/sw.ts (guard-first, precache-only) + src/pwa/registerSW.ts smart-auto-update + manifest/icons; gate now enforces the SW envelope
+- Phase 14 (inline): move ViewToggle from header to a right-side vertical rail before the drop zone (App.tsx layout + ViewToggle orientation, keep role=group/aria-pressed/arrow-key)
+- Carry-forward: Phase 13 offline-boot Playwright UAT (artifacts under .playwright-mcp/ only — Vite-reload trap)
