@@ -3,6 +3,30 @@
 ## Milestones
 
 - ✅ **v1.0 RVTools Atlas (MVP)** — Phases 1–11 (shipped 2026-05-19) — full detail: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
+- ⏳ **v2.0 Offline-Capable, Redesigned, Better Deck** — Phases 12–17
+
+## v2.0 — Offline-Capable, Redesigned, Better Deck
+
+Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQUIREMENTS.md](REQUIREMENTS.md)
+
+- [ ] **Phase 12: Privacy governance — ADR-0001 SW exception + supply-chain gate** (GOV-01, GOV-02)
+  - Goal: land the reviewable privacy-policy change (no app behavior change) before any SW code.
+  - Success: `check:supply-chain` passes with the workbox allowlist; a `sw.ts` missing the guard import fails the gate; ADR-0001 + PITFALLS Critical-2 amended and consistent.
+- [ ] **Phase 13: Installable, fully-offline PWA** (PWA-01..04) — *depends on 12*
+  - Goal: installable + works fully offline via an audited precache-only SW; updates never silently wipe a loaded estate.
+  - Success: build emits `sw.js` + `manifest.webmanifest` (scope `/vatlas/`); offline hard-reload renders; SW first line imports the guard; bundle-size + build green.
+- [ ] **Phase 14: Navigation IA — right-side vertical menu** (NAV-01)
+  - Goal: primary nav is a right rail before the drop zone, keyboard/ARIA preserved.
+  - Success: nav rail in loaded + empty states; ViewToggle tests adapted green; EN/FR unchanged.
+- [ ] **Phase 15: Visual redesign — KPI tile system** (UIX-01..03) — *depends on 14*
+  - Goal: dashboard + cluster zoom become grouped icon/color KPI tiles matching the vsizer reference.
+  - Success: tiles in light+dark; values identical to v1.0; vendored same-origin icons; key-parity + bundle-size green.
+- [ ] **Phase 16: Capacity Planning visual return** (PLN-01)
+  - Goal: changing the planned ratio shows a measured-vs-planned headroom visualization.
+  - Success: visualization updates on ratio change; reconciles with Dashboard; no new memo; no editorial verbs; EN/FR.
+- [ ] **Phase 17: PPTX quality overhaul** (PPT-01..03)
+  - Goal: crisp/correctly-sized deck charts + dense factual brand-free text.
+  - Success: regenerated canary deck has sharp charts + denser facts; structural golden tests pass; brand-free intact.
 
 ## Phases
 
@@ -28,8 +52,9 @@
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 RVTools Atlas (MVP) | 1–11 | 43/43 | ✅ Complete — released & deployed | 2026-05-19 |
+| v2.0 Offline-Capable, Redesigned, Better Deck | 12–17 | 0/6 | ⏳ Planning | — |
 
 Full v1.0 phase detail (goals, success criteria, requirements, pitfalls) is archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md). Requirements archived in [milestones/v1.0-REQUIREMENTS.md](milestones/v1.0-REQUIREMENTS.md). Audit: [milestones/v1.0-MILESTONE-AUDIT.md](milestones/v1.0-MILESTONE-AUDIT.md).
 
 ---
-*v1.0 RVTools Atlas (MVP) shipped 2026-05-19 — 11 phases, 43 plans, ~23.6k LOC, deployed to fjacquet.github.io/vatlas/. Next milestone: `/gsd-new-milestone`.*
+*v1.0 shipped 2026-05-19. v2.0 (Offline-Capable, Redesigned, Better Deck) started 2026-05-19 — Phases 12–17 (GOV/PWA/NAV/UIX/PLN/PPT). Phase 12 next.*

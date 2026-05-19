@@ -8,6 +8,19 @@ vatlas is a 100 % client-side web app that turns one or more RVTools `.xlsx` exp
 
 A user drops a RVTools workbook and walks away with a polished, shareable HTML report and PPTX deck describing their VMware estate — without uploading a single byte. **The report is the product.**
 
+## Current Milestone: v2.0 — Offline-Capable, Redesigned, Better Deck
+
+**Goal:** Make vatlas installable and fully offline (under a deliberately amended, audited privacy ADR), give the dashboard a KPI-tile redesign with right-side navigation, make the Capacity Planning what-if produce a visible factual result, and overhaul the PPTX deck for crisp charts and dense factual content.
+
+**Target features:**
+
+- Privacy governance: ADR-0001 amended with a tightly-scoped, audited service-worker exception (precache-only, same-origin, SW imports the existing privacy guard); supply-chain gate narrowed + strengthened.
+- Installable, fully-offline PWA — `vite-plugin-pwa` injectManifest, precache-only `src/sw.ts`, smart auto-update that never silently wipes a loaded estate.
+- Navigation moved from the top bar to a right-side vertical menu before the drop zone (Improvement 1).
+- Dashboard + cluster zoom redesigned as grouped KPI tile sections with icons and semantic color accents — matching the vsizer reference (Improvement 2).
+- Capacity Planning what-if shows a measured-vs-planned headroom visualization instead of only a caption (Improvement 3).
+- PPTX deck: charts rendered at slide-box aspect and print resolution; previously-dropped estate facts surfaced as factual brand-free EN/FR text.
+
 ## Current State
 
 **Shipped: v1.0.0** — released & deployed live at `https://fjacquet.github.io/vatlas/` (2026-05-19). 11 phases, 43 plans, ~23.6k LOC TypeScript. The full RVTools→atlas loop is in production: drop workbook(s) → global dashboard / inventory / allocation / DR / EOS / storage / network / threshold views / in-session trends → shareable self-contained **HTML report** + themed bilingual **PPTX deck** → leave (refresh = data gone). 484 tests; tsc/biome/supply-chain/bundle-size + the production build are CI-gated and green; client-side privacy invariant held throughout.
@@ -32,14 +45,19 @@ A user drops a RVTools workbook and walks away with a polished, shareable HTML r
 - [x] i18n FR + EN with CI key-parity gate — *v1.0 (continuous, Phases 1–11)*
 - [x] Public deploy to GitHub Pages (`fjacquet.github.io/vatlas/`) — *v1.0 (Phase 10, DEP-01/02)*
 
-### Active
+### Active (v2.0)
 
-- (None — v1.0 shipped. The next milestone defines new requirements via `/gsd-new-milestone`.)
+- [ ] Privacy ADR-0001 amended with an audited service-worker exception; supply-chain gate narrowed+strengthened — *v2.0 (Phase 12, GOV-01/02)*
+- [ ] Installable, fully-offline PWA — precache-only audited SW, smart auto-update — *v2.0 (Phase 13, PWA-01..04)*
+- [ ] Right-side vertical primary navigation before the drop zone — *v2.0 (Phase 14, NAV-01)*
+- [ ] KPI-tile dashboard + cluster redesign (icons, color accents, grouped sections) — *v2.0 (Phase 15, UIX-01..03)*
+- [ ] Capacity Planning visual return (measured-vs-planned headroom) — *v2.0 (Phase 16, PLN-01)*
+- [ ] PPTX quality overhaul — crisp/correctly-sized charts + dense factual text — *v2.0 (Phase 17, PPT-01..03)*
 
 ### Out of Scope
 
 - **Live Optics ingestion** — vsizer supports it; vatlas is RVTools-only. Reduces parser surface and ambiguity.
-- **Cross-session persistence (DB, localStorage of dataset rows, OPFS, IndexedDB)** — would break the vsizer privacy invariant; trends are in-session only (user loads N monthly exports together).
+- **Cross-session persistence of dataset rows (DB, localStorage of rows, OPFS, IndexedDB)** — would break the privacy invariant; trends are in-session only. *(v2.0 note: a precache-only service worker for static app assets is now permitted under the amended ADR-0001 exception; it never touches dataset rows. Refresh = data gone still holds.)*
 - **Backend / server / file upload** — 100 % client-side is a hard product invariant. Nothing leaves the browser.
 - **Telemetry of parsed contents** — same privacy invariant.
 - **Editorial recommendations in the report** — like vsizer, vatlas reports carry numbers and forecasts, not opinions. Narrative stays with the presenter.
@@ -74,6 +92,7 @@ A user drops a RVTools workbook and walks away with a polished, shareable HTML r
 | Charting library = Apache ECharts via `echarts-for-react`, SVG renderer | ECharts ships treemap/sunburst/heatmap/calendar/gauge natively (4 of 6 chart families would be hand-built in visx); SVG renderer makes the HTML-report inline-SVG path trivial; live charts are already `<svg>`, plus `renderToSVGString()` for the report builder | ✓ Good (v1.0) |
 | HTML + PPTX both v1 | "The report is the product" — both formats are how the value leaves the app | ✓ Good (v1.0) |
 | KISS / DRY / functional programming as binding engineering principles | Pure-function engines, immutable data, no premature abstractions, no domain classes; engines compose via small typed functions. Inherits and extends vsizer's posture. Recorded as durable directive after roadmap. | ✓ Good (v1.0) |
+| v2.0: amend ADR-0001 to allow a scoped, audited service worker | Offline/installable PWA requires a SW; ADR-0001 forbade SWs as a privacy attack surface. Exception is tightly bounded: injectManifest (own code), precache-only, same-origin, and `src/sw.ts` imports the privacy guard so cross-origin fetch throws inside SW scope too — extending the 3-layer model rather than poking a hole. | ⏳ v2.0 (Phase 12) |
 
 ## Evolution
 
@@ -95,4 +114,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-19 after **v1.0 milestone complete** — 11/11 phases, 43 plans, v1.0.0 released & deployed to fjacquet.github.io/vatlas/. Full RVTools→atlas + shareable HTML report + bilingual PPTX deck shipped; audit passed (F-1/F-2 closed by Phase 11). All Key Decisions validated Good.*
+*Last updated: 2026-05-19 — **v2.0 milestone started** (Offline-Capable, Redesigned, Better Deck). Phases 12–17: privacy ADR-0001 SW exception + supply-chain gate, installable offline PWA, right-side nav, KPI-tile redesign, Capacity Planning visual return, PPTX overhaul. Prior: v1.0 complete (11/11 phases, v1.0.0 deployed).*

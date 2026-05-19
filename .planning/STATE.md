@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: RVTools Atlas (MVP)
-status: Awaiting next milestone
-stopped_at: v1.0 milestone CLOSED — archived, PROJECT evolved, retrospective written, gsd/v1.0-milestone retired
-last_updated: "2026-05-19T07:10:09.484Z"
-last_activity: 2026-05-19 — Milestone v1.0 completed and archived
+milestone: v2.0
+milestone_name: Offline-Capable, Redesigned, Better Deck
+status: planning
+last_updated: "2026-05-19T17:24:48.952Z"
+last_activity: 2026-05-19
 progress:
-  total_phases: 11
-  completed_phases: 11
-  total_plans: 43
-  completed_plans: 43
-  percent: 100
+  total_phases: 6
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 **Core value:** A user drops a RVTools workbook and walks away with a polished, shareable HTML report and PPTX deck describing their VMware estate — without uploading a single byte. The report is the product.
-**Current focus:** None — v1.0 RVTools Atlas (MVP) shipped & deployed; start the next milestone with `/gsd-new-milestone`
+**Current focus:** v2.0 — Phases 12–17 (privacy SW exception → PWA → right-side nav → KPI-tile redesign → planning visual return → PPTX overhaul). REQUIREMENTS.md + ROADMAP.md written.
 
 ## Current Position
 
-Phase: Milestone v1.0 complete
+Phase: 12 — Privacy governance: ADR-0001 SW exception + supply-chain gate
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-19 — Milestone v1.0 completed and archived
+Status: Milestone artifacts written; starting Phase 12
+Last activity: 2026-05-19 — Milestone v2.0 defined (REQUIREMENTS + ROADMAP), Phase 12 next
 
 ## Performance Metrics
 
@@ -125,4 +124,4 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Phase 12 in progress (inline): amend ADR-0001 SW exception + PITFALLS Critical-2; narrow+strengthen check-supply-chain.mjs with tests
