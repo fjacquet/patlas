@@ -7,10 +7,10 @@ last_updated: "2026-05-19T17:24:48.952Z"
 last_activity: 2026-05-19
 progress:
   total_phases: 6
-  completed_phases: 4
-  total_plans: 4
-  completed_plans: 4
-  percent: 67
+  completed_phases: 5
+  total_plans: 5
+  completed_plans: 5
+  percent: 83
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 ## Current Position
 
-Phase: 16 — Capacity Planning visual return (next)
+Phase: 17 — PPTX quality overhaul (last)
 Plan: —
-Status: Phases 12–15 complete (67%); starting Phase 16
-Last activity: 2026-05-19 — Phase 15 done: KPI-tile redesign (commit feat(15-01)). Carry: Phases 13–15 Playwright UAT; ClusterColumn polish; icons-MCP swap.
+Status: Phases 12–16 complete (83%); starting Phase 17
+Last activity: 2026-05-19 — Phase 16 done: Capacity Planning visual return (commit feat(16-01)). Carry: Phases 13–16 Playwright UAT; ClusterColumn polish; icons-MCP swap.
 
 ## Performance Metrics
 
@@ -125,6 +125,5 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 
 ## Operator Next Steps
 
-1. Phase 16 (inline): Capacity Planning visual return — pure option builder + StatTiles from existing view.globals vs view.plannedView.globals (capacityVcpu/capacityRamMib/vcpuPerPcpu); no new memo; EN/FR alloc.json; factual, no editorial verbs.
-2. Then Phase 17 (PPTX overhaul).
+1. Phase 17 (inline): PPTX overhaul — PPT-01 render charts at slide-box aspect × print DPI (fix chartSvg/renderCharts/export.worker/_layout); PPT-02 surface dropped EstateView facts as factual brand-free EN/FR text across slide builders; PPT-03 expand tests; regenerate canary deck for inspection.
 - Carry-forward (post-Phase-15, consolidated): Phases 13–15 visual/offline Playwright UAT (artifacts under .playwright-mcp/ only — Vite-reload trap); ClusterColumn KPI-tile polish (UIX-02 remainder); swap hand-authored icons for the icons-project render_icon exact set once that MCP is enabled (icon prop is the stable seam — no API change).
