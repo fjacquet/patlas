@@ -97,6 +97,7 @@ None yet.
 
 ### Blockers/Concerns
 
+- **Phase 15 BLOCKED on user action:** the `/Users/fjacquet/Projects/icons` `render_icon` MCP is not connected to the session. Enable it (`claude mcp add icons …` then restart) so the exact KPI icon set can be vendored into `src/components/icons/`. Icon-agnostic structure (StatTile/TileSection + 4-component refactor) can proceed first if desired; icons drop into the slot after.
 - Phase 1 must harvest 4+ real RVTools workbooks (one per generation: 3.10, 3.11, 4.0, 4.4) from `~/Downloads/`, `~/Library/CloudStorage/OneDrive-Home/`, and `vsizer/public/samples/rvtools-sample.xlsx` to lock in column-alias dictionary and MB-is-MiB canary
 - Phase 4 must verify whether RVTools `vCluster` exposes host fault-domain or site tag in current versions (if not, engine surfaces `confidence: 'medium'` with "assumed symmetric" chip)
 - Phase 5 needs research pass: OS-naming-variant matrix (harvest 50+ real OS strings; assert <5% unknown-OS rate) and `endoflife.date` v1 API Beta schema stability
@@ -124,5 +125,7 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 
 ## Operator Next Steps
 
-- Phase 15 (inline): vendor ~15 icons from /Users/fjacquet/Projects/icons (its render_icon MCP not connected this session — may need it enabled or pick equivalents) → src/components/icons/; StatTile+TileSection; refactor GlobalSummaryCard/OperationalInsights/ClusterColumn/ClusterDetail to grouped KPI-tile sections (vsizer reference)
-- Carry-forward: Phases 13–14 visual/offline Playwright UAT (artifacts under .playwright-mcp/ only — Vite-reload trap)
+1. **Enable the icons MCP** (`claude mcp add icons -- node /Users/fjacquet/Projects/icons/mcp-server/<entrypoint>`) and **restart the session** — unblocks Phase 15 icon vendoring (user chose "Enable the icons MCP").
+2. Resume Phase 15: vendor exact icons via `render_icon` → `src/components/icons/`; build StatTile+TileSection; refactor GlobalSummaryCard/OperationalInsights/ClusterColumn/ClusterDetail into grouped KPI-tile sections (vsizer reference); EN/FR section headers; tests.
+3. Then Phase 16 (planning visual return) → Phase 17 (PPTX overhaul).
+- Carry-forward: Phases 13–14 visual/offline Playwright UAT, consolidated after Phase 15 (artifacts under .playwright-mcp/ only — Vite-reload trap).
