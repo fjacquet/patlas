@@ -32,7 +32,6 @@ function App() {
         <header className="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-3 dark:border-surface-700">
           <h1 className="text-lg font-semibold text-slate-700 dark:text-slate-200">vAtlas</h1>
           <div className="flex items-center gap-2">
-            <ViewToggle value={activeView} onChange={setActiveView} />
             {hasSnapshots ? <ExportButtons /> : null}
             <LanguageToggle />
             <ThemeToggle />
@@ -58,6 +57,11 @@ function App() {
             ) : (
               <GlobalDashboard />
             )}
+            {/* Improvement 1: primary navigation is a right-side vertical
+                rail (was a top-bar strip). Keyboard/ARIA unchanged. */}
+            <nav className="flex w-56 shrink-0 flex-col gap-3 overflow-y-auto border-l border-slate-200 p-4 dark:border-surface-700">
+              <ViewToggle value={activeView} onChange={setActiveView} orientation="vertical" />
+            </nav>
           </div>
         ) : (
           <main className="flex flex-1 items-center justify-center p-8">

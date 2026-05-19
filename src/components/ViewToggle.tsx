@@ -24,6 +24,13 @@ const VIEWS = [
 export interface ViewToggleProps {
   value: AppView
   onChange: (view: AppView) => void
+  /**
+   * Layout. `horizontal` (default) is the legacy segmented strip.
+   * `vertical` is the v2.0 right-side rail (Improvement 1) — full-width,
+   * left-aligned items stacked top-to-bottom. The keyboard model is
+   * unchanged (Arrow Up/Down already handled), so a11y is identical.
+   */
+  orientation?: 'horizontal' | 'vertical'
 }
 
 /**
@@ -41,9 +48,10 @@ export interface ViewToggleProps {
  * `bg-primary-600`). Focus ring `ring-2 ring-primary-500`. Every color
  * utility carries its `dark:` twin.
  */
-export function ViewToggle({ value, onChange }: ViewToggleProps) {
+export function ViewToggle({ value, onChange, orientation = 'horizontal' }: ViewToggleProps) {
   const { t } = useTranslation('inventory')
   const label = t('nav.label')
+  const vertical = orientation === 'vertical'
 
   const move = (delta: number) => {
     const idx = VIEWS.indexOf(value)
@@ -67,7 +75,11 @@ export function ViewToggle({ value, onChange }: ViewToggleProps) {
       role="group"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className="flex items-center gap-1 rounded-md border border-slate-200 bg-white p-0.5 text-sm dark:border-surface-700 dark:bg-surface-900"
+      className={
+        vertical
+          ? 'flex w-full flex-col items-stretch gap-1 rounded-md border border-slate-200 bg-white p-1 text-sm dark:border-surface-700 dark:bg-surface-900'
+          : 'flex items-center gap-1 rounded-md border border-slate-200 bg-white p-0.5 text-sm dark:border-surface-700 dark:bg-surface-900'
+      }
     >
       <legend className="sr-only">{label}</legend>
       {VIEWS.map((view) => {
@@ -77,7 +89,9 @@ export function ViewToggle({ value, onChange }: ViewToggleProps) {
             key={view}
             type="button"
             onClick={() => onChange(view)}
-            className={`flex h-10 items-center rounded px-3 font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+            className={`flex h-10 items-center rounded font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+              vertical ? 'w-full justify-start px-3' : 'px-3'
+            } ${
               active
                 ? 'bg-accent-500 text-surface-900 dark:bg-accent-500 dark:text-surface-900'
                 : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
