@@ -85,9 +85,9 @@
   "storage": {
     "title": "Stockage",
     "byCluster": "Stockage par cluster",
-    "provisioned": "Provisionné (Gio)",
-    "inUse": "Utilisé (Gio)",
-    "capacity": "Capacité (Gio)",
+    "provisioned": "Provisionné",
+    "inUse": "Utilisé",
+    "capacity": "Capacité",
     "flagged": "Datastores signalés",
     "colCluster": "Cluster",
     "colProvisioned": "Provisionné",
@@ -111,6 +111,14 @@
     "clusterDelta": "Écart par cluster",
     "colCluster": "Cluster",
     "colMeasured": "Mesuré",
-    "colPlanned": "Planifié"
+    "colPlanned": "Planifié",
+    "capMeasured": "Capacité vCPU (mesurée)",
+    "capPlanned": "Capacité vCPU (planifiée)",
+    "vcpuDemand": "vCPU alloué (demande)",
+    "headroomPlanned": "Marge vCPU (planifiée)",
+    "ramCapMeasured": "Capacité vRAM (mesurée)",
+    "ramCapPlanned": "Capacité vRAM (planifiée)",
+    "ramDemand": "vRAM alloué (demande)",
+    "ramHeadroomPlanned": "Marge vRAM (planifiée)"
   }
 }
