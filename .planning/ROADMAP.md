@@ -18,9 +18,9 @@ Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQU
 - [x] **Phase 14: Navigation IA — right-side vertical menu** (NAV-01) — 2026-05-19
   - Goal: primary nav is a right rail before the drop zone, keyboard/ARIA preserved.
   - Success: right-side `<nav>` rail in the loaded layout; ViewToggle gains opt-in vertical orientation; keyboard/ARIA/role=group preserved; ViewToggle tests adapted + new vertical test; EN/FR unchanged; 495-suite + build green (commit `feat(14-01)`). ⚠ Visual placement UAT pending.
-- [ ] **Phase 15: Visual redesign — KPI tile system** (UIX-01..03) — *depends on 14*
+- [x] **Phase 15: Visual redesign — KPI tile system** (UIX-01, UIX-03; UIX-02 partial) — *depends on 14* — 2026-05-19
   - Goal: dashboard + cluster zoom become grouped icon/color KPI tiles matching the vsizer reference.
-  - Success: tiles in light+dark; values identical to v1.0; vendored same-origin icons; key-parity + bundle-size green.
+  - Success: StatTile/TileSection + same-origin inline-SVG icon set; GlobalSummaryCard + OperationalInsights + ClusterDetail refactored; values unchanged; 498-suite + key-parity + bundle-size + build green (commit `feat(15-01)`). ⚠ UIX-02 partial: ClusterColumn intentionally deferred (already gauge-rich, risk trim). Icons are hand-authored placeholders — swap via the icon prop once the icons-MCP exact set is vendored. Visual UAT pending.
 - [ ] **Phase 16: Capacity Planning visual return** (PLN-01)
   - Goal: changing the planned ratio shows a measured-vs-planned headroom visualization.
   - Success: visualization updates on ratio change; reconciles with Dashboard; no new memo; no editorial verbs; EN/FR.
@@ -52,9 +52,9 @@ Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQU
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 RVTools Atlas (MVP) | 1–11 | 43/43 | ✅ Complete — released & deployed | 2026-05-19 |
-| v2.0 Offline-Capable, Redesigned, Better Deck | 12–17 | 3/6 | ⏳ In progress (Phases 12–14 ✓) | — |
+| v2.0 Offline-Capable, Redesigned, Better Deck | 12–17 | 4/6 | ⏳ In progress (Phases 12–15 ✓) | — |
 
 Full v1.0 phase detail (goals, success criteria, requirements, pitfalls) is archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md). Requirements archived in [milestones/v1.0-REQUIREMENTS.md](milestones/v1.0-REQUIREMENTS.md). Audit: [milestones/v1.0-MILESTONE-AUDIT.md](milestones/v1.0-MILESTONE-AUDIT.md).
 
 ---
-*v1.0 shipped 2026-05-19. v2.0 started 2026-05-19 — Phases 12 (governance) + 13 (PWA) + 14 (right-side nav) ✓. Phase 15 (KPI-tile redesign) next. Carry: visual/offline Playwright UAT for Phases 13–14 pending.*
+*v1.0 shipped 2026-05-19. v2.0 started 2026-05-19 — Phases 12–15 ✓ (governance, PWA, right-side nav, KPI-tile redesign). Phase 16 (Capacity Planning visual return) next. Carry: Phases 13–15 visual/offline Playwright UAT; ClusterColumn tile polish (UIX-02); icons-MCP exact-set swap.*

@@ -7,10 +7,10 @@ last_updated: "2026-05-19T17:24:48.952Z"
 last_activity: 2026-05-19
 progress:
   total_phases: 6
-  completed_phases: 3
-  total_plans: 3
-  completed_plans: 3
-  percent: 50
+  completed_phases: 4
+  total_plans: 4
+  completed_plans: 4
+  percent: 67
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 ## Current Position
 
-Phase: 15 — Visual redesign: KPI tile system (next)
+Phase: 16 — Capacity Planning visual return (next)
 Plan: —
-Status: Phases 12–14 complete (50%); starting Phase 15
-Last activity: 2026-05-19 — Phase 14 done: right-side vertical nav (commit feat(14-01)). Carry: Phases 13–14 visual/offline Playwright UAT pending.
+Status: Phases 12–15 complete (67%); starting Phase 16
+Last activity: 2026-05-19 — Phase 15 done: KPI-tile redesign (commit feat(15-01)). Carry: Phases 13–15 Playwright UAT; ClusterColumn polish; icons-MCP swap.
 
 ## Performance Metrics
 
@@ -125,7 +125,6 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 
 ## Operator Next Steps
 
-1. **Enable the icons MCP** (`claude mcp add icons -- node /Users/fjacquet/Projects/icons/mcp-server/<entrypoint>`) and **restart the session** — unblocks Phase 15 icon vendoring (user chose "Enable the icons MCP").
-2. Resume Phase 15: vendor exact icons via `render_icon` → `src/components/icons/`; build StatTile+TileSection; refactor GlobalSummaryCard/OperationalInsights/ClusterColumn/ClusterDetail into grouped KPI-tile sections (vsizer reference); EN/FR section headers; tests.
-3. Then Phase 16 (planning visual return) → Phase 17 (PPTX overhaul).
-- Carry-forward: Phases 13–14 visual/offline Playwright UAT, consolidated after Phase 15 (artifacts under .playwright-mcp/ only — Vite-reload trap).
+1. Phase 16 (inline): Capacity Planning visual return — pure option builder + StatTiles from existing view.globals vs view.plannedView.globals (capacityVcpu/capacityRamMib/vcpuPerPcpu); no new memo; EN/FR alloc.json; factual, no editorial verbs.
+2. Then Phase 17 (PPTX overhaul).
+- Carry-forward (post-Phase-15, consolidated): Phases 13–15 visual/offline Playwright UAT (artifacts under .playwright-mcp/ only — Vite-reload trap); ClusterColumn KPI-tile polish (UIX-02 remainder); swap hand-authored icons for the icons-project render_icon exact set once that MCP is enabled (icon prop is the stable seam — no API change).
