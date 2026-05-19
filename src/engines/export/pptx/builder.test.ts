@@ -165,7 +165,7 @@ describe('buildPptx — golden structural snapshot', () => {
     // Overview second KPI row
     expect(txt).toContain('Avg CPU %')
     expect(txt).toContain('Physical cores')
-    expect(txt).toContain('In use (MiB)')
+    expect(txt).toContain('In use')
     // Cluster slide (Phase 18 vsizer-parity rebuild): rich layout.
     // ASCII-only substrings (the zip is latin1-decoded — multibyte
     // em-dash titles like "CPU — mean utilization" won't match here).

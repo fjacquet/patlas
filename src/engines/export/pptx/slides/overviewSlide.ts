@@ -3,7 +3,7 @@
 import type PptxGenJS from 'pptxgenjs'
 import type { GlobalSummary, OperationalInsights } from '@/types/estate'
 import type { ExportStrings } from '../../types'
-import { type ExportLocale, pptxNumber } from '../format'
+import { type ExportLocale, pptxMemMib, pptxNumber } from '../format'
 import { addChartPanel, addHeader, addKpiRow, CONTENT_W, M } from './_layout'
 
 export interface OverviewData {
@@ -60,16 +60,16 @@ export function addOverviewSlide(
         value: pptxNumber(Number(o.totalPhysicalCores), locale),
       },
       {
-        label: strings['overview.hostMem'] ?? 'Host memory (MiB)',
-        value: pptxNumber(Number(o.totalHostMemoryMib), locale),
+        label: strings['overview.hostMem'] ?? 'Host memory',
+        value: pptxMemMib(Number(o.totalHostMemoryMib), locale),
       },
       {
-        label: strings['overview.provisioned'] ?? 'Provisioned (MiB)',
-        value: pptxNumber(Number(o.provisionedMib), locale),
+        label: strings['overview.provisioned'] ?? 'Provisioned',
+        value: pptxMemMib(Number(o.provisionedMib), locale),
       },
       {
-        label: strings['overview.inUse'] ?? 'In use (MiB)',
-        value: pptxNumber(Number(o.inUseMib), locale),
+        label: strings['overview.inUse'] ?? 'In use',
+        value: pptxMemMib(Number(o.inUseMib), locale),
       },
     ],
     y2,

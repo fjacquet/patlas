@@ -53,3 +53,16 @@ export function pptxNumber(n: number, locale: ExportLocale, fractionDigits = 0):
   })
   return pptxSafeFormat(s)
 }
+
+/**
+ * Human-readable binary capacity from a MiB value: GiB under 1024 GiB,
+ * else TiB (1 decimal). Raw MiB integers (e.g. 19,142,444) are unreadable
+ * and wrap on a slide — the deck shows "18.3 TiB" instead. Non-finite ->
+ * em-dash sentinel.
+ */
+export function pptxMemMib(mib: number, locale: ExportLocale): string {
+  if (!Number.isFinite(mib)) return EM_DASH
+  const gib = mib / 1024
+  if (gib < 1024) return `${pptxNumber(Math.round(gib), locale)} GiB`
+  return `${pptxNumber(gib / 1024, locale, 1)} TiB`
+}

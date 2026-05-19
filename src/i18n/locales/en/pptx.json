@@ -15,9 +15,9 @@
     "avgCpu": "Avg CPU %",
     "avgMem": "Avg memory %",
     "cores": "Physical cores",
-    "hostMem": "Host memory (MiB)",
-    "provisioned": "Provisioned (MiB)",
-    "inUse": "In use (MiB)"
+    "hostMem": "Host memory",
+    "provisioned": "Provisioned",
+    "inUse": "In use"
   },
   "cluster": {
     "stretched": "Stretched",
