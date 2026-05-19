@@ -1,3 +1,4 @@
+import type { EChartsOption } from 'echarts/types/dist/shared'
 import { describe, expect, it } from 'vitest'
 import { buildEstateView } from '@/engines/aggregation'
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
@@ -81,8 +82,12 @@ interface TreemapSeries {
   data: Array<{ name: string; value: number }>
 }
 
-const treemapSeries = (opt: ReturnType<typeof buildChartBundle>['shared'][string]): TreemapSeries =>
-  (opt.series as unknown as TreemapSeries[])[0]
+const treemapSeries = (opt: EChartsOption | undefined): TreemapSeries => {
+  if (!opt) throw new Error('storageTreemap option missing from shared bundle')
+  const series = (opt.series as unknown as TreemapSeries[])[0]
+  if (!series) throw new Error('treemap series[0] missing')
+  return series
+}
 
 describe('storageTreemap', () => {
   const s = snap({})
