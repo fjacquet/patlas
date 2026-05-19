@@ -130,13 +130,13 @@
 - [x] **STG-01**: User's storage is rolled up by Cluster / ESX / VM / Datastore through pure engine projections that compose into the single `buildEstateView` pass (no second `useMemo`)
 - [x] **STG-02**: User sees a consumption lens (provisioned vs in-use, incl `.vswp`+snapshots) whose totals reconcile to the estate total with no double-count of shared LUNs
 - [x] **STG-03**: User sees a capacity lens (capacity vs used vs free) from NAA-deduped datastores, never re-summing shared-LUN capacity
-- [ ] **STG-04**: User opens a dedicated top-level "Storage" ViewToggle segment (the extended `fieldset`+`aria-pressed` idiom) and switches the two lenses via the shipped accounting-toggle idiom; primary visual = ECharts treemap (consumption) / stacked-bar (capacity) through the single SVG `<Chart>` site, with the P3 DataTable + ColumnPicker + CSV alongside
-- [ ] **STG-05**: A storage value not derivable (e.g. an unrelinkable blank-`Cluster name` datastore's cluster identity) renders a factual em-dash sentinel, never fabricated onto a cluster
-- [ ] **NET-01**: User's RVTools `vInfo.Path` is parsed (the `[datastore] vm/vm.vmx` token) without regressing the validated parser (MiB canary + existing fixtures green — the P5 D-07 regression-gated-parser-change pattern)
-- [ ] **NET-02**: User's workbook is parsed for vNetwork / vSwitch / dvSwitch / dvPort as OPTIONAL sheets — absent ⇒ collected warning + `[]`, never a throw (the shipped `vDatastore`/`vPartition` factual-degrade pattern)
-- [ ] **NET-03**: User's parsed network sheets are validated by Zod schemas at the parser boundary; invalid rows are dropped + reported, never thrown unchecked
-- [ ] **NET-04**: User sees network topology rollups (standard vSwitch, distributed dvSwitch+dvPort, uplinks, portgroup VLANs, VM→portgroup mapping) produced as a pure projection in the single `buildEstateView` pass
-- [ ] **NET-05**: User opens a dedicated top-level "Network" ViewToggle segment showing the vSwitch / dvSwitch+dvPort / vNetwork tables via the P3 DataTable idiom; when network sheets are absent the view shows a single factual "network inventory not available in this export" line — no error styling, no icon, no crash, no editorial verb
+- [x] **STG-04**: User opens a dedicated top-level "Storage" ViewToggle segment (the extended `fieldset`+`aria-pressed` idiom) and switches the two lenses via the shipped accounting-toggle idiom; primary visual = ECharts treemap (consumption) / stacked-bar (capacity) through the single SVG `<Chart>` site, with the P3 DataTable + ColumnPicker + CSV alongside
+- [x] **STG-05**: A storage value not derivable (e.g. an unrelinkable blank-`Cluster name` datastore's cluster identity) renders a factual em-dash sentinel, never fabricated onto a cluster
+- [x] **NET-01**: User's RVTools `vInfo.Path` is parsed (the `[datastore] vm/vm.vmx` token) without regressing the validated parser (MiB canary + existing fixtures green — the P5 D-07 regression-gated-parser-change pattern)
+- [x] **NET-02**: User's workbook is parsed for vNetwork / vSwitch / dvSwitch / dvPort as OPTIONAL sheets — absent ⇒ collected warning + `[]`, never a throw (the shipped `vDatastore`/`vPartition` factual-degrade pattern)
+- [x] **NET-03**: User's parsed network sheets are validated by Zod schemas at the parser boundary; invalid rows are dropped + reported, never thrown unchecked
+- [x] **NET-04**: User sees network topology rollups (standard vSwitch, distributed dvSwitch+dvPort, uplinks, portgroup VLANs, VM→portgroup mapping) produced as a pure projection in the single `buildEstateView` pass
+- [x] **NET-05**: User opens a dedicated top-level "Network" ViewToggle segment showing the vSwitch / dvSwitch+dvPort / vNetwork tables via the P3 DataTable idiom; when network sheets are absent the view shows a single factual "network inventory not available in this export" line — no error styling, no icon, no crash, no editorial verb
 - [ ] **DTL-01**: User clicks a datastore row and drills into a screen-fit, export-ready Datastore detail (capacity / provisioned / in-use / free, VMs-on-it, host count, threshold flag marker) with a back affordance — lifted in-app view-state (the P5 `ClusterDetail` precedent), no router, no 2nd `useMemo`
 - [ ] **DTL-02**: User clicks a VM row and drills into a screen-fit VM detail (vCPU/vRAM, disks, partitions with per-row threshold flag marker, portgroups/switches, datastores) with a back affordance
 - [ ] **DTL-03**: User clicks a host in the Hosts view and drills into a screen-fit ESX storage+network detail (datastores mounted + vSwitch/dvSwitch/uplinks per host) that augments the shipped Hosts view (does not duplicate the P5 cluster-detail drill)
@@ -300,13 +300,13 @@
 | STG-01 | Phase 9 | Complete |
 | STG-02 | Phase 9 | Complete |
 | STG-03 | Phase 9 | Complete |
-| STG-04 | Phase 9 | Pending |
-| STG-05 | Phase 9 | Pending |
-| NET-01 | Phase 9 | Pending |
-| NET-02 | Phase 9 | Pending |
-| NET-03 | Phase 9 | Pending |
-| NET-04 | Phase 9 | Pending |
-| NET-05 | Phase 9 | Pending |
+| STG-04 | Phase 9 | Complete |
+| STG-05 | Phase 9 | Complete |
+| NET-01 | Phase 9 | Complete |
+| NET-02 | Phase 9 | Complete |
+| NET-03 | Phase 9 | Complete |
+| NET-04 | Phase 9 | Complete |
+| NET-05 | Phase 9 | Complete |
 | DTL-01 | Phase 9 | Pending |
 | DTL-02 | Phase 9 | Pending |
 | DTL-03 | Phase 9 | Pending |
