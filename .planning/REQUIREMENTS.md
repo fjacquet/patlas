@@ -127,9 +127,9 @@
 > Store is `src/store/snapshotStore.ts` (NOT `datastoreStore.ts`); the relink join
 > key is `vInfo.Path` (NOT `vDisk."Disk Path"`) — both binding empirical corrections.
 
-- [ ] **STG-01**: User's storage is rolled up by Cluster / ESX / VM / Datastore through pure engine projections that compose into the single `buildEstateView` pass (no second `useMemo`)
-- [ ] **STG-02**: User sees a consumption lens (provisioned vs in-use, incl `.vswp`+snapshots) whose totals reconcile to the estate total with no double-count of shared LUNs
-- [ ] **STG-03**: User sees a capacity lens (capacity vs used vs free) from NAA-deduped datastores, never re-summing shared-LUN capacity
+- [x] **STG-01**: User's storage is rolled up by Cluster / ESX / VM / Datastore through pure engine projections that compose into the single `buildEstateView` pass (no second `useMemo`)
+- [x] **STG-02**: User sees a consumption lens (provisioned vs in-use, incl `.vswp`+snapshots) whose totals reconcile to the estate total with no double-count of shared LUNs
+- [x] **STG-03**: User sees a capacity lens (capacity vs used vs free) from NAA-deduped datastores, never re-summing shared-LUN capacity
 - [ ] **STG-04**: User opens a dedicated top-level "Storage" ViewToggle segment (the extended `fieldset`+`aria-pressed` idiom) and switches the two lenses via the shipped accounting-toggle idiom; primary visual = ECharts treemap (consumption) / stacked-bar (capacity) through the single SVG `<Chart>` site, with the P3 DataTable + ColumnPicker + CSV alongside
 - [ ] **STG-05**: A storage value not derivable (e.g. an unrelinkable blank-`Cluster name` datastore's cluster identity) renders a factual em-dash sentinel, never fabricated onto a cluster
 - [ ] **NET-01**: User's RVTools `vInfo.Path` is parsed (the `[datastore] vm/vm.vmx` token) without regressing the validated parser (MiB canary + existing fixtures green — the P5 D-07 regression-gated-parser-change pattern)
@@ -297,9 +297,9 @@
 | TRD-03 | Phase 8 | Complete |
 | TRD-04 | Phase 8 | Complete |
 | TRD-05 | Phase 8 | Complete |
-| STG-01 | Phase 9 | Pending |
-| STG-02 | Phase 9 | Pending |
-| STG-03 | Phase 9 | Pending |
+| STG-01 | Phase 9 | Complete |
+| STG-02 | Phase 9 | Complete |
+| STG-03 | Phase 9 | Complete |
 | STG-04 | Phase 9 | Pending |
 | STG-05 | Phase 9 | Pending |
 | NET-01 | Phase 9 | Pending |
