@@ -12,8 +12,8 @@
 User found the deck "worthless / not on par with the website" vs the vsizer reference deck. Diagnosis: vatlas's pptx slide builders surface a fraction of the EstateView and lack vsizer's designed layout. Decision: port vsizer's proven slide design **brand-free** (vatlas UI-SPEC §Color — navy/gold/grey, NO verdict green/orange/red); make stretched-cluster handling as simple as vsizer's.
 
 - [x] **18-01 Cluster slide** — rebuilt to vsizer parity (draw primitives, 5 KPI cards, CPU/RAM utilization blocks w/ peak + min/mean/max, KEY FIGURES banner, provenance footer, simple stretched suffix); slide-1 vCenter duplication fixed; cluster i18n EN/FR canonicalised. 502 green. `feat(18-01)`.
-- [ ] **18-02 Title slide** — vsizer-style (eyebrow + big title + navy bottom KPI tiles).
-- [ ] **18-03 Overview + remaining slides** — storage/network/eos/dr/trends/inventory/planned ported onto the draw primitives for consistent density (planned slide → Phase-16 headroom parity).
+- [x] **18-02 Title slide + overview readability** — title rebuilt vsizer-style (eyebrow + big title + 5 navy KPI tiles); new `pptxMemMib` fixes overview's unreadable raw-MiB (now GiB/TiB). Visually verified via soffice render. `feat(18-02)`.
+- [ ] **18-03 Remaining slides** — storage/network/eos/dr/trends/inventory/planned ported onto the draw primitives for consistent density (planned slide → Phase-16 headroom parity).
 - [ ] **18-04 Stretched-management UX** — align the app-side stretched-cluster declaration to vsizer's simplicity (investigate vsizer's toggle vs vatlas `setStretchedClusters`/StretchedPill).
 - Carry: regenerate a real deck and visually UAT vs the vsizer reference.
 

@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 ## Current Position
 
-Phase: 18 — PPTX vsizer-parity rebuild (in progress: 18-01 done)
+Phase: 18 — PPTX vsizer-parity rebuild (18-01, 18-02 done; 18-03/04 remaining)
 Plan: —
-Status: Phases 12–17 done; Phase 18 added (deck not on par w/ vsizer). 18-01 cluster slide rebuilt + title dedup; 18-02/03/04 remaining.
-Last activity: 2026-05-19 — Phase 18-01: cluster slide → vsizer parity, brand-free (commit feat(18-01)). 502 tests green.
+Status: cluster slide + title slide + overview readability now vsizer-grade, VISUALLY VERIFIED via soffice render. Remaining: storage/network/eos/dr/trends/inventory/planned slides (18-03); app-side stretched UX (18-04).
+Last activity: 2026-05-19 — Phase 18-02: vsizer-style title + pptxMemMib readable GiB/TiB (commit feat(18-02)). 502 tests green.
 
 ## Performance Metrics
 
