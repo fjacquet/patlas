@@ -254,18 +254,18 @@
 | INV-04 | Phase 3 | Complete |
 | INV-05 | Phase 3 | Complete |
 | INV-06 | Phase 3 | Complete |
-| MVC-01 | Phase 4 | Pending |
-| MVC-02 | Phase 4 | Pending |
-| MVC-03 | Phase 4 | Pending |
-| MVC-04 | Phase 4 | Pending |
-| STR-01 | Phase 4 | Pending |
-| STR-02 | Phase 4 | Pending |
-| STR-03 | Phase 4 | Pending |
-| RCI-01 | Phase 5 | Pending |
-| RCI-02 | Phase 5 | Pending |
-| RCI-03 | Phase 5 | Pending |
-| RCI-04 | Phase 5 | Pending |
-| RCI-05 | Phase 5 | Pending |
+| MVC-01 | Phase 4 | Complete |
+| MVC-02 | Phase 4 | Complete |
+| MVC-03 | Phase 4 | Complete |
+| MVC-04 | Phase 4 | Complete |
+| STR-01 | Phase 4 | Complete |
+| STR-02 | Phase 4 | Complete |
+| STR-03 | Phase 4 | Complete |
+| RCI-01 | Phase 5 | Complete |
+| RCI-02 | Phase 5 | Complete |
+| RCI-03 | Phase 5 | Complete |
+| RCI-04 | Phase 5 | Complete |
+| RCI-05 | Phase 5 | Complete |
 | ~~ALC-01~~ | Phase 6 | Retired — slider/URL-hash killed (G2); → PLN-02 in-memory preset+numeric |
 | ~~ALC-02~~ | Phase 6 | Re-derived → PLN-02 (CPU 4:1 / RAM 1:1 default kept) |
 | ~~ALC-03~~ | Phase 6 | Retired — URL-hash forbidden (D-06); → PLN-03 in-memory only |
@@ -307,30 +307,30 @@
 | NET-03 | Phase 9 | Complete |
 | NET-04 | Phase 9 | Complete |
 | NET-05 | Phase 9 | Complete |
-| DTL-01 | Phase 9 | Pending |
-| DTL-02 | Phase 9 | Pending |
-| DTL-03 | Phase 9 | Pending |
-| ALR-01 | Phase 9 | Pending |
-| ALR-02 | Phase 9 | Pending |
-| ALR-03 | Phase 9 | Pending |
-| ALR-04 | Phase 9 | Pending |
-| ALR-05 | Phase 9 | Pending |
-| VSR-01 | Phase 9 | Pending |
-| VSR-02 | Phase 9 | Pending |
-| VSR-03 | Phase 9 | Pending |
-| VSR-04 | Phase 9 | Pending |
-| VSR-05 | Phase 9 | Pending |
-| HTM-01 | Phase 7 | Pending |
-| HTM-02 | Phase 7 | Pending |
-| HTM-03 | Phase 7 | Pending |
-| HTM-04 | Phase 7 | Pending |
-| HTM-05 | Phase 7 | Pending |
-| PPT-01 | Phase 7 | Pending |
-| PPT-02 | Phase 7 | Pending |
-| PPT-03 | Phase 7 | Pending |
-| PPT-04 | Phase 7 | Pending |
-| DEP-01 | Phase 7 | Pending |
-| DEP-02 | Phase 7 | Pending |
+| DTL-01 | Phase 9 | Complete |
+| DTL-02 | Phase 9 | Complete |
+| DTL-03 | Phase 9 | Complete |
+| ALR-01 | Phase 9 | Complete |
+| ALR-02 | Phase 9 | Complete |
+| ALR-03 | Phase 9 | Complete |
+| ALR-04 | Phase 9 | Complete |
+| ALR-05 | Phase 9 | Complete |
+| VSR-01 | Phase 9 | Complete |
+| VSR-02 | Phase 9 | Complete |
+| VSR-03 | Phase 9 | Complete |
+| VSR-04 | Phase 9 | Complete |
+| VSR-05 | Phase 9 | Complete |
+| HTM-01 | Phase 10 | Complete |
+| HTM-02 | Phase 10 | Complete |
+| HTM-03 | Phase 10 | Complete |
+| HTM-04 | Phase 10 | Complete |
+| HTM-05 | Phase 10 | Complete |
+| PPT-01 | Phase 10 | Complete |
+| PPT-02 | Phase 10 | Complete |
+| PPT-03 | Phase 10 | Complete |
+| PPT-04 | Phase 10 | Complete |
+| DEP-01 | Phase 10 | Complete |
+| DEP-02 | Phase 10 | Complete |
 
 **Coverage:**
 
