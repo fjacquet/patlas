@@ -85,6 +85,29 @@ function Report({ view, trends, strings, locale }: RenderReportInput): React.Rea
   const clustersByVm = [...view.clusters].sort((a, b) => b.vmCount - a.vmCount)
   const top = clustersByVm.slice(0, TOP_N_CLUSTERS)
   const rest = clustersByVm.slice(TOP_N_CLUSTERS)
+  // P9 size levers: top-N by provisioned, remainder folded into a count.
+  const gib = (m: number): string => fmtInt(Math.round(Number(m) / 1024), loc)
+  const stoByCluster = [...view.storage.byCluster].sort(
+    (a, b) => Number(b.provisionedMib) - Number(a.provisionedMib),
+  )
+  const stoByDs = [...view.storage.byDatastore].sort(
+    (a, b) => Number(b.provisionedMib) - Number(a.provisionedMib),
+  )
+  const stoClusterTop = stoByCluster.slice(0, TOP_N_CLUSTERS)
+  const stoDsTop = stoByDs.slice(0, TOP_N_CLUSTERS)
+  const vsanShared = [...view.vsan.shared.entries()]
+  const flaggedDs = view.flags.counts.ds + view.flags.counts.lu
+  const planned = view.plannedView
+  const plannedRows =
+    planned === null
+      ? []
+      : planned.clusters
+          .map((pc) => ({
+            cluster: pc.cluster,
+            planned: pc.vcpuPerPcpu,
+            measured: view.clusters.find((c) => c.cluster === pc.cluster)?.vcpuPerPcpu ?? null,
+          }))
+          .slice(0, TOP_N_CLUSTERS)
 
   return (
     <main className="report">
@@ -147,6 +170,91 @@ function Report({ view, trends, strings, locale }: RenderReportInput): React.Rea
         ))}
       </Section>
 
+      <Section id="storage" title={strings['storage.title'] ?? 'Storage'}>
+        <Metric
+          label={strings['storage.provisioned'] ?? 'Provisioned (GiB)'}
+          value={gib(Number(view.storage.estate.provisionedMib))}
+        />
+        <Metric
+          label={strings['storage.inUse'] ?? 'In use (GiB)'}
+          value={gib(Number(view.storage.estate.inUseMib))}
+        />
+        <Metric
+          label={strings['storage.capacity'] ?? 'Capacity (GiB)'}
+          value={gib(Number(view.storage.estate.capacityMib))}
+        />
+        <Metric
+          label={strings['storage.flagged'] ?? 'Flagged datastores'}
+          value={fmtInt(flaggedDs, loc)}
+          flag={flaggedDs > 0}
+        />
+        <div data-chart-slot="storage-treemap" className="chart-slot" />
+        <table className="annex-table">
+          <thead>
+            <tr>
+              <th>{strings['storage.colCluster'] ?? 'Cluster'}</th>
+              <th>{strings['storage.colProvisioned'] ?? 'Provisioned'}</th>
+              <th>{strings['storage.colInUse'] ?? 'In use'}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {stoClusterTop.map((s) => (
+              <tr key={`sto-c-${slug(s.key)}`}>
+                <td>{s.key}</td>
+                <td className="num">{gib(Number(s.provisionedMib))}</td>
+                <td className="num">{gib(Number(s.inUseMib))}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <table className="annex-table">
+          <thead>
+            <tr>
+              <th>{strings['storage.colCluster'] ?? 'Cluster'}</th>
+              <th>{strings['storage.colProvisioned'] ?? 'Provisioned'}</th>
+              <th>{strings['storage.colInUse'] ?? 'In use'}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {stoDsTop.map((s) => (
+              <tr key={`sto-d-${slug(s.key)}`}>
+                <td>{s.key}</td>
+                <td className="num">{gib(Number(s.provisionedMib))}</td>
+                <td className="num">{gib(Number(s.inUseMib))}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {vsanShared.map(([k, n]) => (
+          <p key={`vsan-${slug(k)}`} className="factual-note">
+            {k} —{' '}
+            {(strings['storage.vsanShared'] ?? 'Shared across {{n}} clusters').replace(
+              '{{n}}',
+              fmtInt(n, loc),
+            )}
+          </p>
+        ))}
+      </Section>
+
+      <Section id="network" title={strings['network.title'] ?? 'Network'}>
+        <Metric
+          label={strings['network.vswitches'] ?? 'vSwitches'}
+          value={fmtInt(view.network.vswitches.length, loc)}
+        />
+        <Metric
+          label={strings['network.dvswitches'] ?? 'dvSwitches'}
+          value={fmtInt(view.network.dvswitches.length, loc)}
+        />
+        <Metric
+          label={strings['network.portgroups'] ?? 'Portgroups'}
+          value={fmtInt(view.network.portgroups.length, loc)}
+        />
+        <Metric
+          label={strings['network.vnetwork'] ?? 'VM adjacencies'}
+          value={fmtInt(view.network.vmPortgroupCount, loc)}
+        />
+      </Section>
+
       <Section id="eos" title={strings['eos.title'] ?? 'OS end-of-support forecast'}>
         <Metric label={strings['eos.overdue'] ?? 'Overdue'} value={fmtInt(eos.overdue, loc)} />
         <Metric label={strings['eos.le3'] ?? '≤ 3 months'} value={fmtInt(eos.le3, loc)} />
@@ -173,6 +281,51 @@ function Report({ view, trends, strings, locale }: RenderReportInput): React.Rea
               label={strings['dr.survivors'] ?? 'Survivor clusters'}
               value={fmtInt(view.drSim.perSurvivor.length, loc)}
             />
+          </>
+        )}
+      </Section>
+
+      <Section id="planned" title={strings['planned.title'] ?? 'Planned vs measured estate'}>
+        {planned === null ? (
+          <p className="factual-note">{strings['planned.none'] ?? '—'}</p>
+        ) : (
+          <>
+            <Metric
+              label={strings['planned.vcpuMeasured'] ?? 'vCPU:pCPU measured'}
+              value={fmtInt(Number(g.vcpuPerPcpu), loc)}
+            />
+            <Metric
+              label={strings['planned.vcpuPlanned'] ?? 'vCPU:pCPU planned'}
+              value={fmtInt(Number(planned.globals.vcpuPerPcpu), loc)}
+            />
+            <Metric
+              label={strings['planned.vmMeasured'] ?? 'VMs measured'}
+              value={fmtInt(Number(g.vmCount), loc)}
+            />
+            <Metric
+              label={strings['planned.vmPlanned'] ?? 'VMs planned'}
+              value={fmtInt(Number(planned.globals.vmCount), loc)}
+            />
+            <table className="annex-table">
+              <thead>
+                <tr>
+                  <th>{strings['planned.colCluster'] ?? 'Cluster'}</th>
+                  <th>{strings['planned.colMeasured'] ?? 'Measured'}</th>
+                  <th>{strings['planned.colPlanned'] ?? 'Planned'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {plannedRows.map((r) => (
+                  <tr key={`pln-${slug(r.cluster)}`}>
+                    <td>{r.cluster}</td>
+                    <td className="num">
+                      {r.measured === null ? NA : fmtInt(Number(r.measured), loc)}
+                    </td>
+                    <td className="num">{fmtInt(Number(r.planned), loc)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </>
         )}
       </Section>
