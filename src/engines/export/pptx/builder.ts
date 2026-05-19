@@ -22,7 +22,10 @@ import { addContentionAnnex, type ContentionRow } from './slides/contentionAnnex
 import { addDrSimSlide } from './slides/drSimSlide'
 import { addEosSlide } from './slides/eosSlide'
 import { addInventorySlide } from './slides/inventorySlide'
+import { addNetworkSlide } from './slides/networkSlide'
 import { addOverviewSlide } from './slides/overviewSlide'
+import { addPlannedSlide } from './slides/plannedSlide'
+import { addStorageSlide } from './slides/storageSlide'
 import { addTitleSlide } from './slides/titleSlide'
 import { addTrendsSlide } from './slides/trendsSlide'
 
@@ -85,6 +88,11 @@ export async function buildPptx(
     )
   }
 
+  // F-2 (D-05): Storage + Network after the per-cluster narrative,
+  // before the conditional annex. Network has no chart (D-08).
+  addStorageSlide(pptx, view, png('storageTreemap'), strings, locale)
+  addNetworkSlide(pptx, view, strings, locale)
+
   // Conditional CPU-Ready annex.
   if (opts.contentionRows && opts.contentionRows.length > 0) {
     addContentionAnnex(pptx, opts.contentionRows, strings, locale)
@@ -92,6 +100,8 @@ export async function buildPptx(
 
   addEosSlide(pptx, view.eos, png('eosBar'), strings, locale)
   addDrSimSlide(pptx, view.drSim, png('drBar'), strings, locale)
+  // F-1 (deck side): planned-vs-measured with the other re-aggregation.
+  addPlannedSlide(pptx, view, strings, locale)
 
   // D-09: trends slide only when trends is non-null (<2 snapshots ⇒ omit).
   if (trends !== null) addTrendsSlide(pptx, trends, png('trendLine'), strings, locale)

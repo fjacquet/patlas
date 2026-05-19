@@ -99,30 +99,31 @@ describe('buildPptx — golden structural snapshot', () => {
     const one = buildExportView(a, [a], MODE, TODAY)
     expect(one.trends).toBeNull()
     const abOne = await buildPptx(one.view, one.trends, strings, 'en')
-    // title+overview(2) + 6 clusters + eos+drSim(2) + inventory(1) = 11
-    expect(slideCount(abOne)).toBe(11)
+    // title+overview(2) + 6 clusters + storage+network(2) + eos+drSim(2)
+    // + planned(1) + inventory(1) = 14
+    expect(slideCount(abOne)).toBe(14)
 
     // 2 snapshots ⇒ trends slide present (D-09 satisfied)
     const b = snap('b', 6, new Date('2026-02-01'))
     const two = buildExportView(a, [a, b], MODE, TODAY)
     expect(two.trends).not.toBeNull()
     const abTwo = await buildPptx(two.view, two.trends, strings, 'en')
-    expect(slideCount(abTwo)).toBe(12) // +1 trends
+    expect(slideCount(abTwo)).toBe(15) // +1 trends
 
     // + conditional contention annex
     const rows: ContentionRow[] = [{ cluster: 'C0', cpuReadyPct: 3.2 }]
     const abAnnex = await buildPptx(two.view, two.trends, strings, 'en', {
       contentionRows: rows,
     })
-    expect(slideCount(abAnnex)).toBe(13) // +1 annex
+    expect(slideCount(abAnnex)).toBe(16) // +1 annex
   })
 
   it('D-01: a 50-cluster view yields exactly 50 cluster slides (no cap)', async () => {
     const a = snap('a', 50, TODAY)
     const { view, trends } = buildExportView(a, [a], MODE, TODAY)
     const ab = await buildPptx(view, trends, strings, 'en')
-    // 2 + 50 + 2 + 1 = 55 (1 snapshot ⇒ no trends)
-    expect(slideCount(ab)).toBe(55)
+    // 2 + 50 + storage+network(2) + eos+drSim(2) + planned(1) + 1 = 58
+    expect(slideCount(ab)).toBe(58)
   })
 
   it('D-09: a trends-null view produces NO trends slide', async () => {
@@ -130,7 +131,7 @@ describe('buildPptx — golden structural snapshot', () => {
     const { view, trends } = buildExportView(a, [a], MODE, TODAY)
     expect(trends).toBeNull()
     const ab = await buildPptx(view, trends, strings, 'en')
-    expect(slideCount(ab)).toBe(9) // 2 + 4 + 2 + 1, no trends
+    expect(slideCount(ab)).toBe(12) // 2 + 4 + 2 + 2 + 1 + 1, no trends
   })
 
   it('both locales produce a valid same-structure deck (golden, EN + FR)', async () => {
@@ -141,6 +142,18 @@ describe('buildPptx — golden structural snapshot', () => {
     expect(isZip(en)).toBe(true)
     expect(isZip(fr)).toBe(true)
     expect(slideCount(en)).toBe(slideCount(fr)) // locale never changes structure
-    expect(slideCount(en)).toBe(10) // 2 + 5 + 2 + 1
+    expect(slideCount(en)).toBe(13) // 2 + 5 + 2 + 2 + 1 + 1
+  })
+
+  it('F-2/F-1: deck carries Storage, Network and Planned slides', async () => {
+    const a = snap('a', 3, TODAY)
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    const ab = await buildPptx(view, trends, strings, 'en')
+    const txt = new TextDecoder('latin1').decode(new Uint8Array(ab))
+    expect(txt).toContain('Storage')
+    expect(txt).toContain('Network')
+    expect(txt).toContain('Planned vs measured estate')
+    // 2 + 3 clusters + storage+network(2) + eos+drSim(2) + planned(1) + inventory(1)
+    expect(slideCount(ab)).toBe(11)
   })
 })
