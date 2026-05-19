@@ -7,10 +7,10 @@ last_updated: "2026-05-19T17:24:48.952Z"
 last_activity: 2026-05-19
 progress:
   total_phases: 6
-  completed_phases: 5
-  total_plans: 5
-  completed_plans: 5
-  percent: 83
+  completed_phases: 6
+  total_plans: 6
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 ## Current Position
 
-Phase: 17 — PPTX quality overhaul (last)
+Phase: v2.0 code-complete (6/6) — UAT + milestone audit pending
 Plan: —
-Status: Phases 12–16 complete (83%); starting Phase 17
-Last activity: 2026-05-19 — Phase 16 done: Capacity Planning visual return (commit feat(16-01)). Carry: Phases 13–16 Playwright UAT; ClusterColumn polish; icons-MCP swap.
+Status: All phases 12–17 implemented, tested (502), committed
+Last activity: 2026-05-19 — Phase 17 done: PPTX overhaul (commit feat(17-01)). Nav revised to LEFT per user (fix(14-01)).
 
 ## Performance Metrics
 
@@ -125,5 +125,7 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 
 ## Operator Next Steps
 
-1. Phase 17 (inline): PPTX overhaul — PPT-01 render charts at slide-box aspect × print DPI (fix chartSvg/renderCharts/export.worker/_layout); PPT-02 surface dropped EstateView facts as factual brand-free EN/FR text across slide builders; PPT-03 expand tests; regenerate canary deck for inspection.
+1. **Playwright UAT (consolidated)** — verify offline boot (P13), LEFT nav placement (P14), KPI-tile dashboard + cluster zoom (P15), Capacity Planning visual return (P16), and regenerate the canary PPTX to eyeball P17. Artifacts under `.playwright-mcp/` ONLY (Vite-reload trap).
+2. **Milestone audit** (`/gsd-audit-milestone`) then `/gsd-complete-milestone`.
+3. Follow-up polish: ClusterColumn KPI-tile (UIX-02 remainder); PPT-02 remaining slide types; swap hand-authored icons for the icons-project render_icon exact set once that MCP is enabled (icon prop is the stable seam).
 - Carry-forward (post-Phase-15, consolidated): Phases 13–15 visual/offline Playwright UAT (artifacts under .playwright-mcp/ only — Vite-reload trap); ClusterColumn KPI-tile polish (UIX-02 remainder); swap hand-authored icons for the icons-project render_icon exact set once that MCP is enabled (icon prop is the stable seam — no API change).

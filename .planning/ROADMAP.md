@@ -24,9 +24,9 @@ Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQU
 - [x] **Phase 16: Capacity Planning visual return** (PLN-01) — 2026-05-19
   - Goal: changing the planned ratio shows a measured-vs-planned headroom visualization.
   - Success: StatTiles + bar Chart (measured vs planned vCPU/vRAM capacity vs allocated demand, gold markLine) from existing view.globals/plannedView; render-time reduce, no new memo; panel reordered under the ratio control; EN/FR; no editorial verbs; 500-suite + build + bundle green (commit `feat(16-01)`). Visual UAT pending.
-- [ ] **Phase 17: PPTX quality overhaul** (PPT-01..03)
+- [x] **Phase 17: PPTX quality overhaul** (PPT-01, PPT-03; PPT-02 partial) — 2026-05-19
   - Goal: crisp/correctly-sized deck charts + dense factual brand-free text.
-  - Success: regenerated canary deck has sharp charts + denser facts; structural golden tests pass; brand-free intact.
+  - Success: print-grade 1600×900 render + `sizing:'contain'` (no stretch) for ALL charts; overview+cluster slides gain a factual KPI row of the dropped facts; builder/chartSvg tests assert it; 502-suite + golden structural + build + bundle green; brand-free intact (commit `feat(17-01)`). ⚠ PPT-02 partial: only overview+cluster enriched (the screenshotted sparse slides); eos/dr/trends/inventory/network/storage/planned/contention enrichment is follow-up. Visual deck UAT pending.
 
 ## Phases
 
@@ -52,9 +52,9 @@ Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQU
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 RVTools Atlas (MVP) | 1–11 | 43/43 | ✅ Complete — released & deployed | 2026-05-19 |
-| v2.0 Offline-Capable, Redesigned, Better Deck | 12–17 | 5/6 | ⏳ In progress (Phases 12–16 ✓) | — |
+| v2.0 Offline-Capable, Redesigned, Better Deck | 12–17 | 6/6 | ✅ Code-complete (UAT + audit pending) | — |
 
 Full v1.0 phase detail (goals, success criteria, requirements, pitfalls) is archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md). Requirements archived in [milestones/v1.0-REQUIREMENTS.md](milestones/v1.0-REQUIREMENTS.md). Audit: [milestones/v1.0-MILESTONE-AUDIT.md](milestones/v1.0-MILESTONE-AUDIT.md).
 
 ---
-*v1.0 shipped 2026-05-19. v2.0 — Phases 12–16 ✓ (governance, PWA, right-side nav, KPI-tile redesign, planning visual return). Phase 17 (PPTX overhaul) is the last. Carry: Phases 13–16 visual/offline Playwright UAT; ClusterColumn tile polish; icons-MCP exact-set swap.*
+*v1.0 shipped 2026-05-19. v2.0 — all 6 phases (12–17) code-complete 2026-05-19: governance/ADR SW exception, offline PWA, LEFT vertical nav (user-revised from right), KPI-tile redesign, Capacity Planning visual return, PPTX overhaul. 502 tests + tsc/biome/gate/bundle/build green. Pending before milestone close: (1) Playwright visual+offline UAT (Phases 13–17), (2) milestone audit, (3) follow-up polish — ClusterColumn tiles (UIX-02), PPT-02 remaining slides, icons-MCP exact-set swap.*
