@@ -9,9 +9,9 @@
 
 Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQUIREMENTS.md](REQUIREMENTS.md)
 
-- [ ] **Phase 12: Privacy governance — ADR-0001 SW exception + supply-chain gate** (GOV-01, GOV-02)
+- [x] **Phase 12: Privacy governance — ADR-0001 SW exception + supply-chain gate** (GOV-01, GOV-02) — 2026-05-19
   - Goal: land the reviewable privacy-policy change (no app behavior change) before any SW code.
-  - Success: `check:supply-chain` passes with the workbox allowlist; a `sw.ts` missing the guard import fails the gate; ADR-0001 + PITFALLS Critical-2 amended and consistent.
+  - Success: `check:supply-chain` passes with the workbox allowlist; a `sw.ts` missing the guard import fails the gate; ADR-0001 + PITFALLS Critical-2 amended and consistent. ✓ (9/9 gate tests, tsc+biome green, commit `feat(12-01)`)
 - [ ] **Phase 13: Installable, fully-offline PWA** (PWA-01..04) — *depends on 12*
   - Goal: installable + works fully offline via an audited precache-only SW; updates never silently wipe a loaded estate.
   - Success: build emits `sw.js` + `manifest.webmanifest` (scope `/vatlas/`); offline hard-reload renders; SW first line imports the guard; bundle-size + build green.
@@ -52,7 +52,7 @@ Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQU
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 RVTools Atlas (MVP) | 1–11 | 43/43 | ✅ Complete — released & deployed | 2026-05-19 |
-| v2.0 Offline-Capable, Redesigned, Better Deck | 12–17 | 0/6 | ⏳ Planning | — |
+| v2.0 Offline-Capable, Redesigned, Better Deck | 12–17 | 1/6 | ⏳ In progress (Phase 12 ✓) | — |
 
 Full v1.0 phase detail (goals, success criteria, requirements, pitfalls) is archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md). Requirements archived in [milestones/v1.0-REQUIREMENTS.md](milestones/v1.0-REQUIREMENTS.md). Audit: [milestones/v1.0-MILESTONE-AUDIT.md](milestones/v1.0-MILESTONE-AUDIT.md).
 

@@ -7,10 +7,10 @@ last_updated: "2026-05-19T17:24:48.952Z"
 last_activity: 2026-05-19
 progress:
   total_phases: 6
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 1
+  percent: 17
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 ## Current Position
 
-Phase: 12 — Privacy governance: ADR-0001 SW exception + supply-chain gate
+Phase: 13 — Installable, fully-offline PWA (next)
 Plan: —
-Status: Milestone artifacts written; starting Phase 12
-Last activity: 2026-05-19 — Milestone v2.0 defined (REQUIREMENTS + ROADMAP), Phase 12 next
+Status: Phase 12 complete (GOV-01/02); starting Phase 13
+Last activity: 2026-05-19 — Phase 12 done: ADR-0001 SW exception + narrowed/strengthened supply-chain gate (commit feat(12-01))
 
 ## Performance Metrics
 
@@ -124,4 +124,4 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 
 ## Operator Next Steps
 
-- Phase 12 in progress (inline): amend ADR-0001 SW exception + PITFALLS Critical-2; narrow+strengthen check-supply-chain.mjs with tests
+- Phase 13 (inline): add vite-plugin-pwa injectManifest + src/sw.ts (guard-first, precache-only) + src/pwa/registerSW.ts smart-auto-update + manifest/icons; gate now enforces the SW envelope
