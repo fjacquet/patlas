@@ -109,6 +109,26 @@ function eosBar(view: EstateView, L: ChartLabels): EChartsOption {
   }
 }
 
+/** storageTreemap — storage consumption treemap, the SAME series shape
+ *  StorageView renders for the consumption lens (D-07). `g.key` is the
+ *  cluster name (user data, locale-independent), so no ChartLabels field
+ *  is needed. */
+function storageTreemap(view: EstateView, _L: ChartLabels): EChartsOption {
+  return {
+    tooltip: {},
+    series: [
+      {
+        type: 'treemap',
+        breadcrumb: { show: false },
+        data: view.storage.byCluster.map((g) => ({
+          name: g.key,
+          value: g.provisionedMib as number,
+        })),
+      },
+    ],
+  }
+}
+
 /** DR physical-impact before/after bar (factual magnitude, no verdict). */
 function drBar(view: EstateView, L: ChartLabels): EChartsOption | null {
   const dr = view.drSim
@@ -170,6 +190,7 @@ export function buildChartBundle(
   const shared: Record<string, EChartsOption> = {
     ...overviewCharts(view, L),
     eosBar: eosBar(view, L),
+    storageTreemap: storageTreemap(view, L),
   }
   const dr = drBar(view, L)
   if (dr) shared.drBar = dr
