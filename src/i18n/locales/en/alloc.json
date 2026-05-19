@@ -24,5 +24,17 @@
     "drSlotPending": "The reworked DR-sim panel lands on this surface in a following plan.",
     "emptyHeading": "No snapshot loaded",
     "emptyBody": "Load a vCenter snapshot from the sidebar to use the capacity-planning lens."
+  },
+  "plannedEstate": {
+    "title": "Planned vs measured estate",
+    "none": "—",
+    "vmMeasured": "VMs measured",
+    "vmPlanned": "VMs planned",
+    "vcpuMeasured": "vCPU:pCPU measured",
+    "vcpuPlanned": "vCPU:pCPU planned",
+    "clusterDelta": "Per-cluster delta",
+    "colCluster": "Cluster",
+    "colMeasured": "Measured",
+    "colPlanned": "Planned"
   }
 }
