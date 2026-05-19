@@ -1,9 +1,9 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
+milestone_name: RVTools Atlas (MVP)
 status: Awaiting next milestone
-stopped_at: Phase 11 context gathered
+stopped_at: v1.0 milestone CLOSED — archived, PROJECT evolved, retrospective written, gsd/v1.0-milestone retired
 last_updated: "2026-05-19T07:10:09.484Z"
 last_activity: 2026-05-19 — Milestone v1.0 completed and archived
 progress:
@@ -18,10 +18,10 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-15)
+See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 **Core value:** A user drops a RVTools workbook and walks away with a polished, shareable HTML report and PPTX deck describing their VMware estate — without uploading a single byte. The report is the product.
-**Current focus:** v1.0 milestone close — Phase 11 (gap closure) complete; awaiting /gsd-audit-milestone 1.0 re-audit
+**Current focus:** None — v1.0 RVTools Atlas (MVP) shipped & deployed; start the next milestone with `/gsd-new-milestone`
 
 ## Current Position
 
