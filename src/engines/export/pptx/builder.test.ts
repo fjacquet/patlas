@@ -156,4 +156,19 @@ describe('buildPptx — golden structural snapshot', () => {
     // 2 + 3 clusters + storage+network(2) + eos+drSim(2) + planned(1) + inventory(1)
     expect(slideCount(ab)).toBe(11)
   })
+
+  it('PPT-02: overview + cluster slides surface the previously-dropped facts', async () => {
+    const a = snap('a', 3, TODAY)
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    const ab = await buildPptx(view, trends, strings, 'en')
+    const txt = new TextDecoder('latin1').decode(new Uint8Array(ab))
+    // Overview second KPI row
+    expect(txt).toContain('Avg CPU %')
+    expect(txt).toContain('Physical cores')
+    expect(txt).toContain('In use (MiB)')
+    // Cluster second KPI row
+    expect(txt).toContain('Physical GHz')
+    expect(txt).toContain('vCPU capacity')
+    expect(txt).toContain('vCPU allocated')
+  })
 })

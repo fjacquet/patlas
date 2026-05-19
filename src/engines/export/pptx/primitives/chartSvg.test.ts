@@ -45,6 +45,18 @@ describe('chartSvgToPng — PowerPoint-safe raster', () => {
     expect(img?.data).not.toContain('svg+xml')
   })
 
+  it('PPT-01: addChartImage preserves chart aspect via contain sizing', () => {
+    const captured: Array<Record<string, unknown>> = []
+    const slide: ImageSink = { addImage: (o) => captured.push(o) }
+    addChartImage(slide, new Uint8Array([0x89, 0x50, 0x4e, 0x47]), {
+      x: 0.5,
+      y: 1.2,
+      w: 12.33,
+      h: 5.3,
+    })
+    expect(captured[0]?.sizing).toEqual({ type: 'contain', w: 12.33, h: 5.3 })
+  })
+
   it('chartSvg.ts source never constructs an image/svg+xml payload', () => {
     const src = readFileSync(
       join(process.cwd(), 'src/engines/export/pptx/primitives/chartSvg.ts'),

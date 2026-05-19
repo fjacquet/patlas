@@ -11,7 +11,13 @@
     "vcpuPerPcpu": "vCPU : pCPU",
     "os": "OS family",
     "cpu": "Mean CPU %",
-    "mem": "Mean memory %"
+    "mem": "Mean memory %",
+    "avgCpu": "Avg CPU %",
+    "avgMem": "Avg memory %",
+    "cores": "Physical cores",
+    "hostMem": "Host memory (MiB)",
+    "provisioned": "Provisioned (MiB)",
+    "inUse": "In use (MiB)"
   },
   "cluster": {
     "subtitle": "Cluster detail",
@@ -19,7 +25,13 @@
     "vms": "VMs",
     "vcpuPerPcpu": "vCPU : pCPU",
     "datastores": "Datastores",
-    "cpu": "CPU utilization"
+    "cpu": "CPU utilization",
+    "cores": "Physical cores",
+    "ghz": "Physical GHz",
+    "ram": "Host memory (MiB)",
+    "capVcpu": "vCPU capacity",
+    "capRam": "vRAM capacity (MiB)",
+    "vcpuAlloc": "vCPU allocated"
   },
   "eos": {
     "title": "OS end-of-support forecast",

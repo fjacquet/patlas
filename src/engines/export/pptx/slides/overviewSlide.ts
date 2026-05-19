@@ -41,20 +41,53 @@ export function addOverviewSlide(
     ],
     y,
   )
+  // PPT-02: second KPI row surfaces previously-dropped estate facts
+  // (utilization + physical capacity + storage), factual only.
+  const o = d.insights
+  const y3 = addKpiRow(
+    s,
+    [
+      {
+        label: strings['overview.avgCpu'] ?? 'Avg CPU %',
+        value: pptxNumber(Number(o.avgCpuPct), locale, 1),
+      },
+      {
+        label: strings['overview.avgMem'] ?? 'Avg memory %',
+        value: pptxNumber(Number(o.avgMemPct), locale, 1),
+      },
+      {
+        label: strings['overview.cores'] ?? 'Physical cores',
+        value: pptxNumber(Number(o.totalPhysicalCores), locale),
+      },
+      {
+        label: strings['overview.hostMem'] ?? 'Host memory (MiB)',
+        value: pptxNumber(Number(o.totalHostMemoryMib), locale),
+      },
+      {
+        label: strings['overview.provisioned'] ?? 'Provisioned (MiB)',
+        value: pptxNumber(Number(o.provisionedMib), locale),
+      },
+      {
+        label: strings['overview.inUse'] ?? 'In use (MiB)',
+        value: pptxNumber(Number(o.inUseMib), locale),
+      },
+    ],
+    y2,
+  )
   const gap = 0.2
   const pw = (CONTENT_W - gap * 2) / 3
-  const ph = 7.15 - y2
-  addChartPanel(s, d.osDonut, { x: M, y: y2, w: pw, h: ph }, strings['overview.os'] ?? 'OS family')
+  const ph = 7.15 - y3
+  addChartPanel(s, d.osDonut, { x: M, y: y3, w: pw, h: ph }, strings['overview.os'] ?? 'OS family')
   addChartPanel(
     s,
     d.cpuGauge,
-    { x: M + pw + gap, y: y2, w: pw, h: ph },
+    { x: M + pw + gap, y: y3, w: pw, h: ph },
     strings['overview.cpu'] ?? 'Mean CPU %',
   )
   addChartPanel(
     s,
     d.ramGauge,
-    { x: M + (pw + gap) * 2, y: y2, w: pw, h: ph },
+    { x: M + (pw + gap) * 2, y: y3, w: pw, h: ph },
     strings['overview.mem'] ?? 'Mean memory %',
   )
 }

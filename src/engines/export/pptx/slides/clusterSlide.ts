@@ -42,10 +42,42 @@ export function addClusterSlide(
     ],
     y,
   )
+  // PPT-02: second KPI row surfaces previously-dropped per-cluster physical
+  // capacity + headroom facts (factual only, no verdict).
+  const y3 = addKpiRow(
+    s,
+    [
+      {
+        label: strings['cluster.cores'] ?? 'Physical cores',
+        value: pptxNumber(Number(c.physicalCores), locale),
+      },
+      {
+        label: strings['cluster.ghz'] ?? 'Physical GHz',
+        value: pptxNumber(Number(c.physicalGhz), locale, 1),
+      },
+      {
+        label: strings['cluster.ram'] ?? 'Host memory (MiB)',
+        value: pptxNumber(Number(c.physicalRamMib), locale),
+      },
+      {
+        label: strings['cluster.capVcpu'] ?? 'vCPU capacity',
+        value: pptxNumber(Number(c.capacityVcpu), locale),
+      },
+      {
+        label: strings['cluster.capRam'] ?? 'vRAM capacity (MiB)',
+        value: pptxNumber(Number(c.capacityRamMib), locale),
+      },
+      {
+        label: strings['cluster.vcpuAlloc'] ?? 'vCPU allocated',
+        value: pptxNumber(Number(c.vcpuAllocated), locale),
+      },
+    ],
+    y2,
+  )
   addChartPanel(
     s,
     d.chartPng,
-    { x: M, y: y2, w: CONTENT_W, h: 7.15 - y2 },
+    { x: M, y: y3, w: CONTENT_W, h: 7.15 - y3 },
     strings['cluster.cpu'] ?? 'CPU utilization',
   )
 }

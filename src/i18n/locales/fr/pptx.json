@@ -11,7 +11,13 @@
     "vcpuPerPcpu": "vCPU : pCPU",
     "os": "Familles d'OS",
     "cpu": "CPU moyen %",
-    "mem": "Mémoire moyenne %"
+    "mem": "Mémoire moyenne %",
+    "avgCpu": "CPU moyen %",
+    "avgMem": "Mémoire moyenne %",
+    "cores": "Cœurs physiques",
+    "hostMem": "Mémoire hôte (Mio)",
+    "provisioned": "Provisionné (Mio)",
+    "inUse": "Utilisé (Mio)"
   },
   "cluster": {
     "subtitle": "Détail du cluster",
@@ -19,7 +25,13 @@
     "vms": "VM",
     "vcpuPerPcpu": "vCPU : pCPU",
     "datastores": "Datastores",
-    "cpu": "Utilisation CPU"
+    "cpu": "Utilisation CPU",
+    "cores": "Cœurs physiques",
+    "ghz": "GHz physiques",
+    "ram": "Mémoire hôte (Mio)",
+    "capVcpu": "Capacité vCPU",
+    "capRam": "Capacité vRAM (Mio)",
+    "vcpuAlloc": "vCPU alloué"
   },
   "eos": {
     "title": "Prévision de fin de support des OS",
