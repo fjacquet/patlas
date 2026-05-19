@@ -68,6 +68,12 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
         const opt = optBundle.perCluster.get(slot.cluster)
         if (opt) charts.set(slot.id, chartToSvg(opt, CHART_W, CHART_H))
       }
+      // F-2: the single estate-level Storage treemap (fixed slot id —
+      // matches renderReport.tsx's data-chart-slot="storage-treemap").
+      // 11-01 threads it unconditionally; guard is factual (absent ⇒
+      // empty slot, never fabricated).
+      const treemap = optBundle.shared.storageTreemap
+      if (treemap) charts.set('storage-treemap', chartToSvg(treemap, CHART_W, CHART_H))
       const html = assembleHtml({ view, trends, charts, strings, locale: req.locale })
       bytes = new TextEncoder().encode(html).buffer
     } else {
