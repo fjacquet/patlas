@@ -11,6 +11,7 @@ import {
   useSnapshotStore,
 } from '@/store/snapshotStore'
 import type { AccountingMode, DrMode } from '@/types/estate'
+import { PlannedEstatePanel } from './PlannedEstatePanel'
 import { PlannedRatiosControl } from './PlannedRatiosControl'
 
 /**
@@ -94,6 +95,11 @@ export function PlanningView() {
               applyPlannedToDr={applyPlannedToDr}
               onApplyPlannedToDr={setApplyPlannedToDr}
             />
+          </div>
+          {/* F-1 (PLN-03/04): planned-vs-measured estate, same single
+              `view` — structurally separated like the DR block. */}
+          <div className="mt-12">
+            <PlannedEstatePanel view={view} />
           </div>
         </div>
       </ErrorBoundary>
