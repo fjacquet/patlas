@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 Phase: 18 — PPTX vsizer-parity rebuild (18-01/02 done; 18-03 in progress; 18-04 pending)
 Plan: —
-Status: VISUALLY VERIFIED (soffice render) vsizer-grade: cluster, title, overview, Planned (Phase-16 headroom), Storage (table). Remaining 18-03: network (all-zeros → factual absent), dr (barren → stretched summary), eos/inventory (plain). 18-04: app-side stretched UX.
-Last activity: 2026-05-19 — Phase 18-03: Planned headroom parity + Storage table (commit feat(18-03)). 502 tests green.
+Status: VISUALLY VERIFIED (soffice render) vsizer-grade on ALL flagged slides: cluster, title, overview (named OS cards, no giant gauges), Planned (headroom), Storage (table), Inventory (named OS), Network (factual "sheets absent"). Minor remaining: DR barren (optional stretched summary), EOS plain. 18-04: app-side stretched UX.
+Last activity: 2026-05-20 — Phase 18-03: OS-family text + dropped verdict gauges + network absent-note (commit fix(18-03)). 502 tests green.
 
 ## Performance Metrics
 
