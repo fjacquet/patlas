@@ -2,14 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Offline-Capable, Redesigned, Better Deck
-status: planning
-last_updated: "2026-05-19T17:24:48.952Z"
-last_activity: 2026-05-19
+status: Awaiting next milestone
+stopped_at: v2.0 milestone CLOSED — archived (ROADMAP/REQUIREMENTS/audit → milestones/), PROJECT evolved, tagged v2.0
+last_updated: "2026-05-20T12:20:00.000Z"
+last_activity: 2026-05-20 — Milestone v2.0 completed and archived
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 6
-  completed_plans: 6
+  total_phases: 7
+  completed_phases: 7
+  total_plans: 7
+  completed_plans: 7
   percent: 100
 ---
 
@@ -17,17 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
+See: .planning/PROJECT.md (updated 2026-05-20 after v2.0 milestone)
 
 **Core value:** A user drops a RVTools workbook and walks away with a polished, shareable HTML report and PPTX deck describing their VMware estate — without uploading a single byte. The report is the product.
-**Current focus:** v2.0 — Phases 12–17 (privacy SW exception → PWA → right-side nav → KPI-tile redesign → planning visual return → PPTX overhaul). REQUIREMENTS.md + ROADMAP.md written.
+**Current focus:** None — v2.0 shipped & tagged (installable offline PWA, redesigned UI, vsizer-grade deck). Start the next milestone with `/gsd-new-milestone`.
 
 ## Current Position
 
-Phase: 18 — PPTX vsizer-parity rebuild + stretched UX — COMPLETE (18-01..04). Minor leftover: DR bare slide.
+Phase: Milestone v2.0 complete
 Plan: —
-Status: VISUALLY VERIFIED (soffice render) — every flagged slide fixed: cluster, title, overview, Planned, Storage, Inventory, Network, EOS. Root cause of "graphs missing text" fixed: resvg-wasm has no font → rasterized chart text vanished; ALL deck visuals are now native pptxgenjs shapes+text. Web app: one left column + cluster table rows. Minor leftover: DR barren slide. 18-04: app-side stretched UX (optional).
-Last activity: 2026-05-20 — feat(18-04) central stretched toggles + co-located count. Phase 18 complete. 502 tests green. Next: close v2.0 (audit + UAT) or the minor DR bare slide.
+Status: Awaiting next milestone
+Last activity: 2026-05-20 — Milestone v2.0 completed, archived, tagged.
 
 ## Performance Metrics
 
@@ -111,11 +112,13 @@ None yet.
 
 ## Deferred Items
 
-Items acknowledged and carried forward from previous milestone close:
+Items acknowledged and deferred at milestone close:
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| *(none)* | | | |
+| uat | Consolidated Playwright browser UAT — PWA offline cold-boot (PWA-02) + web-layout visuals (installability already browser-confirmed) | open | v2.0 (2026-05-20) |
+| pptx | DR slide bare when no scenario — optional stretched-cluster reservation summary | open | v2.0 (2026-05-20) |
+| ui | UIX-03 icons are hand-authored placeholders — swap for the icons-project render_icon exact set once that MCP is enabled | open | v2.0 (2026-05-20) |
 
 ## Session Continuity
 
@@ -125,12 +128,5 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 
 ## Operator Next Steps
 
-1. **Phase 18 continuation** (the deck rebuild the user is waiting on):
-   - ✅ 18-01 cluster · ✅ 18-02 title + overview · ✅ 18-03 Planned + Storage (all visually verified via soffice render).
-   - 18-03 remaining: networkSlide (empty rollup → factual "optional vNetwork/vSwitch sheets absent" not 4 zeros); drSimSlide (no-scenario → estate stretched-cluster DR reservation summary); eos/inventory density polish.
-   - 18-04 simplify app-side stretched-cluster management to match vsizer (read `/Users/fjacquet/Projects/vsizer` stretched toggle vs vatlas `setStretchedClusters`/StretchedPill).
-   - Reference decks for comparison: vsizer `~/Downloads/RVTools_export_all_2026-01-07_10_23_35_vsizer.pptx`; vatlas current `~/Downloads/vatlas_spvspherevc11_*.pptx`.
-2. **Consolidated Playwright UAT** — offline boot (P13), LEFT nav (P14), KPI tiles (P15), planning visual (P16), regenerate + eyeball the deck (P17/P18). Artifacts under `.playwright-mcp/` ONLY (Vite-reload trap).
-3. **Milestone audit** (`/gsd-audit-milestone`) then `/gsd-complete-milestone`.
-4. Polish: ClusterColumn KPI-tile (UIX-02 remainder); swap hand-authored icons for the icons-project render_icon set once that MCP is enabled.
-- Carry-forward (post-Phase-15, consolidated): Phases 13–15 visual/offline Playwright UAT (artifacts under .playwright-mcp/ only — Vite-reload trap); ClusterColumn KPI-tile polish (UIX-02 remainder); swap hand-authored icons for the icons-project render_icon exact set once that MCP is enabled (icon prop is the stable seam — no API change).
+- **Start the next milestone:** `/gsd-new-milestone`.
+- Optional carry-forwards (deferred at v2.0 close — see Deferred Items): consolidated Playwright UAT (offline cold-boot + web-layout visuals; installability already confirmed); DR bare-slide stretched summary; swap UIX icons for the icons-project exact set. Reference deck for the PPTX bar: vsizer `~/Downloads/RVTools_export_all_2026-01-07_10_23_35_vsizer.pptx`.

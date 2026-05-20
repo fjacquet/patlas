@@ -1,5 +1,23 @@
 # Milestones
 
+## v2.0 Offline-Capable, Redesigned, Better Deck (Shipped: 2026-05-20)
+
+**Phases:** 7 (12–18, executed inline) · **Commits:** 30 · **Changes:** 63 files, +9,296 / −2,090 · **Timeline:** 2026-05-19 → 2026-05-20 · **Tests:** 506 across 80 files.
+
+**Delivered:** vatlas became an installable, fully-offline PWA under a deliberately amended privacy ADR; the dashboard was rebuilt as KPI tiles with a single left column and a scannable cluster table; the Capacity Planning what-if gained a visual headroom return; and the PPTX deck was rebuilt to vsizer parity (brand-free, all charts native, fully labeled).
+
+**Key accomplishments:**
+
+- **Privacy ADR amended + enforced (GOV):** ADR-0001 gained an Accepted, tightly-scoped service-worker exception (injectManifest, precache-only, same-origin, guard-first `sw.ts`); `check-supply-chain.mjs` refactored to a pure tested gate that *blocks* a non-compliant SW (extends the three-layer privacy model into the SW scope).
+- **Installable, fully-offline PWA (PWA):** `vite-plugin-pwa` injectManifest + audited `src/sw.ts` (imports the privacy guard first, precache-only) + smart auto-update that never wipes a loaded estate. Installability browser-confirmed in Chrome.
+- **UX/IA redesign (NAV/UIX):** primary nav folded into a single left column; estate summary, operational insights and cluster detail rebuilt as grouped KPI tiles with a vendored same-origin icon set; the per-cluster columns became a scannable cluster table with central stretched toggles.
+- **Capacity Planning visual return (PLN):** measured-vs-planned vCPU/vRAM headroom (chart + tiles) from the existing engine outputs — no new memo, factual, no editorial verbs.
+- **PPTX rebuilt to vsizer parity (PPT):** title KPI band, dense factual cluster slides (KEY FIGURES, utilization bars + min/mean/max, provenance), readable TiB, per-cluster storage table, factual "network sheets absent" note, planning headroom. Root cause of missing chart text found (resvg-wasm has no font) and fixed by rendering all deck visuals as native pptxgenjs shapes+text.
+
+**Known deferred items at close** (tech debt, non-blocking — see milestones/v2.0-MILESTONE-AUDIT.md): consolidated Playwright browser UAT (offline cold-boot, web-layout visuals) not yet run (installability confirmed); DR slide bare when no scenario; UIX-03 icons are hand-authored placeholders pending the icons-MCP exact set. Method: phases 12–18 executed inline (no per-phase GSD VERIFICATION/SUMMARY/VALIDATION artifacts; code is gate-verified — 6/6 gates green).
+
+---
+
 ## v1.0 RVTools Atlas (MVP) (Shipped: 2026-05-19)
 
 **Phases completed:** 11 phases, 43 plans, 74 tasks
