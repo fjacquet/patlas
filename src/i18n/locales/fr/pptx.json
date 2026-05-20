@@ -1,6 +1,6 @@
 {
   "title": {
-    "identity": "{{vcenters}} · {{clusters}} clusters · {{hosts}} hôtes · {{vms}} VMs · capturé le {{captureDate}}",
+    "identity": "{{clusters}} clusters · {{hosts}} hôtes · {{vms}} VMs · capturé le {{captureDate}}",
     "generated": "Généré par vatlas — synthèse factuelle du parc"
   },
   "overview": {
@@ -11,15 +11,41 @@
     "vcpuPerPcpu": "vCPU : pCPU",
     "os": "Familles d'OS",
     "cpu": "CPU moyen %",
-    "mem": "Mémoire moyenne %"
+    "mem": "Mémoire moyenne %",
+    "avgCpu": "CPU moyen %",
+    "avgMem": "Mémoire moyenne %",
+    "cores": "Cœurs physiques",
+    "hostMem": "Mémoire hôte",
+    "provisioned": "Provisionné",
+    "inUse": "Utilisé"
   },
   "cluster": {
-    "subtitle": "Détail du cluster",
-    "hosts": "Hôtes",
-    "vms": "VM",
-    "vcpuPerPcpu": "vCPU : pCPU",
-    "datastores": "Datastores",
-    "cpu": "Utilisation CPU"
+    "stretched": "Étendu",
+    "drReserved": "Réservé PRA",
+    "hostsWord": "hôtes",
+    "vmsWord": "VM",
+    "coresWord": "cœurs",
+    "ramWord": "RAM",
+    "readyLine": "CPU Ready : {{mean}} % moyen · {{max}} % max · {{count}} VM > {{thr}} %",
+    "readyUnavailable": "CPU Ready : indisponible (source : RVTools)",
+    "cpuMean": "CPU moyen",
+    "ramMean": "RAM moyen",
+    "ghzUsedPhys": "GHz utilisés / phys.",
+    "mhzPerVcpu": "réels par vCPU alloué",
+    "vcpuPerPcpu": "vCPU par cœur physique",
+    "min": "Min",
+    "mean": "Moyen",
+    "max": "Max",
+    "cpuTitle": "CPU — utilisation moyenne",
+    "ramTitle": "RAM — utilisation moyenne",
+    "consumedOf": "consommés sur",
+    "keyFigures": "DONNÉES CLÉS",
+    "vcpuAlloc": "vCPU alloué",
+    "reservedCap": "Capacité réservée (vCPU × horloge)",
+    "consumedGhz": "GHz consommés",
+    "availableGhz": "GHz disponibles",
+    "ramAvailable": "RAM disponible",
+    "footer": "Source : RVTools — vHost (% CPU/RAM, Speed × Cores, Memory) + vInfo (vCPUs, Memory)"
   },
   "eos": {
     "title": "Prévision de fin de support des OS",
@@ -59,9 +85,9 @@
   "storage": {
     "title": "Stockage",
     "byCluster": "Stockage par cluster",
-    "provisioned": "Provisionné (Gio)",
-    "inUse": "Utilisé (Gio)",
-    "capacity": "Capacité (Gio)",
+    "provisioned": "Provisionné",
+    "inUse": "Utilisé",
+    "capacity": "Capacité",
     "flagged": "Datastores signalés",
     "colCluster": "Cluster",
     "colProvisioned": "Provisionné",
@@ -73,7 +99,14 @@
     "vswitches": "vSwitches",
     "dvswitches": "dvSwitches",
     "portgroups": "Groupes de ports",
-    "vnetwork": "Adjacences VM"
+    "vnetwork": "Adjacences VM",
+    "absent": "Les feuilles optionnelles vNetwork / vSwitch / dvSwitch / dvPort sont absentes de cet export RVTools — aucune topologie réseau à présenter."
+  },
+  "os": {
+    "title": "Systèmes d'exploitation",
+    "windows": "Windows",
+    "linux": "Linux",
+    "other": "Autre"
   },
   "planned": {
     "title": "Parc planifié vs mesuré",
@@ -85,6 +118,14 @@
     "clusterDelta": "Écart par cluster",
     "colCluster": "Cluster",
     "colMeasured": "Mesuré",
-    "colPlanned": "Planifié"
+    "colPlanned": "Planifié",
+    "capMeasured": "Capacité vCPU (mesurée)",
+    "capPlanned": "Capacité vCPU (planifiée)",
+    "vcpuDemand": "vCPU alloué (demande)",
+    "headroomPlanned": "Marge vCPU (planifiée)",
+    "ramCapMeasured": "Capacité vRAM (mesurée)",
+    "ramCapPlanned": "Capacité vRAM (planifiée)",
+    "ramDemand": "vRAM alloué (demande)",
+    "ramHeadroomPlanned": "Marge vRAM (planifiée)"
   }
 }

@@ -74,7 +74,14 @@ export function bytesToBase64(bytes: Uint8Array): string {
 /** Minimal structural slide type — decouples from the pptxgenjs class so
  *  this primitive stays pure and trivially testable. */
 export interface ImageSink {
-  addImage(opts: { data: string; x: number; y: number; w: number; h: number }): unknown
+  addImage(opts: {
+    data: string
+    x: number
+    y: number
+    w: number
+    h: number
+    sizing?: { type: 'contain' | 'cover' | 'crop'; w: number; h: number }
+  }): unknown
 }
 
 export interface ChartLayout {
@@ -90,5 +97,12 @@ export interface ChartLayout {
  * in PowerPoint).
  */
 export function addChartImage(slide: ImageSink, png: Uint8Array, layout: ChartLayout): void {
-  slide.addImage({ data: `image/png;base64,${bytesToBase64(png)}`, ...layout })
+  // PPT-01: `sizing: contain` preserves the chart's aspect inside the panel
+  // box (centered/letterboxed) instead of stretching it — what made gauges
+  // and donuts look "oversized"/distorted in wide single-chart slides.
+  slide.addImage({
+    data: `image/png;base64,${bytesToBase64(png)}`,
+    ...layout,
+    sizing: { type: 'contain', w: layout.w, h: layout.h },
+  })
 }

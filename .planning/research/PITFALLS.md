@@ -65,7 +65,7 @@ These cause wrong numbers, privacy violations, or rewrites. Wrong numbers in an 
 | Devtools-style "debug" overlays in prod | A `if (import.meta.env.DEV)` gate around every debug panel; never `process.env.NODE_ENV` (Vite). |
 | fetch / XHR / WebSocket / sendBeacon | A runtime guard: in `src/main.tsx` install a wrapper that overrides `window.fetch`, `XMLHttpRequest.prototype.open`, `navigator.sendBeacon`, and `WebSocket` to throw if the URL host is NOT the document origin. Throwing is the right behavior; a silent block is hard to detect. |
 | CSP header / meta tag | Ship a `<meta http-equiv="Content-Security-Policy">` with `connect-src 'self'` (no `*`, no third-party hosts). This is belt-and-suspenders to the runtime guard. |
-| Service Worker registering and POSTing payloads | Don't register a service worker. CI grep for `navigator.serviceWorker.register`. |
+| Service Worker registering and POSTing payloads | **v1.0:** none allowed. **v2.0 (ADR-0001 Amendment):** permitted ONLY under the bounded envelope — `vite-plugin-pwa` `injectManifest`, audited `src/sw.ts` whose first executable statement imports `./privacy/fetchGuard`, precache-only (no `runtimeCaching`), same-origin, prompt-style update. Enforced by `scripts/check-supply-chain.mjs` (allowlist `vite-plugin-pwa`+`workbox-*`; assert guard-first `src/sw.ts`). Any `runtimeCaching`, dropped guard import, or cross-origin cache re-opens this vector and is a violation. |
 | Web font fetched from Google Fonts / CDN | Self-host all fonts; `font-src 'self' data:` in CSP. (Also fixes Critical-7.) |
 | Resource hints (`<link rel="prefetch">`) to third-party | None. CI grep `<link rel="preconnect"|prefetch"` for non-self URLs. |
 | Iframe to third party | None. `frame-src 'none'` in CSP. |
@@ -564,7 +564,7 @@ A condensed cross-reference: which pitfalls bite each roadmap phase.
 | PPTX-export | Moderate-2, Moderate-8 | `pptxText` wrapper; locale-aware pre-formatting; control-char stripping; golden snapshot CI test |
 | i18n | Moderate-2, Minor-7 | Centralized formatters; U+202F handling; CI key-diff gate |
 | Performance | Critical-5, Moderate-9 | Web Worker parsing; dense mode; chart memoization; Canvas for large datasets |
-| Privacy | Critical-2 | Runtime fetch/XHR/WS/Beacon guard; CSP `connect-src 'self'`; CI denylist on telemetry packages; no source-map upload |
+| Privacy | Critical-2 | Runtime fetch/XHR/WS/Beacon guard; CSP `connect-src 'self'`; CI denylist on telemetry packages; no source-map upload; v2.0 SW only under the ADR-0001 Amendment envelope (guard-first, precache-only, same-origin), CI-enforced |
 
 ---
 

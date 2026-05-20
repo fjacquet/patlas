@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: RVTools Atlas (MVP)
+milestone: v2.0
+milestone_name: Offline-Capable, Redesigned, Better Deck
 status: Awaiting next milestone
-stopped_at: v1.0 milestone CLOSED — archived, PROJECT evolved, retrospective written, gsd/v1.0-milestone retired
-last_updated: "2026-05-19T07:10:09.484Z"
-last_activity: 2026-05-19 — Milestone v1.0 completed and archived
+stopped_at: v2.0 milestone CLOSED — archived (ROADMAP/REQUIREMENTS/audit → milestones/), PROJECT evolved, tagged v2.0
+last_updated: "2026-05-20T12:20:00.000Z"
+last_activity: 2026-05-20 — Milestone v2.0 completed and archived
 progress:
-  total_phases: 11
-  completed_phases: 11
-  total_plans: 43
-  completed_plans: 43
+  total_phases: 7
+  completed_phases: 7
+  total_plans: 7
+  completed_plans: 7
   percent: 100
 ---
 
@@ -18,17 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
+See: .planning/PROJECT.md (updated 2026-05-20 after v2.0 milestone)
 
 **Core value:** A user drops a RVTools workbook and walks away with a polished, shareable HTML report and PPTX deck describing their VMware estate — without uploading a single byte. The report is the product.
-**Current focus:** None — v1.0 RVTools Atlas (MVP) shipped & deployed; start the next milestone with `/gsd-new-milestone`
+**Current focus:** None — v2.0 shipped & tagged (installable offline PWA, redesigned UI, vsizer-grade deck). Start the next milestone with `/gsd-new-milestone`.
 
 ## Current Position
 
-Phase: Milestone v1.0 complete
+Phase: Milestone v2.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-05-19 — Milestone v1.0 completed and archived
+Last activity: 2026-05-20 — Milestone v2.0 completed, archived, tagged.
 
 ## Performance Metrics
 
@@ -98,6 +98,7 @@ None yet.
 
 ### Blockers/Concerns
 
+- **Phase 15 BLOCKED on user action:** the `/Users/fjacquet/Projects/icons` `render_icon` MCP is not connected to the session. Enable it (`claude mcp add icons …` then restart) so the exact KPI icon set can be vendored into `src/components/icons/`. Icon-agnostic structure (StatTile/TileSection + 4-component refactor) can proceed first if desired; icons drop into the slot after.
 - Phase 1 must harvest 4+ real RVTools workbooks (one per generation: 3.10, 3.11, 4.0, 4.4) from `~/Downloads/`, `~/Library/CloudStorage/OneDrive-Home/`, and `vsizer/public/samples/rvtools-sample.xlsx` to lock in column-alias dictionary and MB-is-MiB canary
 - Phase 4 must verify whether RVTools `vCluster` exposes host fault-domain or site tag in current versions (if not, engine surfaces `confidence: 'medium'` with "assumed symmetric" chip)
 - Phase 5 needs research pass: OS-naming-variant matrix (harvest 50+ real OS strings; assert <5% unknown-OS rate) and `endoflife.date` v1 API Beta schema stability
@@ -111,11 +112,13 @@ None yet.
 
 ## Deferred Items
 
-Items acknowledged and carried forward from previous milestone close:
+Items acknowledged and deferred at milestone close:
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| *(none)* | | | |
+| uat | Consolidated Playwright browser UAT — PWA offline cold-boot (PWA-02) + web-layout visuals (installability already browser-confirmed) | open | v2.0 (2026-05-20) |
+| pptx | DR slide bare when no scenario — optional stretched-cluster reservation summary | open | v2.0 (2026-05-20) |
+| ui | UIX-03 icons are hand-authored placeholders — swap for the icons-project render_icon exact set once that MCP is enabled | open | v2.0 (2026-05-20) |
 
 ## Session Continuity
 
@@ -125,4 +128,5 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- **Start the next milestone:** `/gsd-new-milestone`.
+- Optional carry-forwards (deferred at v2.0 close — see Deferred Items): consolidated Playwright UAT (offline cold-boot + web-layout visuals; installability already confirmed); DR bare-slide stretched summary; swap UIX icons for the icons-project exact set. Reference deck for the PPTX bar: vsizer `~/Downloads/RVTools_export_all_2026-01-07_10_23_35_vsizer.pptx`.

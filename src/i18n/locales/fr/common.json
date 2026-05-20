@@ -20,5 +20,9 @@
     "auto": "Auto",
     "light": "Clair",
     "dark": "Sombre"
+  },
+  "pwa": {
+    "updateAvailable": "Une nouvelle version est prête.",
+    "reload": "Recharger"
   }
 }

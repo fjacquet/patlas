@@ -3,6 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 RVTools Atlas (MVP)** — Phases 1–11 (shipped 2026-05-19) — full detail: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
+- ✅ **v2.0 Offline-Capable, Redesigned, Better Deck** — Phases 12–18 (shipped 2026-05-20) — full detail: [milestones/v2.0-ROADMAP.md](milestones/v2.0-ROADMAP.md)
 
 ## Phases
 
@@ -23,13 +24,29 @@
 
 </details>
 
+<details>
+<summary>✅ v2.0 Offline-Capable, Redesigned, Better Deck — Phases 12–18 — SHIPPED 2026-05-20</summary>
+
+- [x] Phase 12: Privacy governance — ADR-0001 SW exception + supply-chain gate (GOV) — 2026-05-19
+- [x] Phase 13: Installable, fully-offline PWA (PWA) — 2026-05-19
+- [x] Phase 14: Navigation IA — vertical nav (NAV) — 2026-05-19
+- [x] Phase 15: Visual redesign — KPI tile system (UIX) — 2026-05-19
+- [x] Phase 16: Capacity Planning visual return (PLN) — 2026-05-19
+- [x] Phase 17: PPTX quality overhaul (PPT) — 2026-05-19
+- [x] Phase 18: PPTX vsizer-parity rebuild + web layout + stretched UX — 2026-05-20
+
+Executed inline (atomic commits, gate-verified). Full detail + per-phase success criteria archived in [milestones/v2.0-ROADMAP.md](milestones/v2.0-ROADMAP.md).
+
+</details>
+
 ## Progress
 
-| Milestone | Phases | Plans | Status | Shipped |
-|-----------|--------|-------|--------|---------|
-| v1.0 RVTools Atlas (MVP) | 1–11 | 43/43 | ✅ Complete — released & deployed | 2026-05-19 |
+| Milestone | Phases | Status | Shipped |
+|-----------|--------|--------|---------|
+| v1.0 RVTools Atlas (MVP) | 1–11 | ✅ Complete — released & deployed | 2026-05-19 |
+| v2.0 Offline-Capable, Redesigned, Better Deck | 12–18 | ✅ Complete — installable PWA, redesigned UI, vsizer-grade deck | 2026-05-20 |
 
-Full v1.0 phase detail (goals, success criteria, requirements, pitfalls) is archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md). Requirements archived in [milestones/v1.0-REQUIREMENTS.md](milestones/v1.0-REQUIREMENTS.md). Audit: [milestones/v1.0-MILESTONE-AUDIT.md](milestones/v1.0-MILESTONE-AUDIT.md).
+Full v1.0 detail archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) · v2.0 in [milestones/v2.0-ROADMAP.md](milestones/v2.0-ROADMAP.md). Audits: [v1.0](milestones/v1.0-MILESTONE-AUDIT.md) · [v2.0](milestones/v2.0-MILESTONE-AUDIT.md).
 
 ---
-*v1.0 RVTools Atlas (MVP) shipped 2026-05-19 — 11 phases, 43 plans, ~23.6k LOC, deployed to fjacquet.github.io/vatlas/. Next milestone: `/gsd-new-milestone`.*
+*v2.0 shipped 2026-05-20 — installable offline PWA (audited ADR-0001 SW exception), KPI-tile redesign with one left column + cluster table, Capacity Planning visual return, and a vsizer-grade brand-free PPTX deck (all charts native). 506 tests green. Carry-forward: consolidated Playwright UAT (offline cold-boot, web-layout) + minor polish (DR bare slide, icon exact-set). Next milestone: `/gsd-new-milestone`.*

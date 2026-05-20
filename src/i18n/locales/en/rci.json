@@ -45,7 +45,12 @@
   },
   "detail": {
     "title": "Cluster detail",
-    "back": "Back to dashboard"
+    "back": "Back to dashboard",
+    "groups": {
+      "capacity": "Capacity",
+      "utilization": "Utilization",
+      "powerSite": "Power & site"
+    }
   },
   "na": "—"
 }

@@ -38,8 +38,9 @@ by a dependency or a contributor.
    `package.json` never installs in CI, and as a local `prebuild` hook.
 4. The Zustand store holds no `persist` middleware. Only `vatlas-lang` (locale
    code) and `vatlas-theme` (theme preference) may write to `localStorage`. No
-   `sessionStorage` / `IndexedDB` / `OPFS` / service worker registrations
-   anywhere.
+   `sessionStorage` / `IndexedDB` / `OPFS`. No service worker registration
+   **except** under the Amendment (v2.0) envelope below — which is precache-only
+   for static build assets and never touches dataset rows.
 5. `FallbackError` reads only `error.message` and `error.name` — never
    `error.cause` (which may carry parsed rows).
 6. The Biome `noConsole` rule is `error` in non-test files; `warn` and `error`
@@ -61,14 +62,53 @@ monkey-patch, CI denylist — are intentionally redundant.
 
 ## Alternatives Considered
 
-- **Service worker as a network kill-switch.** Service workers themselves are a
-  privacy attack surface (they can register, intercept, and POST data);
-  forbidden by PITFALLS.md Critical-2.
+- **Service worker as a network kill-switch.** Service workers are a privacy
+  attack surface (they can register, intercept, and POST data). Forbidden
+  outright in v1.0; permitted in v2.0 ONLY under the tightly-bounded Amendment
+  envelope below (precache-only, same-origin, guard-first). See the rewritten
+  PITFALLS.md Critical-2.
 - **CSP only, no runtime guard.** CSP is reactive; a runtime guard surfaces
   violations at the developer's machine before they ever land in production.
 - **Sentry with `beforeSend: () => null`.** Adds complexity, easy to
   misconfigure, the Sentry SDK still ships and could be activated by a future
   commit.
+
+## Amendment (v2.0): Service-Worker Exception — Accepted
+
+**Status:** Accepted · **Date:** 2026-05-19 · **Phase:** 12
+
+v1.0 forbade service workers outright. v2.0 makes vatlas installable and fully
+offline, which is impossible without a service worker. The objection in
+"Alternatives Considered" is specific — *register, intercept, and POST data* —
+and is neutralized by a tightly-bounded envelope rather than waived:
+
+1. **Own code, not a black box.** `vite-plugin-pwa` is used in `injectManifest`
+   strategy. The service worker is `src/sw.ts` — audited project code — never a
+   generated `generateSW` bundle.
+2. **Guard-first.** `src/sw.ts`'s FIRST executable statement is
+   `import './privacy/fetchGuard'`. Workers have their own global scope (the
+   main-thread monkey-patch and the page `<meta>` CSP do not reach a SW), so
+   this extends the runtime guard into the SW scope exactly as Decision §7 does
+   for the parser worker. Any non-same-origin fetch from the SW throws.
+3. **Precache-only.** The SW uses `precacheAndRoute(self.__WB_MANIFEST)` and
+   **no `runtimeCaching`**. It serves only the static, build-time, hashed asset
+   manifest. No dynamic, opaque, or cross-origin response is ever cached.
+   Workbook bytes / parsed rows never reach the SW or any cache.
+4. **Same-origin only.** SW script, registration, `manifest.webmanifest`, and
+   every precached asset are same-origin under `/vatlas/`. No new cross-origin
+   traffic is introduced.
+5. **Update safety.** A pending SW never silently reloads a loaded estate
+   (would breach "refresh = data gone"): auto-reload only when the snapshot
+   store is empty, otherwise a user-controlled toast (`registerType: 'prompt'`).
+6. **CI enforcement.** `scripts/check-supply-chain.mjs` allowlists exactly
+   `vite-plugin-pwa` + `workbox-*`, denies any other service-worker-named
+   dependency, and — when `vite-plugin-pwa` is present — fails the build unless
+   `src/sw.ts` exists and imports the privacy guard first. The three-layer model
+   (CSP, runtime guard, CI denylist) is *extended into the SW*, not weakened.
+
+This envelope is binding: any change that adds `runtimeCaching`, removes the
+guard-first import, or caches a non-same-origin response re-opens the original
+attack surface and is a violation, not a refinement.
 
 ## Consequences
 

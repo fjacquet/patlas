@@ -20,5 +20,9 @@
     "auto": "Auto",
     "light": "Light",
     "dark": "Dark"
+  },
+  "pwa": {
+    "updateAvailable": "A new version is ready.",
+    "reload": "Reload"
   }
 }

@@ -41,6 +41,41 @@
 
 ---
 
+## Milestone: v2.0 — Offline-Capable, Redesigned, Better Deck
+
+**Shipped:** 2026-05-20
+**Phases:** 7 (12–18, executed inline) · **Commits:** 30 · **Changes:** 63 files, +9,296/−2,090 · **Tests:** 506/80 files
+
+### What Was Built
+Installable, fully-offline PWA under an audited ADR-0001 service-worker exception (guard-first, precache-only); one-left-column KPI-tile dashboard with a scannable cluster table + central stretched toggles; Capacity Planning measured-vs-planned headroom visual; PPTX deck rebuilt to vsizer parity (brand-free, all charts native pptxgenjs, fully labeled).
+
+### What Worked
+- **Catching the ADR conflict before coding** — the brainstorm-then-check habit surfaced that service workers were forbidden by an Accepted ADR *before* any PWA code, turning a silent violation into a deliberate, governed amendment.
+- **Render-and-look verification** — once the PPTX was rendered (`soffice → PDF → Read`) instead of judged by tests, every real defect (missing chart text, ugly raw MiB, broken treemap block) became obvious and fixable. This is now a saved practice.
+- **Native pptxgenjs over rasterized charts** — sidestepped the resvg-no-font root cause entirely and made every deck label reliable.
+- **vsizer as the concrete reference** — reading the sibling's proven slide builders + comparing decks beat guessing.
+
+### What Was Inefficient
+- Several PPTX rounds shipped before the deck was rendered/looked-at — the "tests pass but it's worthless" gap. Multiple partial passes (sparse-text fixes, gauge tweaks) preceded the actual fix (native charts + the render loop). Earlier visual verification would have collapsed ~4 rounds into one.
+- Right-then-left nav churn (docx said "right", user wanted left) — a quick confirm would have saved a flip.
+- A test-file collection bug (`new URL(import.meta.url)` in pwa-sw.test) sat latent until the milestone audit caught it.
+
+### Patterns Established
+- **Deck visuals = native pptxgenjs shapes+text**, never rely on rasterized-chart text ([[project_pptx_resvg_no_font]]).
+- **Verify visual artifacts by rendering** ([[feedback_verify_deck_visually]]).
+- **Govern, don't waive, invariant exceptions** — the SW exception extends the privacy model (guard inside the SW) rather than poking a hole, and is CI-enforced.
+
+### Key Lessons
+- For any visual deliverable, render and look before claiming done — tests/text-extraction miss layout, density, readability, and missing-in-raster text.
+- When a foundational ADR blocks a requested feature, stop and amend it deliberately (with the user) — never route around the gate.
+
+### Cost Observations
+- Model mix: predominantly opus (inline execution, no executor subagents per user preference).
+- Sessions: 1 long continuous session.
+- Notable: inline execution kept the user tightly in the visual-feedback loop (many short "look at this deck" iterations) — high-touch but it's what converged the deck to acceptable. The cost was a very long single session and several pre-render rounds that a render-first habit would have avoided.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution

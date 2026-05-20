@@ -45,7 +45,12 @@
   },
   "detail": {
     "title": "Détail du cluster",
-    "back": "Retour au tableau de bord"
+    "back": "Retour au tableau de bord",
+    "groups": {
+      "capacity": "Capacité",
+      "utilization": "Utilisation",
+      "powerSite": "Alimentation et site"
+    }
   },
   "na": "—"
 }

@@ -82,8 +82,14 @@ export function PlanningView() {
       <ErrorBoundary FallbackComponent={PlanningError}>
         <div className="flex flex-col gap-6">
           <PlannedRatiosControl />
-          {/* 2xl (48px) major break: D-03 structural separation between the
-              planned-ratios block and the DR-sim block. */}
+          {/* PLN-01: the visual return sits IMMEDIATELY below the ratio
+              control so changing the ratio produces a result the user can
+              see right there (Improvement 3). */}
+          <div className="mt-12">
+            <PlannedEstatePanel view={view} />
+          </div>
+          {/* 2xl (48px) major break: D-03 structural separation before the
+              DR-sim block. */}
           <div className="mt-12">
             <DrSimPanel
               view={view}
@@ -95,11 +101,6 @@ export function PlanningView() {
               applyPlannedToDr={applyPlannedToDr}
               onApplyPlannedToDr={setApplyPlannedToDr}
             />
-          </div>
-          {/* F-1 (PLN-03/04): planned-vs-measured estate, same single
-              `view` — structurally separated like the DR block. */}
-          <div className="mt-12">
-            <PlannedEstatePanel view={view} />
           </div>
         </div>
       </ErrorBoundary>

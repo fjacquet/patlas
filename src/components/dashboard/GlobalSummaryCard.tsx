@@ -1,4 +1,14 @@
 import { useTranslation } from 'react-i18next'
+import {
+  CpuIcon,
+  DatabaseIcon,
+  GridIcon,
+  HardDriveIcon,
+  LayersIcon,
+  MemoryIcon,
+  ServerIcon,
+} from '@/components/icons'
+import { StatTile } from '@/components/StatTile'
 import type { AccountingMode, GlobalSummary } from '@/types/estate'
 import { fmtInt, fmtMemMb } from '@/utils/format'
 
@@ -17,26 +27,40 @@ const MODE_KEY: Record<AccountingMode, string> = {
 }
 
 /**
- * DSH-02 — full-width `.panel` estate stat-block. Presentational: consumes
- * `EstateView.globals` as plain props (no memo hooks, no engine/store imports).
- * Labels at 14px with `font-semibold` (the .label→600 override — the shipped
- * `.label` is font-medium/500; inheriting it would introduce a forbidden 3rd
- * weight). Numeric values `font-mono tabular-nums`, rendered via
- * `utils/format.ts` with brands unwrapped at the call site. Every color
- * utility carries its `dark:` twin.
+ * DSH-02 — full-width estate stat block, v2.0 KPI-tile redesign (UIX-01).
+ * Presentational: consumes `EstateView.globals` as plain props (no memo
+ * hooks, no engine/store imports). Section keeps `aria-label` =
+ * `sections.summary` (the dashboard smoke test reads it via getByLabelText).
+ * Each tile keeps label/value as adjacent siblings (StatTile contract).
  */
 export function GlobalSummaryCard({ globals, mode, capturedDate }: GlobalSummaryCardProps) {
   const { t, i18n } = useTranslation('dashboard')
   const loc = i18n.language
 
-  const tiles: ReadonlyArray<{ label: string; value: string }> = [
-    { label: t('stats.clusters'), value: fmtInt(globals.clusterCount, loc) },
-    { label: t('stats.esx'), value: fmtInt(globals.hostCount, loc) },
-    { label: t('stats.vms'), value: fmtInt(globals.vmCount, loc) },
-    { label: t('stats.datastores'), value: fmtInt(globals.datastoreCount, loc) },
-    { label: t('stats.vcpu'), value: fmtInt(globals.vcpuAllocated as number, loc) },
-    { label: t('stats.vram'), value: fmtMemMb(globals.vramAllocatedMib as number, loc) },
-    { label: t('stats.storage'), value: fmtMemMb(globals.totalStorageMib as number, loc) },
+  const tiles: ReadonlyArray<{ label: string; value: string; icon: React.ReactNode }> = [
+    { label: t('stats.clusters'), value: fmtInt(globals.clusterCount, loc), icon: <LayersIcon /> },
+    { label: t('stats.esx'), value: fmtInt(globals.hostCount, loc), icon: <ServerIcon /> },
+    { label: t('stats.vms'), value: fmtInt(globals.vmCount, loc), icon: <GridIcon /> },
+    {
+      label: t('stats.datastores'),
+      value: fmtInt(globals.datastoreCount, loc),
+      icon: <DatabaseIcon />,
+    },
+    {
+      label: t('stats.vcpu'),
+      value: fmtInt(globals.vcpuAllocated as number, loc),
+      icon: <CpuIcon />,
+    },
+    {
+      label: t('stats.vram'),
+      value: fmtMemMb(globals.vramAllocatedMib as number, loc),
+      icon: <MemoryIcon />,
+    },
+    {
+      label: t('stats.storage'),
+      value: fmtMemMb(globals.totalStorageMib as number, loc),
+      icon: <HardDriveIcon />,
+    },
   ]
 
   const modeLabel = t(`accountingMode.${MODE_KEY[mode]}`)
@@ -48,18 +72,17 @@ export function GlobalSummaryCard({ globals, mode, capturedDate }: GlobalSummary
         {' · '}
         <span>{t('capturedAt', { date: capturedDate })}</span>
       </p>
-      <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
         {tiles.map((tile) => (
-          <div key={tile.label} className="flex flex-col">
-            <dt className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              {tile.label}
-            </dt>
-            <dd className="font-mono text-base font-semibold tabular-nums text-slate-900 dark:text-slate-100">
-              {tile.value}
-            </dd>
-          </div>
+          <StatTile
+            key={tile.label}
+            icon={tile.icon}
+            label={tile.label}
+            value={tile.value}
+            accent="primary"
+          />
         ))}
-      </dl>
+      </div>
     </section>
   )
 }

@@ -16,7 +16,7 @@ import { UploadZone } from './UploadZone'
  * The sort lives here behind `useMemo` (NOT in a store selector) — selectors
  * must return stable references or Zustand's `Object.is` equality loops.
  */
-export function SnapshotListSidebar() {
+export function SnapshotListSidebar({ header }: { header?: React.ReactNode }) {
   const { t } = useTranslation('upload')
   const { t: tTrends, i18n } = useTranslation('trends')
   const loc = i18n.language
@@ -39,6 +39,11 @@ export function SnapshotListSidebar() {
       className="flex flex-col gap-4 border-r border-slate-200 p-4 lg:w-80 lg:shrink-0 dark:border-surface-700"
       aria-label={t('snapshots.list')}
     >
+      {/* Optional header slot — the primary nav lives here so the shell has
+          ONE left column (nav + drop zone + snapshots), not two. */}
+      {header ? (
+        <div className="border-b border-slate-200 pb-4 dark:border-surface-700">{header}</div>
+      ) : null}
       <UploadZone onFiles={upload} disabled={isUploading} variant="compact" />
       {done < total && (
         <p className="text-sm text-slate-500 dark:text-slate-400" role="status">

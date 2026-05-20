@@ -32,7 +32,6 @@ function App() {
         <header className="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-3 dark:border-surface-700">
           <h1 className="text-lg font-semibold text-slate-700 dark:text-slate-200">vAtlas</h1>
           <div className="flex items-center gap-2">
-            <ViewToggle value={activeView} onChange={setActiveView} />
             {hasSnapshots ? <ExportButtons /> : null}
             <LanguageToggle />
             <ThemeToggle />
@@ -40,7 +39,14 @@ function App() {
         </header>
         {hasSnapshots ? (
           <div className="flex flex-1 overflow-hidden">
-            <SnapshotListSidebar />
+            {/* ONE left column: the primary nav (vertical) sits at the top of
+                the snapshot sidebar, above the drop zone + snapshot list — no
+                more two separate left rails. Keyboard/ARIA unchanged. */}
+            <SnapshotListSidebar
+              header={
+                <ViewToggle value={activeView} onChange={setActiveView} orientation="vertical" />
+              }
+            />
             {activeView === 'inventory' ? (
               <InventoryView />
             ) : activeView === 'hosts' ? (

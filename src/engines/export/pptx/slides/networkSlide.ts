@@ -5,7 +5,7 @@ import type PptxGenJS from 'pptxgenjs'
 import type { EstateView } from '@/types/estate'
 import type { ExportStrings } from '../../types'
 import { type ExportLocale, pptxNumber } from '../format'
-import { addHeader, addKpiRow } from './_layout'
+import { addHeader, addKpiRow, addNote } from './_layout'
 
 export function addNetworkSlide(
   pptx: PptxGenJS,
@@ -16,6 +16,23 @@ export function addNetworkSlide(
   const s = pptx.addSlide()
   const n = view.network
   const y = addHeader(s, strings['network.title'] ?? 'Network')
+  // The vNetwork/vSwitch/dvSwitch/dvPort sheets are OPTIONAL in RVTools. When
+  // absent the rollup is empty — say so factually instead of four misleading
+  // zeros (user feedback).
+  const empty =
+    n.vswitches.length === 0 &&
+    n.dvswitches.length === 0 &&
+    n.portgroups.length === 0 &&
+    n.vmPortgroupCount === 0
+  if (empty) {
+    addNote(
+      s,
+      strings['network.absent'] ??
+        'Optional network sheets are not present in this RVTools export.',
+      y,
+    )
+    return
+  }
   addKpiRow(
     s,
     [

@@ -35,6 +35,19 @@
     "clusterDelta": "Écart par cluster",
     "colCluster": "Cluster",
     "colMeasured": "Mesuré",
-    "colPlanned": "Planifié"
+    "colPlanned": "Planifié",
+    "headroomTitle": "Marge vCPU — mesuré vs planifié",
+    "capMeasured": "Capacité vCPU (mesurée)",
+    "capPlanned": "Capacité vCPU (planifiée)",
+    "vcpuDemand": "vCPU alloué (demande)",
+    "ramCapMeasured": "Capacité vRAM (mesurée)",
+    "ramCapPlanned": "Capacité vRAM (planifiée)",
+    "ramDemand": "vRAM alloué (demande)",
+    "headroom": "Marge",
+    "seriesCapacity": "Capacité",
+    "seriesDemand": "Alloué",
+    "catMeasured": "Mesuré",
+    "catPlanned": "Planifié",
+    "axisCores": "Cœurs"
   }
 }

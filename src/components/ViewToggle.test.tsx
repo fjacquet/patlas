@@ -49,4 +49,13 @@ describe('ViewToggle (P9 — 8 segments incl Storage + Network)', () => {
     fireEvent.keyDown(screen.getByRole('group'), { key: 'ArrowLeft' })
     expect(onChange).toHaveBeenCalledWith('network')
   })
+
+  it('vertical orientation (Improvement 1): same group/segments/keyboard', () => {
+    const onChange = vi.fn<(v: AppView) => void>()
+    render(<ViewToggle value="dashboard" onChange={onChange} orientation="vertical" />)
+    expect(screen.getByRole('group')).not.toBeNull()
+    expect(screen.getAllByRole('button')).toHaveLength(8)
+    fireEvent.keyDown(screen.getByRole('group'), { key: 'ArrowDown' })
+    expect(onChange).toHaveBeenCalledWith('inventory')
+  })
 })

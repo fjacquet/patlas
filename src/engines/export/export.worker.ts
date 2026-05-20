@@ -17,10 +17,13 @@ import { exportChartSlots } from './html/renderReport'
 import { chartSvgToPng } from './pptx/primitives/chartSvg'
 import type { ExportRequest, ExportResponse } from './types'
 
-// Donut/gauge read better near-square; bars/line wider. One generous size
-// keeps it simple — pptxgenjs scales the PNG into the panel box.
-const CHART_W = 560
-const CHART_H = 360
+// PPT-01: render at print-grade resolution at the slide's 16:9 aspect
+// (13.333:7.5 ≈ 1.778). The old 560×360 PNG was upscaled into 12-inch
+// slide boxes → blurry; this gives ~3× the pixels so charts stay crisp,
+// and `addChartImage` places them with aspect-preserving `contain` sizing
+// so they are no longer stretched/distorted in non-16:9 boxes.
+const CHART_W = 1600
+const CHART_H = 900
 
 /** Same-origin Vite-bundled resvg wasm — fetchGuard permits same-origin;
  *  never a remote host (privacy). */
