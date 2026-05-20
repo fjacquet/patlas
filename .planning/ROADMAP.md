@@ -14,7 +14,9 @@ User found the deck "worthless / not on par with the website" vs the vsizer refe
 - [x] **18-01 Cluster slide** — rebuilt to vsizer parity (draw primitives, 5 KPI cards, CPU/RAM utilization blocks w/ peak + min/mean/max, KEY FIGURES banner, provenance footer, simple stretched suffix); slide-1 vCenter duplication fixed; cluster i18n EN/FR canonicalised. 502 green. `feat(18-01)`.
 - [x] **18-02 Title slide + overview readability** — title rebuilt vsizer-style (eyebrow + big title + 5 navy KPI tiles); new `pptxMemMib` fixes overview's unreadable raw-MiB (now GiB/TiB). Visually verified via soffice render. `feat(18-02)`.
 - [x] **18-03 Remaining slides** — DONE & visually verified: Planned (Phase-16 headroom), Storage (TiB + per-cluster table), Overview (named OS cards, dropped giant verdict gauges), Inventory (native OS bars), Network ("sheets absent"), EOS (native labeled bar chart). **Root cause fixed**: resvg-wasm renders no font → all rasterized-chart text vanished; now every deck visual is native pptxgenjs shapes+text. Web app: single left column + cluster table rows (`feat(15-02)`). Minor leftover: DR barren when no scenario.
-- [ ] **18-04 Stretched-management UX** — align the app-side stretched-cluster declaration to vsizer's simplicity (investigate vsizer's toggle vs vatlas `setStretchedClusters`/StretchedPill).
+- [x] **18-04 Stretched-management UX** — DONE: the cluster table exposes a per-row Stretched toggle for every cluster (central, vsizer-style), with the live "N clusters marked stretched" count co-located in the table header (`feat(18-04)`).
+
+**Phase 18 functionally complete** — deck rebuilt to vsizer parity (brand-free), all charts native pptxgenjs (text renders), web app: one left column + cluster table rows + central stretched toggles. Only minor leftover: DR slide bare when no scenario.
 - Carry: regenerate a real deck and visually UAT vs the vsizer reference.
 
 Plan: `~/.claude/plans/i-need-to-add-delightful-kahan.md` · Requirements: [REQUIREMENTS.md](REQUIREMENTS.md)

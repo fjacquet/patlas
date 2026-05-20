@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-19 after v1.0 milestone)
 
 ## Current Position
 
-Phase: 18 — PPTX vsizer-parity rebuild (18-01/02 done; 18-03 in progress; 18-04 pending)
+Phase: 18 — PPTX vsizer-parity rebuild + stretched UX — COMPLETE (18-01..04). Minor leftover: DR bare slide.
 Plan: —
 Status: VISUALLY VERIFIED (soffice render) — every flagged slide fixed: cluster, title, overview, Planned, Storage, Inventory, Network, EOS. Root cause of "graphs missing text" fixed: resvg-wasm has no font → rasterized chart text vanished; ALL deck visuals are now native pptxgenjs shapes+text. Web app: one left column + cluster table rows. Minor leftover: DR barren slide. 18-04: app-side stretched UX (optional).
-Last activity: 2026-05-20 — fix(18-03) native EOS+inventory bars (chart text renders) + feat(15-02) web layout. 502 tests green.
+Last activity: 2026-05-20 — feat(18-04) central stretched toggles + co-located count. Phase 18 complete. 502 tests green. Next: close v2.0 (audit + UAT) or the minor DR bare slide.
 
 ## Performance Metrics
 
