@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { evaluateSupplyChain } from '../scripts/check-supply-chain.mjs'
 import { shouldAutoReload } from '../src/pwa/updatePolicy'
@@ -14,8 +15,8 @@ describe('PWA smart-update policy (ADR-0001 SW exception §5)', () => {
 })
 
 describe('src/sw.ts honors the ADR-0001 SW exception envelope', () => {
-  const sw = readFileSync(new URL('../src/sw.ts', import.meta.url), 'utf-8')
-  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8'))
+  const sw = readFileSync(resolve(process.cwd(), 'src/sw.ts'), 'utf-8')
+  const pkg = JSON.parse(readFileSync(resolve(process.cwd(), 'package.json'), 'utf-8'))
 
   it('passes the supply-chain gate against the real package.json + src/sw.ts', () => {
     expect(evaluateSupplyChain({ pkg, swSource: sw })).toEqual({ ok: true, errors: [] })
