@@ -89,7 +89,9 @@ function importsGuardFirst(swSource) {
   // `import './privacy/fetchGuard'` — single or double quotes, optional `;`,
   // optional trailing `// …` line comment (the established worker convention,
   // see src/engines/parser/parser.worker.ts).
-  const path = GUARD_IMPORT.replace(/[.]/g, '\\.')
+  // Escape EVERY regex metacharacter (incl. backslash) before embedding the
+  // constant in a RegExp — CodeQL js/incomplete-sanitization.
+  const path = GUARD_IMPORT.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   return new RegExp(`^import\\s+['"]${path}['"];?\\s*(//.*)?$`).test(first)
 }
 
