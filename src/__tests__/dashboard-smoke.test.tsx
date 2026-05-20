@@ -97,14 +97,12 @@ describe('Phase 2 dashboard smoke: drop → buildEstateView → <GlobalDashboard
     expect(screen.queryByRole('heading', { level: 2, name: 'Operating systems' })).not.toBeNull()
     expect(screen.queryByRole('heading', { level: 2, name: 'CPU Ready' })).not.toBeNull()
 
-    // Exactly one cluster column for the single-cluster canary (the cluster
-    // heading is an <h3>; "Clusters" section title is an <h2>).
-    const clusterHeadings = screen
-      .getAllByRole('heading', { level: 3 })
-      .filter((h) => h.textContent && h.textContent.trim().length > 0)
-    expect(clusterHeadings.length).toBe(1)
+    // Exactly one cluster row for the single-cluster canary — the cluster
+    // table renders one "Cluster detail" drill button per row.
+    const clusterDrills = screen.getAllByRole('button', { name: 'Cluster detail' })
+    expect(clusterDrills.length).toBe(1)
 
-    // ESX label present in the cluster column (DSH-01).
+    // ESX column header present in the cluster table (DSH-01).
     expect(screen.getAllByText('ESX').length).toBeGreaterThan(0)
 
     // CPU Ready estate panel + the gold count label (DSH-05).
@@ -146,11 +144,10 @@ describe('Phase 2 dashboard smoke: drop → buildEstateView → <GlobalDashboard
       expect(screen.queryByRole('heading', { level: 2, name: 'Clusters' })).not.toBeNull(),
     )
 
-    // Multiple per-cluster columns render for the multi-cluster real estate.
-    const clusterHeadings = screen
-      .getAllByRole('heading', { level: 3 })
-      .filter((h) => h.textContent && h.textContent.trim().length > 0)
-    expect(clusterHeadings.length).toBeGreaterThan(1)
+    // Multiple per-cluster rows render for the multi-cluster real estate
+    // (one "Cluster detail" drill button per row).
+    const clusterDrills = screen.getAllByRole('button', { name: 'Cluster detail' })
+    expect(clusterDrills.length).toBeGreaterThan(1)
 
     // Read a summary figure (vCPU tile) in Active (default), then Configured.
     const summary = screen.getByLabelText('Estate summary')

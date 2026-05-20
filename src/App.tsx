@@ -39,14 +39,14 @@ function App() {
         </header>
         {hasSnapshots ? (
           <div className="flex flex-1 overflow-hidden">
-            {/* Improvement 1: primary navigation is a vertical rail (was a
-                top-bar strip). Conventional LEFT placement — far-left
-                column, before the snapshot sidebar + drop zone.
-                Keyboard/ARIA unchanged. */}
-            <nav className="flex w-56 shrink-0 flex-col gap-3 overflow-y-auto border-r border-slate-200 p-4 dark:border-surface-700">
-              <ViewToggle value={activeView} onChange={setActiveView} orientation="vertical" />
-            </nav>
-            <SnapshotListSidebar />
+            {/* ONE left column: the primary nav (vertical) sits at the top of
+                the snapshot sidebar, above the drop zone + snapshot list — no
+                more two separate left rails. Keyboard/ARIA unchanged. */}
+            <SnapshotListSidebar
+              header={
+                <ViewToggle value={activeView} onChange={setActiveView} orientation="vertical" />
+              }
+            />
             {activeView === 'inventory' ? (
               <InventoryView />
             ) : activeView === 'hosts' ? (
