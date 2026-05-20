@@ -99,7 +99,14 @@
     "vswitches": "vSwitches",
     "dvswitches": "dvSwitches",
     "portgroups": "Groupes de ports",
-    "vnetwork": "Adjacences VM"
+    "vnetwork": "Adjacences VM",
+    "absent": "Les feuilles optionnelles vNetwork / vSwitch / dvSwitch / dvPort sont absentes de cet export RVTools — aucune topologie réseau à présenter."
+  },
+  "os": {
+    "title": "Systèmes d'exploitation",
+    "windows": "Windows",
+    "linux": "Linux",
+    "other": "Autre"
   },
   "planned": {
     "title": "Parc planifié vs mesuré",

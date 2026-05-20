@@ -73,9 +73,7 @@ export async function buildPptx(
     {
       globals: view.globals,
       insights: view.operationalInsights,
-      osDonut: png('osDonut'),
-      cpuGauge: png('cpuGauge'),
-      ramGauge: png('ramGauge'),
+      osBreakdown: view.osBreakdown,
     },
     strings,
     locale,

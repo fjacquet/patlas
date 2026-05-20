@@ -99,7 +99,14 @@
     "vswitches": "vSwitches",
     "dvswitches": "dvSwitches",
     "portgroups": "Portgroups",
-    "vnetwork": "VM adjacencies"
+    "vnetwork": "VM adjacencies",
+    "absent": "Optional vNetwork / vSwitch / dvSwitch / dvPort sheets are not present in this RVTools export — no network topology to report."
+  },
+  "os": {
+    "title": "Operating systems",
+    "windows": "Windows",
+    "linux": "Linux",
+    "other": "Other"
   },
   "planned": {
     "title": "Planned vs measured estate",
