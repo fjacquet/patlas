@@ -54,7 +54,6 @@ function DashboardError({ error }: FallbackProps) {
  */
 export function GlobalDashboard() {
   const { t, i18n } = useTranslation('dashboard')
-  const { t: tStr } = useTranslation('str')
   const [mode, setMode] = useState<AccountingMode>('active')
   const view = useEstateView(mode)
   const snapshot = useSnapshotStore(selectActiveSnapshot)
@@ -107,10 +106,8 @@ export function GlobalDashboard() {
             </h2>
             <AccountingModeToggle value={mode} onChange={setMode} />
           </div>
-          {/* G1: neutral factual estate echo of the user's stretched declarations. */}
-          <p className="text-xs text-slate-600 dark:text-slate-400">
-            {tStr('stretched.estateCount', { count: stretchedClusters.size })}
-          </p>
+          {/* G1: the factual "N clusters marked stretched" echo now lives in
+              the cluster table header, co-located with the per-row toggles. */}
           <GlobalSummaryCard globals={view.globals} mode={mode} capturedDate={capturedDate} />
           <OperationalInsights insights={view.operationalInsights} />
           <OsBreakdownDonut osBreakdown={view.osBreakdown} />

@@ -38,11 +38,20 @@ export function PerClusterColumns({
     'px-3 py-2 text-right font-mono text-sm tabular-nums text-slate-900 dark:text-slate-100'
   const th = 'px-3 py-2 text-right text-xs font-semibold text-slate-500 dark:text-slate-400'
 
+  const stretchedCount = clusters.filter((c) => c.stretched).length
+
   return (
     <section>
-      <h2 className="mb-3 text-xl font-semibold text-slate-700 dark:text-slate-200">
-        {t('sections.clusters')}
-      </h2>
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-200">
+          {t('sections.clusters')}
+        </h2>
+        {/* Stretched count co-located with the per-row toggles (vsizer-style
+            central management) — updates as you toggle a row. */}
+        <p className="text-xs text-slate-600 dark:text-slate-400">
+          {tStr('stretched.estateCount', { count: stretchedCount })}
+        </p>
+      </div>
       <div className="panel overflow-x-auto p-0">
         <table className="w-full border-collapse text-sm">
           <thead>
