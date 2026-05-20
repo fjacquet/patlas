@@ -55,6 +55,21 @@ build-failing gates rather than convention.
   the build, and raw size is an orthogonal metric to the gzipped budget;
   kept as an independent signal, not as the gate.
 
+## Waivers (OSV-Scanner)
+
+The OSV LOW+ gate is waived only for advisories whose OSV.dev record
+over-matches a version we are demonstrably not running. Each waiver lives in
+`osv-scanner.toml` and MUST mirror an entry here (same `ignoreUntil`); drift is
+a process bug. Current waivers (re-check by **2026-08-14**):
+
+| Advisory | Package | Why waived |
+|----------|---------|-----------|
+| GHSA-4r6h-8v6p-xvw6 | xlsx | SheetJS prototype pollution, fixed < 0.19.3; we ship 0.20.3 (CDN tarball, ADR-0002). OSV range `introduced:0`/no-fixed over-matches all versions. |
+| GHSA-5pgg-2g8v-p4x9 | xlsx | SheetJS ReDoS, fixed < 0.20.2; we ship 0.20.3. Same OSV no-fixed-event over-match. |
+| MAL-2026-4153 | size-sensor | Mini Shai-Hulud malicious releases were **1.0.4 / 1.1.4 / 1.2.4** (2026-05-19). We pin **1.0.3** — the last clean version and npm's current `latest` (malicious versions unpublished) — hard-enforced via a `package.json` `overrides` block so echarts-for-react's `^1.0.1` range can never resolve to a malicious version. OSV's `introduced:0`/no-fixed range over-matches 1.0.3. Transitive of echarts-for-react (v1.0 dep) — applies to main too. |
+
+**`overrides` policy:** when a transitive dependency's semver range would permit a known-malicious version, hard-pin the clean version via `overrides` (defense beyond the lockfile) AND waive the over-matching advisory — never waive without pinning.
+
 ## Consequences
 
 - Adding a telemetry-adjacent package requires amending the denylist in

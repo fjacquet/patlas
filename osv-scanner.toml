@@ -1,9 +1,9 @@
 # OSV-Scanner ignore list — see ADR-0016 Waivers section for full rationale.
 #
 # Each entry must mirror a Waivers entry in
-# docs/adr/0016-strict-audit-gates-all-deps-low-severity.md, including
-# the same ignoreUntil expiry. Drift between this file and the ADR is
-# a process bug — review at the same cadence.
+# docs/adr/0016-supply-chain-audit-gate.md, including the same
+# ignoreUntil expiry. Drift between this file and the ADR is a process
+# bug — review at the same cadence.
 
 [[IgnoredVulns]]
 id = "GHSA-4r6h-8v6p-xvw6"
@@ -28,4 +28,24 @@ SheetJS ReDoS. GHSA summary says affected range is < 0.20.2; we ship
 xlsx 0.20.3 via the CDN tarball (ADR-0002). Same OSV structured-
 range gap as GHSA-4r6h-8v6p-xvw6: introduced=0, no fixed event. Not
 actually vulnerable on 0.20.3. Re-check before 2026-08-14.
+"""
+
+[[IgnoredVulns]]
+id = "MAL-2026-4153"
+ignoreUntil = 2026-08-14
+reason = """
+"Malicious code in size-sensor" — the Mini Shai-Hulud npm campaign
+(2026-05-19) published malicious size-sensor 1.0.4 / 1.1.4 / 1.2.4
+(preinstall hook, obfuscated Bun exfiltration). We do NOT ship any of
+those: we pin size-sensor 1.0.3 (the last CLEAN, pre-compromise
+version — also npm's current `latest` after npm reverted the tag and
+unpublished the malicious releases), enforced by an `overrides` block
+in package.json so even a lockfile-less install of echarts-for-react's
+`^1.0.1` range cannot resolve to 1.0.4+. The advisory's OSV.dev record
+uses range {introduced: 0, no fixed event}, so it over-matches 1.0.3
+even though its explicit affected `versions` list is only
+1.0.4/1.1.4/1.2.4. size-sensor is a transitive of echarts-for-react
+(a v1.0 dependency) — this waiver also applies to main. Re-check before
+2026-08-14: confirm the override still pins 1.0.3 and that no clean
+fixed version > 1.0.3 has shipped to upgrade to.
 """
