@@ -45,7 +45,7 @@ export function addHeader(s: PptxGenJS.Slide, title: string, subtitle?: string):
     w: CONTENT_W,
     h: subtitle ? 0.5 : 0.64,
     color: 'ffffff',
-    fontFace: 'Calibri',
+    fontFace: 'Arial',
     fontSize: 26,
     bold: true,
     valign: 'middle',
@@ -57,7 +57,7 @@ export function addHeader(s: PptxGenJS.Slide, title: string, subtitle?: string):
       w: CONTENT_W,
       h: 0.34,
       color: PPTX_COLORS.primary200,
-      fontFace: 'Calibri',
+      fontFace: 'Arial',
       fontSize: 12,
       valign: 'middle',
     })
@@ -94,7 +94,7 @@ export function addKpiRow(s: PptxGenJS.Slide, cards: ReadonlyArray<Kpi>, y: numb
       w: w - 0.24,
       h: 0.3,
       color: PPTX_COLORS.inkMuted,
-      fontFace: 'Calibri',
+      fontFace: 'Arial',
       fontSize: 11,
     })
     s.addText(pptxSafeFormat(c.value), {
@@ -103,7 +103,7 @@ export function addKpiRow(s: PptxGenJS.Slide, cards: ReadonlyArray<Kpi>, y: numb
       w: w - 0.24,
       h: 0.5,
       color: PPTX_COLORS.ink,
-      fontFace: 'Consolas',
+      fontFace: 'Arial',
       fontSize: 22,
       bold: true,
       valign: 'middle',
@@ -146,7 +146,7 @@ export function addChartPanel(
       w: box.w - pad * 2,
       h: capH,
       color: PPTX_COLORS.inkMuted,
-      fontFace: 'Calibri',
+      fontFace: 'Arial',
       fontSize: 11,
       bold: true,
     })
@@ -166,7 +166,7 @@ export function addChartPanel(
       w: inner.w,
       h: inner.h,
       color: PPTX_COLORS.inkMuted,
-      fontFace: 'Consolas',
+      fontFace: 'Arial',
       fontSize: 18,
       align: 'center',
       valign: 'middle',
@@ -182,7 +182,7 @@ export function addNote(s: PptxGenJS.Slide, text: string, y: number): void {
     w: CONTENT_W,
     h: 0.4,
     color: PPTX_COLORS.inkMuted,
-    fontFace: 'Calibri',
+    fontFace: 'Arial',
     fontSize: 12,
   })
 }

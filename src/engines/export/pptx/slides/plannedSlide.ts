@@ -90,7 +90,7 @@ export function addPlannedSlide(
       y: yy,
       w: CONTENT_W,
       h: 0.4,
-      fontFace: 'Calibri',
+      fontFace: 'Arial',
       fontSize: 12,
       color: PPTX_COLORS.inkMuted,
       valign: 'middle',

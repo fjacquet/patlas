@@ -47,7 +47,7 @@ export function addTitleSlide(
     w: W,
     h: 0.45,
     color: PPTX_COLORS.accent,
-    fontFace: 'Calibri',
+    fontFace: 'Arial',
     fontSize: 14,
     bold: true,
   })
@@ -58,7 +58,7 @@ export function addTitleSlide(
     w: W,
     h: 1.6,
     color: 'ffffff',
-    fontFace: 'Calibri',
+    fontFace: 'Arial',
     fontSize: 40,
     bold: true,
   })
@@ -80,7 +80,7 @@ export function addTitleSlide(
     w: W,
     h: 0.5,
     color: PPTX_COLORS.primary200,
-    fontFace: 'Consolas',
+    fontFace: 'Arial',
     fontSize: 16,
   })
 
@@ -117,7 +117,7 @@ export function addTitleSlide(
     w: W,
     h: 0.4,
     color: PPTX_COLORS.primary200,
-    fontFace: 'Calibri',
+    fontFace: 'Arial',
     fontSize: 11,
   })
 }

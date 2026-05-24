@@ -19,12 +19,12 @@ export const SLIDE = {
 export const PPTX_THEME = {
   layout: 'LAYOUT_WIDE',
   bg: PPTX_COLORS.paper,
-  title: { color: PPTX_COLORS.ink, fontFace: 'Calibri', fontSize: 28, bold: true },
-  heading: { color: PPTX_COLORS.ink, fontFace: 'Calibri', fontSize: 20, bold: true },
-  body: { color: PPTX_COLORS.ink, fontFace: 'Calibri', fontSize: 12 },
-  muted: { color: PPTX_COLORS.inkMuted, fontFace: 'Calibri', fontSize: 11 },
+  title: { color: PPTX_COLORS.ink, fontFace: 'Arial', fontSize: 28, bold: true },
+  heading: { color: PPTX_COLORS.ink, fontFace: 'Arial', fontSize: 20, bold: true },
+  body: { color: PPTX_COLORS.ink, fontFace: 'Arial', fontSize: 12 },
+  muted: { color: PPTX_COLORS.inkMuted, fontFace: 'Arial', fontSize: 11 },
   /** Metric values: monospace-ish, tabular — mirrors the on-screen idiom. */
-  metric: { color: PPTX_COLORS.ink, fontFace: 'Consolas', fontSize: 12, bold: true },
+  metric: { color: PPTX_COLORS.ink, fontFace: 'Arial', fontSize: 12, bold: true },
   series: [PPTX_COLORS.primary500, PPTX_COLORS.primary300, PPTX_COLORS.primary200],
   /** Factual threshold marker fill (gold tint) — never a verdict colour. */
   flagFill: PPTX_COLORS.accent,
