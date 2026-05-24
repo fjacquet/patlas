@@ -100,7 +100,7 @@ export function drawKpiCard(slide: Slide, o: DrawKpiCardOpts): void {
     y: o.y + 0.1,
     w: o.w - 0.3,
     h: 0.55,
-    fontFace: 'Arial',
+    fontFace: 'Consolas',
     fontSize: 22,
     bold: true,
     color: o.onDark ? PPTX_COLORS.accent : accent,

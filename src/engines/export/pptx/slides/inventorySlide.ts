@@ -131,7 +131,7 @@ export function addInventorySlide(
       y: ry,
       w: 1.3,
       h: 0.34,
-      fontFace: 'Arial',
+      fontFace: 'Consolas',
       fontSize: 12,
       color: PPTX_COLORS.ink,
       valign: 'middle',

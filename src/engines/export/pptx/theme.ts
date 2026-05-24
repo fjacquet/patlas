@@ -24,7 +24,7 @@ export const PPTX_THEME = {
   body: { color: PPTX_COLORS.ink, fontFace: 'Arial', fontSize: 12 },
   muted: { color: PPTX_COLORS.inkMuted, fontFace: 'Arial', fontSize: 11 },
   /** Metric values: monospace-ish, tabular — mirrors the on-screen idiom. */
-  metric: { color: PPTX_COLORS.ink, fontFace: 'Arial', fontSize: 12, bold: true },
+  metric: { color: PPTX_COLORS.ink, fontFace: 'Consolas', fontSize: 12, bold: true },
   series: [PPTX_COLORS.primary500, PPTX_COLORS.primary300, PPTX_COLORS.primary200],
   /** Factual threshold marker fill (gold tint) — never a verdict colour. */
   flagFill: PPTX_COLORS.accent,

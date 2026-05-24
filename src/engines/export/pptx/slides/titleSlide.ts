@@ -80,7 +80,7 @@ export function addTitleSlide(
     w: W,
     h: 0.5,
     color: PPTX_COLORS.primary200,
-    fontFace: 'Arial',
+    fontFace: 'Consolas',
     fontSize: 16,
   })
 

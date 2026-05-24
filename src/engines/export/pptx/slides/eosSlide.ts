@@ -86,7 +86,7 @@ export function addEosSlide(
       y: plotBottom - bh - 0.34,
       w: bw,
       h: 0.3,
-      fontFace: 'Arial',
+      fontFace: 'Consolas',
       fontSize: 13,
       bold: true,
       color: PPTX_COLORS.ink,
