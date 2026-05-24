@@ -87,7 +87,7 @@ export function addOverviewSlide(
     y: y3 + 0.05,
     w: 6,
     h: 0.3,
-    fontFace: 'Calibri',
+    fontFace: 'Arial',
     fontSize: 13,
     bold: true,
     color: PPTX_COLORS.ink,
