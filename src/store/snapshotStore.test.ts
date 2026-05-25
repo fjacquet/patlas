@@ -3,10 +3,13 @@ import { resolve } from 'node:path'
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { Snapshot } from '@/types/snapshot'
 import {
+  DEFAULT_MONSTER_THRESHOLDS,
   DEFAULT_SIZING_THRESHOLDS,
   DEFAULT_THRESHOLDS,
   selectActiveSnapshot,
   selectHasSnapshots,
+  selectMonsterThresholds,
+  selectSetMonsterThresholds,
   selectSetSizingThresholds,
   selectSetThresholds,
   selectSizingThresholds,
@@ -239,5 +242,25 @@ describe('P-RS sizingThresholds slice', () => {
     })
     useSnapshotStore.getState().clearAll()
     expect(selectSizingThresholds(useSnapshotStore.getState())).toEqual(DEFAULT_SIZING_THRESHOLDS)
+  })
+})
+
+describe('P-RS monsterThresholds slice', () => {
+  beforeEach(() => {
+    useSnapshotStore.getState().clearAll()
+  })
+
+  it('defaults to DEFAULT_MONSTER_THRESHOLDS', () => {
+    expect(selectMonsterThresholds(useSnapshotStore.getState())).toEqual(DEFAULT_MONSTER_THRESHOLDS)
+  })
+
+  it('setter REPLACES with a fresh object and clearAll restores defaults', () => {
+    const before = selectMonsterThresholds(useSnapshotStore.getState())
+    selectSetMonsterThresholds(useSnapshotStore.getState())({ minVcpu: 8, minVramGib: 64 })
+    const after = selectMonsterThresholds(useSnapshotStore.getState())
+    expect(after).not.toBe(before)
+    expect(after).toEqual({ minVcpu: 8, minVramGib: 64 })
+    useSnapshotStore.getState().clearAll()
+    expect(selectMonsterThresholds(useSnapshotStore.getState())).toEqual(DEFAULT_MONSTER_THRESHOLDS)
   })
 })

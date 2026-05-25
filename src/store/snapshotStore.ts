@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { DEFAULT_MONSTER_THRESHOLDS, type MonsterThresholds } from '@/engines/aggregation/monsterVm'
 import { DEFAULT_SIZING_THRESHOLDS, type SizingThresholds } from '@/engines/aggregation/sizing'
 import { DEFAULT_THRESHOLDS, type ThresholdInput } from '@/engines/aggregation/thresholdFlags'
 import type { DrScenario } from '@/types/estate'
@@ -8,8 +9,8 @@ import type { ReleasedTrendAggregate, Snapshot } from '@/types/snapshot'
  *  truth lives in `engines/aggregation/thresholdFlags`). Re-exported so
  *  existing store consumers keep importing it from here. */
 export type ThresholdConfig = ThresholdInput
-export type { SizingThresholds }
-export { DEFAULT_SIZING_THRESHOLDS, DEFAULT_THRESHOLDS }
+export type { MonsterThresholds, SizingThresholds }
+export { DEFAULT_MONSTER_THRESHOLDS, DEFAULT_SIZING_THRESHOLDS, DEFAULT_THRESHOLDS }
 
 const EMPTY_SCENARIO = (): DrScenario => ({
   failedHosts: new Set(),
@@ -79,6 +80,9 @@ interface SnapshotState {
    * restores defaults so refresh == defaults restored (PAR-05).
    */
   sizingThresholds: SizingThresholds
+  /** P-RS monster-VM thresholds (vCPU/vRAM lines). In-memory inputs-only,
+   *  REPLACED never mutated; no persist — `clearAll` restores defaults. */
+  monsterThresholds: MonsterThresholds
   addSnapshot: (s: Snapshot) => void
   removeSnapshot: (id: string) => void
   setActiveSnapshot: (id: string | null) => void
@@ -88,6 +92,7 @@ interface SnapshotState {
   setPlannedRatios: (r: { cpu: number; ram: number }) => void
   setThresholds: (t: ThresholdConfig) => void
   setSizingThresholds: (t: SizingThresholds) => void
+  setMonsterThresholds: (t: MonsterThresholds) => void
   renameVCenter: (id: string, label: string) => void
   setCapturedAt: (id: string, date: Date) => void
   /**
@@ -111,6 +116,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
   plannedRatios: { cpu: 4, ram: 1 },
   thresholds: { ...DEFAULT_THRESHOLDS },
   sizingThresholds: { ...DEFAULT_SIZING_THRESHOLDS },
+  monsterThresholds: { ...DEFAULT_MONSTER_THRESHOLDS },
 
   addSnapshot: (s) =>
     set((state) => {
@@ -170,6 +176,9 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
   // re-render; no persist, no localStorage (P-RS).
   setSizingThresholds: (t) => set({ sizingThresholds: { ...t } }),
 
+  // REPLACE never mutate (Zustand `Object.is`) — fresh object; no persist.
+  setMonsterThresholds: (t) => set({ monsterThresholds: { ...t } }),
+
   renameVCenter: (id, label) =>
     set((state) => {
       const snap = state.snapshots.get(id)
@@ -220,6 +229,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
       plannedRatios: { cpu: 4, ram: 1 },
       thresholds: { ...DEFAULT_THRESHOLDS },
       sizingThresholds: { ...DEFAULT_SIZING_THRESHOLDS },
+      monsterThresholds: { ...DEFAULT_MONSTER_THRESHOLDS },
     }),
 }))
 
@@ -260,3 +270,7 @@ export const selectSetThresholds = (s: SnapshotState): ((t: ThresholdConfig) => 
 export const selectSizingThresholds = (s: SnapshotState): SizingThresholds => s.sizingThresholds
 export const selectSetSizingThresholds = (s: SnapshotState): ((t: SizingThresholds) => void) =>
   s.setSizingThresholds
+// P-RS monster-threshold slice. Stable refs — never construct here.
+export const selectMonsterThresholds = (s: SnapshotState): MonsterThresholds => s.monsterThresholds
+export const selectSetMonsterThresholds = (s: SnapshotState): ((t: MonsterThresholds) => void) =>
+  s.setMonsterThresholds
