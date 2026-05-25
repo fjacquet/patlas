@@ -1,0 +1,30 @@
+{
+  "appName": "vatlas",
+  "tagline": "RVTools → atlante del tuo parco VMware (100 % lato client)",
+  "footer": "100 % lato client · il tuo file non lascia mai il browser",
+  "error": {
+    "title": "Si è verificato un errore"
+  },
+  "actions": {
+    "reset": "Ricomincia",
+    "selectAll": "Seleziona tutto",
+    "selectNone": "Deseleziona tutto"
+  },
+  "lang": {
+    "label": "Lingua",
+    "fr": "Français",
+    "en": "English",
+    "de": "Deutsch",
+    "it": "Italiano"
+  },
+  "theme": {
+    "label": "Tema",
+    "auto": "Auto",
+    "light": "Chiaro",
+    "dark": "Scuro"
+  },
+  "pwa": {
+    "updateAvailable": "È disponibile una nuova versione.",
+    "reload": "Ricarica"
+  }
+}

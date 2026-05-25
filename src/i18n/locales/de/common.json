@@ -1,0 +1,30 @@
+{
+  "appName": "vatlas",
+  "tagline": "RVTools → Atlas Ihres VMware-Bestands (100 % clientseitig)",
+  "footer": "100 % clientseitig · Ihre Datei verlässt nie Ihren Browser",
+  "error": {
+    "title": "Ein Fehler ist aufgetreten"
+  },
+  "actions": {
+    "reset": "Neu starten",
+    "selectAll": "Alle auswählen",
+    "selectNone": "Alle abwählen"
+  },
+  "lang": {
+    "label": "Sprache",
+    "fr": "Français",
+    "en": "English",
+    "de": "Deutsch",
+    "it": "Italiano"
+  },
+  "theme": {
+    "label": "Design",
+    "auto": "Auto",
+    "light": "Hell",
+    "dark": "Dunkel"
+  },
+  "pwa": {
+    "updateAvailable": "Eine neue Version ist verfügbar.",
+    "reload": "Neu laden"
+  }
+}
