@@ -1,4 +1,6 @@
 /// <reference lib="webworker" />
+import { bytes } from '@/engines/units'
+import type { Snapshot } from '@/types'
 import '../../privacy/fetchGuard' // Plan 02 contract — workers have their own global scope
 import { inferCaptureDate, inferRvtoolsVersion, inferVCenterLabel } from './captureDate'
 import { parseSnapshot } from './normalizeColumns'
@@ -24,29 +26,30 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
     const vCenterLabel = inferVCenterLabel(rows.vinfo, e.data.filename, sheets)
     const rvtoolsVersion = inferRvtoolsVersion(sheets)
 
-    self.postMessage({
-      kind: 'ok',
-      snapshot: {
-        filename: e.data.filename,
-        fileSize: e.data.buf.byteLength,
-        capturedAt,
-        vCenterLabel,
-        rvtoolsVersion,
-        viSdkUuid: rows.viSdkUuid,
-        vMetaData: rows.vMetaData,
-        source: 'rvtools',
-        vinfo: rows.vinfo,
-        vhost: rows.vhost,
-        vdatastore: rows.vdatastore,
-        vpartition: rows.vpartition,
-        vnetwork: rows.vnetwork,
-        vswitch: rows.vswitch,
-        dvswitch: rows.dvswitch,
-        dvport: rows.dvport,
-        parseErrors: rows.parseErrors,
-      },
-      warnings,
-    })
+    // Typed against `Omit<Snapshot, 'id' | 'parsedAt'>` so the compiler
+    // enforces the full field list — a missing row set (e.g. `vmUsage`) is a
+    // build error, not a silent runtime drop (postMessage itself is untyped).
+    const snapshot: Omit<Snapshot, 'id' | 'parsedAt'> = {
+      filename: e.data.filename,
+      fileSize: bytes(e.data.buf.byteLength),
+      capturedAt,
+      vCenterLabel,
+      rvtoolsVersion,
+      viSdkUuid: rows.viSdkUuid,
+      vMetaData: rows.vMetaData,
+      source: 'rvtools',
+      vinfo: rows.vinfo,
+      vhost: rows.vhost,
+      vmUsage: rows.vmUsage,
+      vdatastore: rows.vdatastore,
+      vpartition: rows.vpartition,
+      vnetwork: rows.vnetwork,
+      vswitch: rows.vswitch,
+      dvswitch: rows.dvswitch,
+      dvport: rows.dvport,
+      parseErrors: rows.parseErrors,
+    }
+    self.postMessage({ kind: 'ok', snapshot, warnings })
   } catch (err) {
     const e2 = err as {
       name?: string
