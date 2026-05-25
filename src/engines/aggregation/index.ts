@@ -9,6 +9,13 @@ export { buildEstateView, EMPTY_VIEW } from './estateView'
 export { consumedGhz, physicalGhz } from './ghz'
 export { aggregateGlobals, emptySummary } from './globals'
 export {
+  computeMonsters,
+  DEFAULT_MONSTER_THRESHOLDS,
+  type MonsterEstate,
+  type MonsterThresholds,
+  type MonsterVm,
+} from './monsterVm'
+export {
   type DvSwitchAgg,
   type NetworkRollup,
   networkRollup,

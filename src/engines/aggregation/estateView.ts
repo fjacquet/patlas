@@ -19,6 +19,7 @@ import { aggregateClusters } from './aggregateClusters'
 import { buildDatastoreDetail, buildVmDetail } from './detailIndex'
 import { aggregateGlobals, emptySummary } from './globals'
 import { aggregateGuestData, type GuestData } from './guestData'
+import { computeMonsters, DEFAULT_MONSTER_THRESHOLDS, type MonsterThresholds } from './monsterVm'
 import { networkRollup } from './network'
 import { classifyOsFamily } from './osFamily'
 import { datastoreCountByCluster, perDatastore } from './perDatastore'
@@ -101,6 +102,8 @@ export function buildEstateView(
      *  RVTools-rightsizing defaults. Threaded from the in-memory slice via
      *  the single `useEstateView` memo. */
     sizingThresholds?: SizingThresholds
+    /** P-RS monster-VM thresholds (vCPU/vRAM lines). Absent ⇒ defaults. */
+    monsterThresholds?: MonsterThresholds
   },
 ): EstateView {
   const stretchedClusters = opts?.stretchedClusters ?? new Set<string>()
@@ -326,6 +329,13 @@ export function buildEstateView(
     selected.length,
   )
 
+  // P-RS monster-VM extract — same single pass; configured allocation only,
+  // so no multi-snapshot max is needed (vCPU/vRAM are stable per VM).
+  const monsters = computeMonsters(
+    merged.vinfo,
+    opts?.monsterThresholds ?? DEFAULT_MONSTER_THRESHOLDS,
+  )
+
   return {
     globals,
     clusters,
@@ -349,6 +359,7 @@ export function buildEstateView(
     network,
     flags,
     sizing,
+    monsters,
     datastoreDetail,
     vmDetail,
   }
@@ -451,6 +462,12 @@ const EMPTY_SIZING = Object.freeze({
   hasUsageData: false,
 })
 
+const EMPTY_MONSTERS = Object.freeze({
+  rows: Object.freeze([]) as never[],
+  count: 0,
+  thresholds: DEFAULT_MONSTER_THRESHOLDS,
+})
+
 /**
  * The valid empty-but-typed view `useEstateView` returns when no snapshot
  * is active. Frozen (modeled on `globals.ts:emptySummary`) so consumers
@@ -479,6 +496,7 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   network: EMPTY_NETWORK,
   flags: EMPTY_FLAGS,
   sizing: EMPTY_SIZING,
+  monsters: EMPTY_MONSTERS,
   datastoreDetail: new Map(),
   vmDetail: new Map(),
 })
