@@ -23,6 +23,12 @@ import { networkRollup } from './network'
 import { classifyOsFamily } from './osFamily'
 import { datastoreCountByCluster, perDatastore } from './perDatastore'
 import { perEsx } from './perEsx'
+import {
+  computeSizing,
+  DEFAULT_SIZING_THRESHOLDS,
+  maxVmUsageAcrossSnapshots,
+  type SizingThresholds,
+} from './sizing'
 import { storageByX } from './storageByX'
 import { computeThresholdFlags, DEFAULT_THRESHOLDS, type ThresholdInput } from './thresholdFlags'
 import { relinkBlankClusterDatastores } from './vsanRelink'
@@ -91,6 +97,10 @@ export function buildEstateView(
      *  defaults (mirrors `stretchedClusters ?? new Set()`). Threaded from
      *  the in-memory thresholds slice via the single `useEstateView` memo. */
     thresholds?: ThresholdInput
+    /** P-RS right-sizing thresholds (user-editable ratios). Absent ⇒
+     *  RVTools-rightsizing defaults. Threaded from the in-memory slice via
+     *  the single `useEstateView` memo. */
+    sizingThresholds?: SizingThresholds
   },
 ): EstateView {
   const stretchedClusters = opts?.stretchedClusters ?? new Set<string>()
@@ -303,6 +313,19 @@ export function buildEstateView(
   // `buildTrendSeries`). Pure — no clock, reuses the shipped aggregates.
   const trends = buildTrendSeries(selected, mode, { stretchedClusters, allocRatios })
 
+  // P-RS right-sizing/stress — composed in THIS single pass (no second memo).
+  // Per-VM MAX usage across the pre-merge `selected` snapshots (powered-on
+  // only); the merged `vinfo`/`vhost` give the canonical VM list + host CPU
+  // speed for the utilization denominator. Pure — reuses the shipped rows.
+  const sizingThresholds = opts?.sizingThresholds ?? DEFAULT_SIZING_THRESHOLDS
+  const sizing = computeSizing(
+    merged.vinfo,
+    merged.vhost,
+    maxVmUsageAcrossSnapshots(selected),
+    sizingThresholds,
+    selected.length,
+  )
+
   return {
     globals,
     clusters,
@@ -325,6 +348,7 @@ export function buildEstateView(
     vsan,
     network,
     flags,
+    sizing,
     datastoreDetail,
     vmDetail,
   }
@@ -409,6 +433,24 @@ const EMPTY_FLAGS = Object.freeze({
   counts: Object.freeze({ fs: 0, ds: 0, lu: 0 }),
 })
 
+const EMPTY_SIZING = Object.freeze({
+  rows: Object.freeze([]) as never[],
+  counts: Object.freeze({
+    oversized: 0,
+    undersized: 0,
+    stressed: 0,
+    cpuOversized: 0,
+    memOversized: 0,
+    cpuUndersized: 0,
+    memUndersized: 0,
+    memStressed: 0,
+    cpuStressed: 0,
+  }),
+  thresholds: DEFAULT_SIZING_THRESHOLDS,
+  snapshotCount: 0,
+  hasUsageData: false,
+})
+
 /**
  * The valid empty-but-typed view `useEstateView` returns when no snapshot
  * is active. Frozen (modeled on `globals.ts:emptySummary`) so consumers
@@ -436,6 +478,7 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   vsan: EMPTY_VSAN,
   network: EMPTY_NETWORK,
   flags: EMPTY_FLAGS,
+  sizing: EMPTY_SIZING,
   datastoreDetail: new Map(),
   vmDetail: new Map(),
 })
