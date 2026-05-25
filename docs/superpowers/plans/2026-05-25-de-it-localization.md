@@ -83,7 +83,7 @@ Use these renderings consistently across all namespaces. **Flag the `de`/`it` co
 **Files:**
 - Create: `src/i18n/keyParity.test.ts`
 
-- [ ] **Step 1: Write the test.** It compares the flattened key paths of each namespace across all four locales by reading the JSON files directly (so it does not depend on `index.ts` wiring):
+- [x] **Step 1: Write the test.** It compares the flattened key paths of each namespace across all four locales by reading the JSON files directly (so it does not depend on `index.ts` wiring):
 
 ```ts
 import { readFileSync } from 'node:fs'
@@ -124,12 +124,12 @@ describe('i18n key parity across locales', () => {
 })
 ```
 
-- [ ] **Step 2: Run it (expected: FAIL)**
+- [x] **Step 2: Run it (expected: FAIL)**
 
 Run: `npm run test:run -- src/i18n/keyParity.test.ts`
 Expected: FAIL — `de`/`it` files don't exist yet (ENOENT), and once created, any drift surfaces here. This is the gate every later task runs against.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/i18n/keyParity.test.ts
@@ -153,9 +153,9 @@ git commit -m "feat(i18n-01): add cross-locale key-parity test"
 - Create: `src/i18n/locales/de/common.json`, `src/i18n/locales/it/common.json`
 - Modify: `src/i18n/locales/en/common.json`, `src/i18n/locales/fr/common.json`
 
-- [ ] **Step 1: Read** `en/common.json` + `fr/common.json`. Note the existing `lang` block (`lang.label`, `lang.fr`, `lang.en`).
+- [x] **Step 1: Read** `en/common.json` + `fr/common.json`. Note the existing `lang` block (`lang.label`, `lang.fr`, `lang.en`).
 
-- [ ] **Step 2: Add the two new switcher labels** to BOTH `en/common.json` and `fr/common.json` under `lang`:
+- [x] **Step 2: Add the two new switcher labels** to BOTH `en/common.json` and `fr/common.json` under `lang`:
 
 ```json
     "de": "DE",
@@ -163,14 +163,14 @@ git commit -m "feat(i18n-01): add cross-locale key-parity test"
 ```
 (Match the existing style of `lang.fr`/`lang.en` — they appear to be short codes; keep whatever convention those use. If they spell the language out, spell `de`/`it` out too: en → "German"/"Italian", fr → "Allemand"/"Italien".)
 
-- [ ] **Step 3: Create `de/common.json` and `it/common.json`** mirroring the full `en/common.json` structure (translated), including the `lang` block. The `lang.*` values are the *display labels* shown in the switcher — they should read the same in every locale (e.g. `lang.de` = "DE"/"Deutsch", `lang.it` = "IT"/"Italiano"), not be re-translated per current language.
+- [x] **Step 3: Create `de/common.json` and `it/common.json`** mirroring the full `en/common.json` structure (translated), including the `lang` block. The `lang.*` values are the *display labels* shown in the switcher — they should read the same in every locale (e.g. `lang.de` = "DE"/"Deutsch", `lang.it` = "IT"/"Italiano"), not be re-translated per current language.
 
-- [ ] **Step 4: Validate + parity (common only)**
+- [x] **Step 4: Validate + parity (common only)**
 
 Run: `npx @biomejs/biome check src/i18n/locales/de/common.json src/i18n/locales/it/common.json && npm run test:run -- src/i18n/keyParity.test.ts -t common`
 Expected: `common` parity PASSES (other namespaces still fail — expected until their tasks).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/i18n/locales/en/common.json src/i18n/locales/fr/common.json src/i18n/locales/de/common.json src/i18n/locales/it/common.json
@@ -181,13 +181,13 @@ git commit -m "feat(i18n-02): de/it common.json + switcher labels"
 
 **Files:** create `de/`+`it/` for each of `upload`, `alerts`, `report` (6 files).
 
-- [ ] **Step 1:** Apply the translation method to `upload`, `alerts`, `report`.
-- [ ] **Step 2: Validate + parity**
+- [x] **Step 1:** Apply the translation method to `upload`, `alerts`, `report`.
+- [x] **Step 2: Validate + parity**
 
 Run: `npx @biomejs/biome check src/i18n/locales/de src/i18n/locales/it && npm run test:run -- src/i18n/keyParity.test.ts -t "upload|alerts|report"`
 Expected: those three pass.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/i18n/locales/de/upload.json src/i18n/locales/it/upload.json src/i18n/locales/de/alerts.json src/i18n/locales/it/alerts.json src/i18n/locales/de/report.json src/i18n/locales/it/report.json
@@ -198,13 +198,13 @@ git commit -m "feat(i18n-03): de/it upload, alerts, report"
 
 **Files:** create `de/`+`it/` for `dashboard`, `inventory`, `rci` (6 files).
 
-- [ ] **Step 1:** Apply the translation method. `inventory` includes the `col.*` keys (incl. the right-sizing columns added in Plan 1) — translate the column headers per the glossary (e.g. `col.cpuUtilPct` → DE "CPU-Auslastung %" / IT "Utilizzo CPU %").
-- [ ] **Step 2: Validate + parity**
+- [x] **Step 1:** Apply the translation method. `inventory` includes the `col.*` keys (incl. the right-sizing columns added in Plan 1) — translate the column headers per the glossary (e.g. `col.cpuUtilPct` → DE "CPU-Auslastung %" / IT "Utilizzo CPU %").
+- [x] **Step 2: Validate + parity**
 
 Run: `npm run test:run -- src/i18n/keyParity.test.ts -t "dashboard|inventory|rci"`
 Expected: pass.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/i18n/locales/de/dashboard.json src/i18n/locales/it/dashboard.json src/i18n/locales/de/inventory.json src/i18n/locales/it/inventory.json src/i18n/locales/de/rci.json src/i18n/locales/it/rci.json
@@ -215,13 +215,13 @@ git commit -m "feat(i18n-04): de/it dashboard, inventory, rci"
 
 **Files:** create `de/`+`it/` for `str`, `alloc`, `dr`, `mvc` (8 files).
 
-- [ ] **Step 1:** Apply the translation method (stretched-cluster, allocation, DR, multi-vCenter terms — see glossary).
-- [ ] **Step 2: Validate + parity**
+- [x] **Step 1:** Apply the translation method (stretched-cluster, allocation, DR, multi-vCenter terms — see glossary).
+- [x] **Step 2: Validate + parity**
 
 Run: `npm run test:run -- src/i18n/keyParity.test.ts -t "str|alloc|dr|mvc"`
 Expected: pass.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/i18n/locales/de/str.json src/i18n/locales/it/str.json src/i18n/locales/de/alloc.json src/i18n/locales/it/alloc.json src/i18n/locales/de/dr.json src/i18n/locales/it/dr.json src/i18n/locales/de/mvc.json src/i18n/locales/it/mvc.json
@@ -232,13 +232,13 @@ git commit -m "feat(i18n-05): de/it str, alloc, dr, mvc"
 
 **Files:** create `de/`+`it/` for `eos`, `trends`, `storage`, `network` (8 files).
 
-- [ ] **Step 1:** Apply the translation method.
-- [ ] **Step 2: Validate + parity**
+- [x] **Step 1:** Apply the translation method.
+- [x] **Step 2: Validate + parity**
 
 Run: `npm run test:run -- src/i18n/keyParity.test.ts -t "eos|trends|storage|network"`
 Expected: pass.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/i18n/locales/de/eos.json src/i18n/locales/it/eos.json src/i18n/locales/de/trends.json src/i18n/locales/it/trends.json src/i18n/locales/de/storage.json src/i18n/locales/it/storage.json src/i18n/locales/de/network.json src/i18n/locales/it/network.json
@@ -249,13 +249,13 @@ git commit -m "feat(i18n-06): de/it eos, trends, storage, network"
 
 **Files:** create `de/`+`it/` for `pptx`, `rightsizing` (4 files).
 
-- [ ] **Step 1:** Apply the translation method. `pptx` includes the deck strings (incl. the right-sizing slide group from Plan 1). `rightsizing` uses the neutral category labels — translate per the glossary (DE "Zuweisung ≫ Nutzung" / IT "Allocazione ≫ utilizzo", etc.). Preserve `{{count}}` in the `basis.maxOfN` strings.
-- [ ] **Step 2: Validate + parity (all namespaces now)**
+- [x] **Step 1:** Apply the translation method. `pptx` includes the deck strings (incl. the right-sizing slide group from Plan 1). `rightsizing` uses the neutral category labels — translate per the glossary (DE "Zuweisung ≫ Nutzung" / IT "Allocazione ≫ utilizzo", etc.). Preserve `{{count}}` in the `basis.maxOfN` strings.
+- [x] **Step 2: Validate + parity (all namespaces now)**
 
 Run: `npm run test:run -- src/i18n/keyParity.test.ts`
 Expected: **ALL 17 namespaces PASS** (every locale complete).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/i18n/locales/de/pptx.json src/i18n/locales/it/pptx.json src/i18n/locales/de/rightsizing.json src/i18n/locales/it/rightsizing.json
@@ -271,7 +271,7 @@ git commit -m "feat(i18n-07): de/it pptx, rightsizing — parity complete"
 **Files:**
 - Modify: `src/i18n/index.ts`
 
-- [ ] **Step 1: Add the imports.** After the `fr*` import block, add a `de*` and an `it*` import block — one import per namespace, mirroring the `en*`/`fr*` naming, e.g.:
+- [x] **Step 1: Add the imports.** After the `fr*` import block, add a `de*` and an `it*` import block — one import per namespace, mirroring the `en*`/`fr*` naming, e.g.:
 
 ```ts
 import deCommon from './locales/de/common.json'
@@ -283,16 +283,16 @@ import itCommon from './locales/it/common.json'
 import itRightsizing from './locales/it/rightsizing.json'
 ```
 
-- [ ] **Step 2: Extend `SUPPORTED_LANGUAGES`:**
+- [x] **Step 2: Extend `SUPPORTED_LANGUAGES`:**
 
 ```ts
 export const SUPPORTED_LANGUAGES = ['fr', 'en', 'de', 'it'] as const
 ```
 (The `SupportedLanguage` type derives from this, so the switcher + detector pick the new codes up automatically. `fallbackLng` stays `'fr'`.)
 
-- [ ] **Step 3: Add `rightsizing` to `NAMESPACES`** if Plan 1 didn't already (it should have — verify; the parity test's list must match `NAMESPACES`).
+- [x] **Step 3: Add `rightsizing` to `NAMESPACES`** if Plan 1 didn't already (it should have — verify; the parity test's list must match `NAMESPACES`).
 
-- [ ] **Step 4: Extend `resources`** with `de` and `it` maps mirroring the `en`/`fr` maps exactly (all 17 namespaces):
+- [x] **Step 4: Extend `resources`** with `de` and `it` maps mirroring the `en`/`fr` maps exactly (all 17 namespaces):
 
 ```ts
   de: {
@@ -309,12 +309,12 @@ export const SUPPORTED_LANGUAGES = ['fr', 'en', 'de', 'it'] as const
   },
 ```
 
-- [ ] **Step 5: Typecheck + lint (expected: PASS)**
+- [x] **Step 5: Typecheck + lint (expected: PASS)**
 
 Run: `npm run typecheck && npx @biomejs/biome check src/i18n/index.ts`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/i18n/index.ts
@@ -330,7 +330,7 @@ git commit -m "feat(i18n-08): register de/it locales + imports + resources"
 **Files:**
 - Create: `src/i18n/localeSmoke.test.ts`
 
-- [ ] **Step 1: Write the test:**
+- [x] **Step 1: Write the test:**
 
 ```ts
 import { describe, expect, it } from 'vitest'
@@ -351,16 +351,16 @@ describe('i18n locale smoke', () => {
 })
 ```
 
-- [ ] **Step 2: Run it (expected: PASS)**
+- [x] **Step 2: Run it (expected: PASS)**
 
 Run: `npm run test:run -- src/i18n/localeSmoke.test.ts`
 Expected: PASS.
 
-- [ ] **Step 3: Manual switcher check**
+- [x] **Step 3: Manual switcher check**
 
 Run: `npm run dev` → the language toggle now shows four options; switching to DE and IT re-renders the app (Dashboard, Inventory, Right-sizing, exports) with translated strings and no raw `key.path` text.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/i18n/localeSmoke.test.ts
@@ -369,14 +369,14 @@ git commit -m "feat(i18n-09): locale smoke test (4 locales resolve)"
 
 ### Task 10: Full gate + docs
 
-- [ ] **Step 1: Full gate**
+- [x] **Step 1: Full gate**
 
 Run: `npm run typecheck && npx @biomejs/biome check . && npm run test:run && npm run check:supply-chain && npm run check:bundle-size`
 Expected: all PASS. (Bundle grows by the JSON weight only; confirm within budget.)
 
-- [ ] **Step 2: Update docs.** Record `de`+`it` support (4 locales) in the project docs / feature inventory; note the native-review follow-up for `de`/`it` technical terminology. Flip any phase checkbox/progress row manually (the SDK does not match the ROADMAP format).
+- [x] **Step 2: Update docs.** Record `de`+`it` support (4 locales) in the project docs / feature inventory; note the native-review follow-up for `de`/`it` technical terminology. Flip any phase checkbox/progress row manually (the SDK does not match the ROADMAP format).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add -A

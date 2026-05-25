@@ -41,7 +41,7 @@ vatlas is a 100 % client-side web app that turns one or more RVTools `.xlsx` exp
 | Apache ECharts | `^6.0.0` | Charting engine (treemap, sunburst, heatmap, calendar, gauge, bar, line, pie, area, radial) | Resolved during Phase-2 research to v6 (GA 2025-07-30; tree-shaking + `SVGRenderer` import paths unchanged from v5). Shipped in Phase 2. See "Charting decision" section below. Tree-shake via `echarts/core` + per-chart-type imports + `SVGRenderer`, ~150–300 KB gzipped. |
 | `echarts-for-react` | `^3.0.6` | Thin React wrapper around ECharts | The de-facto React binding; declares `echarts ^6.0.0` in peerDependencies. Use the core entry (`echarts-for-react/lib/core`) with tree-shaken `echarts.use([...])`; supports `opts={{ renderer: 'svg' }}` which is the keystone of the HTML report export plan. |
 | pptxgenjs | `^4.0.1` | PPTX export | Still the only credible browser-side PPTX generator in 2026. 4.0.1 was the only 4.x release and remains the current version; mature, no known CVEs. vsizer's PPTX engine in `engines/export/pptx/` is reusable. |
-| react-i18next | `^16.6.6` | i18n (FR + EN) | vsizer's setup translates 1:1. |
+| react-i18next | `^16.6.6` | i18n (FR · EN · DE · IT) | vsizer's setup translates 1:1. DE/IT shipped 2026-05-25; technical terms pending native review. |
 | i18next | `^26.1.0` | i18n core | Lockstep with react-i18next. |
 | i18next-browser-languagedetector | `^8.2.1` | Locale detection | Same chain (`?lang=` → localStorage → navigator → `fr` fallback). Note: a `vatlas-lang` localStorage key is allowed (it stores a locale code, not dataset rows — does not breach the privacy invariant). |
 
@@ -261,7 +261,7 @@ npm run check:bundle-size         # fails if echarts chunk > 300 KB gz
 - Commit prefix `<type>(NN-NN): …` (phase-plan id), e.g. `feat(03-02): …`.
 - Branded units (`MiB`/`GiB`/`MHz`/`GHz`/…) — never a raw `* 1.048576` (RVTools "MB" is MiB; ADR-0010).
 - Toggles/tabs reuse the `ThemeToggle` `<fieldset role="group">` + `aria-pressed` idiom — don't reinvent.
-- i18n keys land in BOTH `en/` and `fr/`; no pre-formatted numbers in strings; no editorial verbs ("recommend/should/poor/good").
+- i18n keys land in ALL FOUR locales (`en`/`fr`/`de`/`it`); the `src/i18n/keyParity.test.ts` gate enforces identical key paths (namespaces auto-derived from `locales/en/`). No pre-formatted numbers in strings; no editorial verbs ("recommend/should/poor/good"). DE/IT technical terminology is pending native review (tracked in the de-it-i18n spec risk).
 - No `localStorage` of dataset rows — only `vatlas-theme` + `vatlas-lang` keys are allowed.
 
 ## Gotchas
