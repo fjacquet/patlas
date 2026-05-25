@@ -33,7 +33,7 @@ const wasmSource = (): Promise<Response> =>
 self.onmessage = async (e: MessageEvent<ExportRequest>) => {
   const req = e.data
   try {
-    const { view, trends } = buildExportView(
+    const { view, trends, sizing } = buildExportView(
       req.active,
       req.all,
       req.mode,
@@ -97,7 +97,11 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
 
       // pptxgenjs evaluated lazily AFTER the window shim above.
       const { buildPptx } = await import('./pptx/builder')
-      bytes = await buildPptx(view, trends, strings, req.locale, {
+      // P-RS: the deck's right-sizing slide reflects ALL loaded snapshots
+      // (max-of-N) — override the active-only `view.sizing` with the
+      // all-snapshots `sizing` from buildExportView. HTML report is unaffected
+      // (right-sizing is web + PPTX only).
+      bytes = await buildPptx({ ...view, sizing }, trends, strings, req.locale, {
         charts,
         // Active snapshot's real capture date for the D-03 title slide.
         capturedAt: new Date(req.active.capturedAt).toISOString().slice(0, 10),
