@@ -63,6 +63,7 @@ const estate = (vmCount: number): Snapshot => ({
   vMetaData: [],
   vinfo: Array.from({ length: vmCount }, (_, i) => vmRow(i)),
   vhost: Array.from({ length: CLUSTERS }, (_, c) => hostRow(c)),
+  vmUsage: [],
   vdatastore: [],
   vpartition: [],
   vnetwork: [],

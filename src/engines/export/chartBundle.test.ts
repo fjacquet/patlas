@@ -66,6 +66,7 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
     vm({ vmName: 'b1', cluster: 'C2', host: 'esx-2', provisionedMib: mib(81_920) }),
   ],
   vhost: [host({ hostName: 'esx-1', cluster: 'C1' }), host({ hostName: 'esx-2', cluster: 'C2' })],
+  vmUsage: [],
   vdatastore: [],
   vpartition: [],
   vnetwork: [],

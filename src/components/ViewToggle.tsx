@@ -9,6 +9,8 @@ export type AppView =
   | 'trends'
   | 'storage'
   | 'network'
+  | 'rightsizing'
+  | 'monstervm'
 
 const VIEWS = [
   'dashboard',
@@ -19,6 +21,8 @@ const VIEWS = [
   'trends',
   'storage',
   'network',
+  'rightsizing',
+  'monstervm',
 ] as const
 
 export interface ViewToggleProps {

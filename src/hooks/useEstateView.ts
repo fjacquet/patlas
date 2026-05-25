@@ -2,9 +2,11 @@ import { useMemo } from 'react'
 import { buildEstateView, EMPTY_VIEW } from '@/engines/aggregation'
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
 import {
+  selectMonsterThresholds,
   selectPlannedRatios,
   selectScenario,
   selectSelectedSnapshotIds,
+  selectSizingThresholds,
   selectSnapshots,
   selectStretchedClusters,
   selectThresholds,
@@ -47,6 +49,8 @@ export function useEstateView(mode: AccountingMode): EstateView {
   const scenario = useSnapshotStore(selectScenario)
   const planned = useSnapshotStore(selectPlannedRatios)
   const thresholds = useSnapshotStore(selectThresholds)
+  const sizingThresholds = useSnapshotStore(selectSizingThresholds)
+  const monsterThresholds = useSnapshotStore(selectMonsterThresholds)
   return useMemo(() => {
     const selected = [...snapshots.values()].filter((s) => selectedIds.has(s.id))
     if (selected.length === 0) return EMPTY_VIEW
@@ -59,6 +63,8 @@ export function useEstateView(mode: AccountingMode): EstateView {
       scenario,
       plannedRatios: { cpuRatio: planned.cpu, ramRatio: planned.ram },
       thresholds,
+      sizingThresholds,
+      monsterThresholds,
     })
   }, [
     snapshots,
@@ -69,5 +75,7 @@ export function useEstateView(mode: AccountingMode): EstateView {
     planned.cpu,
     planned.ram,
     thresholds,
+    sizingThresholds,
+    monsterThresholds,
   ])
 }

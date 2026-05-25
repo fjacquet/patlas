@@ -17,6 +17,7 @@ const snapshot = (id: string): Snapshot => ({
   source: 'rvtools',
   viSdkUuid: null,
   vMetaData: [],
+  vmUsage: [],
   vhost: [
     {
       hostName: 'esx-1',

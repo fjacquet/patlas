@@ -28,7 +28,18 @@ See: .planning/PROJECT.md (updated 2026-05-20 after v2.0 milestone)
 Phase: Milestone v2.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-05-20 — Milestone v2.0 completed, archived, tagged.
+Last activity: 2026-05-25 — out-of-milestone Right-sizing + Monster-VM extracts shipped on `feat/vm-rightsizing-stress`.
+
+> **Out-of-milestone (2026-05-25, branch `feat/vm-rightsizing-stress`, via the
+> superpowers spec/plan flow — `docs/superpowers/`):** shipped two new
+> analytics extracts — **Right-sizing** (oversized/undersized/stressed from
+> RVTools `vMemory`+`vCPU`) and **Monster VMs** (largest by configured vCPU/
+> vRAM). New parser sheets → `VmUsageRow`; `sizing.ts`/`monsterVm.ts` engines;
+> `sizingThresholds`/`monsterThresholds` store slices; `RightSizingView`/
+> `MonsterVmView` + two native PPTX slides; en+fr i18n. Full gate green (545
+> tests, `sizing.ts` 100%). Pending: app-wide `de`+`it` localization (Plan 2 —
+> `docs/superpowers/plans/2026-05-25-de-it-localization.md`). Fold into a new
+> GSD milestone when convenient.
 
 ## Performance Metrics
 

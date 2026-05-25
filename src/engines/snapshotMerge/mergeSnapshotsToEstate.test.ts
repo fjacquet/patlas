@@ -54,6 +54,7 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   vMetaData: [],
   vinfo: [],
   vhost: [],
+  vmUsage: [],
   vdatastore: [],
   vpartition: [],
   vnetwork: [],

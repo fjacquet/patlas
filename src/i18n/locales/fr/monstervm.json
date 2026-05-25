@@ -1,0 +1,15 @@
+{
+  "heading": "VM monstres",
+  "subtitle": "Plus grandes VM par allocation configurée",
+  "empty": {
+    "heading": "Aucun instantané chargé",
+    "body": "Chargez un instantané pour voir les plus grandes VM par allocation configurée."
+  },
+  "count": "VM monstres",
+  "none": "Aucune VM n'atteint les seuils de taille actuels.",
+  "thresholds": {
+    "heading": "Seuils de taille (réinitialisés au rechargement)",
+    "minVcpu": "vCPU ≥",
+    "minVramGib": "vRAM ≥ Gio"
+  }
+}

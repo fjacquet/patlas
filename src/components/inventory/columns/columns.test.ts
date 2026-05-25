@@ -152,6 +152,7 @@ const sharedLunSnapshot = (): Snapshot => ({
   viSdkUuid: null,
   vMetaData: [],
   vhost: [host({}), host({ hostName: 'esx-2', cluster: 'C2' })],
+  vmUsage: [],
   vinfo: [
     vm({ vmName: 'on-1', cluster: 'C1', host: 'esx-1' }),
     vm({ vmName: 'on-2', cluster: 'C2', host: 'esx-2' }),

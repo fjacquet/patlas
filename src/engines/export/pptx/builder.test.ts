@@ -61,6 +61,7 @@ const snap = (id: string, nClusters: number, capturedAt: Date): Snapshot => ({
   vMetaData: [],
   vinfo: Array.from({ length: nClusters }, (_, c) => vmRow(c)),
   vhost: Array.from({ length: nClusters }, (_, c) => hostRow(c)),
+  vmUsage: [],
   vdatastore: [],
   vpartition: [],
   vnetwork: [],
@@ -116,6 +117,54 @@ describe('buildPptx — golden structural snapshot', () => {
       contentionRows: rows,
     })
     expect(slideCount(abAnnex)).toBe(16) // +1 annex
+  })
+
+  it('P-RS: a view WITH usage data adds exactly one right-sizing slide', async () => {
+    const a = snap('a', 6, new Date('2026-01-01'))
+    const withUsage: Snapshot = {
+      ...a,
+      vmUsage: [
+        {
+          vmName: 'vm-c0',
+          cluster: 'C0',
+          vmBiosUuid: '',
+          vmInstanceUuid: '',
+          activeMib: mib(1024),
+          consumedMib: mib(2048),
+          balloonedMib: mib(0),
+          swappedMib: mib(0),
+          cpuUsageMhz: mhz(300),
+        },
+      ],
+    }
+    const ex = buildExportView(withUsage, [withUsage], MODE, TODAY)
+    expect(ex.sizing.hasUsageData).toBe(true)
+    const ab = await buildPptx(ex.view, ex.trends, strings, 'en')
+    expect(slideCount(ab)).toBe(15) // 14 baseline + 1 right-sizing
+
+    // Without usage data the slide is omitted (back to baseline).
+    const exNone = buildExportView(a, [a], MODE, TODAY)
+    expect(exNone.sizing.hasUsageData).toBe(false)
+    const abNone = await buildPptx(exNone.view, exNone.trends, strings, 'en')
+    expect(slideCount(abNone)).toBe(14)
+  })
+
+  it('P-RS: a view with a monster VM adds exactly one monster slide', async () => {
+    const a = snap('a', 6, new Date('2026-01-01'))
+    const first = a.vinfo[0]
+    if (!first) throw new Error('fixture has no VM')
+    const withMonster: Snapshot = {
+      ...a,
+      vinfo: [...a.vinfo, { ...first, vmName: 'monster-01', vcpu: cores(32) }],
+    }
+    const ex = buildExportView(withMonster, [withMonster], MODE, TODAY)
+    expect(ex.view.monsters.count).toBeGreaterThan(0)
+    const ab = await buildPptx(ex.view, ex.trends, strings, 'en')
+    expect(slideCount(ab)).toBe(15) // 14 baseline + 1 monster
+
+    const exNone = buildExportView(a, [a], MODE, TODAY)
+    expect(exNone.view.monsters.count).toBe(0)
+    expect(slideCount(await buildPptx(exNone.view, exNone.trends, strings, 'en'))).toBe(14)
   })
 
   it('D-01: a 50-cluster view yields exactly 50 cluster slides (no cap)', async () => {

@@ -22,9 +22,11 @@ import { addContentionAnnex, type ContentionRow } from './slides/contentionAnnex
 import { addDrSimSlide } from './slides/drSimSlide'
 import { addEosSlide } from './slides/eosSlide'
 import { addInventorySlide } from './slides/inventorySlide'
+import { addMonsterSlide } from './slides/monsterSlide'
 import { addNetworkSlide } from './slides/networkSlide'
 import { addOverviewSlide } from './slides/overviewSlide'
 import { addPlannedSlide } from './slides/plannedSlide'
+import { addRightSizingSlide } from './slides/rightSizingSlide'
 import { addStorageSlide } from './slides/storageSlide'
 import { addTitleSlide } from './slides/titleSlide'
 import { addTrendsSlide } from './slides/trendsSlide'
@@ -97,6 +99,18 @@ export async function buildPptx(
   // Conditional CPU-Ready annex.
   if (opts.contentionRows && opts.contentionRows.length > 0) {
     addContentionAnnex(pptx, opts.contentionRows, strings, locale)
+  }
+
+  // P-RS right-sizing/stress — conditional: only when usage data (vMemory/
+  // vCPU) was derivable; otherwise the slide is omitted (no empty page).
+  if (view.sizing.hasUsageData) {
+    addRightSizingSlide(pptx, view.sizing, strings, locale)
+  }
+
+  // P-RS monster VMs — conditional: only when the estate has VMs above the
+  // configured-size lines; otherwise omitted (no empty page).
+  if (view.monsters.count > 0) {
+    addMonsterSlide(pptx, view.monsters, strings, locale)
   }
 
   addEosSlide(pptx, view.eos, png('eosBar'), strings, locale)

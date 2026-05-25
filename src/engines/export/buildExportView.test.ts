@@ -64,6 +64,7 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   vMetaData: [],
   vinfo: [vm({})],
   vhost: [host({})],
+  vmUsage: [],
   vdatastore: [],
   vpartition: [],
   vnetwork: [],
@@ -100,6 +101,39 @@ describe('buildExportView — D-08 active-snapshot body', () => {
     const activeOnly = buildEstateView(mergeSnapshotsToEstate([a]), [a], MODE, TODAY)
     const { view } = buildExportView(a, [a, b], MODE, TODAY)
     expect(view).toEqual(activeOnly)
+  })
+
+  it('P-RS: sizing is computed over ALL loaded snapshots (max-of-N)', () => {
+    const usage = (over: Partial<Snapshot['vmUsage'][number]> = {}) => ({
+      vmName: 'vm-1',
+      cluster: 'C1',
+      vmBiosUuid: '',
+      vmInstanceUuid: 'i1',
+      activeMib: mib(1024),
+      consumedMib: mib(2048),
+      balloonedMib: mib(0),
+      swappedMib: mib(0),
+      cpuUsageMhz: mhz(300),
+      ...over,
+    })
+    const a = snap({
+      id: 'a',
+      capturedAt: new Date('2026-01-01'),
+      vinfo: [vm({ vmInstanceUuid: 'i1' })],
+      vmUsage: [usage()],
+    })
+    const b = snap({
+      id: 'b',
+      capturedAt: new Date('2026-02-01'),
+      vinfo: [vm({ vmInstanceUuid: 'i1' })],
+      vmUsage: [usage({ cpuUsageMhz: mhz(50) })],
+    })
+    const { sizing } = buildExportView(a, [a, b], MODE, TODAY)
+    expect(sizing.snapshotCount).toBe(2)
+    expect(sizing.hasUsageData).toBe(true)
+    expect(sizing.rows[0]?.sampleBasis).toBe('max-of-N')
+    // max(300, 50) MHz over a 4×2600 MHz ceiling ≈ 2.9% ≤ 10 ⇒ cpuOversized.
+    expect(sizing.rows[0]?.flags.cpuOversized).toBe(true)
   })
 
   it('is a pure engine — no React / Zustand / hook import', () => {

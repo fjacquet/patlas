@@ -1,0 +1,46 @@
+{
+  "heading": "Right-sizing",
+  "subtitle": "Configured vs used",
+  "empty": {
+    "heading": "No usage data",
+    "body": "This export has no vMemory/vCPU sheets, so utilization and ballooning can't be derived."
+  },
+  "basis": {
+    "single": "single snapshot",
+    "max": "max across {{count}} snapshots"
+  },
+  "poweredOnOnly": "powered-on VMs only",
+  "notDerivable": "— = not derivable",
+  "category": {
+    "oversized": "Allocation ≫ usage",
+    "undersized": "Usage near allocation",
+    "stressed": "Ballooning / CPU-ready"
+  },
+  "filter": {
+    "label": "Filter",
+    "all": "All",
+    "oversized": "Allocation ≫ usage",
+    "undersized": "Usage near allocation",
+    "stressed": "Pressure"
+  },
+  "thresholds": {
+    "heading": "Thresholds (reset on refresh)",
+    "cpuOversize": "CPU oversize ≤ %",
+    "memOversize": "Memory oversize ≤ %",
+    "cpuUndersize": "CPU undersize ≥ %",
+    "memUndersize": "Memory undersize ≥ %",
+    "balloon": "Balloon > MiB",
+    "swap": "Swap > MiB"
+  },
+  "chart": {
+    "title": "Counts by category and resource",
+    "labels": {
+      "cpuOver": "CPU over",
+      "memOver": "Mem over",
+      "cpuUnder": "CPU under",
+      "memUnder": "Mem under",
+      "memStress": "Mem stress",
+      "cpuReady": "CPU ready"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "heading": "Dimensionnement",
+  "subtitle": "Configuré vs utilisé",
+  "empty": {
+    "heading": "Aucune donnée d'utilisation",
+    "body": "Cet export ne contient pas les feuilles vMemory/vCPU : l'utilisation et le ballooning ne sont pas calculables."
+  },
+  "basis": {
+    "single": "instantané unique",
+    "max": "max sur {{count}} instantanés"
+  },
+  "poweredOnOnly": "VM allumées uniquement",
+  "notDerivable": "— = non calculable",
+  "category": {
+    "oversized": "Allocation ≫ utilisation",
+    "undersized": "Utilisation proche de l'allocation",
+    "stressed": "Ballooning / CPU-ready"
+  },
+  "filter": {
+    "label": "Filtre",
+    "all": "Tous",
+    "oversized": "Allocation ≫ utilisation",
+    "undersized": "Utilisation proche de l'allocation",
+    "stressed": "Pression"
+  },
+  "thresholds": {
+    "heading": "Seuils (réinitialisés au rechargement)",
+    "cpuOversize": "Sur-dimension CPU ≤ %",
+    "memOversize": "Sur-dimension mémoire ≤ %",
+    "cpuUndersize": "Sous-dimension CPU ≥ %",
+    "memUndersize": "Sous-dimension mémoire ≥ %",
+    "balloon": "Balloon > Mio",
+    "swap": "Swap > Mio"
+  },
+  "chart": {
+    "title": "Décompte par catégorie et ressource",
+    "labels": {
+      "cpuOver": "CPU sur",
+      "memOver": "Mém sur",
+      "cpuUnder": "CPU sous",
+      "memUnder": "Mém sous",
+      "memStress": "Mém pression",
+      "cpuReady": "CPU ready"
+    }
+  }
+}

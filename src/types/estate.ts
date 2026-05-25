@@ -2,7 +2,9 @@
 // aggregation engines — no runtime coupling, no cycle (the engines import
 // their input types from here; these are produced in the single
 // `buildEstateView` pass and surfaced on `EstateView`).
+import type { MonsterEstate } from '@/engines/aggregation/monsterVm'
 import type { NetworkRollup } from '@/engines/aggregation/network'
+import type { EstateSizing } from '@/engines/aggregation/sizing'
 import type { StorageByX } from '@/engines/aggregation/storageByX'
 import type { ThresholdFlags } from '@/engines/aggregation/thresholdFlags'
 import type { VsanRelinkResult } from '@/engines/aggregation/vsanRelink'
@@ -524,6 +526,17 @@ export interface EstateView {
    * driven by the in-memory thresholds slice; no verdict/severity/
    * colour. Same single-pass origin. */
   flags: ThresholdFlags
+  /**
+   * P-RS right-sizing/stress extract — per-VM oversized/undersized/stressed
+   * flags + counts, max across loaded snapshots, powered-on only. Neutral
+   * measurement, user-editable thresholds (no verdict/severity). Same
+   * single-pass origin; `EMPTY_SIZING` in `EMPTY_VIEW`. */
+  sizing: EstateSizing
+  /**
+   * P-RS monster-VM extract — the largest VMs by CONFIGURED allocation
+   * (vCPU/vRAM ≥ user-editable lines). Same single-pass origin;
+   * `EMPTY_MONSTERS` in `EMPTY_VIEW`. */
+  monsters: MonsterEstate
   /**
    * P9 LC-4 per-datastore drill projection, keyed by the `naa ?? name`
    * datastore key. Produced in the single `buildEstateView` pass — no

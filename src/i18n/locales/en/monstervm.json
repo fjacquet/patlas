@@ -1,0 +1,15 @@
+{
+  "heading": "Monster VMs",
+  "subtitle": "Largest VMs by configured allocation",
+  "empty": {
+    "heading": "No snapshot loaded",
+    "body": "Load a snapshot to see the largest VMs by configured allocation."
+  },
+  "count": "Monster VMs",
+  "none": "No VMs meet the current size lines.",
+  "thresholds": {
+    "heading": "Size lines (reset on refresh)",
+    "minVcpu": "vCPU ≥",
+    "minVramGib": "vRAM ≥ GiB"
+  }
+}

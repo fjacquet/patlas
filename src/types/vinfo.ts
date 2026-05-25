@@ -1,4 +1,4 @@
-import type { Cores, MiB } from '@/engines/units'
+import type { Cores, MHz, MiB } from '@/engines/units'
 
 /** Exact RVTools vInfo Powerstate (P5). `poweredOn` is derived from this. */
 export type VPowerState = 'poweredOn' | 'poweredOff' | 'suspended'
@@ -56,4 +56,29 @@ export interface VInfoRow {
    *  (P9 D-09) parses the `[datastore]` token out of this to attribute a
    *  datastore to the VM's cluster. */
   path: string
+}
+
+/**
+ * Per-VM RUNTIME/perf metrics from the RVTools `vMemory` + `vCPU` sheets.
+ * Kept SEPARATE from `VInfoRow` (config/inventory) — config-vs-perf split.
+ * Joined to a VM by identity (`vmInstanceUuid` → `vmBiosUuid` →
+ * `vmName+cluster`). Every metric is `null` when the cell is absent/blank
+ * ("not derivable") — NEVER coerced to 0 (ADR-0012; same rule as
+ * `cpuReadinessPercent`). Point-in-time per snapshot.
+ */
+export interface VmUsageRow {
+  vmName: string
+  cluster: string
+  vmBiosUuid: string
+  vmInstanceUuid: string
+  /** vMemory `Active` — guest working set (MiB). null when absent. */
+  activeMib: MiB | null
+  /** vMemory `Consumed` — host RAM backing the VM (MiB). null when absent. */
+  consumedMib: MiB | null
+  /** vMemory `Ballooned` (MiB). null when absent. */
+  balloonedMib: MiB | null
+  /** vMemory `Swapped` (MiB). null when absent. */
+  swappedMib: MiB | null
+  /** vCPU `Overall CPU usage` (MHz). null when absent. */
+  cpuUsageMhz: MHz | null
 }

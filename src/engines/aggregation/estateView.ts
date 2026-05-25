@@ -19,10 +19,17 @@ import { aggregateClusters } from './aggregateClusters'
 import { buildDatastoreDetail, buildVmDetail } from './detailIndex'
 import { aggregateGlobals, emptySummary } from './globals'
 import { aggregateGuestData, type GuestData } from './guestData'
+import { computeMonsters, DEFAULT_MONSTER_THRESHOLDS, type MonsterThresholds } from './monsterVm'
 import { networkRollup } from './network'
 import { classifyOsFamily } from './osFamily'
 import { datastoreCountByCluster, perDatastore } from './perDatastore'
 import { perEsx } from './perEsx'
+import {
+  computeSizing,
+  DEFAULT_SIZING_THRESHOLDS,
+  maxVmUsageAcrossSnapshots,
+  type SizingThresholds,
+} from './sizing'
 import { storageByX } from './storageByX'
 import { computeThresholdFlags, DEFAULT_THRESHOLDS, type ThresholdInput } from './thresholdFlags'
 import { relinkBlankClusterDatastores } from './vsanRelink'
@@ -91,6 +98,12 @@ export function buildEstateView(
      *  defaults (mirrors `stretchedClusters ?? new Set()`). Threaded from
      *  the in-memory thresholds slice via the single `useEstateView` memo. */
     thresholds?: ThresholdInput
+    /** P-RS right-sizing thresholds (user-editable ratios). Absent ⇒
+     *  RVTools-rightsizing defaults. Threaded from the in-memory slice via
+     *  the single `useEstateView` memo. */
+    sizingThresholds?: SizingThresholds
+    /** P-RS monster-VM thresholds (vCPU/vRAM lines). Absent ⇒ defaults. */
+    monsterThresholds?: MonsterThresholds
   },
 ): EstateView {
   const stretchedClusters = opts?.stretchedClusters ?? new Set<string>()
@@ -303,6 +316,26 @@ export function buildEstateView(
   // `buildTrendSeries`). Pure — no clock, reuses the shipped aggregates.
   const trends = buildTrendSeries(selected, mode, { stretchedClusters, allocRatios })
 
+  // P-RS right-sizing/stress — composed in THIS single pass (no second memo).
+  // Per-VM MAX usage across the pre-merge `selected` snapshots (powered-on
+  // only); the merged `vinfo`/`vhost` give the canonical VM list + host CPU
+  // speed for the utilization denominator. Pure — reuses the shipped rows.
+  const sizingThresholds = opts?.sizingThresholds ?? DEFAULT_SIZING_THRESHOLDS
+  const sizing = computeSizing(
+    merged.vinfo,
+    merged.vhost,
+    maxVmUsageAcrossSnapshots(selected),
+    sizingThresholds,
+    selected.length,
+  )
+
+  // P-RS monster-VM extract — same single pass; configured allocation only,
+  // so no multi-snapshot max is needed (vCPU/vRAM are stable per VM).
+  const monsters = computeMonsters(
+    merged.vinfo,
+    opts?.monsterThresholds ?? DEFAULT_MONSTER_THRESHOLDS,
+  )
+
   return {
     globals,
     clusters,
@@ -325,6 +358,8 @@ export function buildEstateView(
     vsan,
     network,
     flags,
+    sizing,
+    monsters,
     datastoreDetail,
     vmDetail,
   }
@@ -409,6 +444,30 @@ const EMPTY_FLAGS = Object.freeze({
   counts: Object.freeze({ fs: 0, ds: 0, lu: 0 }),
 })
 
+const EMPTY_SIZING = Object.freeze({
+  rows: Object.freeze([]) as never[],
+  counts: Object.freeze({
+    oversized: 0,
+    undersized: 0,
+    stressed: 0,
+    cpuOversized: 0,
+    memOversized: 0,
+    cpuUndersized: 0,
+    memUndersized: 0,
+    memStressed: 0,
+    cpuStressed: 0,
+  }),
+  thresholds: DEFAULT_SIZING_THRESHOLDS,
+  snapshotCount: 0,
+  hasUsageData: false,
+})
+
+const EMPTY_MONSTERS = Object.freeze({
+  rows: Object.freeze([]) as never[],
+  count: 0,
+  thresholds: DEFAULT_MONSTER_THRESHOLDS,
+})
+
 /**
  * The valid empty-but-typed view `useEstateView` returns when no snapshot
  * is active. Frozen (modeled on `globals.ts:emptySummary`) so consumers
@@ -436,6 +495,8 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   vsan: EMPTY_VSAN,
   network: EMPTY_NETWORK,
   flags: EMPTY_FLAGS,
+  sizing: EMPTY_SIZING,
+  monsters: EMPTY_MONSTERS,
   datastoreDetail: new Map(),
   vmDetail: new Map(),
 })

@@ -9,6 +9,13 @@ export { buildEstateView, EMPTY_VIEW } from './estateView'
 export { consumedGhz, physicalGhz } from './ghz'
 export { aggregateGlobals, emptySummary } from './globals'
 export {
+  computeMonsters,
+  DEFAULT_MONSTER_THRESHOLDS,
+  type MonsterEstate,
+  type MonsterThresholds,
+  type MonsterVm,
+} from './monsterVm'
+export {
   type DvSwitchAgg,
   type NetworkRollup,
   networkRollup,
@@ -19,6 +26,15 @@ export { classifyOsFamily, type OsFamily } from './osFamily'
 export { aggregateHostsPerCluster } from './perCluster'
 export { perDatastore } from './perDatastore'
 export { perEsx } from './perEsx'
+export {
+  computeSizing,
+  DEFAULT_SIZING_THRESHOLDS,
+  type EstateSizing,
+  maxVmUsageAcrossSnapshots,
+  type SizingCounts,
+  type SizingThresholds,
+  type VmSizing,
+} from './sizing'
 export {
   type StorageByX,
   type StorageCapacityGroup,

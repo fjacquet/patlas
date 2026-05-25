@@ -59,6 +59,13 @@ const vInfoHeader = [
   'VI SDK Server',
 ]
 
+// P-RS: vMemory + vCPU runtime sheets, keyed by the same `VM UUID` so the
+// usage→VM identity join (bios-uuid fallback) lands. Populated below.
+const vMemoryHeader = ['VM', 'Cluster', 'VM UUID', 'Active', 'Consumed', 'Ballooned', 'Swapped']
+const vCpuHeader = ['VM', 'Cluster', 'VM UUID', 'Overall Cpu Usage']
+const vMemory = [vMemoryHeader]
+const vCpu = [vCpuHeader]
+
 const vInfo = [vInfoHeader]
 for (let i = 0; i < VM_COUNT; i++) {
   const cl = i % CLUSTERS
@@ -78,8 +85,10 @@ for (let i = 0; i < VM_COUNT; i++) {
     i === 4242
       ? 'Red Hat Enterprise Linux 9.4\nmaintenance window: Sundays 02:00-04:00 UTC'
       : osConfig
+  const vmName = `vm-${String(i + 1).padStart(5, '0')}`
+  const biosUuid = `00000000-0000-4000-8000-${String(i).padStart(12, '0')}`
   vInfo.push([
-    `vm-${String(i + 1).padStart(5, '0')}`,
+    vmName,
     i % 5 === 0 ? 'poweredOff' : 'poweredOn',
     cluster,
     host,
@@ -89,10 +98,38 @@ for (let i = 0; i < VM_COUNT; i++) {
     inUseMib,
     osConfig,
     osTools,
-    `00000000-0000-4000-8000-${String(i).padStart(12, '0')}`,
+    biosUuid,
     'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
     'vcenter.lab.local',
   ])
+
+  // Synthetic right-sizing distribution (host speed 2600 MHz/core). The
+  // engine evaluates POWERED-ON VMs only, so powered-off rows here are
+  // ignored — emitted anyway for realism. i%10: 0-2 oversized · 3-4
+  // undersized · 5-6 stressed (balloon, +swap at 6) · 7-9 mid.
+  const capMhz = vcpu * 2600
+  const ub = i % 10
+  const cpuUsageMhz =
+    ub < 3
+      ? Math.floor(capMhz * 0.05)
+      : ub < 5
+        ? Math.floor(capMhz * 0.95)
+        : ub < 7
+          ? Math.floor(capMhz * 0.5)
+          : Math.floor(capMhz * 0.4)
+  const activeMib =
+    ub < 3
+      ? Math.floor(memMib * 0.1)
+      : ub < 5
+        ? Math.floor(memMib * 0.95)
+        : ub < 7
+          ? Math.floor(memMib * 0.6)
+          : Math.floor(memMib * 0.5)
+  const balloonedMib = ub >= 5 && ub < 7 ? 128 + (i % 256) : 0
+  const swappedMib = ub === 6 ? 64 : 0
+  const consumedMib = Math.floor(memMib * 0.7)
+  vMemory.push([vmName, cluster, biosUuid, activeMib, consumedMib, balloonedMib, swappedMib])
+  vCpu.push([vmName, cluster, biosUuid, cpuUsageMhz])
 }
 
 const vHostHeader = [
@@ -134,6 +171,8 @@ const vMetaData = [
 const wb = XLSX.utils.book_new()
 XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(vInfo), 'vInfo')
 XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(vHost), 'vHost')
+XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(vMemory), 'vMemory')
+XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(vCpu), 'vCPU')
 XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(vMetaData), 'vMetaData')
 
 // Deterministic write — disable compression so the bytes are stable across
