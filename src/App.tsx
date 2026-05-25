@@ -10,6 +10,7 @@ import { InventoryView } from './components/inventory/InventoryView'
 import { LanguageToggle } from './components/LanguageToggle'
 import { NetworkView } from './components/network/NetworkView'
 import { PlanningView } from './components/planning/PlanningView'
+import { RightSizingView } from './components/rightsizing/RightSizingView'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
 import { StorageView } from './components/storage/StorageView'
 import { ThemeToggle } from './components/ThemeToggle'
@@ -61,6 +62,8 @@ function App() {
               <StorageView />
             ) : activeView === 'network' ? (
               <NetworkView />
+            ) : activeView === 'rightsizing' ? (
+              <RightSizingView />
             ) : (
               <GlobalDashboard />
             )}

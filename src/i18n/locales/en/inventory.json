@@ -8,7 +8,8 @@
     "eos": "OS end-of-support",
     "trends": "Trends",
     "storage": "Storage",
-    "network": "Network"
+    "network": "Network",
+    "rightsizing": "Right-sizing"
   },
   "tab": {
     "label": "Object type",
@@ -53,6 +54,13 @@
     "host": "Host",
     "vcpu": "vCPU",
     "vramMib": "vRAM (MiB)",
+    "cpuUtilPct": "CPU util %",
+    "memActivePct": "Active %",
+    "memConsumedPct": "Consumed %",
+    "balloonedMib": "Balloon (MiB)",
+    "swappedMib": "Swap (MiB)",
+    "cpuReadinessPercent": "CPU Ready %",
+    "flags": "Flags",
     "os": "OS",
     "poweredOn": "Powered on",
     "provisionedMib": "Provisioned (MiB)",

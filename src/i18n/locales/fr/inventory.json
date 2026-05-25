@@ -8,7 +8,8 @@
     "eos": "Fin de support OS",
     "trends": "Tendances",
     "storage": "Stockage",
-    "network": "Réseau"
+    "network": "Réseau",
+    "rightsizing": "Dimensionnement"
   },
   "tab": {
     "label": "Type d'objet",
@@ -53,6 +54,13 @@
     "host": "Hôte",
     "vcpu": "vCPU",
     "vramMib": "vRAM (Mio)",
+    "cpuUtilPct": "Util. CPU %",
+    "memActivePct": "Actif %",
+    "memConsumedPct": "Consommé %",
+    "balloonedMib": "Balloon (Mio)",
+    "swappedMib": "Swap (Mio)",
+    "cpuReadinessPercent": "CPU Ready %",
+    "flags": "Indicateurs",
     "os": "OS",
     "poweredOn": "Démarrée",
     "provisionedMib": "Provisionné (Mio)",

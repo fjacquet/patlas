@@ -14,6 +14,7 @@ import enNetwork from './locales/en/network.json'
 import enPptx from './locales/en/pptx.json'
 import enRci from './locales/en/rci.json'
 import enReport from './locales/en/report.json'
+import enRightsizing from './locales/en/rightsizing.json'
 import enStorage from './locales/en/storage.json'
 import enStr from './locales/en/str.json'
 import enTrends from './locales/en/trends.json'
@@ -30,6 +31,7 @@ import frNetwork from './locales/fr/network.json'
 import frPptx from './locales/fr/pptx.json'
 import frRci from './locales/fr/rci.json'
 import frReport from './locales/fr/report.json'
+import frRightsizing from './locales/fr/rightsizing.json'
 import frStorage from './locales/fr/storage.json'
 import frStr from './locales/fr/str.json'
 import frTrends from './locales/fr/trends.json'
@@ -64,6 +66,7 @@ export const NAMESPACES = [
   'network',
   'report',
   'pptx',
+  'rightsizing',
 ] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
@@ -85,6 +88,7 @@ export const resources = {
     network: enNetwork,
     report: enReport,
     pptx: enPptx,
+    rightsizing: enRightsizing,
   },
   fr: {
     common: frCommon,
@@ -103,6 +107,7 @@ export const resources = {
     network: frNetwork,
     report: frReport,
     pptx: frPptx,
+    rightsizing: frRightsizing,
   },
 } as const
 
