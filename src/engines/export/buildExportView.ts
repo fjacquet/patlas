@@ -14,7 +14,7 @@
  * deep-equals the direct single-snapshot `buildEstateView` call — i.e. the
  * exported body is identical to that snapshot's dashboard view.
  */
-import { buildEstateView } from '@/engines/aggregation'
+import { buildEstateView, type EstateSizing } from '@/engines/aggregation'
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
 import type { AccountingMode, EstateView, TrendSeries } from '@/types/estate'
 import type { Snapshot } from '@/types/snapshot'
@@ -25,6 +25,9 @@ export interface ExportView {
   view: EstateView
   /** D-08/D-09: cross-snapshot trends; `null` when <2 snapshots loaded. */
   trends: TrendSeries | null
+  /** P-RS right-sizing computed over ALL loaded snapshots (max-of-N), so the
+   *  deck reflects the full set rather than only the active body. */
+  sizing: EstateSizing
 }
 
 export function buildExportView(
@@ -38,11 +41,14 @@ export function buildExportView(
   // (single snapshot = degenerate merge case, exactly like the dashboard).
   const view = buildEstateView(mergeSnapshotsToEstate([active]), [active], mode, today, opts)
 
-  // D-09 — trends need ≥2 snapshots; otherwise omit entirely.
-  const trends =
-    all.length >= 2
-      ? buildEstateView(mergeSnapshotsToEstate(all), all, mode, today, opts).trends
-      : null
+  // The all-snapshots view feeds BOTH the D-09 trend series AND the P-RS
+  // right-sizing extract (max-of-N). Computed once; reused. With <2 snapshots
+  // it is the active view, so sizing degenerates to the single reading.
+  const allView =
+    all.length >= 2 ? buildEstateView(mergeSnapshotsToEstate(all), all, mode, today, opts) : view
 
-  return { view, trends }
+  // D-09 — trends need ≥2 snapshots; otherwise omit entirely.
+  const trends = all.length >= 2 ? allView.trends : null
+
+  return { view, trends, sizing: allView.sizing }
 }

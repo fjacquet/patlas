@@ -64,6 +64,7 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   vMetaData: [],
   vinfo: [vm({}), vm({ vmName: 'vm-2', cluster: 'C2', host: 'esx-2' })],
   vhost: [host({}), host({ hostName: 'esx-2', cluster: 'C2' })],
+  vmUsage: [],
   vdatastore: [],
   vpartition: [],
   vnetwork: [],

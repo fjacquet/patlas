@@ -57,6 +57,7 @@ const snap = (over: Partial<Snapshot> & { id: string }): Snapshot => ({
   viSdkUuid: null,
   vMetaData: [],
   vhost: [host({})],
+  vmUsage: [],
   vinfo: [
     vm({ vmName: 'on-1', poweredOn: true, powerState: 'poweredOn' }),
     vm({ vmName: 'off-1', poweredOn: false, powerState: 'poweredOff' }),

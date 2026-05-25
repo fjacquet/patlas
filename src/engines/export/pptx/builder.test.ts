@@ -61,6 +61,7 @@ const snap = (id: string, nClusters: number, capturedAt: Date): Snapshot => ({
   vMetaData: [],
   vinfo: Array.from({ length: nClusters }, (_, c) => vmRow(c)),
   vhost: Array.from({ length: nClusters }, (_, c) => hostRow(c)),
+  vmUsage: [],
   vdatastore: [],
   vpartition: [],
   vnetwork: [],
