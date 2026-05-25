@@ -1,0 +1,23 @@
+{
+  "heading": "Andamenti nella sessione",
+  "empty": "Carica 2 o più snapshot per vedere gli andamenti.",
+  "warmup": "Andamenti in preparazione — {{done}}/{{total}}",
+  "orderInferred": "Alcune date di acquisizione non sono state determinate; i punti sono mostrati in ordine di caricamento, non su un asse temporale reale.",
+  "released": "Righe grezze rilasciate per limitare la memoria; il punto di andamento di questo snapshot è conservato.",
+  "error": "Impossibile visualizzare gli andamenti: {{message}}",
+  "axisDate": "{{date}}",
+  "delta": {
+    "heading": "Variazione tra snapshot consecutivi",
+    "vmCount": "VM",
+    "poweredOnVms": "VM accese",
+    "hostCount": "Host",
+    "clusterCount": "Cluster",
+    "vcpuAllocated": "vCPU allocate",
+    "vramAllocated": "vRAM allocata (GiB)",
+    "totalStorage": "Storage (GiB)"
+  },
+  "tooltip": {
+    "date": "Data di acquisizione: {{date}}",
+    "meta": "{{vcenter}} / RVTools {{version}}"
+  }
+}
