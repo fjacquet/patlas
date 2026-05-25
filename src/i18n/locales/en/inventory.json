@@ -9,7 +9,8 @@
     "trends": "Trends",
     "storage": "Storage",
     "network": "Network",
-    "rightsizing": "Right-sizing"
+    "rightsizing": "Right-sizing",
+    "monstervm": "Monster VMs"
   },
   "tab": {
     "label": "Object type",
@@ -54,6 +55,7 @@
     "host": "Host",
     "vcpu": "vCPU",
     "vramMib": "vRAM (MiB)",
+    "vramGib": "vRAM (GiB)",
     "cpuUtilPct": "CPU util %",
     "memActivePct": "Active %",
     "memConsumedPct": "Consumed %",

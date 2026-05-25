@@ -9,6 +9,7 @@ import enDashboard from './locales/en/dashboard.json'
 import enDr from './locales/en/dr.json'
 import enEos from './locales/en/eos.json'
 import enInventory from './locales/en/inventory.json'
+import enMonstervm from './locales/en/monstervm.json'
 import enMvc from './locales/en/mvc.json'
 import enNetwork from './locales/en/network.json'
 import enPptx from './locales/en/pptx.json'
@@ -26,6 +27,7 @@ import frDashboard from './locales/fr/dashboard.json'
 import frDr from './locales/fr/dr.json'
 import frEos from './locales/fr/eos.json'
 import frInventory from './locales/fr/inventory.json'
+import frMonstervm from './locales/fr/monstervm.json'
 import frMvc from './locales/fr/mvc.json'
 import frNetwork from './locales/fr/network.json'
 import frPptx from './locales/fr/pptx.json'
@@ -67,6 +69,7 @@ export const NAMESPACES = [
   'report',
   'pptx',
   'rightsizing',
+  'monstervm',
 ] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
@@ -89,6 +92,7 @@ export const resources = {
     report: enReport,
     pptx: enPptx,
     rightsizing: enRightsizing,
+    monstervm: enMonstervm,
   },
   fr: {
     common: frCommon,
@@ -108,6 +112,7 @@ export const resources = {
     report: frReport,
     pptx: frPptx,
     rightsizing: frRightsizing,
+    monstervm: frMonstervm,
   },
 } as const
 

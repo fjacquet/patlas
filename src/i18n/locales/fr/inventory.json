@@ -9,7 +9,8 @@
     "trends": "Tendances",
     "storage": "Stockage",
     "network": "Réseau",
-    "rightsizing": "Dimensionnement"
+    "rightsizing": "Dimensionnement",
+    "monstervm": "VM monstres"
   },
   "tab": {
     "label": "Type d'objet",
@@ -54,6 +55,7 @@
     "host": "Hôte",
     "vcpu": "vCPU",
     "vramMib": "vRAM (Mio)",
+    "vramGib": "vRAM (Gio)",
     "cpuUtilPct": "Util. CPU %",
     "memActivePct": "Actif %",
     "memConsumedPct": "Consommé %",

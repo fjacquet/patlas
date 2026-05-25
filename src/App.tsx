@@ -8,6 +8,7 @@ import { FallbackError } from './components/FallbackError'
 import { HostsView } from './components/hosts/HostsView'
 import { InventoryView } from './components/inventory/InventoryView'
 import { LanguageToggle } from './components/LanguageToggle'
+import { MonsterVmView } from './components/monstervm/MonsterVmView'
 import { NetworkView } from './components/network/NetworkView'
 import { PlanningView } from './components/planning/PlanningView'
 import { RightSizingView } from './components/rightsizing/RightSizingView'
@@ -64,6 +65,8 @@ function App() {
               <NetworkView />
             ) : activeView === 'rightsizing' ? (
               <RightSizingView />
+            ) : activeView === 'monstervm' ? (
+              <MonsterVmView />
             ) : (
               <GlobalDashboard />
             )}
