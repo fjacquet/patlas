@@ -13,7 +13,9 @@
   "lang": {
     "label": "Language",
     "fr": "Français",
-    "en": "English"
+    "en": "English",
+    "de": "Deutsch",
+    "it": "Italiano"
   },
   "theme": {
     "label": "Theme",

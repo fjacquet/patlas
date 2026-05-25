@@ -1,0 +1,23 @@
+{
+  "heading": "Trends in der Sitzung",
+  "empty": "Laden Sie 2 oder mehr Snapshots, um Trends zu sehen.",
+  "warmup": "Trends werden vorbereitet — {{done}}/{{total}}",
+  "orderInferred": "Einige Erfassungsdaten konnten nicht bestimmt werden; die Punkte werden in Ladereihenfolge angezeigt, nicht auf einer echten Zeitachse.",
+  "released": "Rohzeilen freigegeben, um den Speicher zu begrenzen; der Trendpunkt dieses Snapshots bleibt erhalten.",
+  "error": "Trends konnten nicht dargestellt werden: {{message}}",
+  "axisDate": "{{date}}",
+  "delta": {
+    "heading": "Veränderung zwischen aufeinanderfolgenden Snapshots",
+    "vmCount": "VMs",
+    "poweredOnVms": "Eingeschaltete VMs",
+    "hostCount": "Hosts",
+    "clusterCount": "Cluster",
+    "vcpuAllocated": "vCPU zugewiesen",
+    "vramAllocated": "vRAM zugewiesen (GiB)",
+    "totalStorage": "Speicher (GiB)"
+  },
+  "tooltip": {
+    "date": "Erfassungsdatum: {{date}}",
+    "meta": "{{vcenter}} / RVTools {{version}}"
+  }
+}

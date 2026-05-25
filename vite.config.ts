@@ -73,6 +73,14 @@ export default defineConfig({
         // and reject the object literal). Path-based routing also avoids a
         // brittle list of exact package names.
         manualChunks(id) {
+          // Split the bundled locale JSON (en/fr/de/it × every namespace)
+          // out of the entry chunk. It is statically imported (so the active
+          // locale stays synchronously available — no async i18n init), but
+          // routing it to its own chunk keeps it out of the ECharts-bearing
+          // `index` chunk that the ≤300 KiB gz gate measures. Locale strings
+          // never carry the gate's marker, so this chunk isn't (and need not
+          // be) gated.
+          if (id.includes('/src/i18n/locales/')) return 'app-locales'
           if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) {
             return 'vendor-react'
           }

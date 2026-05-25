@@ -1,0 +1,51 @@
+{
+  "sections": {
+    "summary": "Bestandsübersicht",
+    "clusters": "Cluster",
+    "os": "Betriebssysteme",
+    "cpuReady": "CPU Ready"
+  },
+  "accountingMode": {
+    "label": "Berechnungsmodus",
+    "configured": "Konfiguriert",
+    "active": "Aktiv",
+    "storageRealistic": "Speicher-realistisch",
+    "echo": "({{mode}})",
+    "describe": {
+      "configured": "Alle VMs einschließlich ausgeschalteter (vCPU/vRAM).",
+      "active": "Nur eingeschaltete VMs.",
+      "storageRealistic": "Eingeschaltet für CPU/RAM, alle VMs für bereitgestellten Speicher."
+    }
+  },
+  "stats": {
+    "clusters": "Cluster",
+    "esx": "ESX",
+    "vms": "VMs",
+    "datastores": "Datastores",
+    "vcpu": "vCPU",
+    "vram": "vRAM",
+    "storage": "Speicher",
+    "physicalGhz": "Physische GHz",
+    "consumedGhz": "Verbrauchte GHz",
+    "cpuPct": "CPU %",
+    "ramPct": "RAM %",
+    "vcpuPerCore": "vCPU pro physischem Kern",
+    "cpuReadyMean": "CPU Ready (Mittel)",
+    "cpuReadyMax": "CPU Ready (max)",
+    "vmsAboveReady": "VMs > 5 % CPU Ready"
+  },
+  "os": {
+    "windows": "Windows",
+    "linux": "Linux",
+    "other": "Andere"
+  },
+  "states": {
+    "emptyHeading": "Kein Snapshot geladen",
+    "emptyBody": "Legen Sie einen RVTools-.xlsx-Export in der Seitenleiste ab, um das Bestands-Dashboard zu sehen.",
+    "loading": "Bestand wird aggregiert…",
+    "error": "Dieser Snapshot konnte nicht aggregiert werden: {{message}}. Legen Sie die Arbeitsmappe erneut in der Seitenleiste ab."
+  },
+  "cpuReadyNotReported": "nicht gemeldet",
+  "datastoreNotPerCluster": "nicht pro Cluster verfügbar",
+  "capturedAt": "Erfasst am {{date}}"
+}

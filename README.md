@@ -20,7 +20,7 @@ vatlas is the broader sibling of [vsizer](https://github.com/fjacquet/vsizer): s
 
 ## Stack
 
-React 19 · TypeScript (strict) · Vite 8 · Tailwind v4 · Zustand 5 · Zod 4 · react-i18next (FR + EN) · SheetJS (`xlsx@0.20.3` from the official CDN tarball, **not** the CVE-affected npm package) · Apache ECharts 6 (SVG renderer, tree-shaken) · pptxgenjs 4 · Biome · Vitest. Pure-function `engines/`, an inputs-only Zustand store, and a single `useEstateView` hook bridging store → UI/exports. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full picture.
+React 19 · TypeScript (strict) · Vite 8 · Tailwind v4 · Zustand 5 · Zod 4 · react-i18next (FR · EN · DE · IT) · SheetJS (`xlsx@0.20.3` from the official CDN tarball, **not** the CVE-affected npm package) · Apache ECharts 6 (SVG renderer, tree-shaken) · pptxgenjs 4 · Biome · Vitest. Pure-function `engines/`, an inputs-only Zustand store, and a single `useEstateView` hook bridging store → UI/exports. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full picture.
 
 ## Quick start
 

@@ -11,7 +11,7 @@ vatlas is a 100% client-side React 19 + Vite 8 single-page application. It inges
 graph TD
   subgraph Boot["Boot (src/main.tsx)"]
     FG[privacy/fetchGuard.ts<br/>throws on non-same-origin]
-    I18N[i18n/index.ts<br/>FR + EN, react-i18next]
+    I18N[i18n/index.ts<br/>FR · EN · DE · IT, react-i18next]
   end
 
   UZ[UploadZone] --> USU[useSnapshotUpload hook]

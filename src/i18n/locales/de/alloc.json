@@ -1,0 +1,53 @@
+{
+  "title": "Zuweisungsverhältnisse",
+  "cpu": {
+    "label": "CPU-Verhältnis (vCPU pro physischem Kern)"
+  },
+  "ram": {
+    "label": "RAM-Überbelegung"
+  },
+  "preset": {
+    "1to1": "1:1",
+    "4to1": "4:1",
+    "8to1": "8:1",
+    "vdi10to1": "VDI 10:1"
+  },
+  "echo": "CPU {{cpu}} · RAM {{ram}}",
+  "planned": {
+    "heading": "Kapazitätsplanung — Was-wäre-wenn",
+    "presetGroup": "Voreinstellungen für geplantes Verhältnis",
+    "cpuLabel": "Geplantes CPU-Verhältnis (vCPU : pCPU)",
+    "ramLabel": "Geplantes RAM-Verhältnis",
+    "echo": "Geplante Sicht — wendet {{cpu}} CPU / {{ram}} RAM an. Nicht der gemessene Wert.",
+    "measuredCaption": "Gemessenes Verhältnis — aus diesem Snapshot berechnet (siehe Dashboard › Betriebseinblicke).",
+    "drSlotHeading": "DR-Simulation — Was-wäre-wenn",
+    "drSlotPending": "Das überarbeitete DR-Simulationspanel erscheint in einem folgenden Plan auf dieser Oberfläche.",
+    "emptyHeading": "Kein Snapshot geladen",
+    "emptyBody": "Laden Sie einen vCenter-Snapshot aus der Seitenleiste, um die Kapazitätsplanungs-Sicht zu nutzen."
+  },
+  "plannedEstate": {
+    "title": "Geplanter vs. gemessener Bestand",
+    "none": "—",
+    "vmMeasured": "VMs gemessen",
+    "vmPlanned": "VMs geplant",
+    "vcpuMeasured": "vCPU:pCPU gemessen",
+    "vcpuPlanned": "vCPU:pCPU geplant",
+    "clusterDelta": "Delta pro Cluster",
+    "colCluster": "Cluster",
+    "colMeasured": "Gemessen",
+    "colPlanned": "Geplant",
+    "headroomTitle": "vCPU-Reserve — gemessen vs. geplant",
+    "capMeasured": "vCPU-Kapazität (gemessen)",
+    "capPlanned": "vCPU-Kapazität (geplant)",
+    "vcpuDemand": "vCPU zugewiesen (Bedarf)",
+    "ramCapMeasured": "vRAM-Kapazität (gemessen)",
+    "ramCapPlanned": "vRAM-Kapazität (geplant)",
+    "ramDemand": "vRAM zugewiesen (Bedarf)",
+    "headroom": "Reserve",
+    "seriesCapacity": "Kapazität",
+    "seriesDemand": "Zugewiesen",
+    "catMeasured": "Gemessen",
+    "catPlanned": "Geplant",
+    "axisCores": "Kerne"
+  }
+}

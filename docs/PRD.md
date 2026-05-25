@@ -65,7 +65,7 @@ Requirement IDs are the canonical IDs from `.planning/REQUIREMENTS.md`. Each are
 
 ### 4.1 Foundation, Parser, Units & Privacy — Phase 1 (Shipped 2026-05-15)
 
-- **FND-01..05:** 100% client-side at a public URL; drag-and-drop zone for one or more `.xlsx` files; full FR/EN i18n with auto-detect then toggle; light/dark theme; visible workbook capture-date indicator.
+- **FND-01..05:** 100% client-side at a public URL; drag-and-drop zone for one or more `.xlsx` files; full FR/EN/DE/IT i18n with auto-detect then toggle; light/dark theme; visible workbook capture-date indicator.
 - **PAR-01..05:** Parsing in a Web Worker without blocking the UI; clear error naming a missing sheet/column on schema mismatch; RVTools 3.10/3.11/4.0/4.4 column-drift resolved via an alias dictionary; memory/storage fields preserved as MiB (no `* 1.048576`); refresh confirms data is gone.
 - **PRV-01..03:** No non-same-origin request after load (runtime guard throws); CSP meta `connect-src 'self'`; no telemetry/analytics SDKs (denied at CI).
 

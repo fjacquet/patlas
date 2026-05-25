@@ -1,0 +1,131 @@
+{
+  "title": {
+    "identity": "{{clusters}} Cluster · {{hosts}} Hosts · {{vms}} VMs · erfasst am {{captureDate}}",
+    "generated": "Erstellt von vatlas — faktische Bestandssynthese"
+  },
+  "overview": {
+    "title": "Bestandsübersicht",
+    "vms": "VMs",
+    "hosts": "Hosts",
+    "clusters": "Cluster",
+    "vcpuPerPcpu": "vCPU : pCPU",
+    "os": "OS-Familie",
+    "cpu": "Mittlere CPU %",
+    "mem": "Mittlerer RAM %",
+    "avgCpu": "Durchschn. CPU %",
+    "avgMem": "Durchschn. RAM %",
+    "cores": "Physische Kerne",
+    "hostMem": "Host-Arbeitsspeicher",
+    "provisioned": "Bereitgestellt",
+    "inUse": "Belegt"
+  },
+  "cluster": {
+    "stretched": "Stretched",
+    "drReserved": "DR-reserviert",
+    "hostsWord": "Hosts",
+    "vmsWord": "VMs",
+    "coresWord": "Kerne",
+    "ramWord": "RAM",
+    "readyLine": "CPU Ready: {{mean}} % Mittel · {{max}} % max · {{count}} VM(s) > {{thr}} %",
+    "readyUnavailable": "CPU Ready: nicht verfügbar (Quelle: RVTools)",
+    "cpuMean": "CPU Mittel",
+    "ramMean": "RAM Mittel",
+    "ghzUsedPhys": "GHz genutzt / phys.",
+    "mhzPerVcpu": "real pro zugewiesenem vCPU",
+    "vcpuPerPcpu": "vCPU pro physischem Kern",
+    "min": "Min",
+    "mean": "Mittel",
+    "max": "Max",
+    "cpuTitle": "CPU — mittlere Auslastung",
+    "ramTitle": "RAM — mittlere Auslastung",
+    "consumedOf": "verbraucht von",
+    "keyFigures": "KENNZAHLEN",
+    "vcpuAlloc": "vCPU zugewiesen",
+    "reservedCap": "Reservierte Kapazität (vCPU × Takt)",
+    "consumedGhz": "GHz verbraucht",
+    "availableGhz": "GHz verfügbar",
+    "ramAvailable": "RAM verfügbar",
+    "footer": "Quelle: RVTools — vHost (CPU/RAM-Auslastung %, Speed × Cores, Memory) + vInfo (vCPUs, Memory)"
+  },
+  "eos": {
+    "title": "Prognose zum OS-Support-Ende",
+    "overdue": "Überfällig",
+    "le3": "≤ 3 Mon.",
+    "le6": "≤ 6 Mon.",
+    "le9": "≤ 9 Mon.",
+    "le12": "≤ 12 Mon.",
+    "unknown": "Unbekannt",
+    "byBucket": "Nach Support-Fenster"
+  },
+  "dr": {
+    "title": "DR-Simulation",
+    "none": "Kein DR-Szenario ausgewählt.",
+    "cpuRemovedCores": "Phys. Kerne entfernt",
+    "ramRemovedMib": "Phys. RAM entfernt (GiB)",
+    "survivors": "Überlebende Cluster",
+    "beforeAfter": "Physische Kapazität vorher / nachher"
+  },
+  "trends": {
+    "title": "Trends in der Sitzung",
+    "points": "Zeitachsenpunkte",
+    "deltas": "Deltas",
+    "series": "VM-Anzahl über Snapshots"
+  },
+  "inventory": {
+    "title": "Inventarübersicht",
+    "vms": "VM-Zeilen",
+    "hosts": "Hosts",
+    "clusters": "Cluster",
+    "datastores": "Datastores",
+    "os": "OS-Familie"
+  },
+  "contention": {
+    "title": "CPU Ready (Anhang)"
+  },
+  "storage": {
+    "title": "Speicher",
+    "byCluster": "Speicher nach Cluster",
+    "provisioned": "Bereitgestellt",
+    "inUse": "Belegt",
+    "capacity": "Kapazität",
+    "flagged": "Markierte Datastores",
+    "colCluster": "Cluster",
+    "colProvisioned": "Bereitgestellt",
+    "colInUse": "Belegt",
+    "vsanShared": "Über {{n}} Cluster geteilt"
+  },
+  "network": {
+    "title": "Netzwerk",
+    "vswitches": "vSwitches",
+    "dvswitches": "dvSwitches",
+    "portgroups": "Portgruppen",
+    "vnetwork": "VM-Adjazenzen",
+    "absent": "Optionale Blätter vNetwork / vSwitch / dvSwitch / dvPort sind in diesem RVTools-Export nicht vorhanden — keine Netzwerktopologie zu berichten."
+  },
+  "os": {
+    "title": "Betriebssysteme",
+    "windows": "Windows",
+    "linux": "Linux",
+    "other": "Andere"
+  },
+  "planned": {
+    "title": "Geplanter vs. gemessener Bestand",
+    "none": "—",
+    "vcpuMeasured": "vCPU:pCPU gemessen",
+    "vcpuPlanned": "vCPU:pCPU geplant",
+    "vmMeasured": "VMs gemessen",
+    "vmPlanned": "VMs geplant",
+    "clusterDelta": "Delta pro Cluster",
+    "colCluster": "Cluster",
+    "colMeasured": "Gemessen",
+    "colPlanned": "Geplant",
+    "capMeasured": "vCPU-Kapazität (gemessen)",
+    "capPlanned": "vCPU-Kapazität (geplant)",
+    "vcpuDemand": "vCPU zugewiesen (Bedarf)",
+    "headroomPlanned": "vCPU-Reserve (geplant)",
+    "ramCapMeasured": "vRAM-Kapazität (gemessen)",
+    "ramCapPlanned": "vRAM-Kapazität (geplant)",
+    "ramDemand": "vRAM zugewiesen (Bedarf)",
+    "ramHeadroomPlanned": "vRAM-Reserve (geplant)"
+  }
+}

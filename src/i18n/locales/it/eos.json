@@ -1,0 +1,31 @@
+{
+  "heading": "Previsione di fine supporto degli OS",
+  "asOf": "Previsione calcolata al {{today}}",
+  "verified": "Catalogo EOS verificato: {{date}}",
+  "stale": "Il catalogo potrebbe essere obsoleto",
+  "bucket": {
+    "overdue": "Scaduto",
+    "w3": "Entro 3 mesi",
+    "w6": "Entro 6 mesi",
+    "w9": "Entro 9 mesi",
+    "w12": "Entro 12 mesi",
+    "unknown": "OS sconosciuto"
+  },
+  "drill": "Mostra entità {{label}} ({{count}})",
+  "reconcile": "{{total}} entità — {{bucketed}} raggruppate",
+  "split": "VM: {{vms}} · Host ESXi: {{hosts}}",
+  "unknownHeading": "Stringhe OS non riconosciute",
+  "occurrences": "{{count}} occorrenze",
+  "esxiHeading": "Host ESXi",
+  "col": {
+    "vmName": "VM",
+    "cluster": "Cluster",
+    "host": "Host",
+    "os": "OS",
+    "eolFrom": "Fine supporto",
+    "esxVersion": "Versione ESXi",
+    "major": "Versione principale",
+    "majorEol": "Fine supporto",
+    "patchEol": "Fine supporto patch"
+  }
+}

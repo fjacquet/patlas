@@ -1,0 +1,18 @@
+{
+  "config": {
+    "heading": "Schwellenwerte",
+    "fs": "Dateisystem belegt %",
+    "ds": "Datastore belegt %",
+    "lu": "LU belegt %",
+    "echo": "Dateisystem ≥ {{fs}} % · Datastore > {{ds}} % · LU > {{lu}} %"
+  },
+  "fs": {
+    "count": "{{count}} Partitionen ≥ {{pct}} % belegt"
+  },
+  "ds": {
+    "count": "{{count}} Datastores > {{pct}} % belegt"
+  },
+  "lu": {
+    "count": "{{count}} logische Einheiten > {{pct}} % belegt"
+  }
+}

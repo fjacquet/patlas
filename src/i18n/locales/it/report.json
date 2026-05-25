@@ -1,0 +1,47 @@
+{
+  "action": {
+    "html": "Esporta HTML",
+    "pptx": "Esporta PPTX",
+    "ariaHtml": "Esporta il report del parco come file HTML autonomo",
+    "ariaPptx": "Esporta il report del parco come presentazione PPTX"
+  },
+  "toast": {
+    "progress": "Generazione del report…",
+    "success": "Report pronto — {{filename}}",
+    "error": "L'esportazione non è stata completata. I dati sono invariati — apri la console del browser per i dettagli, poi riprova."
+  },
+  "footer": {
+    "methodology": "Generato da vatlas — sintesi fattuale del parco. Fonte: export RVTools, acquisito il {{captureDate}}. I numeri riflettono solo lo snapshot attivo."
+  },
+  "storage": {
+    "title": "Storage",
+    "byCluster": "Storage per cluster",
+    "provisioned": "Provisionato (GiB)",
+    "inUse": "In uso (GiB)",
+    "capacity": "Capacità (GiB)",
+    "flagged": "Datastore segnalati",
+    "colCluster": "Cluster",
+    "colProvisioned": "Provisionato",
+    "colInUse": "In uso",
+    "vsanShared": "Condiviso su {{n}} cluster"
+  },
+  "network": {
+    "title": "Rete",
+    "vswitches": "vSwitches",
+    "dvswitches": "dvSwitches",
+    "portgroups": "Gruppi di porte",
+    "vnetwork": "Adiacenze VM"
+  },
+  "planned": {
+    "title": "Parco pianificato vs misurato",
+    "none": "—",
+    "vcpuMeasured": "vCPU:pCPU misurato",
+    "vcpuPlanned": "vCPU:pCPU pianificato",
+    "vmMeasured": "VM misurate",
+    "vmPlanned": "VM pianificate",
+    "clusterDelta": "Delta per cluster",
+    "colCluster": "Cluster",
+    "colMeasured": "Misurato",
+    "colPlanned": "Pianificato"
+  }
+}

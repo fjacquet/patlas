@@ -1,0 +1,38 @@
+{
+  "dropzone": {
+    "instruction": "Trascina i tuoi export RVTools",
+    "or": "o",
+    "browse": "sfoglia i tuoi file",
+    "accepted": "Formato accettato: .xlsx (export RVTools). Trascina uno o più file.",
+    "active": "Trascina i file qui"
+  },
+  "fileLoaded": {
+    "ariaLabel": "File caricato",
+    "remove": "Rimuovi"
+  },
+  "source": {
+    "rvtools": "RVTools",
+    "unknown": "Sconosciuto"
+  },
+  "sources": {
+    "list": {
+      "title": "Cartelle di lavoro importate"
+    },
+    "summary": "{{n}} file · {{vms}} VM · {{hosts}} host",
+    "rowCounts": "{{vms}} VM · {{hosts}} host"
+  },
+  "errors": {
+    "rejected": "Formato non riconosciuto. Trascina un export RVTools .xlsx.",
+    "parseFailed": "Impossibile leggere il file: {{message}}"
+  },
+  "snapshots": {
+    "list": "Snapshot caricati",
+    "empty": "Nessuno snapshot — trascina una cartella di lavoro",
+    "card": {
+      "vCenterLabel": "vCenter",
+      "capturedAt": "Acquisito",
+      "rvtoolsVersion": "RVTools",
+      "rows": "{{vms}} VM · {{hosts}} ESX · {{clusters}} cluster · {{datastores}} datastore"
+    }
+  }
+}

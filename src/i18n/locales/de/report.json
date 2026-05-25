@@ -1,0 +1,47 @@
+{
+  "action": {
+    "html": "HTML-Export",
+    "pptx": "PPTX-Export",
+    "ariaHtml": "Bestandsbericht als eigenständige HTML-Datei exportieren",
+    "ariaPptx": "Bestandsbericht als PPTX-Präsentation exportieren"
+  },
+  "toast": {
+    "progress": "Bericht wird erstellt…",
+    "success": "Bericht fertig — {{filename}}",
+    "error": "Der Export wurde nicht abgeschlossen. Die Daten sind unverändert — öffnen Sie die Browser-Konsole für Details und versuchen Sie es erneut."
+  },
+  "footer": {
+    "methodology": "Erstellt von vatlas — faktische Bestandssynthese. Quelle: RVTools-Export, erfasst am {{captureDate}}. Die Zahlen beziehen sich nur auf den aktiven Snapshot."
+  },
+  "storage": {
+    "title": "Speicher",
+    "byCluster": "Speicher nach Cluster",
+    "provisioned": "Bereitgestellt (GiB)",
+    "inUse": "Belegt (GiB)",
+    "capacity": "Kapazität (GiB)",
+    "flagged": "Markierte Datastores",
+    "colCluster": "Cluster",
+    "colProvisioned": "Bereitgestellt",
+    "colInUse": "Belegt",
+    "vsanShared": "Über {{n}} Cluster geteilt"
+  },
+  "network": {
+    "title": "Netzwerk",
+    "vswitches": "vSwitches",
+    "dvswitches": "dvSwitches",
+    "portgroups": "Portgruppen",
+    "vnetwork": "VM-Adjazenzen"
+  },
+  "planned": {
+    "title": "Geplanter vs. gemessener Bestand",
+    "none": "—",
+    "vcpuMeasured": "vCPU:pCPU gemessen",
+    "vcpuPlanned": "vCPU:pCPU geplant",
+    "vmMeasured": "VMs gemessen",
+    "vmPlanned": "VMs geplant",
+    "clusterDelta": "Delta pro Cluster",
+    "colCluster": "Cluster",
+    "colMeasured": "Gemessen",
+    "colPlanned": "Geplant"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "empty": {
+    "unavailable": "Inventario di rete non disponibile in questo export."
+  },
+  "section": {
+    "vswitch": "Switch standard (vSwitch)",
+    "dvswitch": "Switch distribuiti (dvSwitch)",
+    "vnetwork": "Gruppi di porte VM (vNetwork)"
+  },
+  "detail": {
+    "back": "Indietro",
+    "title": "ESX — {{name}}",
+    "datastores": "Datastore montati",
+    "datastoresNote": "I nomi dei datastore per host non sono in RVTools (vDatastore Hosts è un conteggio).",
+    "vswitches": "Switch standard",
+    "dvswitches": "Switch distribuiti",
+    "uplinks": "Uplink",
+    "cluster": "Cluster",
+    "esxVersion": "Versione ESXi"
+  },
+  "na": "—"
+}
