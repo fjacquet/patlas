@@ -1,0 +1,46 @@
+{
+  "heading": "Dimensionierung",
+  "subtitle": "Konfiguriert vs. genutzt",
+  "empty": {
+    "heading": "Keine Nutzungsdaten",
+    "body": "Dieser Export enthält keine vMemory/vCPU-Blätter, daher sind Auslastung und Ballooning nicht ableitbar."
+  },
+  "basis": {
+    "single": "einzelner Snapshot",
+    "max": "max über {{count}} Snapshots"
+  },
+  "poweredOnOnly": "nur eingeschaltete VMs",
+  "notDerivable": "— = nicht ableitbar",
+  "category": {
+    "oversized": "Zuweisung ≫ Nutzung",
+    "undersized": "Nutzung nahe Zuweisung",
+    "stressed": "Ballooning / CPU-ready"
+  },
+  "filter": {
+    "label": "Filter",
+    "all": "Alle",
+    "oversized": "Zuweisung ≫ Nutzung",
+    "undersized": "Nutzung nahe Zuweisung",
+    "stressed": "Druck"
+  },
+  "thresholds": {
+    "heading": "Schwellenwerte (bei Aktualisierung zurückgesetzt)",
+    "cpuOversize": "CPU-Überdimensionierung ≤ %",
+    "memOversize": "RAM-Überdimensionierung ≤ %",
+    "cpuUndersize": "CPU-Unterdimensionierung ≥ %",
+    "memUndersize": "RAM-Unterdimensionierung ≥ %",
+    "balloon": "Balloon > MiB",
+    "swap": "Ausgelagert > MiB"
+  },
+  "chart": {
+    "title": "Anzahl nach Kategorie und Ressource",
+    "labels": {
+      "cpuOver": "CPU über",
+      "memOver": "RAM über",
+      "cpuUnder": "CPU unter",
+      "memUnder": "RAM unter",
+      "memStress": "RAM-Druck",
+      "cpuReady": "CPU ready"
+    }
+  }
+}

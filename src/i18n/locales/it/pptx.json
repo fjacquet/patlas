@@ -1,0 +1,131 @@
+{
+  "title": {
+    "identity": "{{clusters}} cluster · {{hosts}} host · {{vms}} VM · acquisito il {{captureDate}}",
+    "generated": "Generato da vatlas — sintesi fattuale del parco"
+  },
+  "overview": {
+    "title": "Panoramica del parco",
+    "vms": "VM",
+    "hosts": "Host",
+    "clusters": "Cluster",
+    "vcpuPerPcpu": "vCPU : pCPU",
+    "os": "Famiglia OS",
+    "cpu": "CPU media %",
+    "mem": "Memoria media %",
+    "avgCpu": "CPU media %",
+    "avgMem": "Memoria media %",
+    "cores": "Core fisici",
+    "hostMem": "Memoria host",
+    "provisioned": "Provisionato",
+    "inUse": "In uso"
+  },
+  "cluster": {
+    "stretched": "Stretched",
+    "drReserved": "Riservato DR",
+    "hostsWord": "host",
+    "vmsWord": "VM",
+    "coresWord": "core",
+    "ramWord": "RAM",
+    "readyLine": "CPU Ready: {{mean}}% media · {{max}}% max · {{count}} VM > {{thr}}%",
+    "readyUnavailable": "CPU Ready: non disponibile (fonte: RVTools)",
+    "cpuMean": "CPU media",
+    "ramMean": "RAM media",
+    "ghzUsedPhys": "GHz usati / fis.",
+    "mhzPerVcpu": "reali per vCPU allocata",
+    "vcpuPerPcpu": "vCPU per core fisico",
+    "min": "Min",
+    "mean": "Media",
+    "max": "Max",
+    "cpuTitle": "CPU — utilizzo medio",
+    "ramTitle": "RAM — utilizzo medio",
+    "consumedOf": "consumati su",
+    "keyFigures": "DATI CHIAVE",
+    "vcpuAlloc": "vCPU allocate",
+    "reservedCap": "Capacità riservata (vCPU × clock)",
+    "consumedGhz": "GHz consumati",
+    "availableGhz": "GHz disponibili",
+    "ramAvailable": "RAM disponibile",
+    "footer": "Fonte: RVTools — vHost (utilizzo CPU/RAM %, Speed × Cores, Memory) + vInfo (vCPUs, Memory)"
+  },
+  "eos": {
+    "title": "Previsione di fine supporto degli OS",
+    "overdue": "Scaduto",
+    "le3": "≤ 3 mesi",
+    "le6": "≤ 6 mesi",
+    "le9": "≤ 9 mesi",
+    "le12": "≤ 12 mesi",
+    "unknown": "Sconosciuto",
+    "byBucket": "Per finestra di supporto"
+  },
+  "dr": {
+    "title": "Simulazione DR",
+    "none": "Nessuno scenario DR selezionato.",
+    "cpuRemovedCores": "Core fis. rimossi",
+    "ramRemovedMib": "RAM fis. rimossa (GiB)",
+    "survivors": "Cluster superstiti",
+    "beforeAfter": "Capacità fisica prima / dopo"
+  },
+  "trends": {
+    "title": "Andamenti nella sessione",
+    "points": "Punti della cronologia",
+    "deltas": "Delta",
+    "series": "Numero di VM tra gli snapshot"
+  },
+  "inventory": {
+    "title": "Riepilogo dell'inventario",
+    "vms": "Righe VM",
+    "hosts": "Host",
+    "clusters": "Cluster",
+    "datastores": "Datastore",
+    "os": "Famiglia OS"
+  },
+  "contention": {
+    "title": "CPU Ready (allegato)"
+  },
+  "storage": {
+    "title": "Storage",
+    "byCluster": "Storage per cluster",
+    "provisioned": "Provisionato",
+    "inUse": "In uso",
+    "capacity": "Capacità",
+    "flagged": "Datastore segnalati",
+    "colCluster": "Cluster",
+    "colProvisioned": "Provisionato",
+    "colInUse": "In uso",
+    "vsanShared": "Condiviso su {{n}} cluster"
+  },
+  "network": {
+    "title": "Rete",
+    "vswitches": "vSwitches",
+    "dvswitches": "dvSwitches",
+    "portgroups": "Gruppi di porte",
+    "vnetwork": "Adiacenze VM",
+    "absent": "I fogli opzionali vNetwork / vSwitch / dvSwitch / dvPort non sono presenti in questo export RVTools — nessuna topologia di rete da riportare."
+  },
+  "os": {
+    "title": "Sistemi operativi",
+    "windows": "Windows",
+    "linux": "Linux",
+    "other": "Altro"
+  },
+  "planned": {
+    "title": "Parco pianificato vs misurato",
+    "none": "—",
+    "vcpuMeasured": "vCPU:pCPU misurato",
+    "vcpuPlanned": "vCPU:pCPU pianificato",
+    "vmMeasured": "VM misurate",
+    "vmPlanned": "VM pianificate",
+    "clusterDelta": "Delta per cluster",
+    "colCluster": "Cluster",
+    "colMeasured": "Misurato",
+    "colPlanned": "Pianificato",
+    "capMeasured": "Capacità vCPU (misurata)",
+    "capPlanned": "Capacità vCPU (pianificata)",
+    "vcpuDemand": "vCPU allocate (domanda)",
+    "headroomPlanned": "Margine vCPU (pianificato)",
+    "ramCapMeasured": "Capacità vRAM (misurata)",
+    "ramCapPlanned": "Capacità vRAM (pianificata)",
+    "ramDemand": "vRAM allocata (domanda)",
+    "ramHeadroomPlanned": "Margine vRAM (pianificato)"
+  }
+}
