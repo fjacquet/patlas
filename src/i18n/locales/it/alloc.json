@@ -1,0 +1,53 @@
+{
+  "title": "Rapporti di allocazione",
+  "cpu": {
+    "label": "Rapporto CPU (vCPU per core fisico)"
+  },
+  "ram": {
+    "label": "Sovrallocazione RAM"
+  },
+  "preset": {
+    "1to1": "1:1",
+    "4to1": "4:1",
+    "8to1": "8:1",
+    "vdi10to1": "VDI 10:1"
+  },
+  "echo": "CPU {{cpu}} · RAM {{ram}}",
+  "planned": {
+    "heading": "Pianificazione della capacità — ipotesi",
+    "presetGroup": "Preset del rapporto pianificato",
+    "cpuLabel": "Rapporto CPU pianificato (vCPU : pCPU)",
+    "ramLabel": "Rapporto RAM pianificato",
+    "echo": "Vista pianificata — applica {{cpu}} CPU / {{ram}} RAM. Non è il valore misurato.",
+    "measuredCaption": "Rapporto misurato — calcolato da questo snapshot (vedi Dashboard › Approfondimenti operativi).",
+    "drSlotHeading": "Simulazione DR — ipotesi",
+    "drSlotPending": "Il pannello di simulazione DR rielaborato arriverà su questa superficie in un piano successivo.",
+    "emptyHeading": "Nessuno snapshot caricato",
+    "emptyBody": "Carica uno snapshot vCenter dalla barra laterale per usare la vista di pianificazione della capacità."
+  },
+  "plannedEstate": {
+    "title": "Parco pianificato vs misurato",
+    "none": "—",
+    "vmMeasured": "VM misurate",
+    "vmPlanned": "VM pianificate",
+    "vcpuMeasured": "vCPU:pCPU misurato",
+    "vcpuPlanned": "vCPU:pCPU pianificato",
+    "clusterDelta": "Delta per cluster",
+    "colCluster": "Cluster",
+    "colMeasured": "Misurato",
+    "colPlanned": "Pianificato",
+    "headroomTitle": "Margine vCPU — misurato vs pianificato",
+    "capMeasured": "Capacità vCPU (misurata)",
+    "capPlanned": "Capacità vCPU (pianificata)",
+    "vcpuDemand": "vCPU allocate (domanda)",
+    "ramCapMeasured": "Capacità vRAM (misurata)",
+    "ramCapPlanned": "Capacità vRAM (pianificata)",
+    "ramDemand": "vRAM allocata (domanda)",
+    "headroom": "Margine",
+    "seriesCapacity": "Capacità",
+    "seriesDemand": "Allocato",
+    "catMeasured": "Misurato",
+    "catPlanned": "Pianificato",
+    "axisCores": "Core"
+  }
+}

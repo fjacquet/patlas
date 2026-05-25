@@ -1,0 +1,18 @@
+{
+  "pill": {
+    "label": "Gedehnt / Stretched",
+    "group": "Stretched-Cluster"
+  },
+  "site": {
+    "a": "Standort A",
+    "b": "Standort B"
+  },
+  "reservation": "Reservierung",
+  "siteData": {
+    "detected": "Standortdaten: erkannt",
+    "assumed": "symmetrische Aufteilung angenommen (keine Standortdaten)"
+  },
+  "stretched": {
+    "estateCount": "{{count}} Cluster als Stretched markiert"
+  }
+}
