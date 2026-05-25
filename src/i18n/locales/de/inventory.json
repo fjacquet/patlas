@@ -1,0 +1,103 @@
+{
+  "nav": {
+    "label": "Ansicht",
+    "dashboard": "Dashboard",
+    "inventory": "Inventar",
+    "hosts": "Hosts",
+    "planning": "Planung",
+    "eos": "OS-Support-Ende",
+    "trends": "Trends",
+    "storage": "Speicher",
+    "network": "Netzwerk",
+    "rightsizing": "Dimensionierung",
+    "monstervm": "Monster-VMs"
+  },
+  "tab": {
+    "label": "Objekttyp",
+    "vm": "VMs",
+    "esx": "ESX-Hosts",
+    "datastore": "Datastores"
+  },
+  "tree": {
+    "label": "Inventarbaum",
+    "root": "vCenter",
+    "empty": "Kein Snapshot geladen",
+    "emptyBody": "Laden Sie einen vCenter-Snapshot aus der Seitenleiste, um das Inventar zu durchsuchen.",
+    "loading": "Inventar wird geladen…",
+    "error": "Snapshot konnte nicht analysiert werden. Laden Sie den Snapshot neu oder wählen Sie einen anderen aus der Seitenleiste."
+  },
+  "scope": {
+    "all": "Alle Objekte",
+    "active": "Beschränkt auf {{node}}"
+  },
+  "filter": {
+    "placeholder": "Nach Name, OS, Host filtern…",
+    "clear": "Filter löschen"
+  },
+  "columns": {
+    "button": "Spalten",
+    "label": "Spalten ein-/ausblenden",
+    "reset": "Zurücksetzen"
+  },
+  "export": {
+    "csv": "CSV-Export"
+  },
+  "rows": {
+    "count": "{{count}} Zeilen"
+  },
+  "table": {
+    "empty": "Keine {{object}} in diesem Snapshot.",
+    "emptyFiltered": "Keine {{object}} entsprechen dem aktuellen Filter."
+  },
+  "col": {
+    "vmName": "VM",
+    "cluster": "Cluster",
+    "host": "Host",
+    "vcpu": "vCPU",
+    "vramMib": "vRAM (MiB)",
+    "vramGib": "vRAM (GiB)",
+    "cpuUtilPct": "CPU-Auslastung %",
+    "memActivePct": "Aktiv %",
+    "memConsumedPct": "Verbraucht %",
+    "balloonedMib": "Balloon (MiB)",
+    "swappedMib": "Ausgelagert (MiB)",
+    "cpuReadinessPercent": "CPU Ready %",
+    "flags": "Markierungen",
+    "os": "OS",
+    "poweredOn": "Eingeschaltet",
+    "provisionedMib": "Bereitgestellt (MiB)",
+    "hostName": "Host",
+    "sockets": "Sockets",
+    "cores": "Kerne",
+    "speedMhz": "Takt (MHz)",
+    "physicalGhz": "Physische GHz",
+    "memoryMib": "Arbeitsspeicher (MiB)",
+    "vmCount": "VMs",
+    "vcpuAllocated": "vCPU zugewiesen",
+    "vramAllocatedMib": "vRAM zugewiesen (MiB)",
+    "cpuRatio": "CPU %",
+    "ramRatio": "RAM %",
+    "meanCpuReadinessPercent": "CPU Ready Mittel %",
+    "maxCpuReadinessPercent": "CPU Ready max %",
+    "vmsAboveReadinessWarning": "VMs > 5 % CPU Ready",
+    "key": "Datastore-Schlüssel",
+    "name": "Name",
+    "type": "Typ",
+    "capacityMib": "Kapazität (MiB)",
+    "freeMib": "Frei (MiB)",
+    "usedMib": "Belegt (MiB)",
+    "usedRatio": "Belegt %",
+    "overProvisionRatio": "Überprovisionierungs-Verhältnis",
+    "sharedDuplicateCount": "Geteilte Kopien",
+    "eolFrom": "Support-Ende",
+    "switch": "Switch",
+    "ports": "Ports",
+    "freePorts": "Freie Ports",
+    "mtu": "MTU",
+    "version": "Version",
+    "hostMembers": "Host-Mitglieder",
+    "vms": "VMs",
+    "maxMtu": "Max. MTU",
+    "network": "Portgruppe"
+  }
+}

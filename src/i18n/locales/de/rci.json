@@ -1,0 +1,56 @@
+{
+  "hosts": {
+    "title": "Hosts",
+    "rollup": {
+      "title": "Bestands-Hosts",
+      "hosts": "Hosts",
+      "cores": "Physische Kerne",
+      "memMib": "Host-Arbeitsspeicher (MiB)",
+      "avgCpu": "Durchschn. CPU %",
+      "avgMem": "Durchschn. RAM %",
+      "poweredOnVms": "Eingeschaltete VMs"
+    },
+    "col": {
+      "host": "Host",
+      "cluster": "Cluster",
+      "cores": "Kerne",
+      "memMib": "Arbeitsspeicher (MiB)",
+      "cpuPct": "CPU %",
+      "ramPct": "RAM %",
+      "poweredOnVms": "Eingeschaltete VMs",
+      "esxVersion": "ESXi-Version",
+      "faultDomain": "Fehlerdomäne",
+      "model": "Modell",
+      "vendor": "Hersteller"
+    }
+  },
+  "insights": {
+    "title": "Betriebseinblicke",
+    "overcommit": "vCPU : pCPU",
+    "avgCpu": "Durchschn. CPU %",
+    "avgMem": "Durchschn. RAM %",
+    "powerState": "Energiestatus",
+    "provisioned": "Bereitgestellt (MiB)",
+    "inUse": "Belegt (MiB)",
+    "footprint": "Datastore-Belegung (MiB)",
+    "guestData": "Gastdaten (MiB)",
+    "totalCores": "Physische Kerne gesamt",
+    "totalMem": "Host-Arbeitsspeicher gesamt (MiB)",
+    "power": {
+      "on": "{{count}} eingeschaltet",
+      "off": "{{count}} ausgeschaltet",
+      "suspended": "{{count}} angehalten",
+      "template": "{{count}} Vorlagen"
+    }
+  },
+  "detail": {
+    "title": "Cluster-Details",
+    "back": "Zurück zum Dashboard",
+    "groups": {
+      "capacity": "Kapazität",
+      "utilization": "Auslastung",
+      "powerSite": "Energie & Standort"
+    }
+  },
+  "na": "—"
+}

@@ -1,0 +1,51 @@
+{
+  "sections": {
+    "summary": "Riepilogo del parco",
+    "clusters": "Cluster",
+    "os": "Sistemi operativi",
+    "cpuReady": "CPU Ready"
+  },
+  "accountingMode": {
+    "label": "Modalità di conteggio",
+    "configured": "Configurato",
+    "active": "Attivo",
+    "storageRealistic": "Storage realistico",
+    "echo": "({{mode}})",
+    "describe": {
+      "configured": "Tutte le VM comprese quelle spente (vCPU/vRAM).",
+      "active": "Solo VM accese.",
+      "storageRealistic": "Accese per CPU/RAM, tutte le VM per lo storage provisionato."
+    }
+  },
+  "stats": {
+    "clusters": "Cluster",
+    "esx": "ESX",
+    "vms": "VM",
+    "datastores": "Datastore",
+    "vcpu": "vCPU",
+    "vram": "vRAM",
+    "storage": "Storage",
+    "physicalGhz": "GHz fisici",
+    "consumedGhz": "GHz consumati",
+    "cpuPct": "CPU %",
+    "ramPct": "RAM %",
+    "vcpuPerCore": "vCPU per core fisico",
+    "cpuReadyMean": "CPU Ready (media)",
+    "cpuReadyMax": "CPU Ready (max)",
+    "vmsAboveReady": "VM > 5% CPU Ready"
+  },
+  "os": {
+    "windows": "Windows",
+    "linux": "Linux",
+    "other": "Altro"
+  },
+  "states": {
+    "emptyHeading": "Nessuno snapshot caricato",
+    "emptyBody": "Trascina un export RVTools .xlsx nella barra laterale per vedere la dashboard del parco.",
+    "loading": "Aggregazione del parco…",
+    "error": "Impossibile aggregare questo snapshot: {{message}}. Riprova trascinando di nuovo la cartella di lavoro nella barra laterale."
+  },
+  "cpuReadyNotReported": "non riportato",
+  "datastoreNotPerCluster": "non disponibile per cluster",
+  "capturedAt": "Acquisito il {{date}}"
+}

@@ -1,0 +1,56 @@
+{
+  "hosts": {
+    "title": "Host",
+    "rollup": {
+      "title": "Host del parco",
+      "hosts": "Host",
+      "cores": "Core fisici",
+      "memMib": "Memoria host (MiB)",
+      "avgCpu": "CPU media %",
+      "avgMem": "Memoria media %",
+      "poweredOnVms": "VM accese"
+    },
+    "col": {
+      "host": "Host",
+      "cluster": "Cluster",
+      "cores": "Core",
+      "memMib": "Memoria (MiB)",
+      "cpuPct": "CPU %",
+      "ramPct": "RAM %",
+      "poweredOnVms": "VM accese",
+      "esxVersion": "Versione ESXi",
+      "faultDomain": "Dominio di guasto",
+      "model": "Modello",
+      "vendor": "Produttore"
+    }
+  },
+  "insights": {
+    "title": "Approfondimenti operativi",
+    "overcommit": "vCPU : pCPU",
+    "avgCpu": "CPU media %",
+    "avgMem": "Memoria media %",
+    "powerState": "Stato di alimentazione",
+    "provisioned": "Provisionato (MiB)",
+    "inUse": "In uso (MiB)",
+    "footprint": "Impronta datastore (MiB)",
+    "guestData": "Dati guest (MiB)",
+    "totalCores": "Totale core fisici",
+    "totalMem": "Totale memoria host (MiB)",
+    "power": {
+      "on": "{{count}} accese",
+      "off": "{{count}} spente",
+      "suspended": "{{count}} sospese",
+      "template": "{{count}} modelli"
+    }
+  },
+  "detail": {
+    "title": "Dettaglio cluster",
+    "back": "Torna alla dashboard",
+    "groups": {
+      "capacity": "Capacità",
+      "utilization": "Utilizzo",
+      "powerSite": "Alimentazione e sito"
+    }
+  },
+  "na": "—"
+}
