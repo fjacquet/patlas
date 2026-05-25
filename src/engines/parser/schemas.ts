@@ -7,6 +7,7 @@ import type {
   VHostRow,
   VInfoRow,
   VMetaDataRow,
+  VmUsageRow,
   VNetworkRow,
   VPartitionRow,
   VSwitchRow,
@@ -33,6 +34,18 @@ const CoresSchema = z
   .int()
   .nonnegative()
   .transform((n) => n as Cores)
+// Nullable branded metrics for the vMemory/vCPU usage row — `null` means the
+// cell was absent/blank ("not derivable"; ADR-0012), NEVER coerced to 0.
+const NullableMibSchema = z
+  .number()
+  .nonnegative()
+  .nullable()
+  .transform((n) => (n === null ? null : (n as MiB)))
+const NullableMhzSchema = z
+  .number()
+  .nonnegative()
+  .nullable()
+  .transform((n) => (n === null ? null : (n as MHz)))
 // vHost cores/speed must be strictly positive (a host with 0 cores or 0 MHz
 // is a corrupt row, not inventory) — distinct base schemas, NOT a `.pipe()`
 // over the already-branded schema (a pipe re-declares the input as the brand
@@ -161,4 +174,21 @@ export const VMetaDataRowSchema: z.ZodType<VMetaDataRow> = z.object({
       exportedTimestamp: z.string().nullable(),
     }),
   ),
+})
+
+/**
+ * Per-VM runtime metrics from `vMemory`+`vCPU`. Branded MiB/MHz; every metric
+ * is nullable ("not derivable" when the cell is absent/blank — never 0).
+ * `cluster`/uuid columns are allowed empty (vMemory/vCPU may omit them).
+ */
+export const VmUsageRowSchema: z.ZodType<VmUsageRow> = z.object({
+  vmName: z.string().trim().min(1),
+  cluster: z.string().trim(),
+  vmBiosUuid: z.string().trim(),
+  vmInstanceUuid: z.string().trim(),
+  activeMib: NullableMibSchema,
+  consumedMib: NullableMibSchema,
+  balloonedMib: NullableMibSchema,
+  swappedMib: NullableMibSchema,
+  cpuUsageMhz: NullableMhzSchema,
 })
