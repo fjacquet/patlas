@@ -4,9 +4,11 @@ import type { ParsedSheet, ParsedWorkbook } from '../parseXlsx'
 import { synthesizeOrphanClusters } from '../synthesizeOrphanClusters'
 import {
   adaptRvtools,
+  adaptRvtoolsVCpu,
   adaptRvtoolsVDatastore,
   adaptRvtoolsVHost,
   adaptRvtoolsVInfo,
+  adaptRvtoolsVMemory,
   adaptRvtoolsVMetaData,
   adaptRvtoolsVPartition,
   VINFO_COLS,
@@ -28,6 +30,41 @@ const mkSheet = (name: string, headers: string[], rows: unknown[][]): ParsedShee
 /** Wrap one or more sheets into a `ParsedWorkbook`. */
 const workbook = (...sheets: ParsedSheet[]): ParsedWorkbook => ({
   sheets: new Map(sheets.map((s) => [s.name, s])),
+})
+
+describe('adaptRvtoolsVMemory', () => {
+  it('maps Active/Consumed/Ballooned/Swapped + identity; blank → null; drops Total', () => {
+    const sheet = mkSheet(
+      'vMemory',
+      ['VM', 'Cluster', 'VM Instance UUID', 'Active', 'Consumed', 'Ballooned', 'Swapped'],
+      [
+        ['web01', 'C1', 'i1', 512, 1024, 0, ''],
+        ['Total', '', '', 1, 1, 1, 1],
+      ],
+    )
+    const out = adaptRvtoolsVMemory(sheet)
+    expect(out).toHaveLength(1)
+    expect(out[0]?.activeMib).toBe(512)
+    expect(out[0]?.consumedMib).toBe(1024)
+    expect(out[0]?.balloonedMib).toBe(0)
+    expect(out[0]?.swappedMib).toBeNull()
+    expect(out[0]?.cpuUsageMhz).toBeNull()
+    expect(out[0]?.vmInstanceUuid).toBe('i1')
+  })
+})
+
+describe('adaptRvtoolsVCpu', () => {
+  it('maps Overall Cpu Usage (MHz) + identity', () => {
+    const sheet = mkSheet(
+      'vCPU',
+      ['VM', 'Cluster', 'VM Instance UUID', 'Overall Cpu Usage'],
+      [['web01', 'C1', 'i1', 300]],
+    )
+    const out = adaptRvtoolsVCpu(sheet)
+    expect(out).toHaveLength(1)
+    expect(out[0]?.cpuUsageMhz).toBe(300)
+    expect(out[0]?.activeMib).toBeNull()
+  })
 })
 
 const VINFO_FULL = [
@@ -413,6 +450,19 @@ describe('optional-sheet adapters', () => {
           ['Port', 'Switch', 'VLAN', 'Active Uplink', 'Standby Uplink'],
           [['dvpg-10', 'DVS', '10', 'uplink1', 'uplink2']],
         ),
+        // P-RS: vMemory/vCPU are now also OPTIONAL — include them so
+        // "all optional sheets present ⇒ zero warnings" still holds, and so
+        // the vMemory↔vCPU identity join is exercised end-to-end.
+        mkSheet(
+          'vMemory',
+          ['VM', 'Cluster', 'VM Instance UUID', 'Active', 'Consumed', 'Ballooned', 'Swapped'],
+          [['vm-a', 'C1', 'inst-a', 512, 1024, 0, 0]],
+        ),
+        mkSheet(
+          'vCPU',
+          ['VM', 'Cluster', 'VM Instance UUID', 'Overall Cpu Usage'],
+          [['vm-a', 'C1', 'inst-a', 300]],
+        ),
       ),
     )
     expect(out.vdatastore).toHaveLength(1)
@@ -423,6 +473,10 @@ describe('optional-sheet adapters', () => {
     expect(out.vswitch[0]?.ports).toBe(128)
     expect(out.dvswitch[0]?.maxMtu).toBe(9000)
     expect(out.dvport[0]?.vlan).toBe('10')
+    // vMemory + vCPU joined into one usage row by VM Instance UUID.
+    expect(out.vmUsage).toHaveLength(1)
+    expect(out.vmUsage[0]?.activeMib).toBe(512)
+    expect(out.vmUsage[0]?.cpuUsageMhz).toBe(300)
     expect(out.warnings).toHaveLength(0)
   })
 })

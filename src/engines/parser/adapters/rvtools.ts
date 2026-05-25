@@ -7,6 +7,7 @@ import type {
   VHostRow,
   VInfoRow,
   VMetaDataRow,
+  VmUsageRow,
   VNetworkRow,
   VPartitionRow,
   VPowerState,
@@ -82,6 +83,28 @@ export const VINFO_COLS = {
   // P9 D-09: the `[datastore] vm/vm.vmx` token — the ONLY blank-`Cluster
   // name` datastore→cluster identity path. Empty when absent (factual).
   path: ['path'],
+} as const
+
+// ── P-RS: OPTIONAL vMemory/vCPU runtime-metric sheets ──────────────────────
+// Exact-normalized match, MiB-suffix drift (… MiB before … MB), longest
+// spelling first — the rvtools.ts convention. Identity columns mirror VINFO.
+const VMEMORY_COLS = {
+  vmName: ['vm', 'vm name', 'name'],
+  cluster: ['cluster', 'grappe'],
+  vmBiosUuid: ['vm uuid', 'bios uuid', 'uuid'],
+  vmInstanceUuid: ['vm instance uuid', 'instance uuid'],
+  activeMib: ['active mib', 'active mb', 'active'],
+  consumedMib: ['consumed mib', 'consumed mb', 'consumed'],
+  balloonedMib: ['ballooned mib', 'ballooned mb', 'ballooned', 'balloon'],
+  swappedMib: ['swapped mib', 'swapped mb', 'swapped'],
+} as const
+
+const VCPU_COLS = {
+  vmName: ['vm', 'vm name', 'name'],
+  cluster: ['cluster', 'grappe'],
+  vmBiosUuid: ['vm uuid', 'bios uuid', 'uuid'],
+  vmInstanceUuid: ['vm instance uuid', 'instance uuid'],
+  cpuUsageMhz: ['overall cpu usage', 'cpu usage mhz', 'cpu usage', 'usage mhz'],
 } as const
 
 // ── P9 D-11: OPTIONAL network sheets ───────────────────────────────────────
@@ -220,6 +243,25 @@ const parseReadinessCell = (v: unknown): number | null => {
   return null
 }
 
+/**
+ * Strict nullable numeric cell for vMemory/vCPU metrics. blank / sentinel
+ * (`-`, `N/A`) / Excel error (`#…`) / absent column → `null` ("not derivable",
+ * ADR-0012) — NEVER coerced to 0 ("VM idle"). Mirrors `parseReadinessCell`.
+ */
+const parseUsageCell = (v: unknown): number | null => {
+  if (v == null) return null
+  if (typeof v === 'number') return Number.isFinite(v) ? Math.max(0, v) : null
+  if (typeof v === 'string') {
+    const t = v.trim()
+    if (t === '' || t.startsWith('#')) return null
+    const u = t.toUpperCase()
+    if (u === '-' || u === '--' || u === 'N/A' || u === 'NA') return null
+    const n = Number.parseFloat(t.replace(/[\s']/g, '').replace(/%$/, '').replace(',', '.'))
+    return Number.isFinite(n) ? Math.max(0, n) : null
+  }
+  return null
+}
+
 /** RVTools internal summary rows (`Total`, `Summary`, blank primary id). */
 const isInternalRow = (vmName: string): boolean => vmName === '' || /^total|^summary/i.test(vmName)
 
@@ -262,6 +304,72 @@ export const adaptRvtoolsVInfo = (sheet: ParsedSheet): VInfoRow[] => {
       }
     })
     .filter((r) => !isInternalRow(r.vmName))
+}
+
+/** Identity key for joining vMemory/vCPU rows to a VM (mirrors the merge
+ *  key order: instance uuid → bios uuid → name+cluster). */
+const usageIdentity = (r: {
+  vmInstanceUuid: string
+  vmBiosUuid: string
+  vmName: string
+  cluster: string
+}): string => r.vmInstanceUuid || r.vmBiosUuid || `${r.vmName}::${r.cluster}`
+
+export const adaptRvtoolsVMemory = (sheet: ParsedSheet): VmUsageRow[] => {
+  const cols = mapColumns(sheet.headers, VMEMORY_COLS)
+  return sheet.rows
+    .map((row): VmUsageRow => {
+      const a = parseUsageCell(readCol(row, cols.activeMib))
+      const c = parseUsageCell(readCol(row, cols.consumedMib))
+      const b = parseUsageCell(readCol(row, cols.balloonedMib))
+      const s = parseUsageCell(readCol(row, cols.swappedMib))
+      return {
+        vmName: readString(readCol(row, cols.vmName)),
+        cluster: readString(readCol(row, cols.cluster)),
+        vmBiosUuid: readString(readCol(row, cols.vmBiosUuid)),
+        vmInstanceUuid: readString(readCol(row, cols.vmInstanceUuid)),
+        activeMib: a === null ? null : mib(a),
+        consumedMib: c === null ? null : mib(c),
+        balloonedMib: b === null ? null : mib(b),
+        swappedMib: s === null ? null : mib(s),
+        cpuUsageMhz: null,
+      }
+    })
+    .filter((r) => !isInternalRow(r.vmName))
+}
+
+export const adaptRvtoolsVCpu = (sheet: ParsedSheet): VmUsageRow[] => {
+  const cols = mapColumns(sheet.headers, VCPU_COLS)
+  return sheet.rows
+    .map((row): VmUsageRow => {
+      const u = parseUsageCell(readCol(row, cols.cpuUsageMhz))
+      return {
+        vmName: readString(readCol(row, cols.vmName)),
+        cluster: readString(readCol(row, cols.cluster)),
+        vmBiosUuid: readString(readCol(row, cols.vmBiosUuid)),
+        vmInstanceUuid: readString(readCol(row, cols.vmInstanceUuid)),
+        activeMib: null,
+        consumedMib: null,
+        balloonedMib: null,
+        swappedMib: null,
+        cpuUsageMhz: u === null ? null : mhz(u),
+      }
+    })
+    .filter((r) => !isInternalRow(r.vmName))
+}
+
+/** Union the two optional sheets by VM identity into one usage row per VM.
+ *  vMemory carries the memory metrics; vCPU contributes `cpuUsageMhz`. */
+const mergeUsage = (mem: VmUsageRow[], cpu: VmUsageRow[]): VmUsageRow[] => {
+  const byId = new Map<string, VmUsageRow>()
+  for (const r of mem) byId.set(usageIdentity(r), r)
+  for (const r of cpu) {
+    const id = usageIdentity(r)
+    const prev = byId.get(id)
+    if (prev) prev.cpuUsageMhz = r.cpuUsageMhz
+    else byId.set(id, r)
+  }
+  return [...byId.values()]
 }
 
 export const adaptRvtoolsVHost = (sheet: ParsedSheet): VHostRow[] => {
@@ -448,6 +556,7 @@ export const adaptRvtools = (
   vswitch: VSwitchRow[]
   dvswitch: VDvSwitchRow[]
   dvport: VDvPortRow[]
+  vmUsage: VmUsageRow[]
   vmetadata: VMetaDataRow
   warnings: ParseError[]
 } => {
@@ -537,6 +646,27 @@ export const adaptRvtools = (
     })
   }
 
+  // P-RS: OPTIONAL vMemory/vCPU runtime-metric sheets. Absent ⇒ collected
+  // warning + [] (factual-degrade) — NEVER the REQUIRED-sheet parseError path.
+  // The right-sizing view/slide degrade gracefully when usage data is absent.
+  const vmemSheet = findSheet(workbook, ['vmemory', 'rvtools_tabvmemory'])
+  if (!vmemSheet) {
+    warnings.push({
+      sheet: 'vMemory',
+      kind: 'missing-sheet',
+      message: 'optional sheet vMemory absent — memory utilization/ballooning unavailable',
+    })
+  }
+
+  const vcpuSheet = findSheet(workbook, ['vcpu', 'rvtools_tabvcpu'])
+  if (!vcpuSheet) {
+    warnings.push({
+      sheet: 'vCPU',
+      kind: 'missing-sheet',
+      message: 'optional sheet vCPU absent — CPU utilization unavailable',
+    })
+  }
+
   return {
     // vinfoSheet/vhostSheet are non-null here: parseError() returns `never`.
     vinfo: adaptRvtoolsVInfo(vinfoSheet as ParsedSheet),
@@ -547,6 +677,10 @@ export const adaptRvtools = (
     vswitch: swSheet ? adaptRvtoolsVSwitch(swSheet) : [],
     dvswitch: dvswSheet ? adaptRvtoolsDvSwitch(dvswSheet) : [],
     dvport: dvportSheet ? adaptRvtoolsDvPort(dvportSheet) : [],
+    vmUsage: mergeUsage(
+      vmemSheet ? adaptRvtoolsVMemory(vmemSheet) : [],
+      vcpuSheet ? adaptRvtoolsVCpu(vcpuSheet) : [],
+    ),
     vmetadata: metaSheet ? adaptRvtoolsVMetaData(metaSheet) : { entries: [] },
     warnings,
   }
