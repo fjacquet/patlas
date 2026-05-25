@@ -6,6 +6,7 @@ import type {
   VDvSwitchRow,
   VHostRow,
   VInfoRow,
+  VmUsageRow,
   VNetworkRow,
   VPartitionRow,
   VSwitchRow,
@@ -18,6 +19,7 @@ import {
   VDvSwitchRowSchema,
   VHostRowSchema,
   VInfoRowSchema,
+  VmUsageRowSchema,
   VNetworkRowSchema,
   VPartitionRowSchema,
   VSwitchRowSchema,
@@ -33,6 +35,7 @@ export type SnapshotRows = Pick<
   Snapshot,
   | 'vinfo'
   | 'vhost'
+  | 'vmUsage'
   | 'vdatastore'
   | 'vpartition'
   | 'vnetwork'
@@ -93,6 +96,7 @@ export const parseSnapshot = (
   const vswitch = validate<VSwitchRow>(raw.vswitch, VSwitchRowSchema, 'vSwitch')
   const dvswitch = validate<VDvSwitchRow>(raw.dvswitch, VDvSwitchRowSchema, 'dvSwitch')
   const dvport = validate<VDvPortRow>(raw.dvport, VDvPortRowSchema, 'dvPort')
+  const vmUsage = validate<VmUsageRow>(raw.vmUsage, VmUsageRowSchema, 'vMemory/vCPU')
 
   // ADR-0014: bucket clusterless hosts under per-host synthetic cluster
   // names so the aggregator doesn't drop them. Runs after schema validation
@@ -108,6 +112,7 @@ export const parseSnapshot = (
     ...vswitch.errors,
     ...dvswitch.errors,
     ...dvport.errors,
+    ...vmUsage.errors,
   ]
   const viSdkUuid = bucketed.vinfo.find((r) => r.viSdkUuid)?.viSdkUuid ?? null
 
@@ -115,6 +120,7 @@ export const parseSnapshot = (
     snapshot: {
       vinfo: bucketed.vinfo,
       vhost: bucketed.vhost,
+      vmUsage: vmUsage.rows,
       vdatastore: vdatastore.rows,
       vpartition: vpartition.rows,
       vnetwork: vnetwork.rows,
