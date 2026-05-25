@@ -30,4 +30,4 @@ export type {
   VSwitchRow,
 } from './snapshot'
 export type { VHostRow } from './vhost'
-export type { VInfoRow, VPowerState } from './vinfo'
+export type { VInfoRow, VmUsageRow, VPowerState } from './vinfo'

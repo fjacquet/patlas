@@ -1,7 +1,7 @@
 import type { Bytes, MiB } from '@/engines/units'
 import type { TrendHeadline } from './estate'
 import type { VHostRow } from './vhost'
-import type { VInfoRow } from './vinfo'
+import type { VInfoRow, VmUsageRow } from './vinfo'
 
 /**
  * The aggregated trend facts that SURVIVE when a snapshot's raw rows are
@@ -48,6 +48,10 @@ export interface Snapshot {
   vMetaData: VMetaDataEntry[]
   vinfo: VInfoRow[]
   vhost: VHostRow[]
+  /** Per-VM runtime/perf metrics from `vMemory`+`vCPU` (right-sizing/stress).
+   *  `[]` when both OPTIONAL sheets are absent (factual-degrade). Never
+   *  undefined. */
+  vmUsage: VmUsageRow[]
   vdatastore: VDatastoreRow[]
   vpartition: VPartitionRow[]
   /** RVTools `vNetwork` rows (VM→portgroup). `[]` when the OPTIONAL sheet

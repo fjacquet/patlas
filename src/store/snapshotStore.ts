@@ -183,6 +183,7 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
         ...snap,
         vinfo: [],
         vhost: [],
+        vmUsage: [],
         vdatastore: [],
         vpartition: [],
         vnetwork: [],
