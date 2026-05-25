@@ -3,10 +3,13 @@ import { resolve } from 'node:path'
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { Snapshot } from '@/types/snapshot'
 import {
+  DEFAULT_SIZING_THRESHOLDS,
   DEFAULT_THRESHOLDS,
   selectActiveSnapshot,
   selectHasSnapshots,
+  selectSetSizingThresholds,
   selectSetThresholds,
+  selectSizingThresholds,
   selectThresholds,
   useSnapshotStore,
 } from './snapshotStore'
@@ -206,5 +209,35 @@ describe('snapshotStore', () => {
     expect(moduleSource).not.toMatch(/sessionStorage/)
     expect(moduleSource).not.toMatch(/indexedDB|IndexedDB/)
     expect(moduleSource).not.toMatch(/OPFS|navigator\.storage/)
+  })
+})
+
+describe('P-RS sizingThresholds slice', () => {
+  beforeEach(() => {
+    useSnapshotStore.getState().clearAll()
+  })
+
+  it('defaults to DEFAULT_SIZING_THRESHOLDS', () => {
+    expect(selectSizingThresholds(useSnapshotStore.getState())).toEqual(DEFAULT_SIZING_THRESHOLDS)
+  })
+
+  it('setter REPLACES with a fresh object (Object.is fires)', () => {
+    const before = selectSizingThresholds(useSnapshotStore.getState())
+    selectSetSizingThresholds(useSnapshotStore.getState())({
+      ...DEFAULT_SIZING_THRESHOLDS,
+      cpuOversizePct: 5,
+    })
+    const after = selectSizingThresholds(useSnapshotStore.getState())
+    expect(after).not.toBe(before)
+    expect(after.cpuOversizePct).toBe(5)
+  })
+
+  it('clearAll restores the defaults (refresh == defaults)', () => {
+    selectSetSizingThresholds(useSnapshotStore.getState())({
+      ...DEFAULT_SIZING_THRESHOLDS,
+      memOversizePct: 99,
+    })
+    useSnapshotStore.getState().clearAll()
+    expect(selectSizingThresholds(useSnapshotStore.getState())).toEqual(DEFAULT_SIZING_THRESHOLDS)
   })
 })
