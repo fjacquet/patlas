@@ -574,6 +574,15 @@ export interface OperationalInsights {
   totalHostMemoryMib: MiB
   /** In-guest disk used. `null` when no vPartition data (factual, not 0). */
   guestUsedMib: MiB | null
+  /**
+   * Headline "used storage" — the LiveOptics-comparable figure. Equals
+   * `guestUsedMib` (in-guest used, from vPartition) when guest data is
+   * present, else falls back to `inUseMib` (datastore-committed, incl.
+   * .vswp + snapshots) so it is never blank. NOT a new measurement — a
+   * pick between two already-summed columns (KISS/DRY). The storageByX
+   * treemap / per-datastore rollups deliberately stay on `inUseMib`.
+   */
+  usedStorageMib: MiB
 }
 
 /** P5 per-cluster drill projection (one-screen-fit detail / 1 PPTX slide). */

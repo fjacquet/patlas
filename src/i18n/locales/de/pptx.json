@@ -17,7 +17,7 @@
     "cores": "Physische Kerne",
     "hostMem": "Host-Arbeitsspeicher",
     "provisioned": "Bereitgestellt",
-    "inUse": "Belegt"
+    "usedStorage": "Belegter Speicher"
   },
   "cluster": {
     "stretched": "Stretched",

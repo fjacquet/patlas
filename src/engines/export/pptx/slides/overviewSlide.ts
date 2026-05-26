@@ -70,8 +70,8 @@ export function addOverviewSlide(
         value: pptxMemMib(Number(o.provisionedMib), locale),
       },
       {
-        label: strings['overview.inUse'] ?? 'In use',
-        value: pptxMemMib(Number(o.inUseMib), locale),
+        label: strings['overview.usedStorage'] ?? 'Used storage',
+        value: pptxMemMib(Number(o.usedStorageMib), locale),
       },
     ],
     y2,

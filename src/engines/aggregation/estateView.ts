@@ -226,6 +226,9 @@ export function buildEstateView(
     totalPhysicalCores: cores(s.physicalCores),
     totalHostMemoryMib: mib(s.physicalRamMib),
     guestUsedMib: guest ? guest.consumedMib : null,
+    // Headline used storage: in-guest used when reported, else committed
+    // (`a.inuse`) so it never goes blank (LiveOptics-comparable; D-quick).
+    usedStorageMib: mib(guest ? (guest.consumedMib as number) : a.inuse),
   })
   const operationalInsights = insightsOf(
     {
@@ -378,6 +381,7 @@ const EMPTY_INSIGHTS: OperationalInsights = Object.freeze({
   totalPhysicalCores: cores(0),
   totalHostMemoryMib: mib(0),
   guestUsedMib: null,
+  usedStorageMib: mib(0),
 })
 
 const EMPTY_EOS: EosProjection = Object.freeze({

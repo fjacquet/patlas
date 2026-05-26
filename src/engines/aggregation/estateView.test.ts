@@ -155,6 +155,40 @@ describe('buildEstateView', () => {
     expect(view.globals.datastoreCount).toBe(0)
   })
 
+  it('usedStorageMib falls back to inUseMib (committed) when no vPartition guest data', () => {
+    // Base fixture has vpartition: [] → guestUsedMib null → headline used
+    // storage must NOT go blank; it equals inUseMib (4 VMs × 20_480).
+    const o = buildEstateView(snapshot(), 'active').operationalInsights
+    expect(o.guestUsedMib).toBeNull()
+    expect(o.inUseMib as number).toBe(81_920)
+    expect(o.usedStorageMib as number).toBe(81_920)
+  })
+
+  it('usedStorageMib equals guestUsedMib (in-guest used) when vPartition is present', () => {
+    const snap = snapshot()
+    snap.vpartition = [
+      {
+        vmName: 'on-1',
+        disk: '/',
+        capacityMib: mib(10_000),
+        consumedMib: mib(6_000),
+        freeMib: mib(4_000),
+      },
+      {
+        vmName: 'on-2',
+        disk: '/',
+        capacityMib: mib(5_000),
+        consumedMib: mib(3_000),
+        freeMib: mib(2_000),
+      },
+    ]
+    const o = buildEstateView(snap, 'active').operationalInsights
+    expect(o.guestUsedMib as number).toBe(9_000)
+    // Headline tracks guest used (LiveOptics-comparable), NOT committed.
+    expect(o.usedStorageMib as number).toBe(9_000)
+    expect(o.usedStorageMib as number).not.toBe(o.inUseMib as number)
+  })
+
   it('the three accounting modes produce three DISTINCT global totals (Critical-6)', () => {
     const cfg = buildEstateView(snapshot(), 'configured').globals.vcpuAllocated as number
     const act = buildEstateView(snapshot(), 'active').globals.vcpuAllocated as number
