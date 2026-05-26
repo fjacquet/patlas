@@ -8,7 +8,7 @@ import { fmtGhz, fmtGhzValue, fmtInt, fmtMemMb, fmtPercentValue, fmtRatio } from
  * per-host rollup already happened in the Phase-2 `perEsx` pass). Pure
  * config: zero React, zero `useMemo`, zero `@/engines` import.
  *
- * Default-visible set ≈ 8 columns (`esxDefaultVisible`); the rest
+ * Default-visible set ≈ 11 columns (`esxDefaultVisible`); the rest
  * (speed, vRAM allocated, ratios, CPU-Ready fields) are opt-in via the
  * ColumnPicker. The exported id list is the KISS approach (vs. a
  * `meta.defaultHidden` flag) — the wrapper builds the visibility map from
@@ -116,10 +116,30 @@ export const esxColumns: ColumnDef<EsxAggregate>[] = [
     header: 'inventory.col.vmsAboveReadinessWarning',
     cell: (ctx) => (ctx.row.original.readinessAvailable ? fmtInt(ctx.getValue<number>()) : '—'),
   },
+  {
+    accessorKey: 'serialNumber',
+    id: 'serialNumber',
+    header: 'inventory.col.serialNumber',
+    // Display path shows the em-dash sentinel for an unreported serial; the
+    // CSV export reads the RAW accessor ('') — two-path discipline.
+    cell: (ctx) => ctx.getValue<string>() || '—',
+  },
+  {
+    accessorKey: 'model',
+    id: 'model',
+    header: 'inventory.col.model',
+    cell: (ctx) => ctx.getValue<string>() || '—',
+  },
+  {
+    accessorKey: 'vendor',
+    id: 'vendor',
+    header: 'inventory.col.vendor',
+    cell: (ctx) => ctx.getValue<string>() || '—',
+  },
 ]
 
 /**
- * The ≈8-column default-visible set restored by the ColumnPicker "Reset"
+ * The ≈11-column default-visible set restored by the ColumnPicker "Reset"
  * action. Columns absent from this list (speed, vRAM allocated, ratios,
  * CPU-Ready fields) start hidden and are opt-in. `hostName` is omitted
  * here only because it is never hideable (`enableHiding: false`) — it is
@@ -134,4 +154,7 @@ export const esxDefaultVisible = [
   'memoryMib',
   'vmCount',
   'vcpuAllocated',
+  'serialNumber',
+  'model',
+  'vendor',
 ] as const

@@ -76,6 +76,21 @@ describe('esxColumns (INV-03 — EstateView.hosts verbatim)', () => {
   })
 })
 
+describe('esxColumns — physical identity', () => {
+  it('exposes serialNumber, model and vendor columns', () => {
+    const ids = esxColumns.map((c) => c.id)
+    expect(ids).toContain('serialNumber')
+    expect(ids).toContain('model')
+    expect(ids).toContain('vendor')
+  })
+
+  it('makes all three visible by default', () => {
+    expect(esxDefaultVisible).toContain('serialNumber')
+    expect(esxDefaultVisible).toContain('model')
+    expect(esxDefaultVisible).toContain('vendor')
+  })
+})
+
 describe('datastoreColumns (INV-04 — EstateView.datastores verbatim, scope-agnostic)', () => {
   it('the key (NAA dedupe key) identity column is not hideable', () => {
     const idCol = datastoreColumns.find((c) => c.id === 'key')
