@@ -39,6 +39,7 @@ const host = (): VHostRow => ({
   faultDomain: '',
   model: '',
   vendor: '',
+  serialNumber: '',
   esxVersion: '',
 })
 

@@ -26,6 +26,7 @@ const host = (
   faultDomain: '',
   model: '',
   vendor: '',
+  serialNumber: '',
   esxVersion: '',
   poweredOnVms: 0,
   ...over,

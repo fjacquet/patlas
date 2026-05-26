@@ -39,6 +39,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   faultDomain: '',
   model: '',
   vendor: '',
+  serialNumber: '',
   esxVersion: 'VMware ESXi 8.0.3 build-24674464',
   ...over,
 })

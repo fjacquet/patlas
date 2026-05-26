@@ -229,6 +229,7 @@ describe('synthesizeOrphanClusters integration', () => {
           faultDomain: '',
           model: '',
           vendor: '',
+          serialNumber: '',
           esxVersion: '',
         },
       ],

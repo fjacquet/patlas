@@ -31,6 +31,7 @@ const snapshot = (id: string): Snapshot => ({
       faultDomain: '',
       model: '',
       vendor: '',
+      serialNumber: '',
       esxVersion: '',
     },
   ],

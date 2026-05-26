@@ -33,6 +33,7 @@ const host = (over: Partial<EsxAggregate>): EsxAggregate => ({
   faultDomain: '',
   model: '',
   vendor: '',
+  serialNumber: '',
   esxVersion: '',
   poweredOnVms: 8,
   ...over,

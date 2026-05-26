@@ -57,6 +57,7 @@ const snap = (): Snapshot =>
         faultDomain: '',
         model: '',
         vendor: '',
+        serialNumber: '',
         esxVersion: '',
       },
     ],
