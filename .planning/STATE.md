@@ -120,6 +120,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260517-sdq | Fix 4 CodeRabbit PR#1 review findings: engine purity, EOS month math, fmtDate TZ, STATE.md | 2026-05-17 | 47422e4..6a0c7ec | [260517-sdq-fix-4-coderabbit-pr-1-review-findings-en](./quick/260517-sdq-fix-4-coderabbit-pr-1-review-findings-en/) |
+| 260526-vj0 | Headline "used storage" → in-guest used (LiveOptics parity) + fallback to committed; keep inUseMib for storage treemap | 2026-05-26 | a11d963 | [260526-vj0-used-storage-guest-used-headline-kpi-to-](./quick/260526-vj0-used-storage-guest-used-headline-kpi-to-/) |
 
 ## Deferred Items
 
