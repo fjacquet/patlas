@@ -36,6 +36,10 @@ export interface VHostRow {
   model: string
   /** RVTools `vHost.Vendor` — factual. '' when absent. */
   vendor: string
+  /** RVTools `vHost.Serial number` (≥3.11) with fallback to
+   *  `Service tag (serial #)` — the chassis serial a technician reads to
+   *  physically locate the box. '' when absent. Plain text, no verdict. */
+  serialNumber: string
   /** RVTools `vHost.ESX Version` — factual ESXi version string. '' when
    *  absent. Support-state classification is Phase 7 (EOS), NOT here. */
   esxVersion: string

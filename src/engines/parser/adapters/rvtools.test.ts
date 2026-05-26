@@ -229,6 +229,7 @@ describe('synthesizeOrphanClusters integration', () => {
           faultDomain: '',
           model: '',
           vendor: '',
+          serialNumber: '',
           esxVersion: '',
         },
       ],
@@ -478,6 +479,42 @@ describe('optional-sheet adapters', () => {
     expect(out.vmUsage[0]?.activeMib).toBe(512)
     expect(out.vmUsage[0]?.cpuUsageMhz).toBe(300)
     expect(out.warnings).toHaveLength(0)
+  })
+})
+
+describe('adaptRvtoolsVHost — serial / service tag', () => {
+  it('prefers Serial number over Service tag', () => {
+    const rows = adaptRvtoolsVHost(
+      mkSheet(
+        'vHost',
+        [...VHOST_FULL, 'Serial number', 'Service tag (serial #)'],
+        [[...vhostRow, 'SN-AAA', 'ST-BBB']],
+      ),
+    )
+    expect(rows[0]?.serialNumber).toBe('SN-AAA')
+  })
+
+  it('falls back to Service tag when Serial number is blank', () => {
+    const rows = adaptRvtoolsVHost(
+      mkSheet(
+        'vHost',
+        [...VHOST_FULL, 'Serial number', 'Service tag (serial #)'],
+        [[...vhostRow, '   ', 'ST-BBB']],
+      ),
+    )
+    expect(rows[0]?.serialNumber).toBe('ST-BBB')
+  })
+
+  it('falls back to Service tag on a pre-3.11 export (no Serial number column)', () => {
+    const rows = adaptRvtoolsVHost(
+      mkSheet('vHost', [...VHOST_FULL, 'Service tag (serial #)'], [[...vhostRow, 'ST-CCC']]),
+    )
+    expect(rows[0]?.serialNumber).toBe('ST-CCC')
+  })
+
+  it('is the empty string when neither column is present', () => {
+    const rows = adaptRvtoolsVHost(mkSheet('vHost', VHOST_FULL, [vhostRow]))
+    expect(rows[0]?.serialNumber).toBe('')
   })
 })
 

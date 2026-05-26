@@ -79,6 +79,17 @@
     "datastores": "Datastores",
     "os": "Familles d'OS"
   },
+  "physical": {
+    "title": "Inventaire physique — n° de série / service tag",
+    "hosts": "Hôtes",
+    "withSerial": "Hôtes avec n° de série",
+    "colHost": "Hôte",
+    "colCluster": "Cluster",
+    "colSerial": "N° de série / Service tag",
+    "colModel": "Modèle",
+    "colVendor": "Constructeur",
+    "footer": "Source : RVTools — vHost (Serial number / Service tag, Model, Vendor)"
+  },
   "contention": {
     "title": "CPU Ready (annexe)"
   },

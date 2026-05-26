@@ -16,6 +16,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   faultDomain: '',
   model: '',
   vendor: '',
+  serialNumber: '',
   esxVersion: '',
   ...over,
 })

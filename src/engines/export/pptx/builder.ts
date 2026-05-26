@@ -25,6 +25,7 @@ import { addInventorySlide } from './slides/inventorySlide'
 import { addMonsterSlide } from './slides/monsterSlide'
 import { addNetworkSlide } from './slides/networkSlide'
 import { addOverviewSlide } from './slides/overviewSlide'
+import { addPhysicalInventorySlide } from './slides/physicalInventorySlide'
 import { addPlannedSlide } from './slides/plannedSlide'
 import { addRightSizingSlide } from './slides/rightSizingSlide'
 import { addStorageSlide } from './slides/storageSlide'
@@ -122,6 +123,13 @@ export async function buildPptx(
   if (trends !== null) addTrendsSlide(pptx, trends, png('trendLine'), strings, locale)
 
   addInventorySlide(pptx, view, png('osDonut'), strings, locale)
+
+  // P-HWID: physical inventory (serial / service tag) — conditional: only
+  // when at least one host reports a serial; otherwise omitted (no empty
+  // page). Auto-paginates across slides for large estates.
+  if (view.hosts.some((h) => h.serialNumber !== '')) {
+    addPhysicalInventorySlide(pptx, view.hosts, strings, locale)
+  }
 
   return pptx.write({ outputType: 'arraybuffer' }) as Promise<ArrayBuffer>
 }

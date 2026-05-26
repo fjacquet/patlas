@@ -102,6 +102,7 @@ export const VHostRowSchema: z.ZodType<VHostRow> = z.object({
   faultDomain: z.string().trim(),
   model: z.string().trim(),
   vendor: z.string().trim(),
+  serialNumber: z.string().trim(),
   esxVersion: z.string().trim(),
 })
 

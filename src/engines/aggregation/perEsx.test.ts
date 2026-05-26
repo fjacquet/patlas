@@ -17,6 +17,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   faultDomain: '',
   model: '',
   vendor: '',
+  serialNumber: '',
   esxVersion: '',
   ...over,
 })
@@ -83,5 +84,18 @@ describe('perEsx', () => {
     )
     expect(d.meanCpuReadinessPercent).toBeCloseTo(12)
     expect(d.readinessAvailable).toBe(true)
+  })
+
+  it('carries serialNumber / model / vendor through verbatim', () => {
+    const d = first(
+      perEsx(
+        [host({ serialNumber: 'SN-123', model: 'PowerEdge R640', vendor: 'Dell Inc.' })],
+        [],
+        'configured',
+      ),
+    )
+    expect(d.serialNumber).toBe('SN-123')
+    expect(d.model).toBe('PowerEdge R640')
+    expect(d.vendor).toBe('Dell Inc.')
   })
 })

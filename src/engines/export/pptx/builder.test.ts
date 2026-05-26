@@ -45,6 +45,7 @@ const hostRow = (c: number): VHostRow => ({
   faultDomain: '',
   model: '',
   vendor: '',
+  serialNumber: '',
   esxVersion: '',
 })
 
@@ -164,6 +165,23 @@ describe('buildPptx — golden structural snapshot', () => {
 
     const exNone = buildExportView(a, [a], MODE, TODAY)
     expect(exNone.view.monsters.count).toBe(0)
+    expect(slideCount(await buildPptx(exNone.view, exNone.trends, strings, 'en'))).toBe(14)
+  })
+
+  it('P-HWID: a view with host serials adds exactly one physical-inventory slide', async () => {
+    const a = snap('a', 6, new Date('2026-01-01'))
+    const withSerials: Snapshot = {
+      ...a,
+      vhost: a.vhost.map((h, i) => ({ ...h, serialNumber: `SN-${i}` })),
+    }
+    const ex = buildExportView(withSerials, [withSerials], MODE, TODAY)
+    expect(ex.view.hosts.some((h) => h.serialNumber !== '')).toBe(true)
+    const ab = await buildPptx(ex.view, ex.trends, strings, 'en')
+    expect(slideCount(ab)).toBe(15) // 14 baseline + 1 physical inventory
+
+    // No serials anywhere ⇒ slide omitted (baseline).
+    const exNone = buildExportView(a, [a], MODE, TODAY)
+    expect(exNone.view.hosts.every((h) => h.serialNumber === '')).toBe(true)
     expect(slideCount(await buildPptx(exNone.view, exNone.trends, strings, 'en'))).toBe(14)
   })
 

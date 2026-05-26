@@ -305,6 +305,9 @@ export interface EsxAggregate {
   faultDomain: string
   model: string
   vendor: string
+  /** RVTools chassis serial / service tag (P-HWID; '' when absent). Factual
+   *  physical-identity field for move/replacement prep — NO verdict. */
+  serialNumber: string
   esxVersion: string
   /** Powered-on VM count on this host (P5 Hosts view). */
   poweredOnVms: number
