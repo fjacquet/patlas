@@ -481,6 +481,42 @@ describe('optional-sheet adapters', () => {
   })
 })
 
+describe('adaptRvtoolsVHost — serial / service tag', () => {
+  it('prefers Serial number over Service tag', () => {
+    const rows = adaptRvtoolsVHost(
+      mkSheet(
+        'vHost',
+        [...VHOST_FULL, 'Serial number', 'Service tag (serial #)'],
+        [[...vhostRow, 'SN-AAA', 'ST-BBB']],
+      ),
+    )
+    expect(rows[0]?.serialNumber).toBe('SN-AAA')
+  })
+
+  it('falls back to Service tag when Serial number is blank', () => {
+    const rows = adaptRvtoolsVHost(
+      mkSheet(
+        'vHost',
+        [...VHOST_FULL, 'Serial number', 'Service tag (serial #)'],
+        [[...vhostRow, '   ', 'ST-BBB']],
+      ),
+    )
+    expect(rows[0]?.serialNumber).toBe('ST-BBB')
+  })
+
+  it('falls back to Service tag on a pre-3.11 export (no Serial number column)', () => {
+    const rows = adaptRvtoolsVHost(
+      mkSheet('vHost', [...VHOST_FULL, 'Service tag (serial #)'], [[...vhostRow, 'ST-CCC']]),
+    )
+    expect(rows[0]?.serialNumber).toBe('ST-CCC')
+  })
+
+  it('is the empty string when neither column is present', () => {
+    const rows = adaptRvtoolsVHost(mkSheet('vHost', VHOST_FULL, [vhostRow]))
+    expect(rows[0]?.serialNumber).toBe('')
+  })
+})
+
 describe('cell parsing edge cases', () => {
   it('treats Excel error / sentinel readiness cells as null, not 0', () => {
     const headers = [...VINFO_FULL, 'Overall Cpu Readiness']

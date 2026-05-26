@@ -177,6 +177,11 @@ const VHOST_COLS = {
   // Phase 7). Empty string when absent.
   model: ['model', 'host model'],
   vendor: ['vendor'],
+  // Physical chassis identity for move/replacement prep. Two raw columns so
+  // the normalizer can coalesce per row (Serial number wins, Service tag is
+  // the fallback). Longest/most-specific spelling first.
+  serial: ['serial number', 'serial no', 'serial'],
+  serviceTag: ['service tag (serial #)', 'service tag', 'servicetag'],
   esxVersion: ['esx version', 'esxi version', 'version'],
 } as const
 
@@ -388,6 +393,8 @@ export const adaptRvtoolsVHost = (sheet: ParsedSheet): VHostRow[] => {
         faultDomain: readString(readCol(row, cols.faultDomain)),
         model: readString(readCol(row, cols.model)),
         vendor: readString(readCol(row, cols.vendor)),
+        serialNumber:
+          readString(readCol(row, cols.serial)) || readString(readCol(row, cols.serviceTag)),
         esxVersion: readString(readCol(row, cols.esxVersion)),
       }),
     )
