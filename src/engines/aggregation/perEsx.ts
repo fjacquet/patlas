@@ -55,6 +55,7 @@ export const perEsx = (
       faultDomain: h.faultDomain,
       model: h.model,
       vendor: h.vendor,
+      serialNumber: h.serialNumber,
       esxVersion: h.esxVersion,
       poweredOnVms: allVms.filter((vm) => vm.poweredOn).length,
     }
