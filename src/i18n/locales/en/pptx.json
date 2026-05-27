@@ -17,7 +17,7 @@
     "cores": "Physical cores",
     "hostMem": "Host memory",
     "provisioned": "Provisioned",
-    "inUse": "In use"
+    "usedStorage": "Used storage"
   },
   "cluster": {
     "stretched": "Stretched",

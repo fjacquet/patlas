@@ -17,7 +17,7 @@
     "cores": "Cœurs physiques",
     "hostMem": "Mémoire hôte",
     "provisioned": "Provisionné",
-    "inUse": "Utilisé"
+    "usedStorage": "Stockage utilisé"
   },
   "cluster": {
     "stretched": "Étendu",

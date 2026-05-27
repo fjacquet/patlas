@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import {
   ActivityIcon,
   CpuIcon,
-  FileTextIcon,
   GaugeIcon,
   HardDriveIcon,
   MemoryIcon,
@@ -26,7 +25,6 @@ export interface OperationalInsightsProps {
 export function OperationalInsights({ insights: o }: OperationalInsightsProps) {
   const { t, i18n } = useTranslation('rci')
   const loc = i18n.language
-  const na = t('na')
 
   const tiles: {
     label: string
@@ -68,19 +66,14 @@ export function OperationalInsights({ insights: o }: OperationalInsightsProps) {
       icon: <PackageIcon />,
     },
     {
+      label: t('insights.usedStorage'),
+      value: fmtInt(o.usedStorageMib as number, loc),
+      icon: <HardDriveIcon />,
+    },
+    {
       label: t('insights.inUse'),
       value: fmtInt(o.inUseMib as number, loc),
       icon: <HardDriveIcon />,
-    },
-    {
-      label: t('insights.footprint'),
-      value: fmtInt(o.inUseMib as number, loc),
-      icon: <HardDriveIcon />,
-    },
-    {
-      label: t('insights.guestData'),
-      value: o.guestUsedMib === null ? na : fmtInt(o.guestUsedMib as number, loc),
-      icon: <FileTextIcon />,
     },
     {
       label: t('insights.totalCores'),

@@ -176,7 +176,11 @@ function Report({ view, trends, strings, locale }: RenderReportInput): React.Rea
           value={gib(Number(view.storage.estate.provisionedMib))}
         />
         <Metric
-          label={strings['storage.inUse'] ?? 'In use (GiB)'}
+          label={strings['storage.usedStorage'] ?? 'Used storage (GiB)'}
+          value={gib(Number(view.operationalInsights.usedStorageMib))}
+        />
+        <Metric
+          label={strings['storage.inUse'] ?? 'Committed (GiB)'}
           value={gib(Number(view.storage.estate.inUseMib))}
         />
         <Metric
