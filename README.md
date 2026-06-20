@@ -13,6 +13,8 @@
 [![Code style: Biome](https://img.shields.io/badge/code%20style-biome-60a5fa?logo=biome&logoColor=white)](https://biomejs.dev/)
 [![Client-side only](https://img.shields.io/badge/processing-100%25%20client--side-22c55e)](#privacy-guarantee)
 [![RVTools only](https://img.shields.io/badge/input-RVTools%20.xlsx-0ea5e9)](#vatlas)
+[![CI](https://github.com/fjacquet/vatlas/actions/workflows/ci.yml/badge.svg)](https://github.com/fjacquet/vatlas/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/fjacquet/vatlas?sort=semver)](https://github.com/fjacquet/vatlas/releases/latest)
 
 > Drop one or more RVTools `.xlsx` exports, get a navigable, visual **atlas of your VMware estate** — and a shareable HTML report + PPTX deck. **100 % client-side: your workbook never leaves the browser.**
 
