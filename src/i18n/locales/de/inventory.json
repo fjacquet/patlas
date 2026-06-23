@@ -10,7 +10,8 @@
     "storage": "Speicher",
     "network": "Netzwerk",
     "rightsizing": "Dimensionierung",
-    "monstervm": "Monster-Gäste"
+    "monstervm": "Monster-Gäste",
+    "snapshots": "Snapshot-Wildwuchs"
   },
   "tab": {
     "label": "Objekttyp",

@@ -19,6 +19,7 @@ export type {
 } from './estate'
 export type {
   ParseError,
+  ProxmoxSnapshotRow,
   Snapshot,
   VDatastoreRow,
   VDvPortRow,

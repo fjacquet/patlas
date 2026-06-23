@@ -10,7 +10,8 @@
     "storage": "Storage",
     "network": "Network",
     "rightsizing": "Right-sizing",
-    "monstervm": "Monster Guests"
+    "monstervm": "Monster Guests",
+    "snapshots": "Snapshot Sprawl"
   },
   "tab": {
     "label": "Object type",

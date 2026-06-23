@@ -60,6 +60,7 @@ const snap = (over: Partial<Snapshot> & { id: string }): Snapshot => ({
   vMetaData: [],
   vhost: [host({})],
   vmUsage: [],
+  proxmoxSnapshots: [],
   vinfo: [
     vm({ vmName: 'on-1', poweredOn: true, powerState: 'poweredOn' }),
     vm({ vmName: 'off-1', poweredOn: false, powerState: 'poweredOff' }),

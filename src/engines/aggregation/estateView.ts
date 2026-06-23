@@ -28,6 +28,7 @@ import {
   maxVmUsageAcrossSnapshots,
   type SizingThresholds,
 } from './sizing'
+import { computeSnapshotSprawl } from './snapshotSprawl'
 import { storageByX } from './storageByX'
 import { computeThresholdFlags, DEFAULT_THRESHOLDS, type ThresholdInput } from './thresholdFlags'
 import { relinkBlankClusterDatastores } from './vsanRelink'
@@ -307,6 +308,11 @@ export function buildEstateView(
     opts?.monsterThresholds ?? DEFAULT_MONSTER_THRESHOLDS,
   )
 
+  // Plan 3A snapshot sprawl — same single pass. `today` is the injected
+  // reference clock (no in-engine clock); the engine excludes the Proxmox
+  // 'current' live-state marker.
+  const snapshotSprawl = computeSnapshotSprawl(merged.proxmoxSnapshots, today)
+
   return {
     globals,
     clusters,
@@ -328,6 +334,7 @@ export function buildEstateView(
     flags,
     sizing,
     monsters,
+    snapshotSprawl,
     datastoreDetail,
     vmDetail,
   }
@@ -437,6 +444,14 @@ const EMPTY_MONSTERS = Object.freeze({
   thresholds: DEFAULT_MONSTER_THRESHOLDS,
 })
 
+const EMPTY_SPRAWL = Object.freeze({
+  rows: Object.freeze([]) as never[],
+  count: 0,
+  guestsWithSnapshots: 0,
+  totalSizeMib: 0,
+  oldestAgeDays: null,
+})
+
 /**
  * The valid empty-but-typed view `useEstateView` returns when no snapshot
  * is active. Frozen (modeled on `globals.ts:emptySummary`) so consumers
@@ -463,6 +478,7 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   flags: EMPTY_FLAGS,
   sizing: EMPTY_SIZING,
   monsters: EMPTY_MONSTERS,
+  snapshotSprawl: EMPTY_SPRAWL,
   datastoreDetail: new Map(),
   vmDetail: new Map(),
 })

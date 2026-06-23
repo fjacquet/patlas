@@ -45,3 +45,15 @@ export const STORAGE_COLS = {
 export const CLUSTER_COLS = {
   name: ['name'],
 } as const
+
+export const SNAPSHOT_COLS = {
+  node: ['node'],
+  guestId: ['vm id'],
+  guestName: ['vm name'],
+  guestType: ['vm type'],
+  name: ['snapshot'],
+  parent: ['parent'],
+  date: ['date'],
+  includeRam: ['include ram'],
+  sizeGib: ['size gb'],
+} as const

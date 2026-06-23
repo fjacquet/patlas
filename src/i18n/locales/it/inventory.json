@@ -10,7 +10,8 @@
     "storage": "Storage",
     "network": "Rete",
     "rightsizing": "Dimensionamento",
-    "monstervm": "Ospiti mostruosi"
+    "monstervm": "Ospiti mostruosi",
+    "snapshots": "Proliferazione degli snapshot"
   },
   "tab": {
     "label": "Tipo di oggetto",

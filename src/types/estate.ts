@@ -5,6 +5,7 @@
 import type { MonsterEstate } from '@/engines/aggregation/monsterVm'
 import type { NetworkRollup } from '@/engines/aggregation/network'
 import type { EstateSizing } from '@/engines/aggregation/sizing'
+import type { SnapshotSprawl } from '@/engines/aggregation/snapshotSprawl'
 import type { StorageByX } from '@/engines/aggregation/storageByX'
 import type { ThresholdFlags } from '@/engines/aggregation/thresholdFlags'
 import type { VsanRelinkResult } from '@/engines/aggregation/vsanRelink'
@@ -496,6 +497,11 @@ export interface EstateView {
    * (vCPU/vRAM ≥ user-editable lines). Same single-pass origin;
    * `EMPTY_MONSTERS` in `EMPTY_VIEW`. */
   monsters: MonsterEstate
+  /**
+   * Plan 3A snapshot-sprawl extract — guest checkpoints still held on the
+   * estate (the Proxmox live-state `current` marker excluded). Neutral
+   * measurement; same single-pass origin; `EMPTY_SPRAWL` in `EMPTY_VIEW`. */
+  snapshotSprawl: SnapshotSprawl
   /**
    * P9 LC-4 per-datastore drill projection, keyed by the `naa ?? name`
    * datastore key. Produced in the single `buildEstateView` pass — no

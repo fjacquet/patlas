@@ -1,0 +1,24 @@
+{
+  "heading": "Prolifération des instantanés",
+  "subtitle": "Points de contrôle des invités toujours présents dans l'infrastructure",
+  "empty": {
+    "heading": "Aucun instantané chargé",
+    "body": "Chargez un instantané de cluster pour voir l'inventaire des points de contrôle."
+  },
+  "kpi": {
+    "checkpoints": "Points de contrôle",
+    "guests": "Invités avec des points de contrôle",
+    "totalSizeGib": "Taille totale (Gio)",
+    "oldestDays": "Point de contrôle le plus ancien (jours)"
+  },
+  "none": "Aucun point de contrôle trouvé dans cet instantané.",
+  "col": {
+    "guestName": "Invité",
+    "guestType": "Type",
+    "node": "Nœud",
+    "name": "Nom du point de contrôle",
+    "ageDays": "Âge (jours)",
+    "sizeGib": "Taille (Gio)",
+    "includeRam": "Inclut la RAM"
+  }
+}

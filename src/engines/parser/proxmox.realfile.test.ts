@@ -16,5 +16,10 @@ describe('proxmox real-file integration', () => {
     expect(b.vinfo.some((g) => g.guestType === 'qemu')).toBe(true)
     expect(b.vinfo.some((g) => g.guestType === 'lxc')).toBe(true)
     expect(b.vinfo.every((g) => g.vramMib >= 0)).toBe(true)
+    // Plan 3A: the Snapshots sheet parses; the real report holds only the
+    // per-guest 'current' live-state markers (no real checkpoints).
+    expect(b.proxmoxSnapshots.length).toBeGreaterThan(0)
+    expect(b.proxmoxSnapshots.every((s) => ['qemu', 'lxc'].includes(s.guestType))).toBe(true)
+    expect(b.proxmoxSnapshots.every((s) => s.name.toLowerCase() === 'current')).toBe(true)
   })
 })

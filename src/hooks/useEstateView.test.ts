@@ -18,6 +18,7 @@ const snapshot = (id: string): Snapshot => ({
   viSdkUuid: null,
   vMetaData: [],
   vmUsage: [],
+  proxmoxSnapshots: [],
   vhost: [
     {
       hostName: 'esx-1',

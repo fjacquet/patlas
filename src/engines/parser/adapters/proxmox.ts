@@ -1,10 +1,17 @@
 import { cores, mhz, sockets } from '@/engines/units'
 import { gibToMib } from '@/engines/units/converters'
 import { gib } from '@/engines/units/types'
-import type { ParseError, VDatastoreRow, VHostRow, VInfoRow, VmUsageRow } from '@/types'
+import type {
+  ParseError,
+  ProxmoxSnapshotRow,
+  VDatastoreRow,
+  VHostRow,
+  VInfoRow,
+  VmUsageRow,
+} from '@/types'
 import type { ParsedSheet, ParsedWorkbook } from '../parseXlsx'
 import { findSheet, mapColumns, readCol, readNumber, readString } from './columnMap'
-import { CLUSTER_COLS, GUEST_COLS, NODE_COLS, STORAGE_COLS } from './proxmoxColumns'
+import { CLUSTER_COLS, GUEST_COLS, NODE_COLS, SNAPSHOT_COLS, STORAGE_COLS } from './proxmoxColumns'
 
 export const extractClusterName = (sheet: ParsedSheet | undefined): string => {
   if (!sheet || sheet.rows.length === 0) return ''
@@ -111,6 +118,30 @@ export const adaptProxmoxStorages = (sheet: ParsedSheet | undefined): VDatastore
     .filter((d) => d.name !== '')
 }
 
+export const adaptProxmoxSnapshots = (sheet: ParsedSheet | undefined): ProxmoxSnapshotRow[] => {
+  if (!sheet) return []
+  const cols = mapColumns(sheet.headers, SNAPSHOT_COLS)
+  return sheet.rows
+    .map((row): ProxmoxSnapshotRow => {
+      const dateRaw = readCol(row, cols.date)
+      const dateSerial = typeof dateRaw === 'number' && Number.isFinite(dateRaw) ? dateRaw : null
+      const ram = readString(readCol(row, cols.includeRam)).toLowerCase()
+      return {
+        node: readString(readCol(row, cols.node)),
+        guestId: readString(readCol(row, cols.guestId)),
+        guestName: readString(readCol(row, cols.guestName)),
+        guestType:
+          readString(readCol(row, cols.guestType)).toLowerCase() === 'lxc' ? 'lxc' : 'qemu',
+        name: readString(readCol(row, cols.name)),
+        parent: readString(readCol(row, cols.parent)),
+        dateSerial,
+        includeRam: ram === 'true' || ram === 'yes' || ram === '1',
+        sizeMib: gibToMib(gib(Math.max(0, readNumber(readCol(row, cols.sizeGib))))),
+      }
+    })
+    .filter((s) => s.name !== '')
+}
+
 // `null` when the source cell is blank/absent ("not derivable"; ADR-0012).
 const cellOrNull = (row: Record<string, unknown>, col: string | undefined): number | null => {
   const raw = readCol(row, col)
@@ -179,6 +210,7 @@ export const adaptProxmox = (
   vhost: VHostRow[]
   vdatastore: VDatastoreRow[]
   vmUsage: VmUsageRow[]
+  proxmoxSnapshots: ProxmoxSnapshotRow[]
   clusterName: string
   warnings: ParseError[]
 } => {
@@ -215,11 +247,21 @@ export const adaptProxmox = (
     })
   }
 
+  const snapshotsSheet = findSheet(workbook, ['snapshots'])
+  if (!snapshotsSheet) {
+    warnings.push({
+      sheet: 'Snapshots',
+      kind: 'missing-sheet',
+      message: 'optional sheet Snapshots absent — snapshot sprawl will be empty',
+    })
+  }
+
   return {
     vhost: adaptProxmoxNodes(nodesSheet, clusterName),
     vinfo: adaptProxmoxGuests(vmsSheet, ctSheet, clusterName),
     vdatastore: adaptProxmoxStorages(storageSheet),
     vmUsage: adaptProxmoxUsage(vmsSheet, ctSheet, clusterName),
+    proxmoxSnapshots: adaptProxmoxSnapshots(snapshotsSheet),
     clusterName,
     warnings,
   }

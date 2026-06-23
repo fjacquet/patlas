@@ -17,6 +17,32 @@ export interface ReleasedTrendAggregate {
 }
 
 /**
+ * A guest snapshot row from the Proxmox report `Snapshots` sheet. The report
+ * always emits a per-guest live-state marker (`name === 'current'`,
+ * `parent === 'no-parent'`) which is NOT a checkpoint — the snapshot-sprawl
+ * engine excludes it. `dateSerial` is the raw Excel serial (parseXlsx does
+ * not convert dates); `null` when the cell is blank ("not derivable").
+ */
+export interface ProxmoxSnapshotRow {
+  node: string
+  /** Proxmox VMID (Vm Id). */
+  guestId: string
+  guestName: string
+  /** 'qemu' (KVM VM) or 'lxc' (container), from the report `Vm Type` column. */
+  guestType: 'qemu' | 'lxc'
+  /** The snapshot label; `'current'` for the live-state marker row. */
+  name: string
+  /** Parent snapshot label; `'no-parent'` for a root/marker row. */
+  parent: string
+  /** Excel serial date of creation; `null` when the cell is blank. */
+  dateSerial: number | null
+  /** Whether the snapshot captured guest RAM (Include Ram). */
+  includeRam: boolean
+  /** Snapshot size. `Size GB` reinterpreted as GiB → MiB; 0 when blank. */
+  sizeMib: MiB
+}
+
+/**
  * A single parsed RVTools workbook, normalized to vatlas' canonical shape.
  *
  * The parser worker produces everything except `id` and `parsedAt` — those
@@ -52,6 +78,9 @@ export interface Snapshot {
    *  `[]` when both OPTIONAL sheets are absent (factual-degrade). Never
    *  undefined. */
   vmUsage: VmUsageRow[]
+  /** Proxmox guest snapshots from the report `Snapshots` sheet. `[]` when the
+   *  sheet is absent — never undefined (factual-degrade). */
+  proxmoxSnapshots: ProxmoxSnapshotRow[]
   vdatastore: VDatastoreRow[]
   vpartition: VPartitionRow[]
   /** RVTools `vNetwork` rows (VM→portgroup). `[]` when the OPTIONAL sheet
