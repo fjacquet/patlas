@@ -36,6 +36,12 @@ export {
   type VmSizing,
 } from './sizing'
 export {
+  computeSnapshotSprawl,
+  excelSerialToUnixMs,
+  type SnapshotSprawl,
+  type SnapshotSprawlRow,
+} from './snapshotSprawl'
+export {
   type StorageByX,
   type StorageCapacityGroup,
   type StorageConsumptionGroup,
