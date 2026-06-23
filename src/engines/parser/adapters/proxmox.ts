@@ -1,9 +1,9 @@
 import { cores, mhz, sockets } from '@/engines/units'
 import { gibToMib } from '@/engines/units/converters'
 import { gib } from '@/engines/units/types'
-import type { VDatastoreRow, VHostRow, VInfoRow, VmUsageRow } from '@/types'
-import type { ParsedSheet } from '../parseXlsx'
-import { mapColumns, readCol, readNumber, readString } from './columnMap'
+import type { ParseError, VDatastoreRow, VHostRow, VInfoRow, VmUsageRow } from '@/types'
+import type { ParsedSheet, ParsedWorkbook } from '../parseXlsx'
+import { findSheet, mapColumns, readCol, readNumber, readString } from './columnMap'
 import { CLUSTER_COLS, GUEST_COLS, NODE_COLS, STORAGE_COLS } from './proxmoxColumns'
 
 export const extractClusterName = (sheet: ParsedSheet | undefined): string => {
@@ -149,4 +149,75 @@ export const adaptProxmoxUsage = (
     for (const row of sheet.rows) out.push(mapUsageRow(row, cols, clusterName))
   }
   return out.filter((u) => u.vmName !== '')
+}
+
+/**
+ * Throw a structured fatal `ParseError`. `name === 'ParseError'` is the
+ * discriminator the worker boundary serializes; `sheet`/`kind` ride along
+ * as own properties (mirrors rvtools.ts parseError — NO `cause`, STRIDE T-04-04).
+ */
+const parseError = (message: string, meta: { sheet?: string; kind: ParseError['kind'] }): never => {
+  const e = new Error(message) as Error & {
+    sheet?: string
+    kind?: ParseError['kind']
+  }
+  e.name = 'ParseError'
+  e.sheet = meta.sheet
+  e.kind = meta.kind
+  throw e
+}
+
+/**
+ * Assemble the canonical patlas bundle from a parsed Proxmox workbook.
+ * REQUIRED sheets: Nodes, and at least one of VMs or Containers.
+ * OPTIONAL sheets: Cluster (name defaults to ''), Storages (warning collected).
+ */
+export const adaptProxmox = (
+  workbook: ParsedWorkbook,
+): {
+  vinfo: VInfoRow[]
+  vhost: VHostRow[]
+  vdatastore: VDatastoreRow[]
+  vmUsage: VmUsageRow[]
+  clusterName: string
+  warnings: ParseError[]
+} => {
+  const warnings: ParseError[] = []
+  const clusterName = extractClusterName(findSheet(workbook, ['cluster']))
+
+  const nodesSheet = findSheet(workbook, ['nodes'])
+  if (!nodesSheet) {
+    const present = [...workbook.sheets.keys()].sort().join(', ')
+    return parseError(`missing sheet: Nodes (workbook contained: ${present})`, {
+      sheet: 'Nodes',
+      kind: 'missing-sheet',
+    })
+  }
+
+  const vmsSheet = findSheet(workbook, ['vms'])
+  const ctSheet = findSheet(workbook, ['containers'])
+  if (!vmsSheet && !ctSheet) {
+    return parseError('missing both VMs and Containers sheets — nothing to inventory', {
+      sheet: 'VMs',
+      kind: 'missing-sheet',
+    })
+  }
+
+  const storageSheet = findSheet(workbook, ['storages'])
+  if (!storageSheet) {
+    warnings.push({
+      sheet: 'Storages',
+      kind: 'missing-sheet',
+      message: 'optional sheet Storages absent — storage views will be empty',
+    })
+  }
+
+  return {
+    vhost: adaptProxmoxNodes(nodesSheet, clusterName),
+    vinfo: adaptProxmoxGuests(vmsSheet, ctSheet, clusterName),
+    vdatastore: adaptProxmoxStorages(storageSheet),
+    vmUsage: adaptProxmoxUsage(vmsSheet, ctSheet, clusterName),
+    clusterName,
+    warnings,
+  }
 }

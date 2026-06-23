@@ -1,6 +1,7 @@
 import { cores, mhz, mib, sockets } from '@/engines/units'
 import type { ParsedSheet } from '../parseXlsx'
 import {
+  adaptProxmox,
   adaptProxmoxGuests,
   adaptProxmoxNodes,
   adaptProxmoxStorages,
@@ -185,4 +186,40 @@ it('maps native usage % to vmUsage (null when absent)', () => {
   expect(u.vmName).toBe('web01')
   expect(u.consumedMib).toBe(mib(4096))
   expect(u.cpuUsageMhz).toBeNull()
+})
+
+it('assembles a bundle from a workbook (Nodes + VMs required)', () => {
+  const wb = { sheets: new Map<string, ParsedSheet>() }
+  wb.sheets.set('Cluster', { name: 'Cluster', headers: ['Name'], rows: [{ Name: 'pve-prod' }] })
+  wb.sheets.set('Nodes', {
+    name: 'Nodes',
+    headers: ['Node', 'Cpu Cores', 'Memory Size GB'],
+    rows: [{ Node: 'pve1', 'Cpu Cores': 4, 'Memory Size GB': 24 }],
+  })
+  wb.sheets.set('VMs', {
+    name: 'VMs',
+    headers: ['Name', 'Node', 'Vm Id', 'Cores', 'Sockets', 'Memory Size GB', 'Status'],
+    rows: [
+      {
+        Name: 'web01',
+        Node: 'pve1',
+        'Vm Id': 100,
+        Cores: 2,
+        Sockets: 1,
+        'Memory Size GB': 8,
+        Status: 'running',
+      },
+    ],
+  })
+  const b = adaptProxmox(wb)
+  expect(b.clusterName).toBe('pve-prod')
+  expect(b.vhost).toHaveLength(1)
+  expect(b.vinfo).toHaveLength(1)
+  expect(b.vinfo[0]?.cluster).toBe('pve-prod')
+})
+
+it('throws a ParseError when the Nodes sheet is missing', () => {
+  const wb = { sheets: new Map<string, ParsedSheet>() }
+  wb.sheets.set('VMs', { name: 'VMs', headers: ['Name'], rows: [] })
+  expect(() => adaptProxmox(wb)).toThrow(/Nodes/)
 })
