@@ -15,31 +15,38 @@ interface ParseRequest {
 
 /**
  * Parse a `Report_YYYYMMDD_HHMMSS` filename into a Date.
- * Returns `new Date()` when the pattern is absent or malformed.
+ * Falls back to `mtime` (file last-modified epoch ms) when the pattern is
+ * absent or malformed, or to `new Date()` when `mtime` is not finite.
  */
-const parseCaptureDate = (filename: string): Date => {
+const parseCaptureDate = (filename: string, mtime: number): Date => {
+  const fallback = Number.isFinite(mtime) ? new Date(mtime) : new Date()
   const m = filename.match(/Report_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})/)
-  if (!m) return new Date()
+  if (!m) return fallback
   const [, yr, mo, dy, hh, mm, ss] = m
   const d = new Date(Number(yr), Number(mo) - 1, Number(dy), Number(hh), Number(mm), Number(ss))
-  return Number.isNaN(d.getTime()) ? new Date() : d
+  return Number.isNaN(d.getTime()) ? fallback : d
 }
 
 self.onmessage = (e: MessageEvent<ParseRequest>) => {
   if (e.data.kind !== 'parse') return
   try {
     const u8 = new Uint8Array(e.data.buf)
-    const isZip = u8[0] === 0x50 && u8[1] === 0x4b
-    const { xlsx } = isZip ? extractProxmoxBundle(u8) : { xlsx: u8 }
+    const isZip = u8.byteLength >= 2 && u8[0] === 0x50 && u8[1] === 0x4b
+    let xlsxBytes: Uint8Array = u8
+    if (isZip) {
+      const bundle = extractProxmoxBundle(u8)
+      if (bundle.xlsx) xlsxBytes = bundle.xlsx // Proxmox .zip bundle
+      // else: a bare .xlsx (itself a zip with no inner .xlsx) → parse u8 directly
+    }
 
     // `workbook` (the SheetJS-derived workbook) is scoped to this handler and
     // is NEVER posted back — only the canonical typed rows cross the
     // boundary (Critical-5 / STRIDE T-04-07). It is GC-eligible the moment
     // the handler returns.
-    const workbook = parseXlsx(xlsx)
+    const workbook = parseXlsx(xlsxBytes)
     const bundle = adaptProxmox(workbook)
 
-    const capturedAt = parseCaptureDate(e.data.filename)
+    const capturedAt = parseCaptureDate(e.data.filename, e.data.mtime)
     const vCenterLabel = bundle.clusterName || e.data.filename
 
     // Typed against `Omit<Snapshot, 'id' | 'parsedAt'>` so the compiler
