@@ -63,10 +63,15 @@ describe('vmColumns (INV-02 — bound to projected VmDisplayRow)', () => {
     }
   })
 
-  it('vmColumns has a guestType column with accessorKey guestType', () => {
+  it('vmColumns has a guestType column that localizes qemu/lxc to VM/Container', () => {
     const col = vmColumns.find((c) => c.id === 'guestType')
     expect(col).toBeDefined()
     expect((col as { accessorKey?: string }).accessorKey).toBe('guestType')
+    // the cell must localize the raw kind, not render 'qemu'/'lxc'
+    const cell = (col as { cell?: (ctx: { getValue: <T>() => T }) => string }).cell
+    expect(cell).toBeDefined()
+    expect(cell?.({ getValue: () => 'qemu' as never })).toBe('VM')
+    expect(cell?.({ getValue: () => 'lxc' as never })).toBe('Container')
   })
 })
 
