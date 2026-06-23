@@ -48,6 +48,13 @@ export {
   storageByX,
 } from './storageByX'
 export {
+  type BackupFileRow,
+  computeStorageContentHealth,
+  type StorageContentHealth,
+  type StorageContentTypeGroup,
+  type StorageGroup,
+} from './storageContentHealth'
+export {
   computeThresholdFlags,
   type ThresholdFlags,
   type ThresholdInput,
