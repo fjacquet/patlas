@@ -70,3 +70,41 @@ export const STORAGE_CONTENT_COLS = {
   guestName: ['guest name'],
   creationDate: ['creation date'],
 } as const
+
+export const HA_RESOURCE_COLS = {
+  sid: ['sid'],
+  type: ['type'],
+  state: ['state'],
+  group: ['group'],
+  failback: ['failback'],
+  maxRestart: ['max restart'],
+  maxRelocate: ['max relocate'],
+  comment: ['comment'],
+} as const
+
+export const HA_STATUS_COLS = {
+  id: ['id'],
+  type: ['type'],
+  status: ['status'],
+  node: ['node'],
+  sid: ['sid'],
+  state: ['state'],
+  crmState: ['crm state'],
+  requestState: ['request state'],
+  quorate: ['quorate'],
+} as const
+
+export const BACKUP_JOB_COLS = {
+  id: ['id'],
+  enabled: ['enabled'],
+  all: ['all'],
+  vmId: ['vm id'],
+  mode: ['mode'],
+  storage: ['storage'],
+  startTime: ['start time'],
+  schedule: ['schedule'],
+  dayOfWeek: ['day of week'],
+  compress: ['compress'],
+  type: ['type'],
+  node: ['node'],
+} as const

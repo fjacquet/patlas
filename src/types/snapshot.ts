@@ -42,6 +42,54 @@ export interface ProxmoxSnapshotRow {
   sizeMib: MiB
 }
 
+/** A HA-managed resource row from the `Cluster HA` sheet "Resources" sub-table. */
+export interface ProxmoxHaResourceRow {
+  /** Service id, e.g. "vm:100" / "ct:104". */
+  sid: string
+  type: string
+  state: string
+  group: string
+  failback: string
+  /** Max restart attempts; `null` when blank. */
+  maxRestart: number | null
+  /** Max relocate attempts; `null` when blank. */
+  maxRelocate: number | null
+  comment: string
+}
+
+/** A HA service/status row from the `Cluster HA` sheet "Status" sub-table. */
+export interface ProxmoxHaStatusRow {
+  id: string
+  /** "quorum" | "fencing" | "service" | … */
+  type: string
+  status: string
+  node: string
+  sid: string
+  state: string
+  crmState: string
+  requestState: string
+  /** Raw quorate flag (e.g. "X" / ""); kept as text. */
+  quorate: string
+}
+
+/** A scheduled backup job from the `Cluster` sheet "Backup Jobs" sub-table. */
+export interface ProxmoxBackupJobRow {
+  id: string
+  enabled: boolean
+  /** "All guests" flag. */
+  all: boolean
+  /** Comma-separated VMIDs targeted (empty when `all`). */
+  vmId: string
+  mode: string
+  storage: string
+  startTime: string
+  schedule: string
+  dayOfWeek: string
+  compress: string
+  type: string
+  node: string
+}
+
 /**
  * A storage content row from the Proxmox report `Storage Content` sheet.
  * Each row describes a single file stored in Proxmox storage: VM disk images,
@@ -114,6 +162,12 @@ export interface Snapshot {
   /** Proxmox storage content rows from the report `Storage Content` sheet.
    *  `[]` when the sheet is absent — never undefined (factual-degrade). */
   proxmoxStorageContent: ProxmoxStorageContentRow[]
+  /** Proxmox HA-managed resources (`Cluster HA` → Resources). `[]` when absent. */
+  proxmoxHaResources: ProxmoxHaResourceRow[]
+  /** Proxmox HA service status (`Cluster HA` → Status). `[]` when absent. */
+  proxmoxHaStatus: ProxmoxHaStatusRow[]
+  /** Proxmox scheduled backup jobs (`Cluster` → Backup Jobs). `[]` when absent. */
+  proxmoxBackupJobs: ProxmoxBackupJobRow[]
   vdatastore: VDatastoreRow[]
   vpartition: VPartitionRow[]
   /** RVTools `vNetwork` rows (VM→portgroup). `[]` when the OPTIONAL sheet

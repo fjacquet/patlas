@@ -30,6 +30,9 @@ const snapshot = (content: ProxmoxStorageContentRow[]): Snapshot =>
     dvport: [],
     proxmoxSnapshots: [],
     proxmoxStorageContent: content,
+    proxmoxHaResources: [],
+    proxmoxHaStatus: [],
+    proxmoxBackupJobs: [],
     parseErrors: [],
   }) satisfies Snapshot
 

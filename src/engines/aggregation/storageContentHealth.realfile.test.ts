@@ -38,6 +38,9 @@ describe('storage content health acceptance (real report)', () => {
       dvport: [],
       proxmoxSnapshots: bundle.proxmoxSnapshots,
       proxmoxStorageContent: bundle.proxmoxStorageContent,
+      proxmoxHaResources: bundle.proxmoxHaResources,
+      proxmoxHaStatus: bundle.proxmoxHaStatus,
+      proxmoxBackupJobs: bundle.proxmoxBackupJobs,
       parseErrors: bundle.warnings,
     }
 

@@ -29,6 +29,9 @@ const minimalSnapshot = (snaps: ProxmoxSnapshotRow[]): Snapshot => ({
   dvport: [],
   proxmoxSnapshots: snaps,
   proxmoxStorageContent: [],
+  proxmoxHaResources: [],
+  proxmoxHaStatus: [],
+  proxmoxBackupJobs: [],
   parseErrors: [],
 })
 

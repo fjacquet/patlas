@@ -3,6 +3,9 @@ import { gibToMib } from '@/engines/units/converters'
 import { gib } from '@/engines/units/types'
 import type {
   ParseError,
+  ProxmoxBackupJobRow,
+  ProxmoxHaResourceRow,
+  ProxmoxHaStatusRow,
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
   VDatastoreRow,
@@ -13,13 +16,17 @@ import type {
 import type { ParsedSheet, ParsedWorkbook } from '../parseXlsx'
 import { findSheet, mapColumns, readCol, readNumber, readString } from './columnMap'
 import {
+  BACKUP_JOB_COLS,
   CLUSTER_COLS,
   GUEST_COLS,
+  HA_RESOURCE_COLS,
+  HA_STATUS_COLS,
   NODE_COLS,
   SNAPSHOT_COLS,
   STORAGE_COLS,
   STORAGE_CONTENT_COLS,
 } from './proxmoxColumns'
+import { extractStackedSection } from './stackedSection'
 
 export const extractClusterName = (sheet: ParsedSheet | undefined): string => {
   if (!sheet || sheet.rows.length === 0) return ''
@@ -177,11 +184,82 @@ export const adaptProxmoxStorageContent = (
     .filter((r) => r.fileName !== '')
 }
 
+const readBool = (v: unknown): boolean => {
+  if (typeof v === 'boolean') return v
+  const s = readString(v).toLowerCase()
+  return s === 'true' || s === '1' || s === 'yes'
+}
+
 // `null` when the source cell is blank/absent ("not derivable"; ADR-0012).
 const cellOrNull = (row: Record<string, unknown>, col: string | undefined): number | null => {
   const raw = readCol(row, col)
   if (raw === undefined || raw === null || readString(raw) === '') return null
   return Math.max(0, readNumber(raw))
+}
+
+export const adaptProxmoxHaResources = (sheet: ParsedSheet | undefined): ProxmoxHaResourceRow[] => {
+  if (!sheet) return []
+  const sec = extractStackedSection(sheet.cells, 'Resources')
+  const cols = mapColumns(sec.headers, HA_RESOURCE_COLS)
+  return sec.rows
+    .map(
+      (row): ProxmoxHaResourceRow => ({
+        sid: readString(readCol(row, cols.sid)),
+        type: readString(readCol(row, cols.type)),
+        state: readString(readCol(row, cols.state)),
+        group: readString(readCol(row, cols.group)),
+        failback: readString(readCol(row, cols.failback)),
+        maxRestart: cellOrNull(row, cols.maxRestart),
+        maxRelocate: cellOrNull(row, cols.maxRelocate),
+        comment: readString(readCol(row, cols.comment)),
+      }),
+    )
+    .filter((r) => r.sid !== '')
+}
+
+export const adaptProxmoxHaStatus = (sheet: ParsedSheet | undefined): ProxmoxHaStatusRow[] => {
+  if (!sheet) return []
+  const sec = extractStackedSection(sheet.cells, 'Status')
+  const cols = mapColumns(sec.headers, HA_STATUS_COLS)
+  return sec.rows
+    .map(
+      (row): ProxmoxHaStatusRow => ({
+        id: readString(readCol(row, cols.id)),
+        type: readString(readCol(row, cols.type)),
+        status: readString(readCol(row, cols.status)),
+        node: readString(readCol(row, cols.node)),
+        sid: readString(readCol(row, cols.sid)),
+        state: readString(readCol(row, cols.state)),
+        crmState: readString(readCol(row, cols.crmState)),
+        requestState: readString(readCol(row, cols.requestState)),
+        quorate: readString(readCol(row, cols.quorate)),
+      }),
+    )
+    .filter((r) => r.id !== '' || r.type !== '')
+}
+
+export const adaptProxmoxBackupJobs = (sheet: ParsedSheet | undefined): ProxmoxBackupJobRow[] => {
+  if (!sheet) return []
+  const sec = extractStackedSection(sheet.cells, 'Backup Jobs')
+  const cols = mapColumns(sec.headers, BACKUP_JOB_COLS)
+  return sec.rows
+    .map(
+      (row): ProxmoxBackupJobRow => ({
+        id: readString(readCol(row, cols.id)),
+        enabled: readBool(readCol(row, cols.enabled)),
+        all: readBool(readCol(row, cols.all)),
+        vmId: readString(readCol(row, cols.vmId)),
+        mode: readString(readCol(row, cols.mode)),
+        storage: readString(readCol(row, cols.storage)),
+        startTime: readString(readCol(row, cols.startTime)),
+        schedule: readString(readCol(row, cols.schedule)),
+        dayOfWeek: readString(readCol(row, cols.dayOfWeek)),
+        compress: readString(readCol(row, cols.compress)),
+        type: readString(readCol(row, cols.type)),
+        node: readString(readCol(row, cols.node)),
+      }),
+    )
+    .filter((r) => r.id !== '')
 }
 
 const mapUsageRow = (
@@ -247,6 +325,9 @@ export const adaptProxmox = (
   vmUsage: VmUsageRow[]
   proxmoxSnapshots: ProxmoxSnapshotRow[]
   proxmoxStorageContent: ProxmoxStorageContentRow[]
+  proxmoxHaResources: ProxmoxHaResourceRow[]
+  proxmoxHaStatus: ProxmoxHaStatusRow[]
+  proxmoxBackupJobs: ProxmoxBackupJobRow[]
   clusterName: string
   warnings: ParseError[]
 } => {
@@ -254,7 +335,8 @@ export const adaptProxmox = (
   // Standalone Proxmox has no cluster name; a non-empty bucket keeps the estate
   // visible (aggregateClusters drops empty-cluster hosts). Matches design decision
   // D4: cluster pivot = Proxmox cluster name; standalone ⇒ single implicit bucket.
-  const clusterName = extractClusterName(findSheet(workbook, ['cluster'])) || 'proxmox'
+  const clusterSheet = findSheet(workbook, ['cluster'])
+  const clusterName = extractClusterName(clusterSheet) || 'proxmox'
 
   const nodesSheet = findSheet(workbook, ['nodes'])
   if (!nodesSheet) {
@@ -301,6 +383,8 @@ export const adaptProxmox = (
     })
   }
 
+  const clusterHaSheet = findSheet(workbook, ['cluster ha'])
+
   return {
     vhost: adaptProxmoxNodes(nodesSheet, clusterName),
     vinfo: adaptProxmoxGuests(vmsSheet, ctSheet, clusterName),
@@ -308,6 +392,9 @@ export const adaptProxmox = (
     vmUsage: adaptProxmoxUsage(vmsSheet, ctSheet, clusterName),
     proxmoxSnapshots: adaptProxmoxSnapshots(snapshotsSheet),
     proxmoxStorageContent: adaptProxmoxStorageContent(storageContentSheet),
+    proxmoxHaResources: adaptProxmoxHaResources(clusterHaSheet),
+    proxmoxHaStatus: adaptProxmoxHaStatus(clusterHaSheet),
+    proxmoxBackupJobs: adaptProxmoxBackupJobs(clusterSheet),
     clusterName,
     warnings,
   }

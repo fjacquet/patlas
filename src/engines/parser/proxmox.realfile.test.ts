@@ -25,5 +25,10 @@ describe('proxmox real-file integration', () => {
     expect(b.proxmoxStorageContent.length).toBeGreaterThan(0)
     expect(b.proxmoxStorageContent.some((r) => r.content === 'images')).toBe(true)
     expect(b.proxmoxStorageContent.every((r) => r.fileName !== '')).toBe(true)
+    // Plan 3C: HA status parses (the fixture has quorum + fencing service
+    // rows); HA resources and backup jobs are empty in this single-node lab.
+    expect(b.proxmoxHaStatus.some((s) => s.type === 'quorum')).toBe(true)
+    expect(Array.isArray(b.proxmoxHaResources)).toBe(true)
+    expect(Array.isArray(b.proxmoxBackupJobs)).toBe(true)
   })
 })

@@ -20,6 +20,9 @@ const snapshot = (id: string): Snapshot => ({
   vmUsage: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
+  proxmoxHaResources: [],
+  proxmoxHaStatus: [],
+  proxmoxBackupJobs: [],
   vhost: [
     {
       hostName: 'esx-1',
