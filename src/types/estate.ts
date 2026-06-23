@@ -2,6 +2,7 @@
 // aggregation engines — no runtime coupling, no cycle (the engines import
 // their input types from here; these are produced in the single
 // `buildEstateView` pass and surfaced on `EstateView`).
+import type { ClusterHealth } from '@/engines/aggregation/clusterHealth'
 import type { MonsterEstate } from '@/engines/aggregation/monsterVm'
 import type { NetworkRollup } from '@/engines/aggregation/network'
 import type { EstateSizing } from '@/engines/aggregation/sizing'
@@ -508,6 +509,12 @@ export interface EstateView {
    * and by storage, plus a backup-file inventory. Neutral measurement; same
    * single-pass origin; `EMPTY_STORAGE_CONTENT` in `EMPTY_VIEW`. */
   storageContent: StorageContentHealth
+  /**
+   * Plan 3C cluster HA & backup jobs — Proxmox HA service status (quorum/
+   * fencing), HA-managed resources, and scheduled backup jobs. Neutral
+   * measurement; same single-pass origin; `EMPTY_CLUSTER_HEALTH` in
+   * `EMPTY_VIEW`. */
+  clusterHealth: ClusterHealth
   /**
    * P9 LC-4 per-datastore drill projection, keyed by the `naa ?? name`
    * datastore key. Produced in the single `buildEstateView` pass — no
