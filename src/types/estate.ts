@@ -296,6 +296,8 @@ export interface VmDisplayRow {
   os: string
   poweredOn: boolean
   provisionedMib: MiB
+  /** Proxmox guest kind, surfaced for inventory segmentation. */
+  guestType: 'qemu' | 'lxc'
 }
 
 /** Per-OsFamily counts (DSH-04). `other` is always present (even at 0). */

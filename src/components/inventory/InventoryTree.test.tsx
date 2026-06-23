@@ -40,6 +40,7 @@ const vm = (
   os: 'Ubuntu Linux',
   poweredOn: true,
   provisionedMib: mib(40960),
+  guestType: 'qemu',
   ...over,
 })
 
