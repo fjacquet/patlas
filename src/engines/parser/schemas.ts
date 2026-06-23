@@ -87,6 +87,9 @@ export const VInfoRowSchema: z.ZodType<VInfoRow> = z.object({
   // exports. Do NOT `.min(1)`: that would drop legitimate path-less rows
   // (the P5 Powerstate/Template precedent).
   path: z.string().trim(),
+  // Proxmox guest kind — optional so RVTools rows (which never carry it)
+  // still validate. Hardened to required when the RVTools adapter is removed.
+  guestType: z.enum(['qemu', 'lxc']).optional(),
 })
 
 export const VHostRowSchema: z.ZodType<VHostRow> = z.object({
