@@ -8,6 +8,7 @@ import {
   gib,
   type MHz,
   type MiB,
+  mib,
   type TiB,
   tib,
 } from './types'
@@ -17,6 +18,7 @@ import {
 // 1_000_000). RVTools "MB" is already base-2 MiB — see ADR-0010.
 
 export const mibToGib = (n: MiB): GiB => gib(n / MIB_PER_GIB)
+export const gibToMib = (n: GiB): MiB => mib(n * MIB_PER_GIB)
 export const gibToTib = (n: GiB): TiB => tib(n / GIB_PER_TIB)
 export const mibToTib = (n: MiB): TiB => tib(n / (MIB_PER_GIB * GIB_PER_TIB))
 export const mibToBytes = (n: MiB): Bytes => bytes(n * BYTES_PER_MIB)
