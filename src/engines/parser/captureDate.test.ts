@@ -13,6 +13,7 @@ const withMetaData = (rows: { Property: string; Value: string }[]): ParsedWorkbo
         name: 'vMetaData',
         headers: ['Property', 'Value'],
         rows: rows as unknown as Record<string, unknown>[],
+        cells: [],
       },
     ],
   ]),
@@ -28,13 +29,14 @@ const withColumnarMetaData = (
         name: 'vMetaData',
         headers: ['RVTools major version', 'RVTools version', 'xlsx creation datetime', 'Server'],
         rows: rows as unknown as Record<string, unknown>[],
+        cells: [],
       },
     ],
   ]),
 })
 
 const withVInfoHeaders = (headers: string[]): ParsedWorkbook => ({
-  sheets: new Map([['vInfo', { name: 'vInfo', headers, rows: [] }]]),
+  sheets: new Map([['vInfo', { name: 'vInfo', headers, rows: [], cells: [] }]]),
 })
 
 const MTIME = 1_700_000_000_000 // 2023-11-14T22:13:20Z

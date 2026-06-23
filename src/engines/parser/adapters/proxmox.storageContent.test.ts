@@ -19,6 +19,7 @@ const sheet = (rows: Record<string, unknown>[]): ParsedSheet => ({
     'Parent',
   ],
   rows,
+  cells: [],
 })
 
 describe('adaptProxmoxStorageContent', () => {
