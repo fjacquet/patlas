@@ -1,6 +1,12 @@
 import { cores, mhz, mib, sockets } from '@/engines/units'
 import type { ParsedSheet } from '../parseXlsx'
-import { adaptProxmoxGuests, adaptProxmoxNodes, extractClusterName } from './proxmox'
+import {
+  adaptProxmoxGuests,
+  adaptProxmoxNodes,
+  adaptProxmoxStorages,
+  adaptProxmoxUsage,
+  extractClusterName,
+} from './proxmox'
 
 const sheet = (headers: string[], rows: Record<string, unknown>[]): ParsedSheet => ({
   name: 'Cluster',
@@ -143,4 +149,40 @@ it('maps Containers as lxc with sockets defaulting to 1', () => {
 
 it('concatenates both sheets', () => {
   expect(adaptProxmoxGuests(vms, cts, 'pve-prod')).toHaveLength(2)
+})
+
+it('maps Storage row with free = size − usage', () => {
+  const s: ParsedSheet = {
+    name: 'Storages',
+    headers: ['Node', 'Storage', 'Plugin Type', 'Disk Size GB', 'Disk Usage GB', 'Shared'],
+    rows: [
+      {
+        Node: 'pve1',
+        Storage: 'local-lvm',
+        'Plugin Type': 'lvmthin',
+        'Disk Size GB': 100,
+        'Disk Usage GB': 40,
+        Shared: 'false',
+      },
+    ],
+  }
+  const [d] = adaptProxmoxStorages(s)
+  if (!d) throw new Error('Expected datastore to be defined')
+  expect(d.name).toBe('local-lvm')
+  expect(d.type).toBe('lvmthin')
+  expect(d.capacityMib).toBe(mib(102400))
+  expect(d.freeMib).toBe(mib(61440))
+})
+
+it('maps native usage % to vmUsage (null when absent)', () => {
+  const vms_usage: ParsedSheet = {
+    name: 'VMs',
+    headers: ['Name', 'Vm Id', 'Memory Usage GB', 'Cpu Usage %'],
+    rows: [{ Name: 'web01', 'Vm Id': 100, 'Memory Usage GB': 4, 'Cpu Usage %': '' }],
+  }
+  const [u] = adaptProxmoxUsage(vms_usage, undefined, 'pve-prod')
+  if (!u) throw new Error('Expected usage row to be defined')
+  expect(u.vmName).toBe('web01')
+  expect(u.consumedMib).toBe(mib(4096))
+  expect(u.cpuUsageMhz).toBeNull()
 })

@@ -1,10 +1,10 @@
 import { cores, mhz, sockets } from '@/engines/units'
 import { gibToMib } from '@/engines/units/converters'
 import { gib } from '@/engines/units/types'
-import type { VHostRow, VInfoRow } from '@/types'
+import type { VDatastoreRow, VHostRow, VInfoRow, VmUsageRow } from '@/types'
 import type { ParsedSheet } from '../parseXlsx'
 import { mapColumns, readCol, readNumber, readString } from './columnMap'
-import { CLUSTER_COLS, GUEST_COLS, NODE_COLS } from './proxmoxColumns'
+import { CLUSTER_COLS, GUEST_COLS, NODE_COLS, STORAGE_COLS } from './proxmoxColumns'
 
 export const extractClusterName = (sheet: ParsedSheet | undefined): string => {
   if (!sheet || sheet.rows.length === 0) return ''
@@ -88,4 +88,65 @@ export const adaptProxmoxGuests = (
     for (const row of ctSheet.rows) out.push(mapGuestRow(row, cols, clusterName, 'lxc'))
   }
   return out.filter((g) => g.vmName !== '')
+}
+
+export const adaptProxmoxStorages = (sheet: ParsedSheet | undefined): VDatastoreRow[] => {
+  if (!sheet) return []
+  const cols = mapColumns(sheet.headers, STORAGE_COLS)
+  return sheet.rows
+    .map((row): VDatastoreRow => {
+      const cap = Math.max(0, readNumber(readCol(row, cols.capacityGib)))
+      const used = Math.max(0, readNumber(readCol(row, cols.usageGib)))
+      return {
+        name: readString(readCol(row, cols.name)),
+        capacityMib: gibToMib(gib(cap)),
+        freeMib: gibToMib(gib(Math.max(0, cap - used))),
+        provisionedMib: gibToMib(gib(used)),
+        naa: null,
+        type: readString(readCol(row, cols.pluginType)),
+        hosts: readString(readCol(row, cols.node)),
+        clusterName: '',
+      }
+    })
+    .filter((d) => d.name !== '')
+}
+
+// `null` when the source cell is blank/absent ("not derivable"; ADR-0012).
+const cellOrNull = (row: Record<string, unknown>, col: string | undefined): number | null => {
+  const raw = readCol(row, col)
+  if (raw === undefined || raw === null || readString(raw) === '') return null
+  return Math.max(0, readNumber(raw))
+}
+
+const mapUsageRow = (
+  row: Record<string, unknown>,
+  cols: ReturnType<typeof mapColumns>,
+  clusterName: string,
+): VmUsageRow => {
+  const memGib = cellOrNull(row, cols.memUsageGib)
+  return {
+    vmName: readString(readCol(row, cols.vmName)),
+    cluster: clusterName,
+    vmBiosUuid: '',
+    vmInstanceUuid: readString(readCol(row, cols.vmId)),
+    activeMib: null,
+    consumedMib: memGib === null ? null : gibToMib(gib(memGib)),
+    balloonedMib: null,
+    swappedMib: null,
+    cpuUsageMhz: null, // Proxmox reports CPU as %, not MHz; derived later if needed
+  }
+}
+
+export const adaptProxmoxUsage = (
+  vmsSheet: ParsedSheet | undefined,
+  ctSheet: ParsedSheet | undefined,
+  clusterName: string,
+): VmUsageRow[] => {
+  const out: VmUsageRow[] = []
+  for (const sheet of [vmsSheet, ctSheet]) {
+    if (!sheet) continue
+    const cols = mapColumns(sheet.headers, GUEST_COLS)
+    for (const row of sheet.rows) out.push(mapUsageRow(row, cols, clusterName))
+  }
+  return out.filter((u) => u.vmName !== '')
 }
