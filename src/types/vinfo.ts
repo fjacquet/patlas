@@ -56,9 +56,9 @@ export interface VInfoRow {
    *  (P9 D-09) parses the `[datastore]` token out of this to attribute a
    *  datastore to the VM's cluster. */
   path: string
-  /** Proxmox guest kind: 'qemu' (KVM VM) or 'lxc' (container). patlas-only
-   *  extension — the shared engines ignore it; views segment by it. undefined
-   *  for RVTools data (vatlas-compatible). */
+  /** Proxmox guest kind: 'qemu' (KVM VM) or 'lxc' (container). The shared
+   *  engines ignore it; views segment by it. Always set by the Proxmox
+   *  adapter. */
   guestType: 'qemu' | 'lxc'
 }
 
