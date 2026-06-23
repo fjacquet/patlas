@@ -70,6 +70,7 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   vhost: [host({ hostName: 'esx-1', cluster: 'C1' }), host({ hostName: 'esx-2', cluster: 'C2' })],
   vmUsage: [],
   proxmoxSnapshots: [],
+  proxmoxStorageContent: [],
   vdatastore: [],
   vpartition: [],
   vnetwork: [],

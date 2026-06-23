@@ -120,6 +120,7 @@ vi.mock('@/engines/parser', () => ({
       ],
       vmUsage: [],
       proxmoxSnapshots: [],
+      proxmoxStorageContent: [],
       vdatastore: [],
       vpartition: [],
       vnetwork: [],

@@ -20,6 +20,7 @@ export type {
 export type {
   ParseError,
   ProxmoxSnapshotRow,
+  ProxmoxStorageContentRow,
   Snapshot,
   VDatastoreRow,
   VDvPortRow,

@@ -57,3 +57,18 @@ export const SNAPSHOT_COLS = {
   includeRam: ['include ram'],
   sizeGib: ['size gb'],
 } as const
+
+export const STORAGE_CONTENT_COLS = {
+  node: ['node'],
+  storage: ['storage'],
+  contentType: ['content'],
+  fileName: ['file name'],
+  format: ['format'],
+  sizeGib: ['size gb'],
+  storageUsagePct: ['storage usage %'],
+  guestId: ['vm id'],
+  guestName: ['guest name'],
+  creationDate: ['creation date'],
+  notes: ['notes'],
+  parent: ['parent'],
+} as const

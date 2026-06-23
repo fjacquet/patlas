@@ -37,6 +37,7 @@ describe('proxmox estate-totals acceptance (real report)', () => {
       vhost: bundle.vhost,
       vmUsage: bundle.vmUsage,
       proxmoxSnapshots: bundle.proxmoxSnapshots,
+      proxmoxStorageContent: bundle.proxmoxStorageContent,
       vdatastore: bundle.vdatastore,
       vpartition: [],
       vnetwork: [],

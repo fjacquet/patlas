@@ -61,6 +61,7 @@ const snap = (): Snapshot =>
     ],
     vmUsage: [],
     proxmoxSnapshots: [],
+    proxmoxStorageContent: [],
     vdatastore: [],
     vpartition: [],
     vnetwork: [],

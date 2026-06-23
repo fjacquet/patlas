@@ -24,6 +24,7 @@ const snap = (proxmoxSnapshots: Snapshot['proxmoxSnapshots'] = []): Snapshot =>
     vhost: [],
     vmUsage: [],
     proxmoxSnapshots,
+    proxmoxStorageContent: [],
     vdatastore: [],
     vpartition: [],
     vnetwork: [],

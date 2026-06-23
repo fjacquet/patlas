@@ -65,6 +65,7 @@ const snap = (id: string, nClusters: number, capturedAt: Date): Snapshot => ({
   vhost: Array.from({ length: nClusters }, (_, c) => hostRow(c)),
   vmUsage: [],
   proxmoxSnapshots: [],
+  proxmoxStorageContent: [],
   vdatastore: [],
   vpartition: [],
   vnetwork: [],
