@@ -64,6 +64,16 @@ describe('StorageContentView', () => {
     expect(screen.getAllByText('images').length).toBeGreaterThan(0)
   })
 
+  it('resolves table headers to labels, not raw col.* keys (DataTable inventory ns)', () => {
+    useSnapshotStore.getState().addSnapshot(snapshot([imageRow]))
+    render(<StorageContentView />)
+    // Visible headers come from inventory:col.<id>; a raw key would render
+    // the literal "col.content" string instead of a label.
+    expect(screen.getByText('Content type')).not.toBeNull()
+    expect(screen.queryByText('col.content')).toBeNull()
+    expect(screen.queryByText('col.sizeGib')).toBeNull()
+  })
+
   it('shows the no-backups message when no backup files exist', () => {
     useSnapshotStore.getState().addSnapshot(snapshot([imageRow]))
     render(<StorageContentView />)
