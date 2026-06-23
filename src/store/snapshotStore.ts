@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import { DEFAULT_MONSTER_THRESHOLDS, type MonsterThresholds } from '@/engines/aggregation/monsterVm'
 import { DEFAULT_SIZING_THRESHOLDS, type SizingThresholds } from '@/engines/aggregation/sizing'
 import { DEFAULT_THRESHOLDS, type ThresholdInput } from '@/engines/aggregation/thresholdFlags'
-import type { DrScenario } from '@/types/estate'
 import type { ReleasedTrendAggregate, Snapshot } from '@/types/snapshot'
 
 /** Store-public alias of the pure-engine threshold shape (single source of
@@ -11,11 +10,6 @@ import type { ReleasedTrendAggregate, Snapshot } from '@/types/snapshot'
 export type ThresholdConfig = ThresholdInput
 export type { MonsterThresholds, SizingThresholds }
 export { DEFAULT_MONSTER_THRESHOLDS, DEFAULT_SIZING_THRESHOLDS, DEFAULT_THRESHOLDS }
-
-const EMPTY_SCENARIO = (): DrScenario => ({
-  failedHosts: new Set(),
-  failedSites: new Set(),
-})
 
 /**
  * Multi-snapshot, inputs-only Zustand store.
@@ -49,17 +43,6 @@ interface SnapshotState {
    */
   selectedSnapshotIds: Set<string>
   /**
-   * Clusters the user has flagged stretched (Phase 4 STR-01). Drives the
-   * per-site reservation + DR. Inputs-only, REPLACED never mutated; no
-   * persist, no localStorage (PROJECT.md line 53 / T-04-06).
-   */
-  stretchedClusters: Set<string>
-  /**
-   * DR what-if selection (Phase 6 DRX-02..05). Inputs-only, REPLACED
-   * never mutated; never persisted (no hash, no localStorage — T-04-13).
-   */
-  scenario: DrScenario
-  /**
    * P6 capacity-planning "Personal Ratios" — the user's PLANNED CPU/RAM
    * overcommit for the explicitly-"planned" what-if lens (PLN-03/D-05).
    * Defaults CPU 4:1 / RAM 1:1 (the carried ALC-02 intent). Inputs-only,
@@ -87,8 +70,6 @@ interface SnapshotState {
   removeSnapshot: (id: string) => void
   setActiveSnapshot: (id: string | null) => void
   setSelectedSnapshotIds: (ids: Set<string>) => void
-  setStretchedClusters: (clusters: Set<string>) => void
-  setScenario: (scenario: DrScenario) => void
   setPlannedRatios: (r: { cpu: number; ram: number }) => void
   setThresholds: (t: ThresholdConfig) => void
   setSizingThresholds: (t: SizingThresholds) => void
@@ -111,8 +92,6 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
   snapshots: new Map(),
   activeSnapshotId: null,
   selectedSnapshotIds: new Set(),
-  stretchedClusters: new Set(),
-  scenario: EMPTY_SCENARIO(),
   plannedRatios: { cpu: 4, ram: 1 },
   thresholds: { ...DEFAULT_THRESHOLDS },
   sizingThresholds: { ...DEFAULT_SIZING_THRESHOLDS },
@@ -153,16 +132,6 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
   setActiveSnapshot: (id) => set({ activeSnapshotId: id }),
 
   setSelectedSnapshotIds: (ids) => set({ selectedSnapshotIds: new Set(ids) }),
-
-  setStretchedClusters: (clusters) => set({ stretchedClusters: new Set(clusters) }),
-
-  setScenario: (scenario) =>
-    set({
-      scenario: {
-        failedHosts: new Set(scenario.failedHosts),
-        failedSites: new Set(scenario.failedSites),
-      },
-    }),
 
   // REPLACE never mutate (Zustand `Object.is`) — a fresh object so
   // subscribers re-render; no persist, no localStorage (D-06).
@@ -224,8 +193,6 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
       snapshots: new Map(),
       activeSnapshotId: null,
       selectedSnapshotIds: new Set(),
-      stretchedClusters: new Set(),
-      scenario: EMPTY_SCENARIO(),
       plannedRatios: { cpu: 4, ram: 1 },
       thresholds: { ...DEFAULT_THRESHOLDS },
       sizingThresholds: { ...DEFAULT_SIZING_THRESHOLDS },
@@ -251,11 +218,6 @@ export const selectActiveSnapshot = (s: SnapshotState): Snapshot | null =>
 // a second `useMemo` (grep-gated single-memo invariant).
 export const selectSnapshots = (s: SnapshotState): Map<string, Snapshot> => s.snapshots
 export const selectSelectedSnapshotIds = (s: SnapshotState): Set<string> => s.selectedSnapshotIds
-export const selectStretchedClusters = (s: SnapshotState): Set<string> => s.stretchedClusters
-export const selectSetStretchedClusters = (s: SnapshotState): ((c: Set<string>) => void) =>
-  s.setStretchedClusters
-export const selectScenario = (s: SnapshotState): DrScenario => s.scenario
-export const selectSetScenario = (s: SnapshotState): ((sc: DrScenario) => void) => s.setScenario
 // P6 planned-ratios slice (D-06). Stable refs — never construct here.
 export const selectPlannedRatios = (s: SnapshotState): { cpu: number; ram: number } =>
   s.plannedRatios

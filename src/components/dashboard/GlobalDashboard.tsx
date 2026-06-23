@@ -2,12 +2,7 @@ import { useState } from 'react'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
 import { useEstateView } from '@/hooks/useEstateView'
-import {
-  selectActiveSnapshot,
-  selectSetStretchedClusters,
-  selectStretchedClusters,
-  useSnapshotStore,
-} from '@/store/snapshotStore'
+import { selectActiveSnapshot, useSnapshotStore } from '@/store/snapshotStore'
 import type { AccountingMode } from '@/types/estate'
 import { ClusterDetail } from '../cluster/ClusterDetail'
 import { AccountingModeToggle } from './AccountingModeToggle'
@@ -57,18 +52,8 @@ export function GlobalDashboard() {
   const [mode, setMode] = useState<AccountingMode>('active')
   const view = useEstateView(mode)
   const snapshot = useSnapshotStore(selectActiveSnapshot)
-  const stretchedClusters = useSnapshotStore(selectStretchedClusters)
-  const setStretchedClusters = useSnapshotStore(selectSetStretchedClusters)
   // RCI drill: in-app view state (like `mode`) — NOT a router, NOT a 2nd memo.
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null)
-  // Toggle one cluster's stretched membership. Set is REPLACED (never
-  // mutated) so Zustand's Object.is fires and `useEstateView` recomputes.
-  const onToggleStretched = (cluster: string) => {
-    const next = new Set(stretchedClusters)
-    if (next.has(cluster)) next.delete(cluster)
-    else next.add(cluster)
-    setStretchedClusters(next)
-  }
 
   if (!snapshot) {
     return (
@@ -106,15 +91,12 @@ export function GlobalDashboard() {
             </h2>
             <AccountingModeToggle value={mode} onChange={setMode} />
           </div>
-          {/* G1: the factual "N clusters marked stretched" echo now lives in
-              the cluster table header, co-located with the per-row toggles. */}
           <GlobalSummaryCard globals={view.globals} mode={mode} capturedDate={capturedDate} />
           <OperationalInsights insights={view.operationalInsights} />
           <OsBreakdownDonut osBreakdown={view.osBreakdown} />
           <PerClusterColumns
             clusters={view.clusters}
             vmsByCluster={view.vmsByCluster}
-            onToggleStretched={onToggleStretched}
             onSelectCluster={setSelectedCluster}
             trends={view.trends}
           />

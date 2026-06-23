@@ -25,7 +25,6 @@ interface ChartLabels {
   ramTitle: string
   clusterCpu: (name: string) => string
   eosCats: string[]
-  dr: { before: string; after: string; cores: string; ram: string }
   trend: { vmCount: string; poweredOnVms: string }
 }
 
@@ -37,12 +36,6 @@ const LABELS = (l: 'en' | 'fr'): ChartLabels =>
         ramTitle: 'Utilisation mémoire moyenne',
         clusterCpu: (n) => `Utilisation CPU — ${n}`,
         eosCats: ['En retard', '≤3 m', '3–6 m', '6–9 m', '9–12 m', '>12 m', 'Inconnu'],
-        dr: {
-          before: 'Avant',
-          after: 'Après',
-          cores: 'Cœurs phys.',
-          ram: 'RAM phys. (Gio)',
-        },
         trend: { vmCount: 'VM', poweredOnVms: 'Allumées' },
       }
     : {
@@ -51,12 +44,6 @@ const LABELS = (l: 'en' | 'fr'): ChartLabels =>
         ramTitle: 'Mean memory utilization',
         clusterCpu: (n) => `${n} CPU utilization`,
         eosCats: ['Overdue', '≤3m', '3–6m', '6–9m', '9–12m', '>12m', 'Unknown'],
-        dr: {
-          before: 'Before',
-          after: 'After',
-          cores: 'Phys. cores',
-          ram: 'Phys. RAM (GiB)',
-        },
         trend: { vmCount: 'VMs', poweredOnVms: 'Powered-on' },
       }
 
@@ -129,33 +116,6 @@ function storageTreemap(view: EstateView, _L: ChartLabels): EChartsOption {
   }
 }
 
-/** DR physical-impact before/after bar (factual magnitude, no verdict). */
-function drBar(view: EstateView, L: ChartLabels): EChartsOption | null {
-  const dr = view.drSim
-  if (!dr) return null
-  return {
-    grid: { left: 8, right: 8, top: 24, bottom: 24, containLabel: true },
-    legend: { bottom: 0 },
-    xAxis: { type: 'category', data: [L.dr.cores, L.dr.ram] },
-    yAxis: { type: 'value' },
-    series: [
-      {
-        type: 'bar',
-        name: L.dr.before,
-        data: [
-          Number(dr.before.physicalCores),
-          Math.round(Number(dr.before.physicalRamMib) / 1024),
-        ],
-      },
-      {
-        type: 'bar',
-        name: L.dr.after,
-        data: [Number(dr.after.physicalCores), Math.round(Number(dr.after.physicalRamMib) / 1024)],
-      },
-    ],
-  }
-}
-
 /** A per-cluster CPU-utilization gauge (the app's real gauge), keyed by
  *  cluster name — used on every per-cluster slide + the HTML report. */
 function perClusterCharts(view: EstateView, L: ChartLabels): Map<string, EChartsOption> {
@@ -192,8 +152,6 @@ export function buildChartBundle(
     eosBar: eosBar(view, L),
     storageTreemap: storageTreemap(view, L),
   }
-  const dr = drBar(view, L)
-  if (dr) shared.drBar = dr
   if (trends) {
     shared.trendLine = trendLineOption(
       trends,
