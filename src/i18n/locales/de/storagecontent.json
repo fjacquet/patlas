@@ -1,0 +1,20 @@
+{
+  "heading": "Speicherinhalt",
+  "subtitle": "Was jeden Speicher belegt, nach Inhaltstyp",
+  "empty": {
+    "heading": "Kein Bericht geladen",
+    "body": "Laden Sie einen Bericht, um den Speicherinhalt zu sehen."
+  },
+  "kpi": {
+    "totalSize": "Gesamtgröße (GiB)",
+    "files": "Dateien",
+    "contentTypes": "Inhaltstypen",
+    "backups": "Sicherungen"
+  },
+  "byContent": "Nach Inhaltstyp",
+  "byStorage": "Nach Speicher",
+  "backups": {
+    "heading": "Sicherungsdateien",
+    "none": "Keine Sicherungsdateien in diesem Bestand gefunden."
+  }
+}

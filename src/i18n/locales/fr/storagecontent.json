@@ -1,0 +1,20 @@
+{
+  "heading": "Contenu du stockage",
+  "subtitle": "Ce qui occupe chaque stockage, par type de contenu",
+  "empty": {
+    "heading": "Aucun rapport chargé",
+    "body": "Chargez un rapport pour voir le contenu du stockage."
+  },
+  "kpi": {
+    "totalSize": "Taille totale (Gio)",
+    "files": "Fichiers",
+    "contentTypes": "Types de contenu",
+    "backups": "Sauvegardes"
+  },
+  "byContent": "Par type de contenu",
+  "byStorage": "Par stockage",
+  "backups": {
+    "heading": "Fichiers de sauvegarde",
+    "none": "Aucun fichier de sauvegarde trouvé sur ce parc."
+  }
+}

@@ -15,6 +15,7 @@ import { RightSizingView } from './components/rightsizing/RightSizingView'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
 import { SnapshotSprawlView } from './components/snapshots/SnapshotSprawlView'
 import { StorageView } from './components/storage/StorageView'
+import { StorageContentView } from './components/storagecontent/StorageContentView'
 import { ThemeToggle } from './components/ThemeToggle'
 import { TrendsView } from './components/trends/TrendsView'
 import { UploadZone } from './components/UploadZone'
@@ -70,6 +71,8 @@ function App() {
               <MonsterVmView />
             ) : activeView === 'snapshots' ? (
               <SnapshotSprawlView />
+            ) : activeView === 'storagecontent' ? (
+              <StorageContentView />
             ) : (
               <GlobalDashboard />
             )}

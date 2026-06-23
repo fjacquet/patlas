@@ -24,6 +24,7 @@ const snap = (proxmoxSnapshots: Snapshot['proxmoxSnapshots'] = []): Snapshot =>
     vhost: [],
     vmUsage: [],
     proxmoxSnapshots,
+    proxmoxStorageContent: [],
     vdatastore: [],
     vpartition: [],
     vnetwork: [],
@@ -79,6 +80,10 @@ describe('SnapshotSprawlView', () => {
     render(<SnapshotSprawlView />)
     expect(screen.getByText('guest-01')).toBeInTheDocument()
     expect(screen.getByText('guest-02')).toBeInTheDocument()
+    // Visible headers resolve from inventory:col.<id> — a raw key would
+    // render the literal "col.includeRam" string instead of a label.
+    expect(screen.getByText('Includes RAM')).toBeInTheDocument()
+    expect(screen.queryByText('col.includeRam')).not.toBeInTheDocument()
   })
 
   it('shows KPI tile for checkpoint count', () => {

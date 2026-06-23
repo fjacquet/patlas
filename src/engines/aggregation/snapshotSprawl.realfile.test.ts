@@ -39,6 +39,7 @@ describe('snapshotSprawl acceptance (real Proxmox report)', () => {
         vhost: bundle.vhost,
         vmUsage: bundle.vmUsage,
         proxmoxSnapshots: bundle.proxmoxSnapshots,
+        proxmoxStorageContent: bundle.proxmoxStorageContent,
         vdatastore: bundle.vdatastore,
         vpartition: [],
         vnetwork: [],

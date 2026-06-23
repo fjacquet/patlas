@@ -67,6 +67,7 @@ const estate = (vmCount: number): Snapshot => ({
   vhost: Array.from({ length: CLUSTERS }, (_, c) => hostRow(c)),
   vmUsage: [],
   proxmoxSnapshots: [],
+  proxmoxStorageContent: [],
   vdatastore: [],
   vpartition: [],
   vnetwork: [],

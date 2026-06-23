@@ -21,5 +21,9 @@ describe('proxmox real-file integration', () => {
     expect(b.proxmoxSnapshots.length).toBeGreaterThan(0)
     expect(b.proxmoxSnapshots.every((s) => ['qemu', 'lxc'].includes(s.guestType))).toBe(true)
     expect(b.proxmoxSnapshots.every((s) => s.name.toLowerCase() === 'current')).toBe(true)
+    // Plan 3B: the Storage Content sheet parses; the real report has disk images, ISOs, templates.
+    expect(b.proxmoxStorageContent.length).toBeGreaterThan(0)
+    expect(b.proxmoxStorageContent.some((r) => r.content === 'images')).toBe(true)
+    expect(b.proxmoxStorageContent.every((r) => r.fileName !== '')).toBe(true)
   })
 })

@@ -43,6 +43,36 @@ export interface ProxmoxSnapshotRow {
 }
 
 /**
+ * A storage content row from the Proxmox report `Storage Content` sheet.
+ * Each row describes a single file stored in Proxmox storage: VM disk images,
+ * ISO images, container templates, backups, etc. `guestId`/`guestName` are
+ * blank for non-VM content (ISOs, templates). `creationSerial` is the raw
+ * Excel serial; `null` when the cell is blank ("not derivable").
+ */
+export interface ProxmoxStorageContentRow {
+  node: string
+  /** Proxmox storage name (e.g. "DATA", "local", "local-lvm"). */
+  storage: string
+  /** Proxmox content class: "images" | "rootdir" | "iso" | "vztmpl" | "backup" | "snippets" | "import" | … */
+  content: string
+  /** File path within the storage (e.g. "100/vm-100-disk-0.qcow2"). */
+  fileName: string
+  /** Disk/file format (e.g. "qcow2", "raw", "iso", "tzst"). */
+  format: string
+  /** File size. `Size GB` reinterpreted as GiB → MiB. */
+  sizeMib: MiB
+  /** `Storage Usage %` (already a percentage); `null` when the cell is blank
+   *  ("not derivable"; ADR-0012, never coerced to 0). */
+  usagePercent: number | null
+  /** Proxmox VMID owning this content; `''` for non-VM content. */
+  guestId: string
+  /** Guest display name; `''` for non-VM content (ISO, template, etc.). */
+  guestName: string
+  /** Excel serial date of creation; `null` when the cell is blank. */
+  creationSerial: number | null
+}
+
+/**
  * A single parsed RVTools workbook, normalized to vatlas' canonical shape.
  *
  * The parser worker produces everything except `id` and `parsedAt` — those
@@ -81,6 +111,9 @@ export interface Snapshot {
   /** Proxmox guest snapshots from the report `Snapshots` sheet. `[]` when the
    *  sheet is absent — never undefined (factual-degrade). */
   proxmoxSnapshots: ProxmoxSnapshotRow[]
+  /** Proxmox storage content rows from the report `Storage Content` sheet.
+   *  `[]` when the sheet is absent — never undefined (factual-degrade). */
+  proxmoxStorageContent: ProxmoxStorageContentRow[]
   vdatastore: VDatastoreRow[]
   vpartition: VPartitionRow[]
   /** RVTools `vNetwork` rows (VM→portgroup). `[]` when the OPTIONAL sheet

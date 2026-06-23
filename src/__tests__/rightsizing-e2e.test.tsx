@@ -174,6 +174,7 @@ function makeProxmoxEstate(vmCount: number): Snapshot {
     vhost: hostList,
     vmUsage,
     proxmoxSnapshots: [],
+    proxmoxStorageContent: [],
     vdatastore: [],
     vpartition: [],
     vnetwork: [],

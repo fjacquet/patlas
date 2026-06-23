@@ -1,0 +1,20 @@
+{
+  "heading": "Contenuto dello storage",
+  "subtitle": "Cosa occupa ogni storage, per tipo di contenuto",
+  "empty": {
+    "heading": "Nessun report caricato",
+    "body": "Carica un report per vedere il contenuto dello storage."
+  },
+  "kpi": {
+    "totalSize": "Dimensione totale (GiB)",
+    "files": "File",
+    "contentTypes": "Tipi di contenuto",
+    "backups": "Backup"
+  },
+  "byContent": "Per tipo di contenuto",
+  "byStorage": "Per storage",
+  "backups": {
+    "heading": "File di backup",
+    "none": "Nessun file di backup trovato in questo parco."
+  }
+}

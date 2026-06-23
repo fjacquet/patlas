@@ -1,5 +1,6 @@
 import type {
   ProxmoxSnapshotRow,
+  ProxmoxStorageContentRow,
   Snapshot,
   VDatastoreRow,
   VDvPortRow,
@@ -33,6 +34,9 @@ export interface MergedEstate {
   /** Concatenated Proxmox guest snapshot rows across selected snapshots.
    *  Empty when the Snapshots sheet was absent — factual-degrade, never undefined. */
   proxmoxSnapshots: ProxmoxSnapshotRow[]
+  /** Concatenated Proxmox storage content rows across selected snapshots.
+   *  Empty when the Storage Content sheet was absent — factual-degrade, never undefined. */
+  proxmoxStorageContent: ProxmoxStorageContentRow[]
   vcenters: VCenterEntry[]
 }
 
@@ -46,6 +50,7 @@ const EMPTY_MERGED: MergedEstate = {
   dvswitch: [],
   dvport: [],
   proxmoxSnapshots: [],
+  proxmoxStorageContent: [],
   vcenters: [],
 }
 
@@ -149,6 +154,7 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
   const outDvswitch: VDvSwitchRow[] = []
   const outDvport: VDvPortRow[] = []
   const outProxmoxSnapshots: ProxmoxSnapshotRow[] = []
+  const outProxmoxStorageContent: ProxmoxStorageContentRow[] = []
   for (const snap of selected) {
     for (const d of snap.vdatastore) outVdatastore.push(d)
     for (const p of snap.vpartition) outVpartition.push(p)
@@ -161,6 +167,7 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
     for (const ds of snap.dvswitch ?? []) outDvswitch.push(ds)
     for (const dp of snap.dvport ?? []) outDvport.push(dp)
     for (const ps of snap.proxmoxSnapshots ?? []) outProxmoxSnapshots.push(ps)
+    for (const sc of snap.proxmoxStorageContent ?? []) outProxmoxStorageContent.push(sc)
   }
 
   return {
@@ -173,6 +180,7 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
     dvswitch: outDvswitch,
     dvport: outDvport,
     proxmoxSnapshots: outProxmoxSnapshots,
+    proxmoxStorageContent: outProxmoxStorageContent,
     vcenters: [...vcenterIndex.values()],
   }
 }

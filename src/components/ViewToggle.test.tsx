@@ -4,15 +4,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
 import { type AppView, ViewToggle } from './ViewToggle'
 
-describe('ViewToggle (11 segments incl Right-sizing + Monster Guests + Snapshot Sprawl)', () => {
+describe('ViewToggle (12 segments incl Right-sizing + Monster Guests + Snapshot Sprawl + Storage Content)', () => {
   beforeEach(async () => {
     await i18n.changeLanguage('en')
   })
 
-  it('renders all 11 segments', () => {
+  it('renders all 12 segments', () => {
     render(<ViewToggle value="dashboard" onChange={() => {}} />)
     const buttons = screen.getAllByRole('button')
-    expect(buttons).toHaveLength(11)
+    expect(buttons).toHaveLength(12)
     for (const label of [
       'Dashboard',
       'Inventory',
@@ -25,6 +25,7 @@ describe('ViewToggle (11 segments incl Right-sizing + Monster Guests + Snapshot 
       'Right-sizing',
       'Monster Guests',
       'Snapshot Sprawl',
+      'Storage Content',
     ]) {
       expect(screen.getByText(label)).not.toBeNull()
     }
@@ -39,25 +40,25 @@ describe('ViewToggle (11 segments incl Right-sizing + Monster Guests + Snapshot 
     expect(onChange).toHaveBeenCalledWith('monstervm')
   })
 
-  it('Arrow Right wraps from the last segment (Snapshot Sprawl) back to Dashboard', () => {
+  it('Arrow Right wraps from the last segment (Storage Content) back to Dashboard', () => {
     const onChange = vi.fn<(v: AppView) => void>()
-    render(<ViewToggle value="snapshots" onChange={onChange} />)
+    render(<ViewToggle value="storagecontent" onChange={onChange} />)
     fireEvent.keyDown(screen.getByRole('group'), { key: 'ArrowRight' })
     expect(onChange).toHaveBeenCalledWith('dashboard')
   })
 
-  it('Arrow Left from Dashboard wraps to the last segment (Snapshot Sprawl)', () => {
+  it('Arrow Left from Dashboard wraps to the last segment (Storage Content)', () => {
     const onChange = vi.fn<(v: AppView) => void>()
     render(<ViewToggle value="dashboard" onChange={onChange} />)
     fireEvent.keyDown(screen.getByRole('group'), { key: 'ArrowLeft' })
-    expect(onChange).toHaveBeenCalledWith('snapshots')
+    expect(onChange).toHaveBeenCalledWith('storagecontent')
   })
 
   it('vertical orientation (Improvement 1): same group/segments/keyboard', () => {
     const onChange = vi.fn<(v: AppView) => void>()
     render(<ViewToggle value="dashboard" onChange={onChange} orientation="vertical" />)
     expect(screen.getByRole('group')).not.toBeNull()
-    expect(screen.getAllByRole('button')).toHaveLength(11)
+    expect(screen.getAllByRole('button')).toHaveLength(12)
     fireEvent.keyDown(screen.getByRole('group'), { key: 'ArrowDown' })
     expect(onChange).toHaveBeenCalledWith('inventory')
   })

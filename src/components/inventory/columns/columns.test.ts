@@ -183,6 +183,7 @@ const sharedLunSnapshot = (): Snapshot => ({
   vhost: [host({}), host({ hostName: 'esx-2', cluster: 'C2' })],
   vmUsage: [],
   proxmoxSnapshots: [],
+  proxmoxStorageContent: [],
   vinfo: [
     vm({ vmName: 'on-1', cluster: 'C1', host: 'esx-1' }),
     vm({ vmName: 'on-2', cluster: 'C2', host: 'esx-2' }),

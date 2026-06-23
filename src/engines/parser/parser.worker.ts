@@ -65,6 +65,7 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
       vhost: bundle.vhost,
       vmUsage: bundle.vmUsage,
       proxmoxSnapshots: bundle.proxmoxSnapshots,
+      proxmoxStorageContent: bundle.proxmoxStorageContent,
       vdatastore: bundle.vdatastore,
       vpartition: [],
       vnetwork: [],
