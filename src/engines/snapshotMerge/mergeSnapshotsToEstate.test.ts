@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mhz, mib, sockets } from '@/engines/units'
-import type { Snapshot, VHostRow, VInfoRow } from '@/types'
+import type { ProxmoxSnapshotRow, Snapshot, VHostRow, VInfoRow } from '@/types'
 import { mergeSnapshotsToEstate } from './mergeSnapshotsToEstate'
 
 const vm = (over: Partial<VInfoRow>): VInfoRow => ({
@@ -250,5 +250,41 @@ describe('mergeSnapshotsToEstate — empty / degenerate', () => {
     expect(merged.vinfo).toHaveLength(1)
     expect(merged.vcenters).toHaveLength(1)
     expect(merged.vinfo[0]).toBe(a.vinfo[0]) // no collision ⇒ same ref
+  })
+})
+
+describe('mergeSnapshotsToEstate — proxmoxSnapshots concatenation', () => {
+  const pxSnap = (over: Partial<ProxmoxSnapshotRow>): ProxmoxSnapshotRow => ({
+    node: 'pve1',
+    guestId: '100',
+    guestName: 'vm-test',
+    guestType: 'qemu',
+    name: 'snap1',
+    parent: 'no-parent',
+    dateSerial: 45000,
+    includeRam: false,
+    sizeMib: mib(1024),
+    ...over,
+  })
+
+  it('concatenates proxmoxSnapshots from two snapshots', () => {
+    const a = snap({ id: 'a', proxmoxSnapshots: [pxSnap({ name: 'snap-a' })] })
+    const b = snap({
+      id: 'b',
+      proxmoxSnapshots: [pxSnap({ name: 'snap-b' }), pxSnap({ name: 'snap-c' })],
+    })
+    const merged = mergeSnapshotsToEstate([a, b])
+    expect(merged.proxmoxSnapshots).toHaveLength(3)
+    expect(merged.proxmoxSnapshots.map((r) => r.name)).toEqual(['snap-a', 'snap-b', 'snap-c'])
+  })
+
+  it('empty selection yields empty proxmoxSnapshots', () => {
+    expect(mergeSnapshotsToEstate([]).proxmoxSnapshots).toHaveLength(0)
+  })
+
+  it('is resilient to a missing proxmoxSnapshots field (??[])', () => {
+    const a = snap({ id: 'a', proxmoxSnapshots: undefined as unknown as ProxmoxSnapshotRow[] })
+    const merged = mergeSnapshotsToEstate([a])
+    expect(merged.proxmoxSnapshots).toHaveLength(0)
   })
 })
