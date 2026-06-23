@@ -1,3 +1,9 @@
+# Dependencies & build output
+node_modules
+dist
+dist-ssr
+coverage
+
 # Logs
 logs
 *.log
@@ -6,19 +12,20 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+
+# Caches & local overrides
 tmp/
-node_modules
-dist
-dist-ssr
-coverage
 *.local
+# tsc -b (composite projects) incremental build cache
+*.tsbuildinfo
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
 
 # RTK tooling
 .rtk/
-
-# Synthetic 10k stress fixture — generated on demand for tests/stress only,
-# large, NOT bundled in the app. Regenerate with `npm run generate-inventory-10k`.
-src/__fixtures__/rvtools-inventory-10k.xlsx
 
 # Editor directories and files
 .vscode/*
@@ -30,15 +37,21 @@ src/__fixtures__/rvtools-inventory-10k.xlsx
 *.njsproj
 *.sln
 *.sw?
-.env
 
 # Tooling scratch dirs (Playwright MCP captures, Serena cache) — never commit
 .playwright-mcp/
 .serena/
 
-# patlas: real Proxmox report fixtures (privacy — never commit dataset bytes)
-src/engines/parser/__fixtures__/proxmox-report.xlsx
-src/engines/parser/__fixtures__/network-diagram.svg
-
 # SDD orchestration scratch (briefs, reports, review diffs, ledger) — not part of the project
 .superpowers/
+
+# Privacy invariant (PAR-05): NEVER commit dataset bytes. RVTools/Proxmox
+# report spreadsheets (real drops AND the synthetic stress fixture) are loaded
+# at runtime/test time only — never tracked. Regenerate the synthetic fixture
+# with `npm run generate-inventory-10k`. Force-add a verified non-dataset
+# spreadsheet with `git add -f` if ever needed.
+*.xlsx
+*.xls
+*.csv
+# Proxmox report bundle side-car (network topology SVG export — dataset-derived)
+src/engines/parser/__fixtures__/network-diagram.svg
