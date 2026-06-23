@@ -13,7 +13,7 @@ const snap = (over: Partial<Snapshot> & { id: string }): Snapshot => ({
   vCenterLabel: 'vc',
   rvtoolsVersion: '4.4',
   parsedAt: new Date('2026-01-01T00:00:00Z'),
-  source: 'rvtools',
+  source: 'proxmox',
   viSdkUuid: null,
   vMetaData: [],
   vinfo: [],

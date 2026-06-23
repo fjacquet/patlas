@@ -89,7 +89,7 @@ export const VInfoRowSchema: z.ZodType<VInfoRow> = z.object({
   path: z.string().trim(),
   // Proxmox guest kind — optional so RVTools rows (which never carry it)
   // still validate. Hardened to required when the RVTools adapter is removed.
-  guestType: z.enum(['qemu', 'lxc']).optional(),
+  guestType: z.enum(['qemu', 'lxc']),
 })
 
 export const VHostRowSchema: z.ZodType<VHostRow> = z.object({

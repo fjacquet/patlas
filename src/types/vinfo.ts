@@ -59,7 +59,7 @@ export interface VInfoRow {
   /** Proxmox guest kind: 'qemu' (KVM VM) or 'lxc' (container). patlas-only
    *  extension — the shared engines ignore it; views segment by it. undefined
    *  for RVTools data (vatlas-compatible). */
-  guestType?: 'qemu' | 'lxc'
+  guestType: 'qemu' | 'lxc'
 }
 
 /**

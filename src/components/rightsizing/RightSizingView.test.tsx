@@ -19,7 +19,7 @@ const snap = (): Snapshot =>
     vCenterLabel: 'vc',
     rvtoolsVersion: '4.7.1.4',
     parsedAt: new Date('2026-01-02'),
-    source: 'rvtools',
+    source: 'proxmox',
     viSdkUuid: null,
     vMetaData: [],
     vinfo: [
@@ -39,6 +39,7 @@ const snap = (): Snapshot =>
         vmInstanceUuid: 'i1',
         viSdkUuid: '',
         viSdkServer: '',
+        guestType: 'qemu',
         provisionedMib: mib(0),
         inUseMib: mib(0),
         path: '',

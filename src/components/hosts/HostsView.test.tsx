@@ -16,7 +16,7 @@ const snapshot = (): Snapshot =>
     vCenterLabel: 'vc-a',
     rvtoolsVersion: '4.4.0',
     parsedAt: new Date('2026-01-02'),
-    source: 'rvtools',
+    source: 'proxmox',
     viSdkUuid: null,
     vMetaData: [],
     vinfo: [

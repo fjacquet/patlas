@@ -25,7 +25,7 @@ const okPayload = (filename: string) => ({
     capturedAt: new Date('2026-05-15T00:00:00Z'),
     vCenterLabel: 'vcenter.test.local',
     rvtoolsVersion: '4.4.0',
-    source: 'rvtools' as const,
+    source: 'proxmox' as const,
     viSdkUuid: null,
     vinfo: [],
     vhost: [],

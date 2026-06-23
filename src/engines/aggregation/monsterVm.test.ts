@@ -19,6 +19,7 @@ const vm = (over: Partial<VInfoRow> = {}): VInfoRow => ({
   vmInstanceUuid: '',
   viSdkUuid: '',
   viSdkServer: '',
+  guestType: 'qemu',
   provisionedMib: mib(0),
   inUseMib: mib(0),
   path: '',
