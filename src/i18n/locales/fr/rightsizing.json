@@ -9,7 +9,7 @@
     "single": "instantané unique",
     "max": "max sur {{count}} instantanés"
   },
-  "poweredOnOnly": "VM allumées uniquement",
+  "poweredOnOnly": "invités allumés uniquement",
   "notDerivable": "— = non calculable",
   "category": {
     "oversized": "Allocation ≫ utilisation",

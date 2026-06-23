@@ -1,24 +1,24 @@
 {
   "hosts": {
-    "title": "Hôtes",
+    "title": "Nœuds",
     "rollup": {
-      "title": "Hôtes du parc",
-      "hosts": "Hôtes",
+      "title": "Nœuds du parc",
+      "hosts": "Nœuds",
       "cores": "Cœurs physiques",
-      "memMib": "Mémoire hôte (Mio)",
+      "memMib": "Mémoire nœud (Mio)",
       "avgCpu": "CPU moyen %",
       "avgMem": "Mémoire moyenne %",
-      "poweredOnVms": "VM allumées"
+      "poweredOnVms": "Invités allumés"
     },
     "col": {
-      "host": "Hôte",
+      "host": "Nœud",
       "cluster": "Cluster",
       "cores": "Cœurs",
       "memMib": "Mémoire (Mio)",
       "cpuPct": "CPU %",
       "ramPct": "RAM %",
-      "poweredOnVms": "VM allumées",
-      "esxVersion": "Version ESXi",
+      "poweredOnVms": "Invités allumés",
+      "esxVersion": "version PVE",
       "faultDomain": "Domaine de panne",
       "model": "Modèle",
       "vendor": "Fournisseur"
@@ -35,7 +35,7 @@
     "inUse": "Engagé (Mio)",
     "guestData": "Données invité (Mio)",
     "totalCores": "Total cœurs physiques",
-    "totalMem": "Total mémoire hôte (Mio)",
+    "totalMem": "Total mémoire nœud (Mio)",
     "power": {
       "on": "{{count}} allumées",
       "off": "{{count}} éteintes",

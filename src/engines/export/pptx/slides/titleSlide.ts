@@ -41,7 +41,7 @@ export function addTitleSlide(
   const tib = (mib: number) => `${pptxNumber(mib / 1024 / 1024, locale, 1)} TiB`
 
   // Eyebrow
-  s.addText(pptxSafeFormat(t('eyebrow', 'VMWARE ESTATE')), {
+  s.addText(pptxSafeFormat(t('eyebrow', 'PROXMOX ESTATE')), {
     x: M,
     y: 1.4,
     w: W,
@@ -52,7 +52,7 @@ export function addTitleSlide(
     bold: true,
   })
   // Big estate-identity title
-  s.addText(pptxSafeFormat(d.vcenters || t('fallback', 'VMware estate')), {
+  s.addText(pptxSafeFormat(d.vcenters || t('fallback', 'Proxmox estate')), {
     x: M,
     y: 2.0,
     w: W,

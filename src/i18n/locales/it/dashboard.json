@@ -12,16 +12,16 @@
     "storageRealistic": "Storage realistico",
     "echo": "({{mode}})",
     "describe": {
-      "configured": "Tutte le VM comprese quelle spente (vCPU/vRAM).",
-      "active": "Solo VM accese.",
-      "storageRealistic": "Accese per CPU/RAM, tutte le VM per lo storage provisionato."
+      "configured": "Tutti gli ospiti compresi quelli spenti (vCPU/vRAM).",
+      "active": "Solo ospiti accesi.",
+      "storageRealistic": "Accesi per CPU/RAM, tutti gli ospiti per lo storage provisionato."
     }
   },
   "stats": {
     "clusters": "Cluster",
-    "esx": "ESX",
-    "vms": "VM",
-    "datastores": "Datastore",
+    "esx": "Nodi",
+    "vms": "Ospiti",
+    "datastores": "Archiviazioni",
     "vcpu": "vCPU",
     "vram": "vRAM",
     "storage": "Storage",
@@ -32,7 +32,7 @@
     "vcpuPerCore": "vCPU per core fisico",
     "cpuReadyMean": "CPU Ready (media)",
     "cpuReadyMax": "CPU Ready (max)",
-    "vmsAboveReady": "VM > 5% CPU Ready"
+    "vmsAboveReady": "Ospiti > 5% CPU Ready"
   },
   "os": {
     "windows": "Windows",
@@ -41,7 +41,7 @@
   },
   "states": {
     "emptyHeading": "Nessuno snapshot caricato",
-    "emptyBody": "Trascina un export RVTools .xlsx nella barra laterale per vedere la dashboard del parco.",
+    "emptyBody": "Trascina il tuo report Proxmox (.zip o .xlsx) nella barra laterale per vedere la dashboard del parco.",
     "loading": "Aggregazione del parco…",
     "error": "Impossibile aggregare questo snapshot: {{message}}. Riprova trascinando di nuovo la cartella di lavoro nella barra laterale."
   },

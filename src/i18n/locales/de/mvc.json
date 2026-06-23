@@ -1,13 +1,13 @@
 {
   "snapshot": {
-    "vcenters": "{{count}} vCenters",
+    "vcenters": "{{count}} Cluster",
     "vcenter": {
-      "one": "1 vCenter"
+      "one": "1 Cluster"
     },
-    "rvtoolsVersion": "RVTools {{version}}"
+    "rvtoolsVersion": "Proxmox {{version}}"
   },
   "merge": {
     "loading": "Bestand wird zusammengeführt…",
-    "singleVCenter": "Einzelner vCenter — keine vCenter-übergreifende Zusammenführung angewendet."
+    "singleVCenter": "Einzelner Cluster — keine Cluster-übergreifende Zusammenführung angewendet."
   }
 }

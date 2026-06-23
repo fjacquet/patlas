@@ -173,11 +173,11 @@ describe('Proxmox dashboard smoke: drop → buildEstateView → <GlobalDashboard
     const clusterDrills = screen.getAllByRole('button', { name: 'Cluster detail' })
     expect(clusterDrills.length).toBe(1)
 
-    // ESX column header present in the cluster table (DSH-01).
-    expect(screen.getAllByText('ESX').length).toBeGreaterThan(0)
+    // Nodes column header present in the cluster table (DSH-01).
+    expect(screen.getAllByText('Nodes').length).toBeGreaterThan(0)
 
     // CPU Ready estate panel + the gold count label (DSH-05).
-    expect(screen.getAllByText(/VMs > 5% CPU Ready/).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/Guests > 5% CPU Ready/).length).toBeGreaterThan(0)
 
     // SVG renderer wired (Pitfall 3): every chart host emitted an <svg>, no
     // <canvas> anywhere in the rendered dashboard.

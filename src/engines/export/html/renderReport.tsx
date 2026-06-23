@@ -81,7 +81,7 @@ function Report({ view, trends, strings, locale }: RenderReportInput): React.Rea
   const g = view.globals
   const oi = view.operationalInsights
   const eos = view.eos.cumulative
-  const vcenters = ''
+  const vcenters = view.clusters[0]?.cluster ?? ''
   const clustersByVm = [...view.clusters].sort((a, b) => b.vmCount - a.vmCount)
   const top = clustersByVm.slice(0, TOP_N_CLUSTERS)
   const rest = clustersByVm.slice(TOP_N_CLUSTERS)
@@ -111,7 +111,7 @@ function Report({ view, trends, strings, locale }: RenderReportInput): React.Rea
 
   return (
     <main className="report">
-      <Section id="cover" title={strings['cover.title'] ?? 'VMware Estate Report'}>
+      <Section id="cover" title={strings['cover.title'] ?? 'Proxmox Estate Report'}>
         <p className="cover-identity">{vcenters}</p>
         <Metric label={strings['cover.vms'] ?? 'VMs'} value={fmtInt(Number(g.vmCount), loc)} />
         <Metric

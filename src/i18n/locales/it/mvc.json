@@ -1,13 +1,13 @@
 {
   "snapshot": {
-    "vcenters": "{{count}} vCenter",
+    "vcenters": "{{count}} Cluster",
     "vcenter": {
-      "one": "1 vCenter"
+      "one": "1 Cluster"
     },
-    "rvtoolsVersion": "RVTools {{version}}"
+    "rvtoolsVersion": "Proxmox {{version}}"
   },
   "merge": {
     "loading": "Unione del parco in corso…",
-    "singleVCenter": "vCenter singolo — nessuna unione tra vCenter applicata."
+    "singleVCenter": "Cluster singolo — nessuna unione tra Cluster applicata."
   }
 }

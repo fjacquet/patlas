@@ -3,26 +3,26 @@
     "label": "View",
     "dashboard": "Dashboard",
     "inventory": "Inventory",
-    "hosts": "Hosts",
+    "hosts": "Nodes",
     "planning": "Planning",
     "eos": "OS end-of-support",
     "trends": "Trends",
     "storage": "Storage",
     "network": "Network",
     "rightsizing": "Right-sizing",
-    "monstervm": "Monster VMs"
+    "monstervm": "Monster Guests"
   },
   "tab": {
     "label": "Object type",
-    "vm": "VMs",
-    "esx": "ESX hosts",
-    "datastore": "Datastores"
+    "vm": "Guests",
+    "esx": "Nodes",
+    "datastore": "Storages"
   },
   "tree": {
     "label": "Inventory tree",
-    "root": "vCenter",
+    "root": "Cluster",
     "empty": "No snapshot loaded",
-    "emptyBody": "Load a vCenter snapshot from the sidebar to browse the inventory.",
+    "emptyBody": "Load a Cluster snapshot from the sidebar to browse the inventory.",
     "loading": "Loading inventory…",
     "error": "Snapshot could not be parsed. Reload the snapshot or pick another one from the sidebar."
   },
@@ -31,7 +31,7 @@
     "active": "Scoped to {{node}}"
   },
   "filter": {
-    "placeholder": "Filter by name, OS, host…",
+    "placeholder": "Filter by name, OS, node…",
     "clear": "Clear filter"
   },
   "columns": {
@@ -50,9 +50,9 @@
     "emptyFiltered": "No {{object}} match the current filter."
   },
   "col": {
-    "vmName": "VM",
+    "vmName": "Guest",
     "cluster": "Cluster",
-    "host": "Host",
+    "host": "Node",
     "vcpu": "vCPU",
     "vramMib": "vRAM (MiB)",
     "vramGib": "vRAM (GiB)",
@@ -66,24 +66,24 @@
     "os": "OS",
     "poweredOn": "Powered on",
     "provisionedMib": "Provisioned (MiB)",
-    "hostName": "Host",
+    "hostName": "Node",
     "sockets": "Sockets",
     "cores": "Cores",
     "speedMhz": "Speed (MHz)",
     "physicalGhz": "Physical GHz",
     "memoryMib": "Memory (MiB)",
-    "vmCount": "VMs",
+    "vmCount": "Guests",
     "vcpuAllocated": "vCPU allocated",
     "vramAllocatedMib": "vRAM allocated (MiB)",
     "cpuRatio": "CPU %",
     "ramRatio": "RAM %",
     "meanCpuReadinessPercent": "CPU Ready mean %",
     "maxCpuReadinessPercent": "CPU Ready max %",
-    "vmsAboveReadinessWarning": "VMs > 5% CPU Ready",
+    "vmsAboveReadinessWarning": "Guests > 5% CPU Ready",
     "serialNumber": "Serial / Service tag",
     "model": "Model",
     "vendor": "Vendor",
-    "key": "Datastore key",
+    "key": "Storage key",
     "name": "Name",
     "type": "Type",
     "capacityMib": "Capacity (MiB)",
@@ -98,9 +98,14 @@
     "freePorts": "Free ports",
     "mtu": "MTU",
     "version": "Version",
-    "hostMembers": "Host members",
-    "vms": "VMs",
+    "hostMembers": "Node members",
+    "vms": "Guests",
     "maxMtu": "Max MTU",
-    "network": "Portgroup"
+    "network": "Portgroup",
+    "guestType": "Type"
+  },
+  "guestType": {
+    "qemu": "VM",
+    "lxc": "Container"
   }
 }

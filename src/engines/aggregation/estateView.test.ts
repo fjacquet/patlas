@@ -224,4 +224,15 @@ describe('buildEstateView', () => {
     expect(EMPTY_VIEW.network.vmPortgroupCount).toBe(0)
     expect(EMPTY_VIEW.flags.counts).toEqual({ fs: 0, ds: 0, lu: 0 })
   })
+
+  it('vmRows projection carries guestType from source VInfoRow', () => {
+    const snap = snapshot()
+    snap.vinfo = [
+      vm({ vmName: 'qemu-vm', guestType: 'qemu' }),
+      vm({ vmName: 'lxc-vm', guestType: 'lxc' }),
+    ]
+    const view = buildEstateView(snap, 'active')
+    const types = view.vmRows.map((r) => r.guestType).sort()
+    expect(types).toEqual(['lxc', 'qemu'])
+  })
 })

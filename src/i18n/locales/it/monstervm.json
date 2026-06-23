@@ -1,12 +1,12 @@
 {
-  "heading": "VM mostruose",
-  "subtitle": "VM più grandi per allocazione configurata",
+  "heading": "Ospiti mostruosi",
+  "subtitle": "Ospiti più grandi per allocazione configurata",
   "empty": {
     "heading": "Nessuno snapshot caricato",
-    "body": "Carica uno snapshot per vedere le VM più grandi per allocazione configurata."
+    "body": "Carica uno snapshot per vedere gli ospiti più grandi per allocazione configurata."
   },
-  "count": "VM mostruose",
-  "none": "Nessuna VM raggiunge le soglie di dimensione attuali.",
+  "count": "Ospiti mostruosi",
+  "none": "Nessun ospite raggiunge le soglie di dimensione attuali.",
   "thresholds": {
     "heading": "Soglie di dimensione (ripristinate al ricaricamento)",
     "minVcpu": "vCPU ≥",

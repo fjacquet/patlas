@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { cores, mib } from '@/engines/units'
+import { bytes, cores, mib } from '@/engines/units'
 import i18n from '@/i18n'
 import { useSnapshotStore } from '@/store/snapshotStore'
 import type { Snapshot } from '@/types/snapshot'
@@ -11,7 +11,7 @@ const snapshot = (): Snapshot =>
   ({
     id: 's1',
     filename: 's1.xlsx',
-    fileSize: 0,
+    fileSize: bytes(0),
     capturedAt: new Date('2026-01-01'),
     vCenterLabel: 'vc-a',
     rvtoolsVersion: '4.4.0',
@@ -39,9 +39,11 @@ const snapshot = (): Snapshot =>
         provisionedMib: mib(1000),
         inUseMib: mib(600),
         path: '[DS_A] vm-1/vm-1.vmx',
+        guestType: 'qemu',
       },
     ],
     vhost: [],
+    vmUsage: [],
     vdatastore: [
       {
         name: 'DS_A',
@@ -68,7 +70,7 @@ const snapshot = (): Snapshot =>
     dvswitch: [],
     dvport: [],
     parseErrors: [],
-  }) as unknown as Snapshot
+  }) satisfies Snapshot
 
 describe('StorageView (D-05..D-08)', () => {
   beforeEach(async () => {
@@ -81,7 +83,7 @@ describe('StorageView (D-05..D-08)', () => {
     render(<StorageView />)
     expect(screen.getByText('Consumption')).not.toBeNull()
     expect(screen.getByText('Capacity')).not.toBeNull()
-    expect(screen.getByText('Datastore')).not.toBeNull()
+    expect(screen.getByText('Storage')).not.toBeNull()
     // factual alerts count line (no verdict / no colour) — default fs 90 %
     expect(screen.getByText(/partitions ≥ 90% used/)).not.toBeNull()
   })

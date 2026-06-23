@@ -30,6 +30,7 @@ const VM_ROW_KEYS: ReadonlySet<string> = new Set<keyof VmDisplayRow>([
   'os',
   'poweredOn',
   'provisionedMib',
+  'guestType',
 ])
 
 // The forbidden OS-family count fields (the "OsBreakdown" interface) —
@@ -60,6 +61,17 @@ describe('vmColumns (INV-02 — bound to projected VmDisplayRow)', () => {
     for (const col of vmColumns) {
       if (col.id !== 'vmName') expect(col.enableHiding).not.toBe(false)
     }
+  })
+
+  it('vmColumns has a guestType column that localizes qemu/lxc to VM/Container', () => {
+    const col = vmColumns.find((c) => c.id === 'guestType')
+    expect(col).toBeDefined()
+    expect((col as { accessorKey?: string }).accessorKey).toBe('guestType')
+    // the cell must localize the raw kind, not render 'qemu'/'lxc'
+    const cell = (col as { cell?: (ctx: { getValue: <T>() => T }) => string }).cell
+    expect(cell).toBeDefined()
+    expect(cell?.({ getValue: () => 'qemu' as never })).toBe('VM')
+    expect(cell?.({ getValue: () => 'lxc' as never })).toBe('Container')
   })
 })
 

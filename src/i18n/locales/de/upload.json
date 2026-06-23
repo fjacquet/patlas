@@ -1,9 +1,9 @@
 {
   "dropzone": {
-    "instruction": "Ziehen Sie Ihre RVTools-Exporte hierher",
+    "instruction": "Legen Sie Ihren Proxmox-Bericht (.zip oder .xlsx) hier ab",
     "or": "oder",
     "browse": "Dateien durchsuchen",
-    "accepted": "Akzeptiertes Format: .xlsx (RVTools-Export). Eine oder mehrere Dateien ablegen.",
+    "accepted": "Akzeptiertes Format: .zip oder .xlsx (Proxmox-Export). Eine oder mehrere Dateien ablegen.",
     "active": "Dateien hier ablegen"
   },
   "fileLoaded": {
@@ -11,28 +11,28 @@
     "remove": "Entfernen"
   },
   "source": {
-    "rvtools": "RVTools",
+    "rvtools": "Proxmox",
     "unknown": "Unbekannt"
   },
   "sources": {
     "list": {
       "title": "Importierte Arbeitsmappen"
     },
-    "summary": "{{n}} Dateien · {{vms}} VMs · {{hosts}} Hosts",
-    "rowCounts": "{{vms}} VMs · {{hosts}} Hosts"
+    "summary": "{{n}} Dateien · {{vms}} Gäste · {{hosts}} Knoten",
+    "rowCounts": "{{vms}} Gäste · {{hosts}} Knoten"
   },
   "errors": {
-    "rejected": "Format nicht erkannt. Legen Sie einen RVTools-.xlsx-Export ab.",
+    "rejected": "Format nicht erkannt. Legen Sie einen Proxmox-Bericht (.zip oder .xlsx) ab.",
     "parseFailed": "Datei konnte nicht gelesen werden: {{message}}"
   },
   "snapshots": {
     "list": "Geladene Snapshots",
     "empty": "Noch keine Snapshots — Arbeitsmappe ablegen",
     "card": {
-      "vCenterLabel": "vCenter",
+      "vCenterLabel": "Cluster",
       "capturedAt": "Erfasst",
-      "rvtoolsVersion": "RVTools",
-      "rows": "{{vms}} VMs · {{hosts}} ESX · {{clusters}} Cluster · {{datastores}} Datastores"
+      "rvtoolsVersion": "Proxmox",
+      "rows": "{{vms}} Gäste · {{hosts}} Knoten · {{clusters}} Cluster · {{datastores}} Speicher"
     }
   }
 }

@@ -45,7 +45,7 @@ export const trendLineOption = (
     const metaLines = point.metadata
       .map((m) =>
         copy.tooltipMeta
-          .replace('{{vcenter}}', m.vCenterLabel)
+          .replace('{{cluster}}', m.vCenterLabel)
           .replace('{{version}}', m.rvtoolsVersion),
       )
       .join('<br/>')

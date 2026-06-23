@@ -40,6 +40,7 @@ const vm = (
   os: 'Ubuntu Linux',
   poweredOn: true,
   provisionedMib: mib(40960),
+  guestType: 'qemu',
   ...over,
 })
 
@@ -110,8 +111,57 @@ describe('InventoryTree (INV-01 — flatten-visible + lazy children)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'ClusterA' }))
     expect(screen.queryByText('vm-a-1')).toBeNull()
     await userEvent.click(screen.getByRole('button', { name: 'esx-a1' }))
+    // Host expanded → gtype group node "VM" is visible, but guests still collapsed.
+    expect(screen.queryByText('vm-a-1')).toBeNull()
+    // Expand the VM group to see the guests.
+    await userEvent.click(screen.getByRole('button', { name: 'VM' }))
     expect(screen.getByText('vm-a-1')).not.toBeNull()
     expect(screen.getByText('vm-a-2')).not.toBeNull()
+  })
+
+  it('groups guests by type under each node', async () => {
+    const mixedVmsByHost = new Map<string, VmDisplayRow[]>([
+      [
+        'esx-a1',
+        [
+          vm({ vmName: 'vm-qemu-1', cluster: 'ClusterA', host: 'esx-a1', guestType: 'qemu' }),
+          vm({ vmName: 'vm-lxc-1', cluster: 'ClusterA', host: 'esx-a1', guestType: 'lxc' }),
+        ],
+      ],
+    ])
+    render(
+      <InventoryTree
+        rootLabel="vcenter.test.local"
+        clustersOrdered={['ClusterA']}
+        hostsByCluster={
+          new Map([['ClusterA', [host({ hostName: 'esx-a1', cluster: 'ClusterA' })]]])
+        }
+        vmsByHost={mixedVmsByHost}
+        selectedId={null}
+        onSelect={() => {}}
+      />,
+    )
+
+    // Expand root (already open) → cluster → host
+    await userEvent.click(screen.getByRole('button', { name: 'ClusterA' }))
+    await userEvent.click(screen.getByRole('button', { name: 'esx-a1' }))
+
+    // Two gtype group nodes should appear: "VM" (qemu) and "Container" (lxc)
+    expect(screen.getByText('VM')).not.toBeNull()
+    expect(screen.getByText('Container')).not.toBeNull()
+
+    // Guests are NOT visible yet (groups collapsed)
+    expect(screen.queryByText('vm-qemu-1')).toBeNull()
+    expect(screen.queryByText('vm-lxc-1')).toBeNull()
+
+    // Expand the VM group → only qemu guest appears
+    await userEvent.click(screen.getByRole('button', { name: 'VM' }))
+    expect(screen.getByText('vm-qemu-1')).not.toBeNull()
+    expect(screen.queryByText('vm-lxc-1')).toBeNull()
+
+    // Expand the Container group → lxc guest appears
+    await userEvent.click(screen.getByRole('button', { name: 'Container' }))
+    expect(screen.getByText('vm-lxc-1')).not.toBeNull()
   })
 
   it('chevron toggles aria-expanded', async () => {

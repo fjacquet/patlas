@@ -1,24 +1,24 @@
 {
   "hosts": {
-    "title": "Hosts",
+    "title": "Knoten",
     "rollup": {
-      "title": "Bestands-Hosts",
-      "hosts": "Hosts",
+      "title": "Bestands-Knoten",
+      "hosts": "Knoten",
       "cores": "Physische Kerne",
-      "memMib": "Host-Arbeitsspeicher (MiB)",
+      "memMib": "Knoten-Arbeitsspeicher (MiB)",
       "avgCpu": "Durchschn. CPU %",
       "avgMem": "Durchschn. RAM %",
-      "poweredOnVms": "Eingeschaltete VMs"
+      "poweredOnVms": "Eingeschaltete Gäste"
     },
     "col": {
-      "host": "Host",
+      "host": "Knoten",
       "cluster": "Cluster",
       "cores": "Kerne",
       "memMib": "Arbeitsspeicher (MiB)",
       "cpuPct": "CPU %",
       "ramPct": "RAM %",
-      "poweredOnVms": "Eingeschaltete VMs",
-      "esxVersion": "ESXi-Version",
+      "poweredOnVms": "Eingeschaltete Gäste",
+      "esxVersion": "PVE-Version",
       "faultDomain": "Fehlerdomäne",
       "model": "Modell",
       "vendor": "Hersteller"
@@ -35,7 +35,7 @@
     "inUse": "Zugesichert (MiB)",
     "guestData": "Gastdaten (MiB)",
     "totalCores": "Physische Kerne gesamt",
-    "totalMem": "Host-Arbeitsspeicher gesamt (MiB)",
+    "totalMem": "Knoten-Arbeitsspeicher gesamt (MiB)",
     "power": {
       "on": "{{count}} eingeschaltet",
       "off": "{{count}} ausgeschaltet",

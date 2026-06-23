@@ -1,4 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import i18n from '@/i18n'
 import type { VmDisplayRow } from '@/types/estate'
 import { fmtInt, fmtMemMb } from '@/utils/format'
 
@@ -67,5 +68,11 @@ export const vmColumns: ColumnDef<VmDisplayRow>[] = [
     id: 'provisionedMib',
     header: 'inventory.col.provisionedMib',
     cell: (ctx) => fmtMemMb(ctx.getValue<number>()),
+  },
+  {
+    accessorKey: 'guestType',
+    id: 'guestType',
+    header: 'inventory.col.guestType',
+    cell: (ctx) => i18n.t(`inventory:guestType.${ctx.getValue<'qemu' | 'lxc'>()}`),
   },
 ]

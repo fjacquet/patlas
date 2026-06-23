@@ -23,13 +23,13 @@
     "drSlotHeading": "Simulazione DR — ipotesi",
     "drSlotPending": "Il pannello di simulazione DR rielaborato arriverà su questa superficie in un piano successivo.",
     "emptyHeading": "Nessuno snapshot caricato",
-    "emptyBody": "Carica uno snapshot vCenter dalla barra laterale per usare la vista di pianificazione della capacità."
+    "emptyBody": "Carica uno snapshot Cluster dalla barra laterale per usare la vista di pianificazione della capacità."
   },
   "plannedEstate": {
     "title": "Parco pianificato vs misurato",
     "none": "—",
-    "vmMeasured": "VM misurate",
-    "vmPlanned": "VM pianificate",
+    "vmMeasured": "Ospiti misurati",
+    "vmPlanned": "Ospiti pianificati",
     "vcpuMeasured": "vCPU:pCPU misurato",
     "vcpuPlanned": "vCPU:pCPU pianificato",
     "clusterDelta": "Delta per cluster",

@@ -23,13 +23,13 @@
     "drSlotHeading": "DR-Simulation — Was-wäre-wenn",
     "drSlotPending": "Das überarbeitete DR-Simulationspanel erscheint in einem folgenden Plan auf dieser Oberfläche.",
     "emptyHeading": "Kein Snapshot geladen",
-    "emptyBody": "Laden Sie einen vCenter-Snapshot aus der Seitenleiste, um die Kapazitätsplanungs-Sicht zu nutzen."
+    "emptyBody": "Laden Sie einen Cluster-Snapshot aus der Seitenleiste, um die Kapazitätsplanungs-Sicht zu nutzen."
   },
   "plannedEstate": {
     "title": "Geplanter vs. gemessener Bestand",
     "none": "—",
-    "vmMeasured": "VMs gemessen",
-    "vmPlanned": "VMs geplant",
+    "vmMeasured": "Gäste gemessen",
+    "vmPlanned": "Gäste geplant",
     "vcpuMeasured": "vCPU:pCPU gemessen",
     "vcpuPlanned": "vCPU:pCPU geplant",
     "clusterDelta": "Delta pro Cluster",

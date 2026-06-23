@@ -23,13 +23,13 @@
     "drSlotHeading": "Simulation de reprise — simulation",
     "drSlotPending": "Le panneau de simulation de reprise retravaillé arrive sur cette surface dans un plan suivant.",
     "emptyHeading": "Aucun instantané chargé",
-    "emptyBody": "Chargez un instantané vCenter depuis la barre latérale pour utiliser la lentille de planification de capacité."
+    "emptyBody": "Chargez un instantané Cluster depuis la barre latérale pour utiliser la lentille de planification de capacité."
   },
   "plannedEstate": {
     "title": "Parc planifié vs mesuré",
     "none": "—",
-    "vmMeasured": "VM mesurées",
-    "vmPlanned": "VM planifiées",
+    "vmMeasured": "Invités mesurés",
+    "vmPlanned": "Invités planifiés",
     "vcpuMeasured": "vCPU:pCPU mesuré",
     "vcpuPlanned": "vCPU:pCPU planifié",
     "clusterDelta": "Écart par cluster",

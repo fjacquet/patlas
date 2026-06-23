@@ -1,6 +1,6 @@
 {
   "appName": "vatlas",
-  "tagline": "RVTools → atlas of your VMware estate (100 % client-side)",
+  "tagline": "Proxmox → atlas of your Proxmox estate (100 % client-side)",
   "footer": "100% client-side · your file never leaves your browser",
   "error": {
     "title": "An error occurred"
