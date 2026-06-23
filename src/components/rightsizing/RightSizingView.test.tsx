@@ -75,6 +75,7 @@ const snap = (): Snapshot =>
         cpuUsageMhz: mhz(300),
       },
     ],
+    proxmoxSnapshots: [],
     vdatastore: [],
     vpartition: [],
     vnetwork: [],

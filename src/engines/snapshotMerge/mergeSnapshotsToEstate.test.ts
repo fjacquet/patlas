@@ -57,6 +57,7 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   vinfo: [],
   vhost: [],
   vmUsage: [],
+  proxmoxSnapshots: [],
   vdatastore: [],
   vpartition: [],
   vnetwork: [],
