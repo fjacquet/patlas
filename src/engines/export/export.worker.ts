@@ -51,7 +51,7 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
     const fmtN = (n: number): string =>
       Number.isFinite(n) ? n.toLocaleString(bcp47, { maximumFractionDigits: 0 }) : '—'
     const vars: Record<string, string> = {
-      vcenters: '',
+      vcenters: view.clusters[0]?.cluster ?? '',
       clusters: fmtN(view.globals.clusterCount),
       hosts: fmtN(view.globals.hostCount),
       vms: fmtN(view.globals.vmCount),
