@@ -11,7 +11,8 @@
     "network": "Netzwerk",
     "rightsizing": "Dimensionierung",
     "monstervm": "Monster-Gäste",
-    "snapshots": "Snapshot-Wildwuchs"
+    "snapshots": "Snapshot-Wildwuchs",
+    "storagecontent": "Speicherinhalt"
   },
   "tab": {
     "label": "Objekttyp",

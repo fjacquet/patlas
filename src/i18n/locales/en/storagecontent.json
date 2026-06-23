@@ -1,0 +1,29 @@
+{
+  "heading": "Storage Content",
+  "subtitle": "What occupies each storage, by content type",
+  "empty": {
+    "heading": "No report loaded",
+    "body": "Load a report to see storage content."
+  },
+  "kpi": {
+    "totalSize": "Total size (GiB)",
+    "files": "Files",
+    "contentTypes": "Content types",
+    "backups": "Backups"
+  },
+  "byContent": "By content type",
+  "byStorage": "By storage",
+  "backups": {
+    "heading": "Backup files",
+    "none": "No backup files found on this estate."
+  },
+  "col": {
+    "content": "Content type",
+    "storage": "Storage",
+    "count": "Files",
+    "sizeGib": "Size (GiB)",
+    "guestName": "Guest",
+    "fileName": "File",
+    "ageDays": "Age (days)"
+  }
+}

@@ -11,7 +11,8 @@
     "network": "Réseau",
     "rightsizing": "Dimensionnement",
     "monstervm": "Invités monstres",
-    "snapshots": "Prolifération des instantanés"
+    "snapshots": "Prolifération des instantanés",
+    "storagecontent": "Contenu stockage"
   },
   "tab": {
     "label": "Type d'objet",

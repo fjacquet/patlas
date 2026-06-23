@@ -16,6 +16,7 @@ import deReport from './locales/de/report.json'
 import deRightsizing from './locales/de/rightsizing.json'
 import deSnapshots from './locales/de/snapshots.json'
 import deStorage from './locales/de/storage.json'
+import deStorageContent from './locales/de/storagecontent.json'
 import deTrends from './locales/de/trends.json'
 import deUpload from './locales/de/upload.json'
 import enAlerts from './locales/en/alerts.json'
@@ -33,6 +34,7 @@ import enReport from './locales/en/report.json'
 import enRightsizing from './locales/en/rightsizing.json'
 import enSnapshots from './locales/en/snapshots.json'
 import enStorage from './locales/en/storage.json'
+import enStorageContent from './locales/en/storagecontent.json'
 import enTrends from './locales/en/trends.json'
 import enUpload from './locales/en/upload.json'
 import frAlerts from './locales/fr/alerts.json'
@@ -50,6 +52,7 @@ import frReport from './locales/fr/report.json'
 import frRightsizing from './locales/fr/rightsizing.json'
 import frSnapshots from './locales/fr/snapshots.json'
 import frStorage from './locales/fr/storage.json'
+import frStorageContent from './locales/fr/storagecontent.json'
 import frTrends from './locales/fr/trends.json'
 import frUpload from './locales/fr/upload.json'
 import itAlerts from './locales/it/alerts.json'
@@ -67,6 +70,7 @@ import itReport from './locales/it/report.json'
 import itRightsizing from './locales/it/rightsizing.json'
 import itSnapshots from './locales/it/snapshots.json'
 import itStorage from './locales/it/storage.json'
+import itStorageContent from './locales/it/storagecontent.json'
 import itTrends from './locales/it/trends.json'
 import itUpload from './locales/it/upload.json'
 
@@ -100,6 +104,7 @@ export const NAMESPACES = [
   'rightsizing',
   'monstervm',
   'snapshots',
+  'storagecontent',
 ] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
@@ -122,6 +127,7 @@ export const resources = {
     rightsizing: enRightsizing,
     monstervm: enMonstervm,
     snapshots: enSnapshots,
+    storagecontent: enStorageContent,
   },
   fr: {
     common: frCommon,
@@ -141,6 +147,7 @@ export const resources = {
     rightsizing: frRightsizing,
     monstervm: frMonstervm,
     snapshots: frSnapshots,
+    storagecontent: frStorageContent,
   },
   de: {
     common: deCommon,
@@ -160,6 +167,7 @@ export const resources = {
     rightsizing: deRightsizing,
     monstervm: deMonstervm,
     snapshots: deSnapshots,
+    storagecontent: deStorageContent,
   },
   it: {
     common: itCommon,
@@ -179,6 +187,7 @@ export const resources = {
     rightsizing: itRightsizing,
     monstervm: itMonstervm,
     snapshots: itSnapshots,
+    storagecontent: itStorageContent,
   },
 } as const
 
