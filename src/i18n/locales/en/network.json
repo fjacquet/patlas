@@ -5,18 +5,18 @@
   "section": {
     "vswitch": "Standard switches (vSwitch)",
     "dvswitch": "Distributed switches (dvSwitch)",
-    "vnetwork": "VM portgroups (vNetwork)"
+    "vnetwork": "Guest portgroups (vNetwork)"
   },
   "detail": {
     "back": "Back",
-    "title": "ESX — {{name}}",
-    "datastores": "Datastores mounted",
-    "datastoresNote": "Per-host datastore names are not in RVTools (vDatastore Hosts is a count).",
+    "title": "Node — {{name}}",
+    "datastores": "Storages mounted",
+    "datastoresNote": "Per-node storage names are not available (Storage Nodes is a count).",
     "vswitches": "Standard switches",
     "dvswitches": "Distributed switches",
     "uplinks": "Uplinks",
     "cluster": "Cluster",
-    "esxVersion": "ESXi version"
+    "esxVersion": "PVE version"
   },
   "na": "—"
 }

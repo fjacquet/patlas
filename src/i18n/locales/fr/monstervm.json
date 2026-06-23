@@ -1,12 +1,12 @@
 {
-  "heading": "VM monstres",
-  "subtitle": "Plus grandes VM par allocation configurée",
+  "heading": "Invités monstres",
+  "subtitle": "Plus grands invités par allocation configurée",
   "empty": {
     "heading": "Aucun instantané chargé",
-    "body": "Chargez un instantané pour voir les plus grandes VM par allocation configurée."
+    "body": "Chargez un instantané pour voir les plus grands invités par allocation configurée."
   },
-  "count": "VM monstres",
-  "none": "Aucune VM n'atteint les seuils de taille actuels.",
+  "count": "Invités monstres",
+  "none": "Aucun invité n'atteint les seuils de taille actuels.",
   "thresholds": {
     "heading": "Seuils de taille (réinitialisés au rechargement)",
     "minVcpu": "vCPU ≥",

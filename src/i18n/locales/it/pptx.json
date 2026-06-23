@@ -1,14 +1,14 @@
 {
   "title": {
-    "identity": "{{clusters}} cluster · {{hosts}} host · {{vms}} VM · acquisito il {{captureDate}}",
+    "identity": "{{clusters}} cluster · {{hosts}} nodi · {{vms}} ospiti · acquisito il {{captureDate}}",
     "generated": "Generato da vatlas — sintesi fattuale del parco",
     "eyebrow": "INFRASTRUTTURA PROXMOX",
     "fallback": "infrastruttura Proxmox"
   },
   "overview": {
     "title": "Panoramica del parco",
-    "vms": "VM",
-    "hosts": "Host",
+    "vms": "Ospiti",
+    "hosts": "Nodi",
     "clusters": "Cluster",
     "vcpuPerPcpu": "vCPU : pCPU",
     "os": "Famiglia OS",
@@ -17,19 +17,19 @@
     "avgCpu": "CPU media %",
     "avgMem": "Memoria media %",
     "cores": "Core fisici",
-    "hostMem": "Memoria host",
+    "hostMem": "Memoria nodo",
     "provisioned": "Provisionato",
     "usedStorage": "Spazio utilizzato"
   },
   "cluster": {
     "stretched": "Stretched",
     "drReserved": "Riservato DR",
-    "hostsWord": "host",
-    "vmsWord": "VM",
+    "hostsWord": "nodi",
+    "vmsWord": "ospiti",
     "coresWord": "core",
     "ramWord": "RAM",
-    "readyLine": "CPU Ready: {{mean}}% media · {{max}}% max · {{count}} VM > {{thr}}%",
-    "readyUnavailable": "CPU Ready: non disponibile (fonte: RVTools)",
+    "readyLine": "CPU Ready: {{mean}}% media · {{max}}% max · {{count}} ospite/i > {{thr}}%",
+    "readyUnavailable": "CPU Ready: non disponibile (fonte: Proxmox)",
     "cpuMean": "CPU media",
     "ramMean": "RAM media",
     "ghzUsedPhys": "GHz usati / fis.",
@@ -47,7 +47,7 @@
     "consumedGhz": "GHz consumati",
     "availableGhz": "GHz disponibili",
     "ramAvailable": "RAM disponibile",
-    "footer": "Fonte: RVTools — vHost (utilizzo CPU/RAM %, Speed × Cores, Memory) + vInfo (vCPUs, Memory)"
+    "footer": "Fonte: Proxmox — nodo (utilizzo CPU/RAM %, Speed × Cores, Memory) + info ospite (vCPUs, Memory)"
   },
   "eos": {
     "title": "Previsione di fine supporto degli OS",
@@ -71,37 +71,37 @@
     "title": "Andamenti nella sessione",
     "points": "Punti della cronologia",
     "deltas": "Delta",
-    "series": "Numero di VM tra gli snapshot"
+    "series": "Numero di ospiti tra gli snapshot"
   },
   "inventory": {
     "title": "Riepilogo dell'inventario",
-    "vms": "Righe VM",
-    "hosts": "Host",
+    "vms": "Righe ospiti",
+    "hosts": "Nodi",
     "clusters": "Cluster",
-    "datastores": "Datastore",
+    "datastores": "Archiviazioni",
     "os": "Famiglia OS"
   },
   "physical": {
     "title": "Inventario fisico — numero di serie / service tag",
-    "hosts": "Host",
-    "withSerial": "Host con numero di serie",
-    "colHost": "Host",
+    "hosts": "Nodi",
+    "withSerial": "Nodi con numero di serie",
+    "colHost": "Nodo",
     "colCluster": "Cluster",
     "colSerial": "Numero di serie / Service tag",
     "colModel": "Modello",
     "colVendor": "Produttore",
-    "footer": "Fonte: RVTools — vHost (Serial number / Service tag, Model, Vendor)"
+    "footer": "Fonte: Proxmox — nodo (Serial number / Service tag, Model, Vendor)"
   },
   "contention": {
     "title": "CPU Ready (allegato)"
   },
   "storage": {
-    "title": "Storage",
-    "byCluster": "Storage per cluster",
+    "title": "Archiviazione",
+    "byCluster": "Archiviazione per cluster",
     "provisioned": "Provisionato",
     "inUse": "In uso",
     "capacity": "Capacità",
-    "flagged": "Datastore segnalati",
+    "flagged": "Archiviazioni segnalate",
     "colCluster": "Cluster",
     "colProvisioned": "Provisionato",
     "colInUse": "In uso",
@@ -112,8 +112,8 @@
     "vswitches": "vSwitches",
     "dvswitches": "dvSwitches",
     "portgroups": "Gruppi di porte",
-    "vnetwork": "Adiacenze VM",
-    "absent": "I fogli opzionali vNetwork / vSwitch / dvSwitch / dvPort non sono presenti in questo export RVTools — nessuna topologia di rete da riportare."
+    "vnetwork": "Adiacenze ospiti",
+    "absent": "I fogli opzionali vNetwork / vSwitch / dvSwitch / dvPort non sono presenti in questo export Proxmox — nessuna topologia di rete da riportare."
   },
   "os": {
     "title": "Sistemi operativi",
@@ -126,8 +126,8 @@
     "none": "—",
     "vcpuMeasured": "vCPU:pCPU misurato",
     "vcpuPlanned": "vCPU:pCPU pianificato",
-    "vmMeasured": "VM misurate",
-    "vmPlanned": "VM pianificate",
+    "vmMeasured": "Ospiti misurati",
+    "vmPlanned": "Ospiti pianificati",
     "clusterDelta": "Delta per cluster",
     "colCluster": "Cluster",
     "colMeasured": "Misurato",

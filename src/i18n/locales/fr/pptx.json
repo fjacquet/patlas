@@ -1,14 +1,14 @@
 {
   "title": {
-    "identity": "{{clusters}} clusters · {{hosts}} hôtes · {{vms}} VMs · capturé le {{captureDate}}",
+    "identity": "{{clusters}} clusters · {{hosts}} nœuds · {{vms}} invités · capturé le {{captureDate}}",
     "generated": "Généré par vatlas — synthèse factuelle du parc",
     "eyebrow": "PARC PROXMOX",
     "fallback": "parc Proxmox"
   },
   "overview": {
     "title": "Vue d'ensemble du parc",
-    "vms": "VM",
-    "hosts": "Hôtes",
+    "vms": "Invités",
+    "hosts": "Nœuds",
     "clusters": "Clusters",
     "vcpuPerPcpu": "vCPU : pCPU",
     "os": "Familles d'OS",
@@ -17,19 +17,19 @@
     "avgCpu": "CPU moyen %",
     "avgMem": "Mémoire moyenne %",
     "cores": "Cœurs physiques",
-    "hostMem": "Mémoire hôte",
+    "hostMem": "Mémoire nœud",
     "provisioned": "Provisionné",
     "usedStorage": "Stockage utilisé"
   },
   "cluster": {
     "stretched": "Étendu",
     "drReserved": "Réservé PRA",
-    "hostsWord": "hôtes",
-    "vmsWord": "VM",
+    "hostsWord": "nœuds",
+    "vmsWord": "invités",
     "coresWord": "cœurs",
     "ramWord": "RAM",
-    "readyLine": "CPU Ready : {{mean}} % moyen · {{max}} % max · {{count}} VM > {{thr}} %",
-    "readyUnavailable": "CPU Ready : indisponible (source : RVTools)",
+    "readyLine": "CPU Ready : {{mean}} % moyen · {{max}} % max · {{count}} invité(s) > {{thr}} %",
+    "readyUnavailable": "CPU Ready : indisponible (source : Proxmox)",
     "cpuMean": "CPU moyen",
     "ramMean": "RAM moyen",
     "ghzUsedPhys": "GHz utilisés / phys.",
@@ -47,7 +47,7 @@
     "consumedGhz": "GHz consommés",
     "availableGhz": "GHz disponibles",
     "ramAvailable": "RAM disponible",
-    "footer": "Source : RVTools — vHost (% CPU/RAM, Speed × Cores, Memory) + vInfo (vCPUs, Memory)"
+    "footer": "Source : Proxmox — nœud (% CPU/RAM, Speed × Cores, Memory) + info invité (vCPUs, Memory)"
   },
   "eos": {
     "title": "Prévision de fin de support des OS",
@@ -71,26 +71,26 @@
     "title": "Tendances de session",
     "points": "Points de la chronologie",
     "deltas": "Deltas",
-    "series": "Nombre de VM sur les snapshots"
+    "series": "Nombre d'invités sur les instantanés"
   },
   "inventory": {
     "title": "Synthèse d'inventaire",
-    "vms": "Lignes VM",
-    "hosts": "Hôtes",
+    "vms": "Lignes invités",
+    "hosts": "Nœuds",
     "clusters": "Clusters",
-    "datastores": "Datastores",
+    "datastores": "Stockages",
     "os": "Familles d'OS"
   },
   "physical": {
     "title": "Inventaire physique — n° de série / service tag",
-    "hosts": "Hôtes",
-    "withSerial": "Hôtes avec n° de série",
-    "colHost": "Hôte",
+    "hosts": "Nœuds",
+    "withSerial": "Nœuds avec n° de série",
+    "colHost": "Nœud",
     "colCluster": "Cluster",
     "colSerial": "N° de série / Service tag",
     "colModel": "Modèle",
     "colVendor": "Constructeur",
-    "footer": "Source : RVTools — vHost (Serial number / Service tag, Model, Vendor)"
+    "footer": "Source : Proxmox — nœud (Serial number / Service tag, Model, Vendor)"
   },
   "contention": {
     "title": "CPU Ready (annexe)"
@@ -101,7 +101,7 @@
     "provisioned": "Provisionné",
     "inUse": "Utilisé",
     "capacity": "Capacité",
-    "flagged": "Datastores signalés",
+    "flagged": "Stockages signalés",
     "colCluster": "Cluster",
     "colProvisioned": "Provisionné",
     "colInUse": "Utilisé",
@@ -112,8 +112,8 @@
     "vswitches": "vSwitches",
     "dvswitches": "dvSwitches",
     "portgroups": "Groupes de ports",
-    "vnetwork": "Adjacences VM",
-    "absent": "Les feuilles optionnelles vNetwork / vSwitch / dvSwitch / dvPort sont absentes de cet export RVTools — aucune topologie réseau à présenter."
+    "vnetwork": "Adjacences invités",
+    "absent": "Les feuilles optionnelles vNetwork / vSwitch / dvSwitch / dvPort sont absentes de cet export Proxmox — aucune topologie réseau à présenter."
   },
   "os": {
     "title": "Systèmes d'exploitation",
@@ -126,8 +126,8 @@
     "none": "—",
     "vcpuMeasured": "vCPU:pCPU mesuré",
     "vcpuPlanned": "vCPU:pCPU planifié",
-    "vmMeasured": "VM mesurées",
-    "vmPlanned": "VM planifiées",
+    "vmMeasured": "Invités mesurés",
+    "vmPlanned": "Invités planifiés",
     "clusterDelta": "Écart par cluster",
     "colCluster": "Cluster",
     "colMeasured": "Mesuré",

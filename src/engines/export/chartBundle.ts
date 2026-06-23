@@ -159,7 +159,7 @@ export function buildChartBundle(
         vmCount: L.trend.vmCount,
         poweredOnVms: L.trend.poweredOnVms,
         tooltipDate: '{{date}}',
-        tooltipMeta: '{{vcenter}} · {{version}}',
+        tooltipMeta: '{{cluster}} · {{version}}',
       },
       locale === 'fr' ? 'fr-FR' : 'en-US',
     )

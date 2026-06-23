@@ -12,16 +12,16 @@
     "storageRealistic": "Stockage réaliste",
     "echo": "({{mode}})",
     "describe": {
-      "configured": "Toutes les VM y compris éteintes (vCPU/vRAM).",
-      "active": "VM démarrées uniquement.",
-      "storageRealistic": "Démarrées pour CPU/RAM, toutes les VM pour le stockage provisionné."
+      "configured": "Tous les invités y compris éteints (vCPU/vRAM).",
+      "active": "Invités démarrés uniquement.",
+      "storageRealistic": "Démarrés pour CPU/RAM, tous les invités pour le stockage provisionné."
     }
   },
   "stats": {
     "clusters": "Clusters",
-    "esx": "ESX",
-    "vms": "VM",
-    "datastores": "Datastores",
+    "esx": "Nœuds",
+    "vms": "Invités",
+    "datastores": "Stockages",
     "vcpu": "vCPU",
     "vram": "vRAM",
     "storage": "Stockage",
@@ -32,7 +32,7 @@
     "vcpuPerCore": "vCPU par cœur physique",
     "cpuReadyMean": "CPU Ready (moy.)",
     "cpuReadyMax": "CPU Ready (max)",
-    "vmsAboveReady": "VM > 5 % CPU Ready"
+    "vmsAboveReady": "Invités > 5 % CPU Ready"
   },
   "os": {
     "windows": "Windows",
@@ -41,7 +41,7 @@
   },
   "states": {
     "emptyHeading": "Aucun instantané chargé",
-    "emptyBody": "Déposez un export RVTools .xlsx dans la barre latérale pour afficher le tableau de bord du parc.",
+    "emptyBody": "Déposez votre rapport Proxmox (.zip ou .xlsx) dans la barre latérale pour afficher le tableau de bord du parc.",
     "loading": "Agrégation du parc…",
     "error": "Cet instantané n'a pas pu être agrégé : {{message}}. Réessayez en redéposant le classeur dans la barre latérale."
   },

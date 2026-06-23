@@ -12,16 +12,16 @@
     "storageRealistic": "Speicher-realistisch",
     "echo": "({{mode}})",
     "describe": {
-      "configured": "Alle VMs einschließlich ausgeschalteter (vCPU/vRAM).",
-      "active": "Nur eingeschaltete VMs.",
-      "storageRealistic": "Eingeschaltet für CPU/RAM, alle VMs für bereitgestellten Speicher."
+      "configured": "Alle Gäste einschließlich ausgeschalteter (vCPU/vRAM).",
+      "active": "Nur eingeschaltete Gäste.",
+      "storageRealistic": "Eingeschaltet für CPU/RAM, alle Gäste für bereitgestellten Speicher."
     }
   },
   "stats": {
     "clusters": "Cluster",
-    "esx": "ESX",
-    "vms": "VMs",
-    "datastores": "Datastores",
+    "esx": "Knoten",
+    "vms": "Gäste",
+    "datastores": "Speicher",
     "vcpu": "vCPU",
     "vram": "vRAM",
     "storage": "Speicher",
@@ -32,7 +32,7 @@
     "vcpuPerCore": "vCPU pro physischem Kern",
     "cpuReadyMean": "CPU Ready (Mittel)",
     "cpuReadyMax": "CPU Ready (max)",
-    "vmsAboveReady": "VMs > 5 % CPU Ready"
+    "vmsAboveReady": "Gäste > 5 % CPU Ready"
   },
   "os": {
     "windows": "Windows",
@@ -41,7 +41,7 @@
   },
   "states": {
     "emptyHeading": "Kein Snapshot geladen",
-    "emptyBody": "Legen Sie einen RVTools-.xlsx-Export in der Seitenleiste ab, um das Bestands-Dashboard zu sehen.",
+    "emptyBody": "Legen Sie Ihren Proxmox-Bericht (.zip oder .xlsx) in der Seitenleiste ab, um das Bestands-Dashboard zu sehen.",
     "loading": "Bestand wird aggregiert…",
     "error": "Dieser Snapshot konnte nicht aggregiert werden: {{message}}. Legen Sie die Arbeitsmappe erneut in der Seitenleiste ab."
   },

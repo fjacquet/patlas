@@ -12,16 +12,16 @@
     "storageRealistic": "Storage-realistic",
     "echo": "({{mode}})",
     "describe": {
-      "configured": "All VMs including powered-off (vCPU/vRAM).",
-      "active": "Powered-on VMs only.",
-      "storageRealistic": "Powered-on for CPU/RAM, all VMs for provisioned storage."
+      "configured": "All Guests including powered-off (vCPU/vRAM).",
+      "active": "Powered-on Guests only.",
+      "storageRealistic": "Powered-on for CPU/RAM, all Guests for provisioned storage."
     }
   },
   "stats": {
     "clusters": "Clusters",
-    "esx": "ESX",
-    "vms": "VMs",
-    "datastores": "Datastores",
+    "esx": "Nodes",
+    "vms": "Guests",
+    "datastores": "Storages",
     "vcpu": "vCPU",
     "vram": "vRAM",
     "storage": "Storage",
@@ -32,7 +32,7 @@
     "vcpuPerCore": "vCPU per physical core",
     "cpuReadyMean": "CPU Ready (mean)",
     "cpuReadyMax": "CPU Ready (max)",
-    "vmsAboveReady": "VMs > 5% CPU Ready"
+    "vmsAboveReady": "Guests > 5% CPU Ready"
   },
   "os": {
     "windows": "Windows",
@@ -41,7 +41,7 @@
   },
   "states": {
     "emptyHeading": "No snapshot loaded",
-    "emptyBody": "Drop an RVTools .xlsx export in the sidebar to see the estate dashboard.",
+    "emptyBody": "Drop your Proxmox report (.zip or .xlsx) in the sidebar to see the estate dashboard.",
     "loading": "Aggregating the estate…",
     "error": "This snapshot could not be aggregated: {{message}}. Try re-dropping the workbook in the sidebar."
   },

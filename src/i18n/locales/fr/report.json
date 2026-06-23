@@ -11,7 +11,7 @@
     "error": "L'export ne s'est pas terminé. Les données sont inchangées — ouvrez la console du navigateur pour le détail, puis réessayez."
   },
   "footer": {
-    "methodology": "Généré par vatlas — synthèse factuelle du parc. Source : export RVTools, capturé le {{captureDate}}. Les chiffres reflètent l'instantané actif uniquement."
+    "methodology": "Généré par vatlas — synthèse factuelle du parc. Source : export Proxmox, capturé le {{captureDate}}. Les chiffres reflètent l'instantané actif uniquement."
   },
   "storage": {
     "title": "Stockage",
@@ -20,7 +20,7 @@
     "usedStorage": "Stockage utilisé (Gio)",
     "inUse": "Engagé (Gio)",
     "capacity": "Capacité (Gio)",
-    "flagged": "Datastores signalés",
+    "flagged": "Stockages signalés",
     "colCluster": "Cluster",
     "colProvisioned": "Provisionné",
     "colInUse": "Utilisé",
@@ -31,15 +31,15 @@
     "vswitches": "vSwitches",
     "dvswitches": "dvSwitches",
     "portgroups": "Groupes de ports",
-    "vnetwork": "Adjacences VM"
+    "vnetwork": "Adjacences invités"
   },
   "planned": {
     "title": "Parc planifié vs mesuré",
     "none": "—",
     "vcpuMeasured": "vCPU:pCPU mesuré",
     "vcpuPlanned": "vCPU:pCPU planifié",
-    "vmMeasured": "VM mesurées",
-    "vmPlanned": "VM planifiées",
+    "vmMeasured": "Invités mesurés",
+    "vmPlanned": "Invités planifiés",
     "clusterDelta": "Écart par cluster",
     "colCluster": "Cluster",
     "colMeasured": "Mesuré",

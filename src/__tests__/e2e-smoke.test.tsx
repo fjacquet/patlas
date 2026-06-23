@@ -142,8 +142,8 @@ describe('Proxmox end-to-end smoke: drop → parse → render', () => {
     // Cluster label from the mock Proxmox snapshot (may appear in sidebar + table).
     expect(screen.queryAllByText(/proxmox/i).length).toBeGreaterThan(0)
 
-    // Row counts: 2 guests (1 VM + 1 LXC), 1 ESX node.
-    expect(screen.getByText(/2 VMs/i)).not.toBeNull()
+    // Row counts: 2 guests (1 VM + 1 LXC), 1 node.
+    expect(screen.getByText(/2 Guests/i)).not.toBeNull()
   })
 
   it('PAR-05: clearing the store mimics a refresh — no persisted dataset rows remain', () => {

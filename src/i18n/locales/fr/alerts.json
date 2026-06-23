@@ -2,15 +2,15 @@
   "config": {
     "heading": "Seuils",
     "fs": "Système de fichiers utilisé %",
-    "ds": "Datastore utilisé %",
+    "ds": "Stockage utilisé %",
     "lu": "LU utilisé %",
-    "echo": "Système de fichiers ≥ {{fs}} % · Datastore > {{ds}} % · LU > {{lu}} %"
+    "echo": "Système de fichiers ≥ {{fs}} % · Stockage > {{ds}} % · LU > {{lu}} %"
   },
   "fs": {
-    "count": "{{count}} partitions ≥ {{pct}} % utilisés"
+    "count": "{{count}} partitions ≥ {{pct}} % utilisées"
   },
   "ds": {
-    "count": "{{count}} datastores > {{pct}} % utilisés"
+    "count": "{{count}} stockages > {{pct}} % utilisés"
   },
   "lu": {
     "count": "{{count}} unités logiques > {{pct}} % utilisées"

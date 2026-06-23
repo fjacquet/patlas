@@ -1,24 +1,24 @@
 {
   "hosts": {
-    "title": "Hosts",
+    "title": "Nodes",
     "rollup": {
-      "title": "Estate hosts",
-      "hosts": "Hosts",
+      "title": "Estate nodes",
+      "hosts": "Nodes",
       "cores": "Physical cores",
-      "memMib": "Host memory (MiB)",
+      "memMib": "Node memory (MiB)",
       "avgCpu": "Avg CPU %",
       "avgMem": "Avg memory %",
-      "poweredOnVms": "Powered-on VMs"
+      "poweredOnVms": "Powered-on Guests"
     },
     "col": {
-      "host": "Host",
+      "host": "Node",
       "cluster": "Cluster",
       "cores": "Cores",
       "memMib": "Memory (MiB)",
       "cpuPct": "CPU %",
       "ramPct": "RAM %",
-      "poweredOnVms": "Powered-on VMs",
-      "esxVersion": "ESXi version",
+      "poweredOnVms": "Powered-on Guests",
+      "esxVersion": "PVE version",
       "faultDomain": "Fault domain",
       "model": "Model",
       "vendor": "Vendor"
@@ -35,7 +35,7 @@
     "inUse": "Committed (MiB)",
     "guestData": "Guest data (MiB)",
     "totalCores": "Total physical cores",
-    "totalMem": "Total host memory (MiB)",
+    "totalMem": "Total node memory (MiB)",
     "power": {
       "on": "{{count}} on",
       "off": "{{count}} off",

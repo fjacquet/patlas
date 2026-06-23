@@ -11,7 +11,7 @@
     "error": "Der Export wurde nicht abgeschlossen. Die Daten sind unverändert — öffnen Sie die Browser-Konsole für Details und versuchen Sie es erneut."
   },
   "footer": {
-    "methodology": "Erstellt von vatlas — faktische Bestandssynthese. Quelle: RVTools-Export, erfasst am {{captureDate}}. Die Zahlen beziehen sich nur auf den aktiven Snapshot."
+    "methodology": "Erstellt von vatlas — faktische Bestandssynthese. Quelle: Proxmox-Export, erfasst am {{captureDate}}. Die Zahlen beziehen sich nur auf den aktiven Snapshot."
   },
   "storage": {
     "title": "Speicher",
@@ -20,7 +20,7 @@
     "usedStorage": "Belegter Speicher (GiB)",
     "inUse": "Zugesichert (GiB)",
     "capacity": "Kapazität (GiB)",
-    "flagged": "Markierte Datastores",
+    "flagged": "Markierter Speicher",
     "colCluster": "Cluster",
     "colProvisioned": "Bereitgestellt",
     "colInUse": "Belegt",
@@ -31,15 +31,15 @@
     "vswitches": "vSwitches",
     "dvswitches": "dvSwitches",
     "portgroups": "Portgruppen",
-    "vnetwork": "VM-Adjazenzen"
+    "vnetwork": "Gast-Adjazenzen"
   },
   "planned": {
     "title": "Geplanter vs. gemessener Bestand",
     "none": "—",
     "vcpuMeasured": "vCPU:pCPU gemessen",
     "vcpuPlanned": "vCPU:pCPU geplant",
-    "vmMeasured": "VMs gemessen",
-    "vmPlanned": "VMs geplant",
+    "vmMeasured": "Gäste gemessen",
+    "vmPlanned": "Gäste geplant",
     "clusterDelta": "Delta pro Cluster",
     "colCluster": "Cluster",
     "colMeasured": "Gemessen",
