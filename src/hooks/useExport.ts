@@ -13,9 +13,7 @@ import type { ExportKind, ExportRequest, ExportResponse } from '@/engines/export
 import {
   selectActiveSnapshot,
   selectPlannedRatios,
-  selectScenario,
   selectSnapshots,
-  selectStretchedClusters,
   selectThresholds,
   useSnapshotStore,
 } from '@/store/snapshotStore'
@@ -89,8 +87,6 @@ export function useExport(): { run: (kind: ExportKind) => Promise<void>; busy: b
         mode: 'configured',
         today: Date.now(),
         opts: {
-          stretchedClusters: selectStretchedClusters(st),
-          scenario: selectScenario(st),
           plannedRatios: { cpuRatio: planned.cpu, ramRatio: planned.ram },
           thresholds: selectThresholds(st),
         },

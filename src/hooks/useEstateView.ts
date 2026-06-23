@@ -4,11 +4,9 @@ import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
 import {
   selectMonsterThresholds,
   selectPlannedRatios,
-  selectScenario,
   selectSelectedSnapshotIds,
   selectSizingThresholds,
   selectSnapshots,
-  selectStretchedClusters,
   selectThresholds,
   useSnapshotStore,
 } from '@/store/snapshotStore'
@@ -25,9 +23,8 @@ import type { AccountingMode, EstateView } from '@/types/estate'
  * selected.
  *
  * The store reads return referentially-stable inputs (`snapshots` Map,
- * `selectedSnapshotIds` and `stretchedClusters` Sets are REPLACED never
- * mutated), so the memo recomputes only when a selection identity, the
- * stretched set, or `mode` actually changes.
+ * `selectedSnapshotIds` Set are REPLACED never mutated), so the memo
+ * recomputes only when a selection identity or `mode` actually changes.
  * The `Snapshot[]` is derived INSIDE this memo — never in a selector (a
  * fresh array there loops Zustand's `Object.is`) and never in a SECOND
  * `useMemo` (grep-gated single-memo invariant).
@@ -45,8 +42,6 @@ import type { AccountingMode, EstateView } from '@/types/estate'
 export function useEstateView(mode: AccountingMode): EstateView {
   const snapshots = useSnapshotStore(selectSnapshots)
   const selectedIds = useSnapshotStore(selectSelectedSnapshotIds)
-  const stretchedClusters = useSnapshotStore(selectStretchedClusters)
-  const scenario = useSnapshotStore(selectScenario)
   const planned = useSnapshotStore(selectPlannedRatios)
   const thresholds = useSnapshotStore(selectThresholds)
   const sizingThresholds = useSnapshotStore(selectSizingThresholds)
@@ -59,8 +54,6 @@ export function useEstateView(mode: AccountingMode): EstateView {
     // memo dep — `today` is read when inputs change, not on time passing.
     const today = new Date()
     return buildEstateView(mergeSnapshotsToEstate(selected), selected, mode, today, {
-      stretchedClusters,
-      scenario,
       plannedRatios: { cpuRatio: planned.cpu, ramRatio: planned.ram },
       thresholds,
       sizingThresholds,
@@ -69,8 +62,6 @@ export function useEstateView(mode: AccountingMode): EstateView {
   }, [
     snapshots,
     selectedIds,
-    stretchedClusters,
-    scenario,
     mode,
     planned.cpu,
     planned.ram,

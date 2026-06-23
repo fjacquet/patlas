@@ -85,7 +85,6 @@ const SECTIONS = [
   'storage',
   'network',
   'eos',
-  'dr',
   'planned',
   'annex',
   'methodology',
@@ -107,8 +106,8 @@ describe('renderReport — HTM-04 sections', () => {
     expect(trends).not.toBeNull()
     const html = renderReport({ view, trends, strings, locale: 'en' })
     expect(html).toContain('data-section="trends"')
-    // fixed order: trends after dr, before annex
-    expect(html.indexOf('data-section="dr"')).toBeLessThan(html.indexOf('data-section="trends"'))
+    // fixed order: trends after eos, before annex
+    expect(html.indexOf('data-section="eos"')).toBeLessThan(html.indexOf('data-section="trends"'))
     expect(html.indexOf('data-section="trends"')).toBeLessThan(html.indexOf('data-section="annex"'))
   })
 })

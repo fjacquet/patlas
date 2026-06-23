@@ -16,7 +16,6 @@ const cluster = (over: Partial<ClusterAggregate>): ClusterAggregate => ({
   availableGhz: ghz(36),
   physicalRamMib: mib(524_288),
   consumedRamMib: mib(262_144),
-  drReservedRamMib: mib(0),
   availableRamMib: mib(262_144),
   meanCpuRatio: 0.4,
   maxCpuRatio: 0.5,
@@ -29,14 +28,6 @@ const cluster = (over: Partial<ClusterAggregate>): ClusterAggregate => ({
   capacityVcpu: cores(96),
   capacityRamMib: mib(524_288),
   mhzPerVcpu: 500,
-  stretched: false,
-  drReservedGhz: ghz(0),
-  siteData: 'assumed',
-  reservedFraction: 0,
-  siteACapacityGhz: null,
-  siteBCapacityGhz: null,
-  siteACapacityRamMib: null,
-  siteBCapacityRamMib: null,
   meanCpuReadinessPercent: null,
   maxCpuReadinessPercent: null,
   vmsAboveReadinessWarning: 0,
@@ -70,27 +61,20 @@ describe('aggregateGlobals', () => {
     expect(g.totalStorageMib as number).toBe(999)
   })
 
-  it('sums readiness across reporting clusters and counts stretched ones', () => {
+  it('sums readiness across reporting clusters', () => {
     const g = aggregateGlobals([
       cluster({
         cluster: 'A',
         readinessAvailable: true,
         vmsAboveReadinessWarning: 3,
-        stretched: true,
-        drReservedGhz: ghz(10),
-        drReservedRamMib: mib(1024),
       }),
       cluster({
         cluster: 'B',
         readinessAvailable: true,
         vmsAboveReadinessWarning: 2,
-        stretched: false,
       }),
     ])
     expect(g.vmsAboveReadinessWarning).toBe(5)
-    expect(g.stretchedClusterCount).toBe(1)
-    expect(g.drReservedGhz as number).toBe(10)
-    // Capacity-weighted means use the USABLE (physical − drReserved) divisor.
     expect(g.meanCpuRatio).toBeGreaterThan(0)
     expect(g.meanRamRatio).toBeGreaterThan(0)
   })
@@ -102,8 +86,6 @@ describe('aggregateGlobals', () => {
         consumedGhz: ghz(0),
         physicalRamMib: mib(0),
         consumedRamMib: mib(0),
-        drReservedGhz: ghz(0),
-        drReservedRamMib: mib(0),
         vcpuAllocated: cores(0),
         usablePhysicalCores: cores(0),
       }),

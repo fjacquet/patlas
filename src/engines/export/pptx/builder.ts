@@ -5,7 +5,7 @@
  *
  *   title → overview → one clusterSlide PER cluster (D-01, ALWAYS, no cap)
  *   → contention annex (only if readiness rows present, conditional)
- *   → eos → drSim → trends (only if trends non-null — D-09) → inventory
+ *   → eos → trends (only if trends non-null — D-09) → inventory
  *
  * Returns a valid OOXML `ArrayBuffer`. Pure: the worker pre-rasterizes the
  * app's real charts into `opts.charts` (a `PngBundle`) and injects them;
@@ -19,7 +19,6 @@ import type { ExportStrings } from '../types'
 import type { ExportLocale } from './format'
 import { addClusterSlide } from './slides/clusterSlide'
 import { addContentionAnnex, type ContentionRow } from './slides/contentionAnnex'
-import { addDrSimSlide } from './slides/drSimSlide'
 import { addEosSlide } from './slides/eosSlide'
 import { addInventorySlide } from './slides/inventorySlide'
 import { addMonsterSlide } from './slides/monsterSlide'
@@ -59,7 +58,7 @@ export async function buildPptx(
   addTitleSlide(
     pptx,
     {
-      vcenters: view.vcenters.map((v) => v.label).join(' · '),
+      vcenters: '',
       clusterCount: view.globals.clusterCount,
       hostCount: view.globals.hostCount,
       vmCount: view.globals.vmCount,
@@ -115,7 +114,6 @@ export async function buildPptx(
   }
 
   addEosSlide(pptx, view.eos, png('eosBar'), strings, locale)
-  addDrSimSlide(pptx, view.drSim, png('drBar'), strings, locale)
   // F-1 (deck side): planned-vs-measured with the other re-aggregation.
   addPlannedSlide(pptx, view, strings, locale)
 

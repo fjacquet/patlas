@@ -35,18 +35,15 @@ export const aggregateTrendGroup = (
   group: Snapshot[],
   mode: AccountingMode,
   opts: {
-    stretchedClusters?: ReadonlySet<string>
     allocRatios?: { cpuRatio: number; ramRatio: number }
   } = {},
 ): { headline: TrendHeadline; byCluster: Map<string, TrendHeadline> } => {
-  const stretchedClusters = opts.stretchedClusters ?? new Set<string>()
   const allocRatios = opts.allocRatios ?? { cpuRatio: 4, ramRatio: 1 }
   const merged = mergeSnapshotsToEstate(group)
   const clusters = aggregateClusters({
     vinfo: merged.vinfo,
     vhost: merged.vhost,
     mode,
-    stretchedClusters,
     allocRatios,
   })
   const datastores = perDatastore(merged.vdatastore)
@@ -105,12 +102,10 @@ export const buildTrendSeries = (
   selected: Snapshot[],
   mode: AccountingMode,
   opts: {
-    stretchedClusters?: ReadonlySet<string>
     allocRatios?: { cpuRatio: number; ramRatio: number }
   },
 ): TrendSeries | null => {
   if (selected.length < 2) return null
-  const stretchedClusters = opts.stretchedClusters ?? new Set<string>()
   const allocRatios = opts.allocRatios ?? { cpuRatio: 4, ramRatio: 1 }
 
   const ord = captureDateOrdinal(selected)
@@ -139,7 +134,7 @@ export const buildTrendSeries = (
             headline: released.releasedAggregate.headline,
             byCluster: released.releasedAggregate.byCluster,
           }
-        : aggregateTrendGroup(group, mode, { stretchedClusters, allocRatios })
+        : aggregateTrendGroup(group, mode, { allocRatios })
     // `group` is non-empty by construction (dated groups have >=1 member;
     // inferred points are single-snapshot). Earliest capturedAt represents
     // the day; no clock is constructed here (engine purity).

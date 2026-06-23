@@ -81,7 +81,7 @@ function Report({ view, trends, strings, locale }: RenderReportInput): React.Rea
   const g = view.globals
   const oi = view.operationalInsights
   const eos = view.eos.cumulative
-  const vcenters = view.vcenters.map((v) => v.label).join(' · ')
+  const vcenters = ''
   const clustersByVm = [...view.clusters].sort((a, b) => b.vmCount - a.vmCount)
   const top = clustersByVm.slice(0, TOP_N_CLUSTERS)
   const rest = clustersByVm.slice(TOP_N_CLUSTERS)
@@ -266,27 +266,6 @@ function Report({ view, trends, strings, locale }: RenderReportInput): React.Rea
         <Metric label={strings['eos.le9'] ?? '≤ 9 months'} value={fmtInt(eos.le9, loc)} />
         <Metric label={strings['eos.le12'] ?? '≤ 12 months'} value={fmtInt(eos.le12, loc)} />
         <Metric label={strings['eos.unknown'] ?? 'Unknown'} value={fmtInt(eos.unknown, loc)} />
-      </Section>
-
-      <Section id="dr" title={strings['dr.title'] ?? 'DR results'}>
-        {view.drSim === null ? (
-          <p className="factual-note">{strings['dr.none'] ?? 'No DR scenario selected.'}</p>
-        ) : (
-          <>
-            <Metric
-              label={strings['dr.cpuRemovedCores'] ?? 'Physical cores removed'}
-              value={fmtInt(Number(view.drSim.physicalCpuRemovedCores), loc)}
-            />
-            <Metric
-              label={strings['dr.ramRemovedMib'] ?? 'Physical RAM removed (MiB)'}
-              value={fmtInt(Number(view.drSim.physicalRamRemovedMib), loc)}
-            />
-            <Metric
-              label={strings['dr.survivors'] ?? 'Survivor clusters'}
-              value={fmtInt(view.drSim.perSurvivor.length, loc)}
-            />
-          </>
-        )}
       </Section>
 
       <Section id="planned" title={strings['planned.title'] ?? 'Planned vs measured estate'}>

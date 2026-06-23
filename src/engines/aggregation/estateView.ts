@@ -1,4 +1,3 @@
-import { runScenario } from '@/engines/drSim'
 import { buildEosProjection } from '@/engines/eos/bucketEos'
 import { loadEosCatalogue } from '@/engines/eos/catalogue'
 import type { MergedEstate } from '@/engines/snapshotMerge'
@@ -7,7 +6,6 @@ import { cores, mib } from '@/engines/units'
 import type {
   AccountingMode,
   ClusterDetail,
-  DrScenario,
   EosProjection,
   EstateView,
   OperationalInsights,
@@ -39,10 +37,7 @@ import { relinkBlankClusterDatastores } from './vsanRelink'
  * component and export consumes (via the `useEstateView` hook). No React,
  * no Zustand, no Zod.
  *
- * Stretched-cluster handling is ACTIVE in Phase 4: `opts.stretchedClusters`
- * (the user's in-memory selection) drives the per-site reservation; absent
- * ⇒ empty set ⇒ no reservation (the Phase-2 behaviour). The
- * NAA-deduped `perDatastore` count + first-row capacity sum feed
+ * The NAA-deduped `perDatastore` count + first-row capacity sum feed
  * `globals.datastoreCount`/`totalStorageMib` (no double-count, Moderate-11).
  * `trends` is the P8 per-snapshot temporal series (`null` for < 2
  * snapshots), composed here in this single pass from the pre-merge
@@ -82,21 +77,13 @@ export function buildEstateView(
    *  pure, deterministic function of its inputs (no in-engine clock). */
   today: Date,
   opts?: {
-    stretchedClusters?: ReadonlySet<string>
     allocRatios?: { cpuRatio: number; ramRatio: number }
-    scenario?: DrScenario
     /** P6 PLANNED Personal Ratios — the explicitly-"planned" what-if
-     *  lens (D-05). Drives `plannedView` (and `plannedDrSim` when
-     *  `applyPlannedToDr`). NEVER overwrites the measured path. */
+     *  lens (D-05). Drives `plannedView`. NEVER overwrites the measured path. */
     plannedRatios?: { cpuRatio: number; ramRatio: number }
-    /** P6 Custom Failover (D-11): when true AND a scenario is present,
-     *  re-run `runScenario` under the PLANNED ratios into
-     *  `plannedDrSim`. Defaults to true here (the in-app toggle is
-     *  lifted into Plan 02/03's PlanningView). */
-    applyPlannedToDr?: boolean
     /** P9 threshold-alerting lines (D-02). Absent ⇒ RVTools-Analyser
-     *  defaults (mirrors `stretchedClusters ?? new Set()`). Threaded from
-     *  the in-memory thresholds slice via the single `useEstateView` memo. */
+     *  defaults. Threaded from the in-memory thresholds slice via the
+     *  single `useEstateView` memo. */
     thresholds?: ThresholdInput
     /** P-RS right-sizing thresholds (user-editable ratios). Absent ⇒
      *  RVTools-rightsizing defaults. Threaded from the in-memory slice via
@@ -106,7 +93,6 @@ export function buildEstateView(
     monsterThresholds?: MonsterThresholds
   },
 ): EstateView {
-  const stretchedClusters = opts?.stretchedClusters ?? new Set<string>()
   const allocRatios = opts?.allocRatios ?? { cpuRatio: 4, ramRatio: 1 }
   // No vDatastore rows ⇒ sheet absent/empty ⇒ per-cluster count is
   // genuinely unknown (undefined → em-dash). Rows present ⇒ attribute
@@ -126,7 +112,6 @@ export function buildEstateView(
     vinfo: merged.vinfo,
     vhost: merged.vhost,
     mode,
-    stretchedClusters,
     datastoreCountByCluster: dsByCluster,
     allocRatios,
   })
@@ -260,20 +245,11 @@ export function buildEstateView(
     clusterDetail.set(c.cluster, { aggregate: c, insights: ins })
   }
 
-  // DR what-if runs INSIDE this single composition (no second memo): the
-  // shipped aggregation re-run on survivors. `null` when nothing failed.
-  const drSim = opts?.scenario
-    ? runScenario(merged, opts.scenario, { mode, stretchedClusters, allocRatios })
-    : null
-
   // ── P6 PLANNED what-if (PLN-03/PLN-04/D-02/D-11) — composes in THIS
   // single pass (no second memo, no new file). A SEPARATE re-aggregation
   // under the user's PLANNED Personal Ratios; the measured `globals`/
-  // `clusters`/`drSim` above are untouched (never conflated — D-02/D-11).
-  // `applyPlannedToDr` defaults true (the in-app toggle is lifted into
-  // Plan 02/03's PlanningView; absent ⇒ planned DR mirrors measured DR).
+  // `clusters` above are untouched (never conflated — D-02/D-11).
   const plannedRatios = opts?.plannedRatios ?? null
-  const applyPlannedToDr = opts?.applyPlannedToDr ?? true
   const plannedView =
     plannedRatios === null
       ? null
@@ -282,7 +258,6 @@ export function buildEstateView(
             vinfo: merged.vinfo,
             vhost: merged.vhost,
             mode,
-            stretchedClusters,
             datastoreCountByCluster: dsByCluster,
             allocRatios: plannedRatios,
           })
@@ -291,14 +266,6 @@ export function buildEstateView(
             clusters: plannedClusters,
           }
         })()
-  const plannedDrSim =
-    plannedRatios !== null && applyPlannedToDr && opts?.scenario
-      ? runScenario(merged, opts.scenario, {
-          mode,
-          stretchedClusters,
-          allocRatios: plannedRatios,
-        })
-      : null
 
   // P7 EOS forecast — composed in this single pass (no second memo site,
   // D-00; the only memo is the `useEstateView` hook). `buildEosProjection`
@@ -317,7 +284,7 @@ export function buildEstateView(
   // temporal series from the PRE-merge `selected` (DD-A A2); `null` for
   // < 2 snapshots (the Phase-2 degenerate case, handled inside
   // `buildTrendSeries`). Pure — no clock, reuses the shipped aggregates.
-  const trends = buildTrendSeries(selected, mode, { stretchedClusters, allocRatios })
+  const trends = buildTrendSeries(selected, mode, { allocRatios })
 
   // P-RS right-sizing/stress — composed in THIS single pass (no second memo).
   // Per-VM MAX usage across the pre-merge `selected` snapshots (powered-on
@@ -349,13 +316,10 @@ export function buildEstateView(
     osBreakdown,
     accountingMode: mode,
     trends,
-    vcenters: merged.vcenters.map((vc) => ({ viSdkUuid: vc.viSdkUuid, label: vc.label })),
-    drSim,
     operationalInsights,
     clusterInsights,
     clusterDetail,
     plannedView,
-    plannedDrSim,
     eos,
     storage,
     vsan,
@@ -487,13 +451,10 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   osBreakdown: Object.freeze({ windows: 0, linux: 0, other: 0 }),
   accountingMode: 'active',
   trends: null,
-  vcenters: Object.freeze([]) as never[],
-  drSim: null,
   operationalInsights: EMPTY_INSIGHTS,
   clusterInsights: new Map(),
   clusterDetail: new Map(),
   plannedView: null,
-  plannedDrSim: null,
   eos: EMPTY_EOS,
   storage: EMPTY_STORAGE,
   vsan: EMPTY_VSAN,
