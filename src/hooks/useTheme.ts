@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 export type ThemePreference = 'auto' | 'light' | 'dark'
 export type ResolvedTheme = 'light' | 'dark'
 
-const STORAGE_KEY = 'vatlas-theme'
+const STORAGE_KEY = 'patlas-theme'
 const MEDIA_QUERY = '(prefers-color-scheme: dark)'
 
 const isPreference = (v: unknown): v is ThemePreference =>
@@ -47,7 +47,7 @@ const computeResolved = (pref: ThemePreference): ResolvedTheme => {
 
 /**
  * 3-state theme preference (`auto` / `light` / `dark`) backed by
- * `localStorage['vatlas-theme']`. `auto` follows the OS via `matchMedia`
+ * `localStorage['patlas-theme']`. `auto` follows the OS via `matchMedia`
  * with reactive updates; `light` / `dark` override.
  *
  * The PPTX deck stays Midnight Executive regardless. This hook only drives

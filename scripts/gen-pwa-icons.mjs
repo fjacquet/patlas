@@ -5,7 +5,7 @@
 // for the PPTX export). Run manually when the brand mark changes:
 //   node scripts/gen-pwa-icons.mjs
 //
-// Emits (committed, served same-origin under /vatlas/):
+// Emits (committed, served same-origin under /patlas/):
 //   public/pwa-192.png           192x192, transparent  (purpose: any)
 //   public/pwa-512.png           512x512, transparent  (purpose: any)
 //   public/pwa-maskable-512.png  512x512, solid bg     (purpose: maskable)

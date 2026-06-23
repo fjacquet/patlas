@@ -6,15 +6,15 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // Base path for GitHub Pages deployment (https://fjacquet.github.io/vatlas/)
-  base: '/vatlas/',
+  // Base path for GitHub Pages deployment (https://fjacquet.github.io/patlas/)
+  base: '/patlas/',
   plugins: [
     react(),
     tailwindcss(),
     // ADR-0001 SW exception — injectManifest (our audited src/sw.ts, not a
     // generated black box), precache-only, prompt-style update. We register
     // manually in src/pwa/registerSW.ts so `injectRegister` is null. Scope and
-    // start_url derive from `base` (/vatlas/) and are pinned in the manifest.
+    // start_url derive from `base` (/patlas/) and are pinned in the manifest.
     VitePWA({
       strategies: 'injectManifest',
       srcDir: 'src',

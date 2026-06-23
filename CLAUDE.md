@@ -1,7 +1,7 @@
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 
-**vatlas**
+**patlas**
 
 vatlas is a 100 % client-side web app that turns one or more RVTools `.xlsx` exports into a navigable, visual atlas of a VMware estate — global dashboard, inventory tree views, allocation/DR analysis, OS End-of-Support forecasting, in-session trends across multiple snapshots — and exports the whole thing as a shareable HTML report and a PPTX deck. It is the broader sibling of vsizer: same architectural mold (drop file in browser → see numbers → export → leave), much larger feature surface.
 
@@ -262,7 +262,7 @@ npm run check:bundle-size         # fails if echarts chunk > 300 KB gz
 - Branded units (`MiB`/`GiB`/`MHz`/`GHz`/…) — never a raw `* 1.048576` (RVTools "MB" is MiB; ADR-0010).
 - Toggles/tabs reuse the `ThemeToggle` `<fieldset role="group">` + `aria-pressed` idiom — don't reinvent.
 - i18n keys land in ALL FOUR locales (`en`/`fr`/`de`/`it`); the `src/i18n/keyParity.test.ts` gate enforces identical key paths (namespaces auto-derived from `locales/en/`). No pre-formatted numbers in strings; no editorial verbs ("recommend/should/poor/good"). DE/IT technical terminology is pending native review (tracked in the de-it-i18n spec risk).
-- No `localStorage` of dataset rows — only `vatlas-theme` + `vatlas-lang` keys are allowed.
+- No `localStorage` of dataset rows — only `patlas-theme` + `patlas-lang` keys are allowed.
 
 ## Gotchas
 

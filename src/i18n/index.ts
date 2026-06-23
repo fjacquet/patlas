@@ -206,7 +206,7 @@ i18n
     detection: {
       order: ['querystring', 'localStorage', 'navigator'],
       lookupQuerystring: 'lang',
-      lookupLocalStorage: 'vatlas-lang',
+      lookupLocalStorage: 'patlas-lang',
       caches: ['localStorage'],
     },
   })

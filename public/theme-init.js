@@ -1,10 +1,10 @@
-// FOUC-prevention for vatlas's dark-mode toggle. Externalised from
+// FOUC-prevention for patlas's dark-mode toggle. Externalised from
 // index.html so the container's strict CSP (script-src 'self') applies.
 // Behaviour is byte-identical to the previous inline script. See ADR-0013.
 ;(() => {
   var pref = null
   try {
-    pref = localStorage.getItem('vatlas-theme')
+    pref = localStorage.getItem('patlas-theme')
   } catch (_) {}
   var resolved =
     pref === 'light' || pref === 'dark'

@@ -1,5 +1,5 @@
 <!-- generated-by: gsd-doc-writer -->
-# vAtlas
+# pAtlas
 
 [![Deploy to GitHub Pages](https://github.com/fjacquet/vatlas/actions/workflows/static.yml/badge.svg?branch=main)](https://github.com/fjacquet/vatlas/actions/workflows/static.yml)
 [![Live app](https://img.shields.io/badge/live-fjacquet.github.io%2Fvatlas-2563eb)](https://fjacquet.github.io/vatlas/)

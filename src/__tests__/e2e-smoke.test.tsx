@@ -60,7 +60,7 @@ describe('Phase 1 end-to-end smoke: drop → parse → render', () => {
 
   it('renders the hero UploadZone when no snapshots are loaded', () => {
     render(<App />)
-    expect(screen.queryByText(/vAtlas/)).not.toBeNull()
+    expect(screen.queryByText(/pAtlas/)).not.toBeNull()
     expect(screen.queryAllByRole('button').length).toBeGreaterThan(0)
   })
 
@@ -130,9 +130,9 @@ describe('Phase 1 end-to-end smoke: drop → parse → render', () => {
     useSnapshotStore.getState().clearAll()
     expect(useSnapshotStore.getState().snapshots.size).toBe(0)
 
-    // Only vatlas-lang / vatlas-theme UI prefs are allowed in localStorage.
+    // Only patlas-lang / patlas-theme UI prefs are allowed in localStorage.
     const stray = Object.keys(localStorage).filter(
-      (k) => !k.startsWith('vatlas-lang') && !k.startsWith('vatlas-theme'),
+      (k) => !k.startsWith('patlas-lang') && !k.startsWith('patlas-theme'),
     )
     expect(stray).toEqual([])
   })
