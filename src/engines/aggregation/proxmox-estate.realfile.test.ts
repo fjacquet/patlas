@@ -20,26 +20,21 @@ describe('proxmox estate-totals acceptance (real report)', () => {
     // parser worker produces. Network arrays are empty (Proxmox has none);
     // viSdkUuid is null (no vCenter). `id` and `parsedAt` are stamped here
     // as the main-thread store would do.
-    // When the Cluster sheet is absent, clusterName is ''. `aggregateClusters`
-    // skips hosts with empty cluster. Fall back to 'proxmox' so every node/guest
-    // belongs to a named cluster and the estate globals are non-zero.
-    const clusterName = bundle.clusterName || 'proxmox'
-    const vhost = bundle.vhost.map((h) => (h.cluster === '' ? { ...h, cluster: clusterName } : h))
-    const vinfo = bundle.vinfo.map((g) => (g.cluster === '' ? { ...g, cluster: clusterName } : g))
-
+    // No row-level cluster fallback needed here: adaptProxmox itself now
+    // defaults clusterName to 'proxmox' for standalone nodes (D4).
     const snapshot: Snapshot = {
       id: 'proxmox-realfile-test',
       filename: 'proxmox-report.xlsx',
       fileSize: bytes(0),
       capturedAt: new Date('2025-01-01T00:00:00Z'),
-      vCenterLabel: clusterName,
+      vCenterLabel: bundle.clusterName,
       rvtoolsVersion: 'proxmox',
       parsedAt: new Date(),
       source: 'proxmox',
       viSdkUuid: null,
       vMetaData: [],
-      vinfo,
-      vhost,
+      vinfo: bundle.vinfo,
+      vhost: bundle.vhost,
       vmUsage: bundle.vmUsage,
       vdatastore: bundle.vdatastore,
       vpartition: [],

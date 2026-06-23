@@ -183,7 +183,10 @@ export const adaptProxmox = (
   warnings: ParseError[]
 } => {
   const warnings: ParseError[] = []
-  const clusterName = extractClusterName(findSheet(workbook, ['cluster']))
+  // Standalone Proxmox has no cluster name; a non-empty bucket keeps the estate
+  // visible (aggregateClusters drops empty-cluster hosts). Matches design decision
+  // D4: cluster pivot = Proxmox cluster name; standalone ⇒ single implicit bucket.
+  const clusterName = extractClusterName(findSheet(workbook, ['cluster'])) || 'proxmox'
 
   const nodesSheet = findSheet(workbook, ['nodes'])
   if (!nodesSheet) {

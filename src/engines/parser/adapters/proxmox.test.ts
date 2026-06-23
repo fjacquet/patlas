@@ -223,3 +223,31 @@ it('throws a ParseError when the Nodes sheet is missing', () => {
   wb.sheets.set('VMs', { name: 'VMs', headers: ['Name'], rows: [] })
   expect(() => adaptProxmox(wb)).toThrow(/Nodes/)
 })
+
+it('falls back to "proxmox" cluster name when no Cluster sheet is present', () => {
+  const wb = { sheets: new Map<string, ParsedSheet>() }
+  wb.sheets.set('Nodes', {
+    name: 'Nodes',
+    headers: ['Node', 'Cpu Cores', 'Memory Size GB'],
+    rows: [{ Node: 'pve1', 'Cpu Cores': 4, 'Memory Size GB': 24 }],
+  })
+  wb.sheets.set('VMs', {
+    name: 'VMs',
+    headers: ['Name', 'Node', 'Vm Id', 'Cores', 'Sockets', 'Memory Size GB', 'Status'],
+    rows: [
+      {
+        Name: 'web01',
+        Node: 'pve1',
+        'Vm Id': 100,
+        Cores: 2,
+        Sockets: 1,
+        'Memory Size GB': 8,
+        Status: 'running',
+      },
+    ],
+  })
+  const b = adaptProxmox(wb)
+  expect(b.clusterName).toBe('proxmox')
+  expect(b.vhost[0]?.cluster).toBe('proxmox')
+  expect(b.vinfo[0]?.cluster).toBe('proxmox')
+})
