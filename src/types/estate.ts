@@ -7,6 +7,7 @@ import type { NetworkRollup } from '@/engines/aggregation/network'
 import type { EstateSizing } from '@/engines/aggregation/sizing'
 import type { SnapshotSprawl } from '@/engines/aggregation/snapshotSprawl'
 import type { StorageByX } from '@/engines/aggregation/storageByX'
+import type { StorageContentHealth } from '@/engines/aggregation/storageContentHealth'
 import type { ThresholdFlags } from '@/engines/aggregation/thresholdFlags'
 import type { VsanRelinkResult } from '@/engines/aggregation/vsanRelink'
 import type { Cores, GHz, GiB, MHz, MiB, Sockets } from '@/engines/units'
@@ -502,6 +503,11 @@ export interface EstateView {
    * estate (the Proxmox live-state `current` marker excluded). Neutral
    * measurement; same single-pass origin; `EMPTY_SPRAWL` in `EMPTY_VIEW`. */
   snapshotSprawl: SnapshotSprawl
+  /**
+   * Plan 3B storage-content health — Proxmox storage usage by content type
+   * and by storage, plus a backup-file inventory. Neutral measurement; same
+   * single-pass origin; `EMPTY_STORAGE_CONTENT` in `EMPTY_VIEW`. */
+  storageContent: StorageContentHealth
   /**
    * P9 LC-4 per-datastore drill projection, keyed by the `naa ?? name`
    * datastore key. Produced in the single `buildEstateView` pass — no

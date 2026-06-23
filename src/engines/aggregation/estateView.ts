@@ -30,6 +30,7 @@ import {
 } from './sizing'
 import { computeSnapshotSprawl } from './snapshotSprawl'
 import { storageByX } from './storageByX'
+import { computeStorageContentHealth } from './storageContentHealth'
 import { computeThresholdFlags, DEFAULT_THRESHOLDS, type ThresholdInput } from './thresholdFlags'
 import { relinkBlankClusterDatastores } from './vsanRelink'
 
@@ -313,6 +314,10 @@ export function buildEstateView(
   // 'current' live-state marker.
   const snapshotSprawl = computeSnapshotSprawl(merged.proxmoxSnapshots, today)
 
+  // Plan 3B storage-content health — same single pass; `today` reused for
+  // backup-file recency.
+  const storageContent = computeStorageContentHealth(merged.proxmoxStorageContent, today)
+
   return {
     globals,
     clusters,
@@ -335,6 +340,7 @@ export function buildEstateView(
     sizing,
     monsters,
     snapshotSprawl,
+    storageContent,
     datastoreDetail,
     vmDetail,
   }
@@ -452,6 +458,21 @@ const EMPTY_SPRAWL = Object.freeze({
   oldestAgeDays: null,
 })
 
+const EMPTY_STORAGE_CONTENT = Object.freeze({
+  byContent: Object.freeze([]) as never[],
+  byStorage: Object.freeze([]) as never[],
+  backups: Object.freeze({
+    rows: Object.freeze([]) as never[],
+    count: 0,
+    guestsCovered: 0,
+    totalSizeMib: 0,
+    newestAgeDays: null,
+    oldestAgeDays: null,
+  }),
+  totalSizeMib: 0,
+  fileCount: 0,
+})
+
 /**
  * The valid empty-but-typed view `useEstateView` returns when no snapshot
  * is active. Frozen (modeled on `globals.ts:emptySummary`) so consumers
@@ -479,6 +500,7 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   sizing: EMPTY_SIZING,
   monsters: EMPTY_MONSTERS,
   snapshotSprawl: EMPTY_SPRAWL,
+  storageContent: EMPTY_STORAGE_CONTENT,
   datastoreDetail: new Map(),
   vmDetail: new Map(),
 })
