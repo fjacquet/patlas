@@ -2,10 +2,10 @@
 
 /* Class-strategy dark variant: `dark:bg-X` activates when an ancestor has
  * `class="dark"`. The FOUC script in index.html sets this before paint
- * based on `localStorage['vatlas-theme']` and `prefers-color-scheme`. */
+ * based on `localStorage['patlas-theme']` and `prefers-color-scheme`. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* vatlas — Midnight Executive palette (matches PPTX export theme) */
+/* patlas — Midnight Executive palette (matches PPTX export theme) */
 @theme {
   /* Navy primary scale */
   --color-primary-50: oklch(96% 0.02 270);

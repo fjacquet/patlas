@@ -2,8 +2,8 @@
 import { bytes } from '@/engines/units'
 import type { Snapshot } from '@/types'
 import '../../privacy/fetchGuard' // Plan 02 contract — workers have their own global scope
-import { inferCaptureDate, inferRvtoolsVersion, inferVCenterLabel } from './captureDate'
-import { parseSnapshot } from './normalizeColumns'
+import { adaptProxmox } from './adapters/proxmox'
+import { extractProxmoxBundle } from './extractZip'
 import { parseXlsx } from './parseXlsx'
 
 interface ParseRequest {
@@ -13,43 +13,66 @@ interface ParseRequest {
   mtime: number
 }
 
+/**
+ * Parse a `Report_YYYYMMDD_HHMMSS` filename into a Date.
+ * Falls back to `mtime` (file last-modified epoch ms) when the pattern is
+ * absent or malformed, or to `new Date()` when `mtime` is not finite.
+ */
+const parseCaptureDate = (filename: string, mtime: number): Date => {
+  const fallback = Number.isFinite(mtime) ? new Date(mtime) : new Date()
+  const m = filename.match(/Report_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})/)
+  if (!m) return fallback
+  const [, yr, mo, dy, hh, mm, ss] = m
+  const d = new Date(Number(yr), Number(mo) - 1, Number(dy), Number(hh), Number(mm), Number(ss))
+  return Number.isNaN(d.getTime()) ? fallback : d
+}
+
 self.onmessage = (e: MessageEvent<ParseRequest>) => {
   if (e.data.kind !== 'parse') return
   try {
-    // `sheets` (the SheetJS-derived workbook) is scoped to this handler and
+    const u8 = new Uint8Array(e.data.buf)
+    const isZip = u8.byteLength >= 2 && u8[0] === 0x50 && u8[1] === 0x4b
+    let xlsxBytes: Uint8Array = u8
+    if (isZip) {
+      const bundle = extractProxmoxBundle(u8)
+      if (bundle.xlsx) xlsxBytes = bundle.xlsx // Proxmox .zip bundle
+      // else: a bare .xlsx (itself a zip with no inner .xlsx) → parse u8 directly
+    }
+
+    // `workbook` (the SheetJS-derived workbook) is scoped to this handler and
     // is NEVER posted back — only the canonical typed rows cross the
     // boundary (Critical-5 / STRIDE T-04-07). It is GC-eligible the moment
     // the handler returns.
-    const sheets = parseXlsx(e.data.buf)
-    const { snapshot: rows, warnings } = parseSnapshot(sheets)
-    const capturedAt = inferCaptureDate(e.data.filename, e.data.mtime, sheets)
-    const vCenterLabel = inferVCenterLabel(rows.vinfo, e.data.filename, sheets)
-    const rvtoolsVersion = inferRvtoolsVersion(sheets)
+    const workbook = parseXlsx(xlsxBytes)
+    const bundle = adaptProxmox(workbook)
+
+    const capturedAt = parseCaptureDate(e.data.filename, e.data.mtime)
+    const vCenterLabel = bundle.clusterName || e.data.filename
 
     // Typed against `Omit<Snapshot, 'id' | 'parsedAt'>` so the compiler
-    // enforces the full field list — a missing row set (e.g. `vmUsage`) is a
-    // build error, not a silent runtime drop (postMessage itself is untyped).
+    // enforces the full field list — a missing row set is a build error,
+    // not a silent runtime drop (postMessage itself is untyped).
     const snapshot: Omit<Snapshot, 'id' | 'parsedAt'> = {
       filename: e.data.filename,
       fileSize: bytes(e.data.buf.byteLength),
       capturedAt,
       vCenterLabel,
-      rvtoolsVersion,
-      viSdkUuid: rows.viSdkUuid,
-      vMetaData: rows.vMetaData,
-      source: 'rvtools',
-      vinfo: rows.vinfo,
-      vhost: rows.vhost,
-      vmUsage: rows.vmUsage,
-      vdatastore: rows.vdatastore,
-      vpartition: rows.vpartition,
-      vnetwork: rows.vnetwork,
-      vswitch: rows.vswitch,
-      dvswitch: rows.dvswitch,
-      dvport: rows.dvport,
-      parseErrors: rows.parseErrors,
+      rvtoolsVersion: '',
+      viSdkUuid: null,
+      vMetaData: [],
+      source: 'proxmox',
+      vinfo: bundle.vinfo,
+      vhost: bundle.vhost,
+      vmUsage: bundle.vmUsage,
+      vdatastore: bundle.vdatastore,
+      vpartition: [],
+      vnetwork: [],
+      vswitch: [],
+      dvswitch: [],
+      dvport: [],
+      parseErrors: bundle.warnings,
     }
-    self.postMessage({ kind: 'ok', snapshot, warnings })
+    self.postMessage({ kind: 'ok', snapshot, warnings: bundle.warnings })
   } catch (err) {
     const e2 = err as {
       name?: string

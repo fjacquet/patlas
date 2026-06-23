@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { useTheme } from './useTheme'
 
-const STORAGE_KEY = 'vatlas-theme'
+const STORAGE_KEY = 'patlas-theme'
 
 describe('useTheme', () => {
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('useTheme', () => {
     expect(result.current.preference).toBe('auto')
   })
 
-  it('reads a stored `dark` preference from localStorage[vatlas-theme]', () => {
+  it('reads a stored `dark` preference from localStorage[patlas-theme]', () => {
     localStorage.setItem(STORAGE_KEY, 'dark')
     const { result } = renderHook(() => useTheme())
     expect(result.current.preference).toBe('dark')

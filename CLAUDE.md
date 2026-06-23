@@ -1,7 +1,7 @@
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 
-**vatlas**
+**patlas**
 
 vatlas is a 100 % client-side web app that turns one or more RVTools `.xlsx` exports into a navigable, visual atlas of a VMware estate — global dashboard, inventory tree views, allocation/DR analysis, OS End-of-Support forecasting, in-session trends across multiple snapshots — and exports the whole thing as a shareable HTML report and a PPTX deck. It is the broader sibling of vsizer: same architectural mold (drop file in browser → see numbers → export → leave), much larger feature surface.
 
@@ -12,7 +12,7 @@ vatlas is a 100 % client-side web app that turns one or more RVTools `.xlsx` exp
 - **Tech stack:** React 19 · TypeScript (strict) · Vite 8 · Tailwind v4 · Zustand 5 · react-i18next · Zod · SheetJS (`xlsx@0.20.3` from official tarball, **not** the CVE-affected npm package) · pptxgenjs 4 · Biome · Vitest + @testing-library/react · Apache ECharts via `echarts-for-react` (SVG renderer everywhere, tree-shaken). Match vsizer.
 - **Engineering principles (binding):** **KISS**, **DRY**, **functional programming**. No premature abstractions, no class hierarchies for domain logic, no copy-paste between phases. Engines are pure functions; the Zustand store holds inputs only; `useEstateView` is the one place `useMemo` lives. If two phases would compute the same thing, the second imports from the first.
 - **Privacy invariant:** no fetch ships workbook bytes; no telemetry of parsed contents; no `localStorage` of dataset rows. Refresh = data gone.
-- **Deploy target:** GitHub Pages static site at `fjacquet.github.io/vatlas/` (same CI shape as vsizer: typecheck → lint → test → build → deploy).
+- **Deploy target:** GitHub Pages static site at `fjacquet.github.io/patlas/` (same CI shape as vsizer: typecheck → lint → test → build → deploy).
 - **Input format:** RVTools `.xlsx` only (no Live Optics, no `.zip` bundles in v1).
 - **Charting:** Apache ECharts with `{ renderer: 'svg' }` mandated project-wide (locked in during research — SVG everywhere for crisp pictures and trivial HTML-report inlining). Canvas permitted only as a per-chart escape hatch for in-app >10k-point overviews that don't appear in the HTML report.
 <!-- GSD:project-end -->
@@ -43,7 +43,7 @@ vatlas is a 100 % client-side web app that turns one or more RVTools `.xlsx` exp
 | pptxgenjs | `^4.0.1` | PPTX export | Still the only credible browser-side PPTX generator in 2026. 4.0.1 was the only 4.x release and remains the current version; mature, no known CVEs. vsizer's PPTX engine in `engines/export/pptx/` is reusable. |
 | react-i18next | `^16.6.6` | i18n (FR · EN · DE · IT) | vsizer's setup translates 1:1. DE/IT shipped 2026-05-25; technical terms pending native review. |
 | i18next | `^26.1.0` | i18n core | Lockstep with react-i18next. |
-| i18next-browser-languagedetector | `^8.2.1` | Locale detection | Same chain (`?lang=` → localStorage → navigator → `fr` fallback). Note: a `vatlas-lang` localStorage key is allowed (it stores a locale code, not dataset rows — does not breach the privacy invariant). |
+| i18next-browser-languagedetector | `^8.2.1` | Locale detection | Same chain (`?lang=` → localStorage → navigator → `fr` fallback). Note: a `patlas-lang` localStorage key is allowed (it stores a locale code, not dataset rows — does not breach the privacy invariant). |
 
 ### Supporting Libraries
 
@@ -237,7 +237,7 @@ Do not make direct repo edits outside a GSD workflow unless the user explicitly 
 ## Commands
 
 ```bash
-npm run dev                       # Vite dev server → http://localhost:5173/vatlas/
+npm run dev                       # Vite dev server → http://localhost:5173/patlas/
 npm run build                     # tsc -b && vite build (prebuild runs supply-chain gate)
 npm run typecheck                 # tsc --noEmit (app + tsconfig.test.json)
 npx @biomejs/biome check .        # Lint — use THIS, not `npm run lint` (see Gotchas)
@@ -262,7 +262,7 @@ npm run check:bundle-size         # fails if echarts chunk > 300 KB gz
 - Branded units (`MiB`/`GiB`/`MHz`/`GHz`/…) — never a raw `* 1.048576` (RVTools "MB" is MiB; ADR-0010).
 - Toggles/tabs reuse the `ThemeToggle` `<fieldset role="group">` + `aria-pressed` idiom — don't reinvent.
 - i18n keys land in ALL FOUR locales (`en`/`fr`/`de`/`it`); the `src/i18n/keyParity.test.ts` gate enforces identical key paths (namespaces auto-derived from `locales/en/`). No pre-formatted numbers in strings; no editorial verbs ("recommend/should/poor/good"). DE/IT technical terminology is pending native review (tracked in the de-it-i18n spec risk).
-- No `localStorage` of dataset rows — only `vatlas-theme` + `vatlas-lang` keys are allowed.
+- No `localStorage` of dataset rows — only `patlas-theme` + `patlas-lang` keys are allowed.
 
 ## Gotchas
 
