@@ -19,7 +19,9 @@ describe('UploadZone accept filter', () => {
   it('accepts a Proxmox .zip bundle (the regression: it was filtered out)', () => {
     const onFiles = vi.fn()
     const { container } = render(<UploadZone onFiles={onFiles} />)
-    fireEvent.change(fileInput(container), { target: { files: [file('Report_20260623_093049.zip')] } })
+    fireEvent.change(fileInput(container), {
+      target: { files: [file('Report_20260623_093049.zip')] },
+    })
     expect(onFiles).toHaveBeenCalledTimes(1)
     expect(onFiles.mock.calls[0]?.[0]?.[0]?.name).toBe('Report_20260623_093049.zip')
   })
