@@ -140,7 +140,7 @@ function makeProxmoxEstate(vmCount: number): Snapshot {
           consumedMib: mib(3_900),
           balloonedMib: mib(0),
           swappedMib: mib(0),
-          cpuUsageMhz: mhz(23_000), // ~89% of 8 * 3200 = 25600 MHz
+          cpuUsageMhz: mhz(24_000), // ~93.8% of 8 * 3200 = 25600 MHz (CPU also > 90%)
         })
       } else {
         // stressed: ballooning present — exceeds DEFAULT balloonMib threshold of 0
