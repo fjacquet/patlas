@@ -157,6 +157,7 @@ export function buildEstateView(
       os: vm.osTools || vm.osConfig,
       poweredOn: vm.poweredOn,
       provisionedMib: vm.provisionedMib,
+      guestType: vm.guestType,
     })
   }
 
