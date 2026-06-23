@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { gibToTib, mhzToGhz, mibToBytes, mibToGib, mibToTib } from './converters'
+import { gibToMib, gibToTib, mhzToGhz, mibToBytes, mibToGib, mibToTib } from './converters'
 import { gib, mhz, mib } from './types'
+
+describe('units converters — gibToMib (GiB→MiB)', () => {
+  it('gibToMib multiplies by 1024 (binary GiB→MiB)', () => {
+    expect(gibToMib(gib(2))).toBe(mib(2048))
+    expect(gibToMib(gib(0))).toBe(mib(0))
+  })
+})
 
 describe('units converters — round trips', () => {
   it('mibToGib(mib(1024)) === gib(1)', () => {
