@@ -101,6 +101,11 @@
     "hostMembers": "Host members",
     "vms": "VMs",
     "maxMtu": "Max MTU",
-    "network": "Portgroup"
+    "network": "Portgroup",
+    "guestType": "Type"
+  },
+  "guestType": {
+    "qemu": "VM",
+    "lxc": "Container"
   }
 }

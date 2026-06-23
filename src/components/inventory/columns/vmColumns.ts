@@ -68,4 +68,9 @@ export const vmColumns: ColumnDef<VmDisplayRow>[] = [
     header: 'inventory.col.provisionedMib',
     cell: (ctx) => fmtMemMb(ctx.getValue<number>()),
   },
+  {
+    accessorKey: 'guestType',
+    id: 'guestType',
+    header: 'inventory.col.guestType',
+  },
 ]

@@ -30,6 +30,7 @@ const VM_ROW_KEYS: ReadonlySet<string> = new Set<keyof VmDisplayRow>([
   'os',
   'poweredOn',
   'provisionedMib',
+  'guestType',
 ])
 
 // The forbidden OS-family count fields (the "OsBreakdown" interface) —
@@ -60,6 +61,12 @@ describe('vmColumns (INV-02 — bound to projected VmDisplayRow)', () => {
     for (const col of vmColumns) {
       if (col.id !== 'vmName') expect(col.enableHiding).not.toBe(false)
     }
+  })
+
+  it('vmColumns has a guestType column with accessorKey guestType', () => {
+    const col = vmColumns.find((c) => c.id === 'guestType')
+    expect(col).toBeDefined()
+    expect((col as { accessorKey?: string }).accessorKey).toBe('guestType')
   })
 })
 
