@@ -1,58 +1,108 @@
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import i18n from '@/i18n'
 import { useSnapshotStore } from '@/store/snapshotStore'
+import type { Snapshot } from '@/types/snapshot'
 
 // jsdom cannot drive a real module Worker, so we mock the `parseInWorker`
-// boundary to run the SAME pure pipeline the worker runs (parseXlsx →
-// parseSnapshot → capture/vCenter/version inference) synchronously in-process.
-// STRIDE T-05-05: this mock is test-only and exercises the identical code
-// path; in production the real worker runs the privacy guard at its top.
-vi.mock('@/engines/parser', async () => {
-  const { parseXlsx } = await import('@/engines/parser/parseXlsx')
-  const { parseSnapshot } = await import('@/engines/parser/normalizeColumns')
-  const { inferCaptureDate, inferVCenterLabel, inferRvtoolsVersion } = await import(
-    '@/engines/parser/captureDate'
-  )
-
-  return {
-    parseInWorker: async (file: File) => {
-      const buf = await file.arrayBuffer()
-      const sheets = parseXlsx(buf)
-      const { snapshot: rows, warnings } = parseSnapshot(sheets)
-      const capturedAt = inferCaptureDate(file.name, file.lastModified, sheets)
-      const vCenterLabel = inferVCenterLabel(rows.vinfo, file.name, sheets)
-      const rvtoolsVersion = inferRvtoolsVersion(sheets)
-      return {
-        snapshot: {
-          filename: file.name,
-          fileSize: buf.byteLength,
-          capturedAt,
-          vCenterLabel,
-          rvtoolsVersion,
-          viSdkUuid: rows.viSdkUuid,
-          vMetaData: rows.vMetaData,
-          source: 'rvtools' as const,
-          vinfo: rows.vinfo,
-          vhost: rows.vhost,
-          vdatastore: rows.vdatastore,
-          vpartition: rows.vpartition,
-          parseErrors: rows.parseErrors,
+// boundary to return a minimal in-memory Proxmox Snapshot synchronously
+// in-process. This mirrors the same boundary the originals used (they mocked
+// parseSnapshot from the now-deleted RVTools normalizeColumns; we mock the
+// same exported boundary — `@/engines/parser` → `parseInWorker`).
+// STRIDE T-05-05: test-only mock; the real worker runs the privacy guard at
+// its top.
+vi.mock('@/engines/parser', () => ({
+  parseInWorker: async (file: File) => {
+    const buf = await file.arrayBuffer()
+    const snapshot: Omit<Snapshot, 'id' | 'parsedAt'> = {
+      filename: file.name,
+      fileSize: bytes(buf.byteLength),
+      capturedAt: new Date('2026-05-15T00:00:00Z'),
+      vCenterLabel: 'proxmox',
+      rvtoolsVersion: '',
+      viSdkUuid: null,
+      vMetaData: [],
+      source: 'proxmox' as const,
+      vinfo: [
+        {
+          vmName: 'test-vm-1',
+          cluster: 'proxmox',
+          host: 'pve-node-1',
+          vcpu: cores(4),
+          vramMib: mib(8192),
+          cpuReadinessPercent: null,
+          powerState: 'poweredOn' as const,
+          template: false,
+          poweredOn: true,
+          osConfig: 'Debian 12',
+          osTools: 'Debian 12',
+          vmBiosUuid: '',
+          vmInstanceUuid: '101',
+          viSdkUuid: '',
+          viSdkServer: '',
+          provisionedMib: mib(32768),
+          inUseMib: mib(10240),
+          path: '',
+          guestType: 'qemu',
         },
-        warnings,
-      }
-    },
-  }
-})
+        {
+          vmName: 'test-ct-1',
+          cluster: 'proxmox',
+          host: 'pve-node-1',
+          vcpu: cores(2),
+          vramMib: mib(2048),
+          cpuReadinessPercent: null,
+          powerState: 'poweredOn' as const,
+          template: false,
+          poweredOn: true,
+          osConfig: 'Alpine Linux',
+          osTools: 'Alpine Linux',
+          vmBiosUuid: '',
+          vmInstanceUuid: '201',
+          viSdkUuid: '',
+          viSdkServer: '',
+          provisionedMib: mib(8192),
+          inUseMib: mib(2048),
+          path: '',
+          guestType: 'lxc',
+        },
+      ],
+      vhost: [
+        {
+          hostName: 'pve-node-1',
+          cluster: 'proxmox',
+          sockets: sockets(1),
+          cores: cores(8),
+          speedMhz: mhz(3200),
+          memoryMib: mib(65536),
+          cpuRatio: 0,
+          ramRatio: 0.3,
+          faultDomain: '',
+          model: 'AMD EPYC',
+          vendor: '',
+          serialNumber: '',
+          esxVersion: 'pve-8.2',
+        },
+      ],
+      vmUsage: [],
+      vdatastore: [],
+      vpartition: [],
+      vnetwork: [],
+      vswitch: [],
+      dvswitch: [],
+      dvport: [],
+      parseErrors: [],
+    }
+    return { snapshot, warnings: [] }
+  },
+}))
 
 // App imports `parseInWorker` transitively via useSnapshotUpload — import
 // AFTER the mock is registered.
 import App from '@/App'
 
-describe('Phase 1 end-to-end smoke: drop → parse → render', () => {
+describe('Proxmox end-to-end smoke: drop → parse → render', () => {
   beforeEach(async () => {
     useSnapshotStore.getState().clearAll()
     await i18n.changeLanguage('en')
@@ -64,9 +114,8 @@ describe('Phase 1 end-to-end smoke: drop → parse → render', () => {
     expect(screen.queryAllByRole('button').length).toBeGreaterThan(0)
   })
 
-  it('drops the MiB canary fixture and renders a SnapshotCard with the expected metadata', async () => {
-    const buf = readFileSync(resolve(process.cwd(), 'src/__fixtures__/rvtools-mib-canary.xlsx'))
-    const file = new File([buf], 'rvtools-mib-canary.xlsx', {
+  it('drops a Proxmox file and renders a SnapshotCard with the expected metadata', async () => {
+    const file = new File([new ArrayBuffer(8)], 'proxmox-report.xlsx', {
       lastModified: Date.UTC(2026, 4, 15),
     })
 
@@ -82,47 +131,45 @@ describe('Phase 1 end-to-end smoke: drop → parse → render', () => {
     })
 
     await waitFor(() => {
-      expect(screen.queryByText(/rvtools-mib-canary\.xlsx/)).not.toBeNull()
+      expect(screen.queryByText(/proxmox-report\.xlsx/)).not.toBeNull()
     })
 
-    // Capture-date indicator visible (FND-05). The canary's vMetaData carries
-    // an Exported Timestamp in 2026; we assert the year appears (locale format
-    // of toLocaleDateString varies, so we do not lock the exact string).
-    // Phase-2: the dashboard now also renders a "Captured {date}" provenance
-    // line beside the sidebar SnapshotCard, so >1 node matches /2026/ — assert
-    // at least one is present (intent unchanged: the capture date is visible).
+    // The mock returns capturedAt 2026-05-15; assert the year appears
+    // (locale format of toLocaleDateString varies).
     const dated = screen.getAllByText(/2026/)
     expect(dated.length).toBeGreaterThan(0)
-    expect(dated[0]?.textContent).toMatch(/2026/)
 
-    // vCenter label from the canary fixture.
-    expect(screen.queryByText(/vcenter\.canary\.local/)).not.toBeNull()
+    // Cluster label from the mock Proxmox snapshot (may appear in sidebar + table).
+    expect(screen.queryAllByText(/proxmox/i).length).toBeGreaterThan(0)
 
-    // RVTools version from vMetaData.
-    expect(screen.queryByText(/4\.4\.0/)).not.toBeNull()
-
-    // Row counts: 1 VM, 1 ESX, 1 cluster, 0 datastores (per the canary).
-    expect(screen.getByText(/1 VMs/i)).not.toBeNull()
+    // Row counts: 2 guests (1 VM + 1 LXC), 1 ESX node.
+    expect(screen.getByText(/2 VMs/i)).not.toBeNull()
   })
 
   it('PAR-05: clearing the store mimics a refresh — no persisted dataset rows remain', () => {
     const { addSnapshot } = useSnapshotStore.getState()
     addSnapshot({
       id: 'test-id',
-      filename: 'test.xlsx',
-      fileSize: 0,
+      filename: 'proxmox-test.xlsx',
+      fileSize: bytes(0),
       capturedAt: new Date(),
-      vCenterLabel: 'x',
-      rvtoolsVersion: '4.4',
+      vCenterLabel: 'proxmox',
+      rvtoolsVersion: '',
       parsedAt: new Date(),
-      source: 'rvtools',
+      source: 'proxmox',
       viSdkUuid: null,
+      vMetaData: [],
       vinfo: [],
       vhost: [],
+      vmUsage: [],
       vdatastore: [],
       vpartition: [],
+      vnetwork: [],
+      vswitch: [],
+      dvswitch: [],
+      dvport: [],
       parseErrors: [],
-    } as unknown as Parameters<typeof addSnapshot>[0])
+    })
     expect(useSnapshotStore.getState().snapshots.size).toBe(1)
 
     // A page reload re-initializes the module-scope `new Map()`; clearAll is
@@ -130,7 +177,7 @@ describe('Phase 1 end-to-end smoke: drop → parse → render', () => {
     useSnapshotStore.getState().clearAll()
     expect(useSnapshotStore.getState().snapshots.size).toBe(0)
 
-    // Only patlas-lang / patlas-theme UI prefs are allowed in localStorage.
+    // PAR-05: Only patlas-lang / patlas-theme UI prefs are allowed in localStorage.
     const stray = Object.keys(localStorage).filter(
       (k) => !k.startsWith('patlas-lang') && !k.startsWith('patlas-theme'),
     )
@@ -138,8 +185,7 @@ describe('Phase 1 end-to-end smoke: drop → parse → render', () => {
   })
 
   it('Phase-3: ViewToggle switches Dashboard↔Inventory with the sidebar intact throughout', async () => {
-    const buf = readFileSync(resolve(process.cwd(), 'src/__fixtures__/rvtools-mib-canary.xlsx'))
-    const file = new File([buf], 'rvtools-mib-canary.xlsx', {
+    const file = new File([new ArrayBuffer(8)], 'proxmox-report.xlsx', {
       lastModified: Date.UTC(2026, 4, 15),
     })
 
@@ -153,26 +199,27 @@ describe('Phase 1 end-to-end smoke: drop → parse → render', () => {
 
     // Snapshot loaded → sidebar SnapshotCard + dashboard render (default view).
     await waitFor(() => {
-      expect(screen.queryByText(/rvtools-mib-canary\.xlsx/)).not.toBeNull()
+      expect(screen.queryByText(/proxmox-report\.xlsx/)).not.toBeNull()
     })
     expect(screen.getByRole('button', { name: 'Inventory' }).getAttribute('aria-pressed')).toBe(
       'false',
     )
 
     // Toggle → Inventory: the tree + object-table tab strip render.
-    await userEvent.click(screen.getByRole('button', { name: 'Inventory' }))
+    const { userEvent } = await import('@testing-library/user-event')
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Inventory' }))
     await waitFor(() => {
       expect(screen.queryByRole('tree', { name: /inventory tree/i })).not.toBeNull()
     })
     expect(screen.getByRole('group', { name: /object type/i })).not.toBeNull()
     // Sidebar still mounted across the switch.
-    expect(screen.queryByText(/rvtools-mib-canary\.xlsx/)).not.toBeNull()
+    expect(screen.queryByText(/proxmox-report\.xlsx/)).not.toBeNull()
 
     // Toggle back → Dashboard: the estate section heading returns.
-    await userEvent.click(screen.getByRole('button', { name: 'Dashboard' }))
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Dashboard' }))
     await waitFor(() => {
       expect(screen.queryByRole('heading', { level: 2, name: 'Clusters' })).not.toBeNull()
     })
-    expect(screen.queryByText(/rvtools-mib-canary\.xlsx/)).not.toBeNull()
+    expect(screen.queryByText(/proxmox-report\.xlsx/)).not.toBeNull()
   })
 })

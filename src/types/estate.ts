@@ -15,7 +15,7 @@ import type { Cores, GHz, GiB, MHz, MiB, Sockets } from '@/engines/units'
  * `types/global.ts`, then brand-retrofitted to vatlas' Phase-1 units.
  *
  * The vsizer→vatlas deltas (ADR-0010 / Phase-1 type contract):
- * - GHz fields (`physicalGhz`/`consumedGhz`/`availableGhz`/`drReservedGhz`)
+ * - GHz fields (`physicalGhz`/`consumedGhz`/`availableGhz`)
  *   become branded `GHz`; core counts become `Cores`.
  * - `physicalRamMb`/`vramAllocatedMb` are RENAMED + branded to
  *   `physicalRamMib: MiB` / `vramAllocatedMib: MiB` (RVTools "MB" IS MiB —
@@ -109,8 +109,7 @@ export interface TopReadinessVm {
 
 /**
  * Per-cluster aggregate (ported vsizer `ClusterAggregate`). GHz/MiB/Cores
- * branded; active-memory field dropped. Stretched-cluster DR math is ported
- * intact but dormant in Phase 2 (`stretchedClusters` is always empty).
+ * branded; active-memory field dropped.
  */
 export interface ClusterAggregate {
   cluster: string
@@ -126,28 +125,27 @@ export interface ClusterAggregate {
 
   // ── CPU capacity ──────────────────────────────────────────────────────
   physicalCores: Cores
-  /** `stretched ? 0.5 × physicalCores : physicalCores`. */
+  /** Equal to `physicalCores` (no DR reservation). */
   usablePhysicalCores: Cores
   /** vCPU consolidation: `vcpuAllocated / usablePhysicalCores`, against
    *  PHYSICAL cores never threads (Moderate-4). `0` when divisor is 0. */
   vcpuPerPcpu: number
   physicalGhz: GHz
   consumedGhz: GHz
-  /** physicalGhz − consumedGhz − drReservedGhz. */
+  /** physicalGhz − consumedGhz. */
   availableGhz: GHz
 
   // ── RAM capacity (host-side) ──────────────────────────────────────────
   physicalRamMib: MiB
   consumedRamMib: MiB
-  drReservedRamMib: MiB
   availableRamMib: MiB
 
-  // ── CPU ratios — capacity-weighted, DR-aware (0..3) ───────────────────
+  // ── CPU ratios — capacity-weighted (0..3) ─────────────────────────────
   meanCpuRatio: number
   maxCpuRatio: number
   minCpuRatio: number
 
-  // ── RAM ratios — capacity-weighted, DR-aware (0..3) ───────────────────
+  // ── RAM ratios — capacity-weighted (0..3) ─────────────────────────────
   meanRamRatio: number
   maxRamRatio: number
   minRamRatio: number
@@ -173,34 +171,6 @@ export interface ClusterAggregate {
   maxCpuReadinessPercent: number | null
   vmsAboveReadinessWarning: number
   readinessAvailable: boolean
-
-  // ── Stretched-cluster DR (Phase 4 — per-site reservation + confidence) ─
-  stretched: boolean
-  drReservedGhz: GHz
-  /**
-   * FACTUAL site-data discriminator (UAT G1 — the stretched flag is the
-   * user's declaration; the engine never judges it, only states where the
-   * split came from):
-   *   - 'detected' — every host carries a fault domain AND ≥2 distinct
-   *                  domains → reservation from REAL per-site capacity
-   *                  (Site A/B values populated)
-   *   - 'assumed'  — partial OR no fault-domain coverage → symmetric 0.5
-   *                  reservation, per-site values null
-   * No 'high/medium/low' verdict, no chip — that judgement was removed.
-   */
-  siteData: 'detected' | 'assumed'
-  /**
-   * Headline reservation fraction (GHz basis) used for the UI "%" row and
-   * the DR subtraction echo. `0` when not stretched. Per-resource fractions
-   * are applied internally (see aggregateClusters ADR comment).
-   */
-  reservedFraction: number
-  /** Larger / smaller site physical GHz. `null` ⇒ sites indeterminate
-   *  (assumed-symmetric medium/low) → em-dash sentinel (UI-SPEC §STR-02). */
-  siteACapacityGhz: GHz | null
-  siteBCapacityGhz: GHz | null
-  siteACapacityRamMib: MiB | null
-  siteBCapacityRamMib: MiB | null
 }
 
 /**
@@ -224,7 +194,6 @@ export interface GlobalSummary {
   // RAM (host-side)
   physicalRamMib: MiB
   consumedRamMib: MiB
-  drReservedRamMib: MiB
   availableRamMib: MiB
 
   meanCpuRatio: number
@@ -234,10 +203,6 @@ export interface GlobalSummary {
   vramAllocatedMib: MiB
 
   mhzPerVcpu: number
-
-  // Stretched-cluster rollup
-  stretchedClusterCount: number
-  drReservedGhz: GHz
 
   /** Estate-wide count of powered-on VMs whose CPU Ready exceeds the
    *  warning threshold. Sum across reporting clusters; `null` when no
@@ -476,11 +441,6 @@ export interface EstateView {
    * pass (composed there, never in a component or a separate memoised
    * hook). `null` when fewer than 2 snapshots are selected. */
   trends: TrendSeries | null
-  /** Distinct vCenters in the merged estate (DR vCenter-loss picker). */
-  vcenters: { viSdkUuid: string; label: string }[]
-  /** DR what-if result. `null` when no component is marked failed
-   *  (mirrors the `trends: T | null` idiom). Phase-4 DRS-01..06. */
-  drSim: DrSimResult | null
   /** P5 estate-level operational insights (RCI). */
   operationalInsights: OperationalInsights
   /** P5 per-cluster operational insights, keyed by cluster name. */
@@ -497,12 +457,6 @@ export interface EstateView {
    * default 4:1/1:1, D-05). Produced inside the single
    * `buildEstateView` pass — no second `useMemo` (D-11). */
   plannedView: { globals: GlobalSummary; clusters: ClusterAggregate[] } | null
-  /**
-   * P6 Custom Failover (D-11): the SAME `runScenario` sim re-run with
-   * the PLANNED ratios applied. Never a third DR mode and never
-   * conflated with the measured `drSim`. `null` when no scenario is
-   * marked failed or the planned ratios are not applied to DR. */
-  plannedDrSim: DrSimResult | null
   /**
    * P7 OS End-of-Support forecast. Produced inside the single
    * `buildEstateView` pass — no second `useMemo` (D-00). A frozen empty
@@ -644,54 +598,4 @@ export interface VmDetailEntry {
   partitions: VmPartitionEntry[]
   portgroups: { network: string; switch: string }[]
   datastores: string[]
-}
-
-/** Factual per-survivor headroom verdict (no color, no editorial verb). */
-export type Verdict = 'absorbs' | 'tight' | 'overflows'
-
-/**
- * The DR loss mode of a scenario (UI selector state echo). Phase-6
- * re-derivation (D-12 / G3): exactly two modes — `server` (a set of
- * failed hosts removed with their VMs) and `site` (a set of failed
- * fault-domains removed). Cluster-loss (DRS-02) and vCenter-loss
- * (DRS-03) are RETIRED — they were UAT-rejected.
- */
-export type DrMode = 'server' | 'site'
-
-/**
- * Inputs-only DR what-if selection. Sets are REPLACED never mutated
- * (Zustand `Object.is`); never persisted (no hash, no localStorage).
- * Phase-6 re-derivation (D-07/D-08): `failedHosts` drives Server loss;
- * `failedSites` holds `faultDomain` values driving Site loss.
- */
-export interface DrScenario {
-  failedHosts: Set<string>
-  failedSites: Set<string>
-}
-
-/**
- * DR simulation result — the SHIPPED aggregation re-run on the survivor
- * row subset. Wrong DR numbers are the project's #1 risk; the factual
- * `caveats` (i18n KEYS, never free text / numbers / editorial verbs)
- * are the structural disclosure mitigation (DRX-03). Phase-6
- * re-derivation (D-09/D-10): impact is PHYSICAL CPU (GHz + cores) +
- * PHYSICAL RAM removed (never vCPU); the high/med/low `confidence`
- * grade is RETIRED entirely (the tool does not judge the user's
- * scenario — DRX-05) while `caveats`/assumptions survive verbatim.
- */
-export interface DrSimResult {
-  mode: DrMode
-  before: GlobalSummary
-  after: GlobalSummary
-  /** Physical CPU clock removed (before − after `physicalGhz`). The
-   *  single gold accent figure, with `physicalCpuRemovedCores`. */
-  physicalCpuRemovedGhz: GHz
-  /** Physical CPU cores removed (before − after `physicalCores`). */
-  physicalCpuRemovedCores: Cores
-  /** Physical RAM removed (before − after `physicalRamMib`). */
-  physicalRamRemovedMib: MiB
-  perSurvivor: { cluster: string; verdict: Verdict }[]
-  /** i18n key suffixes (e.g. `caveats.reservationHigh`) — never free
-   *  text, never a pre-formatted number, never an editorial verb. */
-  caveats: string[]
 }

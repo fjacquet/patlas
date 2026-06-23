@@ -9,13 +9,12 @@ import {
   PackageIcon,
   PowerIcon,
   ServerIcon,
-  SplitIcon,
   ZapIcon,
 } from '@/components/icons'
 import { StatTile } from '@/components/StatTile'
 import { TileSection } from '@/components/TileSection'
 import type { ClusterDetail as Detail } from '@/types/estate'
-import { fmtGhzValue, fmtInt, fmtPercentValue, fmtPercentWhole, fmtRatio } from '@/utils/format'
+import { fmtGhzValue, fmtInt, fmtPercentValue, fmtRatio } from '@/utils/format'
 
 export interface ClusterDetailProps {
   detail: Detail
@@ -32,11 +31,9 @@ export interface ClusterDetailProps {
  */
 export function ClusterDetail({ detail, onBack }: ClusterDetailProps) {
   const { t, i18n } = useTranslation('rci')
-  const { t: tStr } = useTranslation('str')
   const loc = i18n.language
   const { aggregate: a, insights: o } = detail
   const na = t('na')
-  const siteGhz = (v: number | null) => (v === null ? na : fmtGhzValue(v, loc))
 
   return (
     <main className="flex-1 overflow-y-auto p-8">
@@ -125,29 +122,6 @@ export function ClusterDetail({ detail, onBack }: ClusterDetailProps) {
               t('insights.power.template', { count: o.templateVms }),
             ].join(' · ')}
           />
-          {a.stretched && (
-            <>
-              <StatTile
-                icon={<SplitIcon />}
-                label={tStr('site.a')}
-                value={siteGhz(a.siteACapacityGhz as number | null)}
-                accent="gold"
-              />
-              <StatTile
-                icon={<SplitIcon />}
-                label={tStr('site.b')}
-                value={siteGhz(a.siteBCapacityGhz as number | null)}
-                accent="gold"
-              />
-              <StatTile
-                icon={<GaugeIcon />}
-                label={tStr('reservation')}
-                value={fmtPercentWhole(a.reservedFraction, loc)}
-                sub={tStr(`siteData.${a.siteData}`)}
-                accent="gold"
-              />
-            </>
-          )}
         </TileSection>
       </div>
     </main>

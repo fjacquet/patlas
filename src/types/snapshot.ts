@@ -36,7 +36,7 @@ export interface Snapshot {
   /** 'unknown' | '3.10' | '3.11' | '4.0' | '4.4' | '4.4.0' | future builds. */
   rvtoolsVersion: string
   parsedAt: Date
-  source: 'rvtools' | 'proxmox'
+  source: 'proxmox'
   /** vCenter instance UUID from `vInfo.VI SDK UUID`; null when absent. */
   viSdkUuid: string | null
   /**

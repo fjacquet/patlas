@@ -28,7 +28,7 @@ const makeSnapshot = (id: string, overrides: Partial<Snapshot> = {}): Snapshot =
     vCenterLabel: `vc-${id}`,
     rvtoolsVersion: '4.4.0',
     parsedAt: new Date('2026-05-15T00:00:00Z'),
-    source: 'rvtools',
+    source: 'proxmox',
     viSdkUuid: null,
     vinfo: [],
     vhost: [],

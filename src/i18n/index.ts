@@ -5,7 +5,6 @@ import deAlerts from './locales/de/alerts.json'
 import deAlloc from './locales/de/alloc.json'
 import deCommon from './locales/de/common.json'
 import deDashboard from './locales/de/dashboard.json'
-import deDr from './locales/de/dr.json'
 import deEos from './locales/de/eos.json'
 import deInventory from './locales/de/inventory.json'
 import deMonstervm from './locales/de/monstervm.json'
@@ -16,14 +15,12 @@ import deRci from './locales/de/rci.json'
 import deReport from './locales/de/report.json'
 import deRightsizing from './locales/de/rightsizing.json'
 import deStorage from './locales/de/storage.json'
-import deStr from './locales/de/str.json'
 import deTrends from './locales/de/trends.json'
 import deUpload from './locales/de/upload.json'
 import enAlerts from './locales/en/alerts.json'
 import enAlloc from './locales/en/alloc.json'
 import enCommon from './locales/en/common.json'
 import enDashboard from './locales/en/dashboard.json'
-import enDr from './locales/en/dr.json'
 import enEos from './locales/en/eos.json'
 import enInventory from './locales/en/inventory.json'
 import enMonstervm from './locales/en/monstervm.json'
@@ -34,14 +31,12 @@ import enRci from './locales/en/rci.json'
 import enReport from './locales/en/report.json'
 import enRightsizing from './locales/en/rightsizing.json'
 import enStorage from './locales/en/storage.json'
-import enStr from './locales/en/str.json'
 import enTrends from './locales/en/trends.json'
 import enUpload from './locales/en/upload.json'
 import frAlerts from './locales/fr/alerts.json'
 import frAlloc from './locales/fr/alloc.json'
 import frCommon from './locales/fr/common.json'
 import frDashboard from './locales/fr/dashboard.json'
-import frDr from './locales/fr/dr.json'
 import frEos from './locales/fr/eos.json'
 import frInventory from './locales/fr/inventory.json'
 import frMonstervm from './locales/fr/monstervm.json'
@@ -52,14 +47,12 @@ import frRci from './locales/fr/rci.json'
 import frReport from './locales/fr/report.json'
 import frRightsizing from './locales/fr/rightsizing.json'
 import frStorage from './locales/fr/storage.json'
-import frStr from './locales/fr/str.json'
 import frTrends from './locales/fr/trends.json'
 import frUpload from './locales/fr/upload.json'
 import itAlerts from './locales/it/alerts.json'
 import itAlloc from './locales/it/alloc.json'
 import itCommon from './locales/it/common.json'
 import itDashboard from './locales/it/dashboard.json'
-import itDr from './locales/it/dr.json'
 import itEos from './locales/it/eos.json'
 import itInventory from './locales/it/inventory.json'
 import itMonstervm from './locales/it/monstervm.json'
@@ -70,7 +63,6 @@ import itRci from './locales/it/rci.json'
 import itReport from './locales/it/report.json'
 import itRightsizing from './locales/it/rightsizing.json'
 import itStorage from './locales/it/storage.json'
-import itStr from './locales/it/str.json'
 import itTrends from './locales/it/trends.json'
 import itUpload from './locales/it/upload.json'
 
@@ -92,9 +84,7 @@ export const NAMESPACES = [
   'dashboard',
   'inventory',
   'mvc',
-  'str',
   'alloc',
-  'dr',
   'rci',
   'eos',
   'trends',
@@ -115,9 +105,7 @@ export const resources = {
     dashboard: enDashboard,
     inventory: enInventory,
     mvc: enMvc,
-    str: enStr,
     alloc: enAlloc,
-    dr: enDr,
     rci: enRci,
     eos: enEos,
     trends: enTrends,
@@ -135,9 +123,7 @@ export const resources = {
     dashboard: frDashboard,
     inventory: frInventory,
     mvc: frMvc,
-    str: frStr,
     alloc: frAlloc,
-    dr: frDr,
     rci: frRci,
     eos: frEos,
     trends: frTrends,
@@ -155,9 +141,7 @@ export const resources = {
     dashboard: deDashboard,
     inventory: deInventory,
     mvc: deMvc,
-    str: deStr,
     alloc: deAlloc,
-    dr: deDr,
     rci: deRci,
     eos: deEos,
     trends: deTrends,
@@ -175,9 +159,7 @@ export const resources = {
     dashboard: itDashboard,
     inventory: itInventory,
     mvc: itMvc,
-    str: itStr,
     alloc: itAlloc,
-    dr: itDr,
     rci: itRci,
     eos: itEos,
     trends: itTrends,

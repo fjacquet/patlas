@@ -27,15 +27,12 @@ export const emptySummary: GlobalSummary = Object.freeze({
   availableGhz: ghzOf(0),
   physicalRamMib: mib(0),
   consumedRamMib: mib(0),
-  drReservedRamMib: mib(0),
   availableRamMib: mib(0),
   meanCpuRatio: 0,
   meanRamRatio: 0,
   vcpuAllocated: coresOf(0),
   vramAllocatedMib: mib(0),
   mhzPerVcpu: 0,
-  stretchedClusterCount: 0,
-  drReservedGhz: ghzOf(0),
   vmsAboveReadinessWarning: null,
   datastoreCount: 0,
   totalStorageMib: mib(0),
@@ -44,9 +41,8 @@ export const emptySummary: GlobalSummary = Object.freeze({
 /**
  * Estate-wide rollup. Drives the GlobalSummaryCard (DSH-02).
  *
- * - `meanCpuRatio`/`meanRamRatio` are capacity-weighted and DR-aware —
- *   the divisor is the USABLE capacity sum so a stretched cluster's
- *   reservation makes the headline rise (ADR-0011).
+ * - `meanCpuRatio`/`meanRamRatio` are capacity-weighted — the divisor is
+ *   the physical capacity sum (ADR-0011).
  * - `vmsAboveReadinessWarning` is `null` when no cluster reports
  *   readiness — never collapse absence to 0 (ADR-0012).
  * - `datastoreCount`/`totalStorageMib` carry through from the caller's
@@ -66,11 +62,9 @@ export const aggregateGlobals = (
   const physicalGhz = sum(clusters.map((c) => c.physicalGhz as number))
   const consumedGhz = sum(clusters.map((c) => c.consumedGhz as number))
   const availableGhz = sum(clusters.map((c) => c.availableGhz as number))
-  const drReservedGhz = sum(clusters.map((c) => c.drReservedGhz as number))
 
   const physicalRamMib = sum(clusters.map((c) => c.physicalRamMib as number))
   const consumedRamMib = sum(clusters.map((c) => c.consumedRamMib as number))
-  const drReservedRamMib = sum(clusters.map((c) => c.drReservedRamMib as number))
   const availableRamMib = sum(clusters.map((c) => c.availableRamMib as number))
 
   const hostCount = sum(clusters.map((c) => c.hostCount))
@@ -86,12 +80,9 @@ export const aggregateGlobals = (
       ? null
       : reportingReadiness.reduce((acc, c) => acc + c.vmsAboveReadinessWarning, 0)
 
-  // Capacity-weighted, DR-aware (ADR-0011). Divisor is the *usable*
-  // capacity sum, not the raw physical sum.
-  const usableGhz = physicalGhz - drReservedGhz
-  const usableRamMib = physicalRamMib - drReservedRamMib
-  const meanCpuRatio = usableGhz <= 0 ? 0 : consumedGhz / usableGhz
-  const meanRamRatio = usableRamMib <= 0 ? 0 : consumedRamMib / usableRamMib
+  // Capacity-weighted (ADR-0011). Divisor is the physical capacity sum.
+  const meanCpuRatio = physicalGhz <= 0 ? 0 : consumedGhz / physicalGhz
+  const meanRamRatio = physicalRamMib <= 0 ? 0 : consumedRamMib / physicalRamMib
   const mhzPerVcpu = vcpuAllocated === 0 ? 0 : (consumedGhz * 1000) / vcpuAllocated
   const vcpuPerPcpu = usablePhysicalCores === 0 ? 0 : vcpuAllocated / usablePhysicalCores
 
@@ -107,15 +98,12 @@ export const aggregateGlobals = (
     availableGhz: ghzOf(availableGhz),
     physicalRamMib: mib(physicalRamMib),
     consumedRamMib: mib(consumedRamMib),
-    drReservedRamMib: mib(drReservedRamMib),
     availableRamMib: mib(availableRamMib),
     meanCpuRatio,
     meanRamRatio,
     vcpuAllocated: coresOf(vcpuAllocated),
     vramAllocatedMib: mib(vramAllocatedMib),
     mhzPerVcpu,
-    stretchedClusterCount: clusters.filter((c) => c.stretched).length,
-    drReservedGhz: ghzOf(drReservedGhz),
     vmsAboveReadinessWarning,
     datastoreCount,
     totalStorageMib,

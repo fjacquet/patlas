@@ -1,10 +1,10 @@
-import { existsSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import i18n from '@/i18n'
 import { useSnapshotStore } from '@/store/snapshotStore'
+import type { Snapshot } from '@/types/snapshot'
 
 // SVG-assertion path — identical documented fallback 02-01's Chart.test.tsx
 // chose (RESEARCH Open Question 2): jsdom cannot mount real ReactEChartsCore /
@@ -21,46 +21,120 @@ vi.mock('echarts-for-react/esm/core', () => ({
     ),
 }))
 
-// Same synchronous-pipeline boundary mock as e2e-smoke: run the real pure
-// parse pipeline in-process (jsdom cannot drive a module Worker).
-vi.mock('@/engines/parser', async () => {
-  const { parseXlsx } = await import('@/engines/parser/parseXlsx')
-  const { parseSnapshot } = await import('@/engines/parser/normalizeColumns')
-  const { inferCaptureDate, inferVCenterLabel, inferRvtoolsVersion } = await import(
-    '@/engines/parser/captureDate'
-  )
-  return {
-    parseInWorker: async (file: File) => {
-      const buf = await file.arrayBuffer()
-      const sheets = parseXlsx(buf)
-      const { snapshot: rows, warnings } = parseSnapshot(sheets)
-      return {
-        snapshot: {
-          filename: file.name,
-          fileSize: buf.byteLength,
-          capturedAt: inferCaptureDate(file.name, file.lastModified, sheets),
-          vCenterLabel: inferVCenterLabel(rows.vinfo, file.name),
-          rvtoolsVersion: inferRvtoolsVersion(sheets),
-          viSdkUuid: rows.viSdkUuid,
-          source: 'rvtools' as const,
-          vMetaData: rows.vMetaData,
-          vinfo: rows.vinfo,
-          vhost: rows.vhost,
-          vdatastore: rows.vdatastore,
-          vpartition: rows.vpartition,
-          parseErrors: rows.parseErrors,
+// Same synchronous-pipeline boundary mock as e2e-smoke: returns a minimal
+// Proxmox Snapshot in-process (jsdom cannot drive a module Worker).
+// Uses source: 'proxmox' with guestType set on every VInfoRow.
+vi.mock('@/engines/parser', () => ({
+  parseInWorker: async (file: File) => {
+    const buf = await file.arrayBuffer()
+    const snapshot: Omit<Snapshot, 'id' | 'parsedAt'> = {
+      filename: file.name,
+      fileSize: bytes(buf.byteLength),
+      capturedAt: new Date('2026-05-15T00:00:00Z'),
+      vCenterLabel: 'proxmox',
+      rvtoolsVersion: '',
+      viSdkUuid: null,
+      vMetaData: [],
+      source: 'proxmox' as const,
+      vinfo: [
+        {
+          vmName: 'vm-1',
+          cluster: 'proxmox',
+          host: 'pve-node-1',
+          vcpu: cores(4),
+          vramMib: mib(8192),
+          cpuReadinessPercent: null,
+          powerState: 'poweredOn' as const,
+          template: false,
+          poweredOn: true,
+          osConfig: 'Debian 12',
+          osTools: 'Debian 12',
+          vmBiosUuid: '',
+          vmInstanceUuid: '101',
+          viSdkUuid: '',
+          viSdkServer: '',
+          provisionedMib: mib(32768),
+          inUseMib: mib(10240),
+          path: '',
+          guestType: 'qemu',
         },
-        warnings,
-      }
-    },
-  }
-})
+        {
+          vmName: 'vm-2',
+          cluster: 'proxmox',
+          host: 'pve-node-1',
+          vcpu: cores(2),
+          vramMib: mib(4096),
+          cpuReadinessPercent: null,
+          powerState: 'poweredOff' as const,
+          template: false,
+          poweredOn: false,
+          osConfig: 'Ubuntu 22.04',
+          osTools: 'Ubuntu 22.04',
+          vmBiosUuid: '',
+          vmInstanceUuid: '102',
+          viSdkUuid: '',
+          viSdkServer: '',
+          provisionedMib: mib(20480),
+          inUseMib: mib(5120),
+          path: '',
+          guestType: 'qemu',
+        },
+        {
+          vmName: 'ct-1',
+          cluster: 'proxmox',
+          host: 'pve-node-1',
+          vcpu: cores(1),
+          vramMib: mib(1024),
+          cpuReadinessPercent: null,
+          powerState: 'poweredOn' as const,
+          template: false,
+          poweredOn: true,
+          osConfig: 'Alpine Linux',
+          osTools: 'Alpine Linux',
+          vmBiosUuid: '',
+          vmInstanceUuid: '201',
+          viSdkUuid: '',
+          viSdkServer: '',
+          provisionedMib: mib(8192),
+          inUseMib: mib(2048),
+          path: '',
+          guestType: 'lxc',
+        },
+      ],
+      vhost: [
+        {
+          hostName: 'pve-node-1',
+          cluster: 'proxmox',
+          sockets: sockets(1),
+          cores: cores(8),
+          speedMhz: mhz(3200),
+          memoryMib: mib(65536),
+          cpuRatio: 0,
+          ramRatio: 0.3,
+          faultDomain: '',
+          model: 'AMD EPYC',
+          vendor: '',
+          serialNumber: '',
+          esxVersion: 'pve-8.2',
+        },
+      ],
+      vmUsage: [],
+      vdatastore: [],
+      vpartition: [],
+      vnetwork: [],
+      vswitch: [],
+      dvswitch: [],
+      dvport: [],
+      parseErrors: [],
+    }
+    return { snapshot, warnings: [] }
+  },
+}))
 
 import App from '@/App'
 
-const dropFile = async (path: string, name: string) => {
-  const buf = readFileSync(path)
-  const file = new File([buf], name, { lastModified: Date.UTC(2026, 4, 15) })
+const dropFile = async (name: string) => {
+  const file = new File([new ArrayBuffer(8)], name, { lastModified: Date.UTC(2026, 4, 15) })
   const fileInput = document.querySelectorAll('input[type="file"]')[0] as HTMLInputElement
   Object.defineProperty(fileInput, 'files', { value: [file], configurable: true })
   await act(async () => {
@@ -68,7 +142,7 @@ const dropFile = async (path: string, name: string) => {
   })
 }
 
-describe('Phase 2 dashboard smoke: drop → buildEstateView → <GlobalDashboard>', () => {
+describe('Proxmox dashboard smoke: drop → buildEstateView → <GlobalDashboard>', () => {
   beforeEach(async () => {
     useSnapshotStore.getState().clearAll()
     await i18n.changeLanguage('en')
@@ -82,12 +156,9 @@ describe('Phase 2 dashboard smoke: drop → buildEstateView → <GlobalDashboard
     expect(document.querySelectorAll('input[type="file"]').length).toBeGreaterThan(0)
   })
 
-  it('drops the MiB canary and renders the estate dashboard (DSH-01..06, SVG-wired)', async () => {
+  it('drops a Proxmox file and renders the estate dashboard (DSH-01..06, SVG-wired)', async () => {
     render(<App />)
-    await dropFile(
-      resolve(process.cwd(), 'src/__fixtures__/rvtools-mib-canary.xlsx'),
-      'rvtools-mib-canary.xlsx',
-    )
+    await dropFile('proxmox-report.xlsx')
 
     // Section titles present (i18n dashboard namespace, EN). "Clusters" also
     // appears as a summary tile label, so query the section <h2> by role.
@@ -97,8 +168,8 @@ describe('Phase 2 dashboard smoke: drop → buildEstateView → <GlobalDashboard
     expect(screen.queryByRole('heading', { level: 2, name: 'Operating systems' })).not.toBeNull()
     expect(screen.queryByRole('heading', { level: 2, name: 'CPU Ready' })).not.toBeNull()
 
-    // Exactly one cluster row for the single-cluster canary — the cluster
-    // table renders one "Cluster detail" drill button per row.
+    // Exactly one cluster row for the single-cluster Proxmox snapshot — the
+    // cluster table renders one "Cluster detail" drill button per row.
     const clusterDrills = screen.getAllByRole('button', { name: 'Cluster detail' })
     expect(clusterDrills.length).toBe(1)
 
@@ -115,45 +186,21 @@ describe('Phase 2 dashboard smoke: drop → buildEstateView → <GlobalDashboard
   })
 
   it('toggling accounting mode recomputes via useEstateView (Critical-6 / ROADMAP #2)', async () => {
-    // Use the realistic ~50/50 powered-on fixture so Configured ≠ Active.
-    // tests/fixtures/*.xlsx are gitignored (01-04) — guard so CI (no real
-    // fixtures) still passes on the canary path; this block is best-effort.
-    const realFixture = resolve(
-      process.cwd(),
-      'tests/fixtures/RVTools_export_all_2026-04-17_16.51.38-MOM-vCenter.xlsx',
-    )
-    if (!existsSync(realFixture)) {
-      // Canary has all-powered-on VMs, so modes may not differ — assert the
-      // toggle at least re-renders without throwing (structural fallback).
-      render(<App />)
-      await dropFile(
-        resolve(process.cwd(), 'src/__fixtures__/rvtools-mib-canary.xlsx'),
-        'rvtools-mib-canary.xlsx',
-      )
-      await waitFor(() =>
-        expect(screen.queryByRole('heading', { level: 2, name: 'Clusters' })).not.toBeNull(),
-      )
-      await userEvent.click(screen.getByText('Configured'))
-      expect(screen.getByText('Configured').getAttribute('aria-pressed')).toBe('true')
-      return
-    }
-
+    // The mock has 2 powered-on guests + 1 powered-off guest, so
+    // Configured (all 3) ≠ Active (powered-on 2). This tests the real
+    // useEstateView path without needing an external fixture file.
     render(<App />)
-    await dropFile(realFixture, 'RVTools_export_all_2026-04-17_16.51.38-MOM-vCenter.xlsx')
+    await dropFile('proxmox-report.xlsx')
+
     await waitFor(() =>
       expect(screen.queryByRole('heading', { level: 2, name: 'Clusters' })).not.toBeNull(),
     )
-
-    // Multiple per-cluster rows render for the multi-cluster real estate
-    // (one "Cluster detail" drill button per row).
-    const clusterDrills = screen.getAllByRole('button', { name: 'Cluster detail' })
-    expect(clusterDrills.length).toBeGreaterThan(1)
 
     // Read a summary figure (vCPU tile) in Active (default), then Configured.
     const summary = screen.getByLabelText('Estate summary')
     const vcpuActive = within(summary).getByText('vCPU').nextElementSibling?.textContent ?? ''
 
-    await userEvent.click(screen.getByText('Configured'))
+    await userEvent.setup().click(screen.getByText('Configured'))
     await waitFor(() => {
       expect(screen.getByText('Configured').getAttribute('aria-pressed')).toBe('true')
     })
@@ -162,6 +209,8 @@ describe('Phase 2 dashboard smoke: drop → buildEstateView → <GlobalDashboard
 
     // Configured (all VMs incl. powered-off) ≠ Active (powered-on only) — the
     // powered-off-VM trap is surfaced (three distinct totals, ROADMAP #2/#6).
+    // Active: vm-1 (4 vCPU) + ct-1 (1 vCPU) = 5 vCPU
+    // Configured: vm-1 (4) + vm-2 (2) + ct-1 (1) = 7 vCPU
     expect(vcpuConfigured).not.toBe(vcpuActive)
   })
 })

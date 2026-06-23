@@ -1,70 +1,200 @@
-import { execFileSync } from 'node:child_process'
-import { existsSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 import { render, screen } from '@testing-library/react'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { RightSizingView } from '@/components/rightsizing/RightSizingView'
 import { buildEstateView } from '@/engines/aggregation'
-import { inferVCenterLabel } from '@/engines/parser/captureDate'
-import { parseSnapshot } from '@/engines/parser/normalizeColumns'
-import { parseXlsx } from '@/engines/parser/parseXlsx'
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
+import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import i18n from '@/i18n'
 import { useSnapshotStore } from '@/store/snapshotStore'
 import type { Snapshot } from '@/types/snapshot'
+import type { VHostRow } from '@/types/vhost'
+import type { VInfoRow, VmUsageRow } from '@/types/vinfo'
 
 /**
- * P-RS end-to-end: drive the SAME pure pipeline the worker runs (parseXlsx →
- * parseSnapshot → mergeSnapshotsToEstate → buildEstateView) on the synthetic
- * 10k fixture (which now carries vMemory/vCPU), then assert the right-sizing
- * extract is derived correctly — powered-on only, all three categories
- * populated — and that the view renders it.
+ * P-RS end-to-end: build a 10k Proxmox estate in memory (no xlsx, no
+ * parsing), run it through the SAME pure pipeline (mergeSnapshotsToEstate →
+ * buildEstateView), then assert the right-sizing extract is derived correctly
+ * — powered-on-only filtering, all three categories populated — and that the
+ * view renders.
+ *
+ * The distribution is seeded to guarantee all three categories:
+ *  - i % 5 === 0  → poweredOff (2 000 VMs, excluded from sizing)
+ *  - i % 3 === 0  → oversized:  1 vCPU,  512 MiB RAM, low active (50 MHz, 20 MiB)
+ *  - i % 7 === 0  → undersized: 8 vCPU, 4096 MiB RAM, high active (3500 MHz, 3500 MiB)
+ *  - else         → stressed:   4 vCPU, 2048 MiB RAM, balloon > 0
+ *  (powered-on VMs only — categories apply to powered-on VMs)
  */
 
-const FIXTURE = resolve(process.cwd(), 'src/__fixtures__/rvtools-inventory-10k.xlsx')
-const TODAY = new Date('2026-01-01T00:00:00Z')
 const VM_COUNT = 10_000
-const POWERED_ON = VM_COUNT - VM_COUNT / 5 // i%5===0 are poweredOff ⇒ 8000 on
+// i%5===0 → poweredOff → 8 000 powered-on
+const POWERED_ON = VM_COUNT - Math.floor(VM_COUNT / 5)
+const TODAY = new Date('2026-01-01T00:00:00Z')
+
+// 8 Proxmox nodes spread across 2 clusters
+const CLUSTERS: [string, ...string[]] = ['cluster-a', 'cluster-b']
+const HOSTS_PER_CLUSTER = 4
+
+function makeProxmoxHosts(): VHostRow[] {
+  const hosts: VHostRow[] = []
+  for (const cluster of CLUSTERS) {
+    for (let h = 0; h < HOSTS_PER_CLUSTER; h++) {
+      hosts.push({
+        hostName: `${cluster}-node${h + 1}`,
+        cluster,
+        sockets: sockets(2),
+        cores: cores(32),
+        speedMhz: mhz(3_200),
+        memoryMib: mib(65_536),
+        cpuRatio: 0.4,
+        ramRatio: 0.5,
+        faultDomain: '',
+        model: 'Dell PowerEdge R750',
+        vendor: 'Dell',
+        serialNumber: `SN-${cluster}-${h}`,
+        esxVersion: '',
+      })
+    }
+  }
+  return hosts
+}
+
+function makeProxmoxEstate(vmCount: number): Snapshot {
+  const hostList = makeProxmoxHosts()
+  const hostNames: [string, ...string[]] = hostList.map((h) => h.hostName) as [string, ...string[]]
+  const vinfo: VInfoRow[] = []
+  const vmUsage: VmUsageRow[] = []
+
+  // pick(arr, i) is safe: modulo always yields a valid index for non-empty arrays.
+  const pick = <T,>(arr: [T, ...T[]], i: number): T => arr[i % arr.length] as T
+
+  for (let i = 0; i < vmCount; i++) {
+    const name = `vm-${String(i + 1).padStart(5, '0')}`
+    const cluster = pick(CLUSTERS, i)
+    const host = pick(hostNames, i)
+    const guestType: 'qemu' | 'lxc' = i % 10 === 0 ? 'lxc' : 'qemu'
+    const poweredOff = i % 5 === 0
+    const powerState = poweredOff ? ('poweredOff' as const) : ('poweredOn' as const)
+
+    // Sizing distribution (only matters for powered-on)
+    let vcpuN = 4
+    let vramN = 2_048
+
+    if (!poweredOff) {
+      if (i % 3 === 0) {
+        // oversized: low vcpu + low allocation
+        vcpuN = 1
+        vramN = 512
+      } else if (i % 7 === 0) {
+        // undersized: high allocation + high usage
+        vcpuN = 8
+        vramN = 4_096
+      }
+      // else stressed default: 4 vcpu, 2048 MiB
+    }
+
+    vinfo.push({
+      vmName: name,
+      cluster,
+      host,
+      vcpu: cores(vcpuN),
+      vramMib: mib(vramN),
+      cpuReadinessPercent: null,
+      powerState,
+      template: false,
+      poweredOn: !poweredOff,
+      osConfig: 'Debian GNU/Linux 12',
+      osTools: 'Debian GNU/Linux 12',
+      vmBiosUuid: `bios-${i}`,
+      vmInstanceUuid: `inst-${i}`,
+      viSdkUuid: '',
+      viSdkServer: '',
+      provisionedMib: mib(vramN * 2),
+      inUseMib: mib(vramN),
+      path: `[local] ${name}/${name}.conf`,
+      guestType,
+    })
+
+    if (!poweredOff) {
+      // Provide usage rows to drive sizing engine
+      if (i % 3 === 0) {
+        // oversized: very low CPU + mem usage → cpuUtil < 10%, memActive < 20%
+        vmUsage.push({
+          vmName: name,
+          cluster,
+          vmBiosUuid: `bios-${i}`,
+          vmInstanceUuid: `inst-${i}`,
+          activeMib: mib(50), // 20% of 512 MiB
+          consumedMib: mib(80),
+          balloonedMib: mib(0),
+          swappedMib: mib(0),
+          cpuUsageMhz: mhz(50), // 10% of 1 * 3200 MHz
+        })
+      } else if (i % 7 === 0) {
+        // undersized: very high CPU + mem usage → cpuUtil > 90%, memActive > 90%
+        vmUsage.push({
+          vmName: name,
+          cluster,
+          vmBiosUuid: `bios-${i}`,
+          vmInstanceUuid: `inst-${i}`,
+          activeMib: mib(3_800), // ~92% of 4096 MiB
+          consumedMib: mib(3_900),
+          balloonedMib: mib(0),
+          swappedMib: mib(0),
+          cpuUsageMhz: mhz(23_000), // ~89% of 8 * 3200 = 25600 MHz
+        })
+      } else {
+        // stressed: ballooning present — exceeds DEFAULT balloonMib threshold of 0
+        vmUsage.push({
+          vmName: name,
+          cluster,
+          vmBiosUuid: `bios-${i}`,
+          vmInstanceUuid: `inst-${i}`,
+          activeMib: mib(1_200),
+          consumedMib: mib(1_800),
+          balloonedMib: mib(512),
+          swappedMib: mib(0),
+          cpuUsageMhz: mhz(8_000),
+        })
+      }
+    }
+  }
+
+  return {
+    id: 'proxmox-rs-e2e',
+    filename: 'proxmox-10k.xlsx',
+    fileSize: bytes(0),
+    capturedAt: new Date(Date.UTC(2026, 4, 15)),
+    parsedAt: new Date(),
+    vCenterLabel: 'proxmox-cluster',
+    rvtoolsVersion: 'proxmox',
+    source: 'proxmox',
+    viSdkUuid: null,
+    vMetaData: [],
+    vinfo,
+    vhost: hostList,
+    vmUsage,
+    vdatastore: [],
+    vpartition: [],
+    vnetwork: [],
+    vswitch: [],
+    dvswitch: [],
+    dvport: [],
+    parseErrors: [],
+  }
+}
 
 let snapshot: Snapshot
 
 beforeAll(() => {
-  if (!existsSync(FIXTURE)) {
-    execFileSync('node', ['scripts/generate-inventory-10k.mjs'], { stdio: 'ignore' })
-  }
-  const buf = readFileSync(FIXTURE)
-  const sheets = parseXlsx(buf)
-  const { snapshot: rows } = parseSnapshot(sheets)
-  snapshot = {
-    id: 'rs-e2e',
-    filename: 'rvtools-inventory-10k.xlsx',
-    fileSize: buf.byteLength,
-    capturedAt: new Date(Date.UTC(2026, 4, 15)),
-    parsedAt: new Date(),
-    vCenterLabel: inferVCenterLabel(rows.vinfo, 'rvtools-inventory-10k.xlsx'),
-    rvtoolsVersion: '4.4.0',
-    viSdkUuid: rows.viSdkUuid,
-    source: 'rvtools',
-    vMetaData: rows.vMetaData,
-    vinfo: rows.vinfo,
-    vhost: rows.vhost,
-    vmUsage: rows.vmUsage,
-    vdatastore: rows.vdatastore,
-    vpartition: rows.vpartition,
-    vnetwork: rows.vnetwork,
-    vswitch: rows.vswitch,
-    dvswitch: rows.dvswitch,
-    dvport: rows.dvport,
-    parseErrors: rows.parseErrors,
-  } as unknown as Snapshot
-}, 60_000)
+  snapshot = makeProxmoxEstate(VM_COUNT)
+}, 30_000)
 
 const buildSizing = () =>
   buildEstateView(mergeSnapshotsToEstate([snapshot]), [snapshot], 'active', TODAY).sizing
 
-describe('Right-sizing end-to-end (parse → buildEstateView)', () => {
-  it('parses vMemory/vCPU into a populated usage extract', () => {
-    expect(snapshot.vmUsage.length).toBeGreaterThanOrEqual(9_000)
+describe('Right-sizing end-to-end (Proxmox in-memory 10k estate)', () => {
+  it('populates vmUsage for powered-on VMs', () => {
+    expect(snapshot.vmUsage.length).toBeGreaterThanOrEqual(7_000)
     const sizing = buildSizing()
     expect(sizing.hasUsageData).toBe(true)
   })
@@ -79,7 +209,7 @@ describe('Right-sizing end-to-end (parse → buildEstateView)', () => {
   it('evaluates powered-on VMs only (powered-off excluded)', () => {
     const sizing = buildSizing()
     expect(sizing.rows.length).toBe(POWERED_ON)
-    // vm-00001 is i=0 ⇒ poweredOff ⇒ absent from the extract.
+    // vm-00001 is i=0 → poweredOff → absent from the extract
     expect(sizing.rows.some((r) => r.vmName === 'vm-00001')).toBe(false)
   })
 

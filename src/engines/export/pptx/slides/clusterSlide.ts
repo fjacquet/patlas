@@ -46,13 +46,9 @@ export function addClusterSlide(
   const cores = Number(c.physicalCores)
   const pGhz = Number(c.physicalGhz)
   const ghzPerCore = cores > 0 ? pGhz / cores : 0
-  const stretchedSuffix = c.stretched
-    ? ` · ${t('stretched', 'Stretched')} · ${t('drReserved', 'DR reserved')} ${ghz(c.drReservedGhz)} / ${gib(c.drReservedRamMib)}`
-    : ''
   const subtitle =
     `${n(c.hostCount)} ${t('hostsWord', 'hosts')} · ${n(c.vmCount)} ${t('vmsWord', 'VMs')} · ` +
-    `${n(cores)} ${t('coresWord', 'cores')} (${n1(ghzPerCore)} GHz/core) · ${gib(c.physicalRamMib)} ${t('ramWord', 'RAM')}` +
-    stretchedSuffix
+    `${n(cores)} ${t('coresWord', 'cores')} (${n1(ghzPerCore)} GHz/core) · ${gib(c.physicalRamMib)} ${t('ramWord', 'RAM')}`
 
   const y = addHeader(s, c.cluster, subtitle)
 

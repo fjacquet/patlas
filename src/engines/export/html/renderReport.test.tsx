@@ -46,6 +46,7 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   vmInstanceUuid: '',
   viSdkUuid: '',
   viSdkServer: '',
+  guestType: 'qemu',
   provisionedMib: mib(40_960),
   inUseMib: mib(20_480),
   path: '',
@@ -60,7 +61,7 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   vCenterLabel: 'vc',
   rvtoolsVersion: '4.7.1.4',
   parsedAt: new Date('2026-01-02'),
-  source: 'rvtools',
+  source: 'proxmox',
   viSdkUuid: null,
   vMetaData: [],
   vinfo: [vm({}), vm({ vmName: 'vm-2', cluster: 'C2', host: 'esx-2' })],
@@ -85,7 +86,6 @@ const SECTIONS = [
   'storage',
   'network',
   'eos',
-  'dr',
   'planned',
   'annex',
   'methodology',
@@ -107,8 +107,8 @@ describe('renderReport — HTM-04 sections', () => {
     expect(trends).not.toBeNull()
     const html = renderReport({ view, trends, strings, locale: 'en' })
     expect(html).toContain('data-section="trends"')
-    // fixed order: trends after dr, before annex
-    expect(html.indexOf('data-section="dr"')).toBeLessThan(html.indexOf('data-section="trends"'))
+    // fixed order: trends after eos, before annex
+    expect(html.indexOf('data-section="eos"')).toBeLessThan(html.indexOf('data-section="trends"'))
     expect(html.indexOf('data-section="trends"')).toBeLessThan(html.indexOf('data-section="annex"'))
   })
 })

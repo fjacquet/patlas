@@ -1,71 +1,134 @@
-import { execFileSync } from 'node:child_process'
-import { existsSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InventoryTree } from '@/components/inventory/InventoryTree'
 import { VmTable } from '@/components/inventory/VmTable'
 import { buildEstateView as buildEstateViewMerged } from '@/engines/aggregation'
-import { inferVCenterLabel } from '@/engines/parser/captureDate'
-import { parseSnapshot } from '@/engines/parser/normalizeColumns'
-import { parseXlsx } from '@/engines/parser/parseXlsx'
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
+import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import i18n from '@/i18n'
 import type { AccountingMode } from '@/types/estate'
 import type { Snapshot } from '@/types/snapshot'
+import type { VHostRow } from '@/types/vhost'
+import type { VInfoRow } from '@/types/vinfo'
 
-// Phase-4 contract: `buildEstateView` consumes the MERGED bundle. These
-// shipped tests still drive it from a single `Snapshot`; route through the
-// production merge path (single snapshot = degenerate merge case).
+/**
+ * 10k-VM Proxmox stress proof (ROADMAP Phase-3 success #1/#2/#4). Builds the
+ * estate entirely in memory (no xlsx parse, no fixture file), then asserts:
+ *  - VM sort by `provisionedMib` desc completes < 200 ms (#2)
+ *  - the virtualised tree keeps a BOUNDED rendered window at 10k (#1 proxy)
+ *  - CSV export of a filtered VM view works with special characters (#4)
+ */
+
 const TEST_TODAY = new Date('2026-01-01T00:00:00Z')
+const VM_COUNT = 10_000
+
 const buildEstateView = (snap: Snapshot, mode: AccountingMode) =>
   buildEstateViewMerged(mergeSnapshotsToEstate([snap]), [snap], mode, TEST_TODAY)
 
-/**
- * 10k-VM synthetic stress proof (ROADMAP Phase-3 success #1/#2/#4). Loads the
- * `generate-inventory-10k` fixture through the SAME pure parse pipeline the
- * worker runs (parseXlsx → parseSnapshot → buildEstateView), then asserts:
- *  - VM sort by `provisionedMib` desc completes < 200 ms (#2)
- *  - the virtualised tree keeps a BOUNDED rendered window at 10k (#1 proxy —
- *    fps is not measurable in jsdom; assert window node count ≪ total,
- *    03-RESEARCH line 462)
- *  - CSV export of a filtered VM view is the filtered rows, raw values,
- *    newline preserved, under BOTH `light` and `dark` theme classes (#4)
- *
- * The fixture is gitignored (regenerated on demand); generate it in
- * `beforeAll` if absent so CI is self-contained.
- */
+// 8 Proxmox nodes spread across 2 clusters
+const CLUSTER_NAMES: [string, ...string[]] = ['cluster-alpha', 'cluster-beta']
+const HOSTS_PER_CLUSTER = 4
 
-const FIXTURE = resolve(process.cwd(), 'src/__fixtures__/rvtools-inventory-10k.xlsx')
+// pick(arr, i) is safe: modulo always yields a valid index for non-empty arrays.
+const pick = <T,>(arr: [T, ...T[]], i: number): T => arr[i % arr.length] as T
+
+function makeHosts(): VHostRow[] {
+  const hosts: VHostRow[] = []
+  for (const cluster of CLUSTER_NAMES) {
+    for (let h = 0; h < HOSTS_PER_CLUSTER; h++) {
+      hosts.push({
+        hostName: `${cluster}-node${h + 1}`,
+        cluster,
+        sockets: sockets(2),
+        cores: cores(32),
+        speedMhz: mhz(3_200),
+        memoryMib: mib(65_536),
+        cpuRatio: 0.4,
+        ramRatio: 0.5,
+        faultDomain: '',
+        model: 'Supermicro SYS-6029P',
+        vendor: 'Supermicro',
+        serialNumber: `SN-${cluster}-${h}`,
+        esxVersion: '',
+      })
+    }
+  }
+  return hosts
+}
+
+function makeProxmoxEstate(vmCount: number): Snapshot {
+  const hostList = makeHosts()
+  const hostNames: [string, ...string[]] = hostList.map((h) => h.hostName) as [string, ...string[]]
+  const vinfo: VInfoRow[] = []
+
+  for (let i = 0; i < vmCount; i++) {
+    const name = `vm-${String(i + 1).padStart(5, '0')}`
+    const cluster = pick(CLUSTER_NAMES, i)
+    const host = pick(hostNames, i)
+    const guestType: 'qemu' | 'lxc' = i % 10 === 0 ? 'lxc' : 'qemu'
+    const poweredOff = i % 5 === 0
+
+    // Row i=4242 carries a newline in osConfig to test RFC-4180 CSV quoting.
+    const osConfig =
+      i === 4242
+        ? 'Debian GNU/Linux 12\nmaintenance window: 2026-06'
+        : `Debian GNU/Linux ${(i % 5) + 8}`
+
+    vinfo.push({
+      vmName: name,
+      cluster,
+      host,
+      vcpu: cores((i % 4) + 1),
+      vramMib: mib(512 * ((i % 8) + 1)),
+      cpuReadinessPercent: null,
+      powerState: poweredOff ? 'poweredOff' : 'poweredOn',
+      template: false,
+      poweredOn: !poweredOff,
+      osConfig,
+      osTools: osConfig,
+      vmBiosUuid: `bios-${i}`,
+      vmInstanceUuid: `inst-${i}`,
+      viSdkUuid: '',
+      viSdkServer: '',
+      provisionedMib: mib(1_024 * ((i % 8) + 1)),
+      inUseMib: mib(512 * ((i % 8) + 1)),
+      path: `[local] ${name}/${name}.conf`,
+      guestType,
+    })
+  }
+
+  return {
+    id: 'proxmox-inventory-stress',
+    filename: 'proxmox-10k.xlsx',
+    fileSize: bytes(0),
+    capturedAt: new Date(Date.UTC(2026, 4, 15)),
+    parsedAt: new Date(),
+    vCenterLabel: 'proxmox-stress',
+    rvtoolsVersion: 'proxmox',
+    source: 'proxmox',
+    viSdkUuid: null,
+    vMetaData: [],
+    vinfo,
+    vhost: hostList,
+    vmUsage: [],
+    vdatastore: [],
+    vpartition: [],
+    vnetwork: [],
+    vswitch: [],
+    dvswitch: [],
+    dvport: [],
+    parseErrors: [],
+  }
+}
 
 let snapshot: Snapshot
 
 beforeAll(() => {
-  if (!existsSync(FIXTURE)) {
-    execFileSync('node', ['scripts/generate-inventory-10k.mjs'], { stdio: 'ignore' })
-  }
-  const buf = readFileSync(FIXTURE)
-  const sheets = parseXlsx(buf)
-  const { snapshot: rows } = parseSnapshot(sheets)
-  snapshot = {
-    filename: 'rvtools-inventory-10k.xlsx',
-    fileSize: buf.byteLength,
-    capturedAt: new Date(Date.UTC(2026, 4, 15)),
-    vCenterLabel: inferVCenterLabel(rows.vinfo, 'rvtools-inventory-10k.xlsx'),
-    rvtoolsVersion: '4.4.0',
-    viSdkUuid: rows.viSdkUuid,
-    source: 'rvtools',
-    vMetaData: rows.vMetaData,
-    vinfo: rows.vinfo,
-    vhost: rows.vhost,
-    vdatastore: rows.vdatastore,
-    vpartition: rows.vpartition,
-    parseErrors: rows.parseErrors,
-  } as unknown as Snapshot
-}, 60_000)
+  snapshot = makeProxmoxEstate(VM_COUNT)
+}, 30_000)
 
-describe('Inventory 10k stress (ROADMAP Phase-3 #1/#2/#4)', () => {
+describe('Inventory 10k stress — Proxmox in-memory estate (Phase-3 #1/#2/#4)', () => {
   beforeEach(async () => {
     await i18n.changeLanguage('en')
   })
@@ -74,7 +137,7 @@ describe('Inventory 10k stress (ROADMAP Phase-3 #1/#2/#4)', () => {
     vi.restoreAllMocks()
   })
 
-  it('parses ~10k VMs and projects vmRows in the single estate pass', () => {
+  it('builds ~10k VMs and projects vmRows in the single estate pass', () => {
     expect(snapshot.vinfo.length).toBeGreaterThanOrEqual(9_000)
     const view = buildEstateView(snapshot, 'active')
     expect(view.vmRows.length).toBe(snapshot.vinfo.length)
@@ -114,7 +177,7 @@ describe('Inventory 10k stress (ROADMAP Phase-3 #1/#2/#4)', () => {
 
     render(
       <InventoryTree
-        rootLabel="vcenter.stress.local"
+        rootLabel="proxmox.stress.local"
         clustersOrdered={clustersOrdered}
         hostsByCluster={hostsByCluster}
         vmsByHost={vmsByHost}
@@ -166,7 +229,7 @@ describe('Inventory 10k stress (ROADMAP Phase-3 #1/#2/#4)', () => {
       const { unmount } = render(<VmTable rows={view.vmRows} />)
 
       // Filter to the deterministic multi-line annotation row the generator
-      // embeds (row i===4242: its `os` carries a "\n" + the unique token
+      // embeds (row i===4242: its `osTools` carries a "\n" + the unique token
       // "maintenance window"); narrow + assert RFC-4180 quoting.
       const filter = screen.getByRole('searchbox')
       await user.type(filter, 'maintenance')

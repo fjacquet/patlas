@@ -45,6 +45,7 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   vmInstanceUuid: '',
   viSdkUuid: '',
   viSdkServer: '',
+  guestType: 'qemu',
   provisionedMib: mib(40_960),
   inUseMib: mib(20_480),
   path: '',
@@ -59,7 +60,7 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   vCenterLabel: 'vc',
   rvtoolsVersion: '4.7.1.4',
   parsedAt: new Date('2026-01-02'),
-  source: 'rvtools',
+  source: 'proxmox',
   viSdkUuid: null,
   vMetaData: [],
   vinfo: [

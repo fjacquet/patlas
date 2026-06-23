@@ -1,16 +1,9 @@
 import { useState } from 'react'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
-import { DrSimPanel } from '@/components/dr/DrSimPanel'
 import { useEstateView } from '@/hooks/useEstateView'
-import {
-  selectActiveSnapshot,
-  selectScenario,
-  selectSetScenario,
-  selectStretchedClusters,
-  useSnapshotStore,
-} from '@/store/snapshotStore'
-import type { AccountingMode, DrMode } from '@/types/estate'
+import { selectActiveSnapshot, useSnapshotStore } from '@/store/snapshotStore'
+import type { AccountingMode } from '@/types/estate'
 import { PlannedEstatePanel } from './PlannedEstatePanel'
 import { PlannedRatiosControl } from './PlannedRatiosControl'
 
@@ -36,31 +29,21 @@ function PlanningError({ error }: FallbackProps) {
  * D-04 / D-03 — the explicitly-"planned" Capacity-planning what-if surface.
  * A new top-level ViewToggle branch (no router; view-state is App-shell
  * component state, like P5 Hosts). Hosts the planned-ratios control ABOVE a
- * `2xl` (48px) vertical break, then the reworked DR-sim slot (Plan 03 fills
- * it). Structurally separated from the realized "measured" value (D-03):
+ * `2xl` (48px) vertical break, then the planned estate panel.
+ * Structurally separated from the realized "measured" value (D-03):
  * this surface carries the "planned" qualifier; the measured ratio stays
  * read-only on the Dashboard › Operational Insights (referenced via a
  * read-only caption, never rebuilt or overwritten here — D-01/D-02).
  *
  * Single-memo invariant: the one estate-view hook is called exactly ONCE
  * here; no second memoization hook, no component-level recompute (presenter
- * only). The `applyPlannedToDr` flag is lifted here as component state
- * (default false) for the in-panel "Apply planned ratios to this scenario"
- * affordance (D-11); `drMode` is lifted likewise (no router).
+ * only).
  */
 export function PlanningView() {
   const { t } = useTranslation('alloc')
   const [mode] = useState<AccountingMode>('active')
   const view = useEstateView(mode)
   const snapshot = useSnapshotStore(selectActiveSnapshot)
-  const scenario = useSnapshotStore(selectScenario)
-  const setScenario = useSnapshotStore(selectSetScenario)
-  const declaredStretched = useSnapshotStore(selectStretchedClusters)
-  const [drMode, setDrMode] = useState<DrMode>('server')
-  // D-11: the single in-panel Custom-Failover affordance switches the
-  // presented DR result between measured (`view.drSim`) and planned
-  // (`view.plannedDrSim`) — never a third mode.
-  const [applyPlannedToDr, setApplyPlannedToDr] = useState(false)
 
   if (!snapshot) {
     return (
@@ -87,20 +70,6 @@ export function PlanningView() {
               see right there (Improvement 3). */}
           <div className="mt-12">
             <PlannedEstatePanel view={view} />
-          </div>
-          {/* 2xl (48px) major break: D-03 structural separation before the
-              DR-sim block. */}
-          <div className="mt-12">
-            <DrSimPanel
-              view={view}
-              drMode={drMode}
-              onDrMode={setDrMode}
-              scenario={scenario}
-              onScenario={setScenario}
-              declaredStretched={declaredStretched}
-              applyPlannedToDr={applyPlannedToDr}
-              onApplyPlannedToDr={setApplyPlannedToDr}
-            />
           </div>
         </div>
       </ErrorBoundary>
