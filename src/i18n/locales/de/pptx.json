@@ -1,7 +1,9 @@
 {
   "title": {
     "identity": "{{clusters}} Cluster · {{hosts}} Hosts · {{vms}} VMs · erfasst am {{captureDate}}",
-    "generated": "Erstellt von vatlas — faktische Bestandssynthese"
+    "generated": "Erstellt von vatlas — faktische Bestandssynthese",
+    "eyebrow": "PROXMOX-BESTAND",
+    "fallback": "Proxmox-Bestand"
   },
   "overview": {
     "title": "Bestandsübersicht",

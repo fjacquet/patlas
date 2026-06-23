@@ -87,6 +87,25 @@ const isZip = (ab: ArrayBuffer): boolean => {
   return u[0] === 0x50 && u[1] === 0x4b && u[2] === 0x03 && u[3] === 0x04
 }
 
+describe('buildPptx — Proxmox label on title slide', () => {
+  it('title slide uses the Proxmox cluster label, not a VMware fallback', async () => {
+    // Build a snapshot whose single cluster is named 'pve-prod'
+    const pveVm: VInfoRow = { ...vmRow(0), cluster: 'pve-prod' }
+    const pveHost: VHostRow = { ...hostRow(0), cluster: 'pve-prod' }
+    const s: Snapshot = {
+      ...snap('a', 0, TODAY),
+      vinfo: [pveVm],
+      vhost: [pveHost],
+    }
+    const { view, trends } = buildExportView(s, [s], MODE, TODAY)
+    expect(view.clusters[0]?.cluster).toBe('pve-prod')
+    const ab = await buildPptx(view, trends, strings, 'en')
+    const txt = new TextDecoder('latin1').decode(new Uint8Array(ab))
+    expect(txt).toContain('pve-prod')
+    expect(txt).not.toMatch(/VMware/i)
+  })
+})
+
 describe('buildPptx — golden structural snapshot', () => {
   it('emits a valid OOXML container (PK\\x03\\x04) that opens without Repair', async () => {
     const s = snap('a', 3, TODAY)

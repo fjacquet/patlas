@@ -1,7 +1,9 @@
 {
   "title": {
     "identity": "{{clusters}} cluster · {{hosts}} host · {{vms}} VM · acquisito il {{captureDate}}",
-    "generated": "Generato da vatlas — sintesi fattuale del parco"
+    "generated": "Generato da vatlas — sintesi fattuale del parco",
+    "eyebrow": "INFRASTRUTTURA PROXMOX",
+    "fallback": "infrastruttura Proxmox"
   },
   "overview": {
     "title": "Panoramica del parco",

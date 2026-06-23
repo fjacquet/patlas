@@ -58,7 +58,7 @@ export async function buildPptx(
   addTitleSlide(
     pptx,
     {
-      vcenters: '',
+      vcenters: view.clusters[0]?.cluster ?? '',
       clusterCount: view.globals.clusterCount,
       hostCount: view.globals.hostCount,
       vmCount: view.globals.vmCount,
