@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mhz, mib, sockets } from '@/engines/units'
-import type { ProxmoxSnapshotRow, Snapshot, VHostRow, VInfoRow } from '@/types'
+import type {
+  ProxmoxSnapshotRow,
+  ProxmoxStorageContentRow,
+  Snapshot,
+  VHostRow,
+  VInfoRow,
+} from '@/types'
 import { mergeSnapshotsToEstate } from './mergeSnapshotsToEstate'
 
 const vm = (over: Partial<VInfoRow>): VInfoRow => ({
@@ -287,5 +293,49 @@ describe('mergeSnapshotsToEstate — proxmoxSnapshots concatenation', () => {
     const a = snap({ id: 'a', proxmoxSnapshots: undefined as unknown as ProxmoxSnapshotRow[] })
     const merged = mergeSnapshotsToEstate([a])
     expect(merged.proxmoxSnapshots).toHaveLength(0)
+  })
+})
+
+describe('mergeSnapshotsToEstate — proxmoxStorageContent concatenation', () => {
+  const sc = (over: Partial<ProxmoxStorageContentRow>): ProxmoxStorageContentRow => ({
+    node: 'pve1',
+    storage: 'local',
+    content: 'images',
+    fileName: 'vm-100-disk-0.qcow2',
+    format: 'qcow2',
+    sizeMib: mib(10_240),
+    usagePercent: 42,
+    guestId: '100',
+    guestName: 'vm-test',
+    creationSerial: 45000,
+    ...over,
+  })
+
+  it('concatenates proxmoxStorageContent from two snapshots', () => {
+    const a = snap({ id: 'a', proxmoxStorageContent: [sc({ fileName: 'disk-a.qcow2' })] })
+    const b = snap({
+      id: 'b',
+      proxmoxStorageContent: [sc({ fileName: 'disk-b.qcow2' }), sc({ fileName: 'disk-c.qcow2' })],
+    })
+    const merged = mergeSnapshotsToEstate([a, b])
+    expect(merged.proxmoxStorageContent).toHaveLength(3)
+    expect(merged.proxmoxStorageContent.map((r) => r.fileName)).toEqual([
+      'disk-a.qcow2',
+      'disk-b.qcow2',
+      'disk-c.qcow2',
+    ])
+  })
+
+  it('empty selection yields empty proxmoxStorageContent', () => {
+    expect(mergeSnapshotsToEstate([]).proxmoxStorageContent).toHaveLength(0)
+  })
+
+  it('is resilient to a missing proxmoxStorageContent field (??[])', () => {
+    const a = snap({
+      id: 'a',
+      proxmoxStorageContent: undefined as unknown as ProxmoxStorageContentRow[],
+    })
+    const merged = mergeSnapshotsToEstate([a])
+    expect(merged.proxmoxStorageContent).toHaveLength(0)
   })
 })
