@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
-import { mib } from '@/engines/units'
+import { bytes, mib } from '@/engines/units'
 import type { ProxmoxSnapshotRow } from '@/types'
 import type { Snapshot } from '@/types/snapshot'
 import { buildEstateView, EMPTY_VIEW } from './estateView'
@@ -10,7 +10,7 @@ const TODAY = new Date('2026-06-23T00:00:00Z')
 const minimalSnapshot = (snaps: ProxmoxSnapshotRow[]): Snapshot => ({
   id: 's1',
   filename: 'r.xlsx',
-  fileSize: mib(0) as unknown as Snapshot['fileSize'],
+  fileSize: bytes(0),
   capturedAt: TODAY,
   vCenterLabel: 'proxmox',
   rvtoolsVersion: '',
