@@ -39,3 +39,6 @@ src/__fixtures__/rvtools-inventory-10k.xlsx
 # patlas: real Proxmox report fixtures (privacy — never commit dataset bytes)
 src/engines/parser/__fixtures__/proxmox-report.xlsx
 src/engines/parser/__fixtures__/network-diagram.svg
+
+# SDD orchestration scratch (briefs, reports, review diffs, ledger) — not part of the project
+.superpowers/
