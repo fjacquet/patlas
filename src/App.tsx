@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Toaster } from 'sonner'
+import { ClusterHealthView } from './components/clusterhealth/ClusterHealthView'
 import { GlobalDashboard } from './components/dashboard/GlobalDashboard'
 import { ExportButtons } from './components/ExportButtons'
 import { EosView } from './components/eos/EosView'
@@ -73,6 +74,8 @@ function App() {
               <SnapshotSprawlView />
             ) : activeView === 'storagecontent' ? (
               <StorageContentView />
+            ) : activeView === 'clusterhealth' ? (
+              <ClusterHealthView />
             ) : (
               <GlobalDashboard />
             )}
