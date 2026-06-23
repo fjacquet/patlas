@@ -46,33 +46,30 @@ export interface ProxmoxSnapshotRow {
  * A storage content row from the Proxmox report `Storage Content` sheet.
  * Each row describes a single file stored in Proxmox storage: VM disk images,
  * ISO images, container templates, backups, etc. `guestId`/`guestName` are
- * blank for non-VM content (ISOs, templates). `creationDateSerial` is the raw
+ * blank for non-VM content (ISOs, templates). `creationSerial` is the raw
  * Excel serial; `null` when the cell is blank ("not derivable").
  */
 export interface ProxmoxStorageContentRow {
   node: string
   /** Proxmox storage name (e.g. "DATA", "local", "local-lvm"). */
   storage: string
-  /** Content type from the report: "images", "rootdir", "iso", "vztmpl", etc. */
-  contentType: string
+  /** Proxmox content class: "images" | "rootdir" | "iso" | "vztmpl" | "backup" | "snippets" | "import" | … */
+  content: string
   /** File path within the storage (e.g. "100/vm-100-disk-0.qcow2"). */
   fileName: string
   /** Disk/file format (e.g. "qcow2", "raw", "iso", "tzst"). */
   format: string
-  /** File size. `Size GB` reinterpreted as GiB → MiB; 0 when blank. */
+  /** File size. `Size GB` reinterpreted as GiB → MiB. */
   sizeMib: MiB
-  /** Storage usage ratio (0–1). 0 when blank. */
-  storageUsageRatio: number
+  /** `Storage Usage %` (already a percentage); `null` when the cell is blank
+   *  ("not derivable"; ADR-0012, never coerced to 0). */
+  usagePercent: number | null
   /** Proxmox VMID owning this content; `''` for non-VM content. */
   guestId: string
   /** Guest display name; `''` for non-VM content (ISO, template, etc.). */
   guestName: string
   /** Excel serial date of creation; `null` when the cell is blank. */
-  creationDateSerial: number | null
-  /** Free-text notes; `''` when blank. */
-  notes: string
-  /** Parent snapshot label for delta-disk chains; `''` when absent. */
-  parent: string
+  creationSerial: number | null
 }
 
 /**

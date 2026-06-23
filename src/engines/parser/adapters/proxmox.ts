@@ -158,21 +158,20 @@ export const adaptProxmoxStorageContent = (
   return sheet.rows
     .map((row): ProxmoxStorageContentRow => {
       const dateRaw = readCol(row, cols.creationDate)
-      const creationDateSerial =
+      const creationSerial =
         typeof dateRaw === 'number' && Number.isFinite(dateRaw) ? dateRaw : null
       return {
         node: readString(readCol(row, cols.node)),
         storage: readString(readCol(row, cols.storage)),
-        contentType: readString(readCol(row, cols.contentType)),
+        content: readString(readCol(row, cols.content)),
         fileName: readString(readCol(row, cols.fileName)),
         format: readString(readCol(row, cols.format)),
         sizeMib: gibToMib(gib(Math.max(0, readNumber(readCol(row, cols.sizeGib))))),
-        storageUsageRatio: Math.max(0, readNumber(readCol(row, cols.storageUsagePct))),
+        // `null` when blank ("not derivable"; ADR-0012) — never coerced to 0.
+        usagePercent: cellOrNull(row, cols.usagePercent),
         guestId: readString(readCol(row, cols.guestId)),
         guestName: readString(readCol(row, cols.guestName)),
-        creationDateSerial,
-        notes: readString(readCol(row, cols.notes)),
-        parent: readString(readCol(row, cols.parent)),
+        creationSerial,
       }
     })
     .filter((r) => r.fileName !== '')
