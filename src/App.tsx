@@ -13,6 +13,7 @@ import { NetworkView } from './components/network/NetworkView'
 import { PlanningView } from './components/planning/PlanningView'
 import { RightSizingView } from './components/rightsizing/RightSizingView'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
+import { SnapshotSprawlView } from './components/snapshots/SnapshotSprawlView'
 import { StorageView } from './components/storage/StorageView'
 import { ThemeToggle } from './components/ThemeToggle'
 import { TrendsView } from './components/trends/TrendsView'
@@ -67,6 +68,8 @@ function App() {
               <RightSizingView />
             ) : activeView === 'monstervm' ? (
               <MonsterVmView />
+            ) : activeView === 'snapshots' ? (
+              <SnapshotSprawlView />
             ) : (
               <GlobalDashboard />
             )}

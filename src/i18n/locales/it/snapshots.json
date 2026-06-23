@@ -1,0 +1,24 @@
+{
+  "heading": "Proliferazione degli snapshot",
+  "subtitle": "Checkpoint degli ospiti ancora presenti nell'infrastruttura",
+  "empty": {
+    "heading": "Nessuno snapshot caricato",
+    "body": "Carica uno snapshot del cluster per vedere l'inventario dei checkpoint."
+  },
+  "kpi": {
+    "checkpoints": "Checkpoint",
+    "guests": "Ospiti con checkpoint",
+    "totalSizeGib": "Dimensione totale (GiB)",
+    "oldestDays": "Checkpoint più vecchio (giorni)"
+  },
+  "none": "Nessun checkpoint trovato in questo snapshot.",
+  "col": {
+    "guestName": "Ospite",
+    "guestType": "Tipo",
+    "node": "Nodo",
+    "name": "Nome checkpoint",
+    "ageDays": "Età (giorni)",
+    "sizeGib": "Dimensione (GiB)",
+    "includeRam": "Include RAM"
+  }
+}

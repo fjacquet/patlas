@@ -11,6 +11,7 @@ export type AppView =
   | 'network'
   | 'rightsizing'
   | 'monstervm'
+  | 'snapshots'
 
 const VIEWS = [
   'dashboard',
@@ -23,6 +24,7 @@ const VIEWS = [
   'network',
   'rightsizing',
   'monstervm',
+  'snapshots',
 ] as const
 
 export interface ViewToggleProps {

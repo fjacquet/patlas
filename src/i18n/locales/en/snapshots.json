@@ -1,0 +1,24 @@
+{
+  "heading": "Snapshot Sprawl",
+  "subtitle": "Guest checkpoints still held across the estate",
+  "empty": {
+    "heading": "No snapshot loaded",
+    "body": "Load a cluster snapshot to see the checkpoint inventory."
+  },
+  "kpi": {
+    "checkpoints": "Checkpoints",
+    "guests": "Guests with checkpoints",
+    "totalSizeGib": "Total size (GiB)",
+    "oldestDays": "Oldest checkpoint (days)"
+  },
+  "none": "No checkpoints found in this snapshot.",
+  "col": {
+    "guestName": "Guest",
+    "guestType": "Type",
+    "node": "Node",
+    "name": "Checkpoint name",
+    "ageDays": "Age (days)",
+    "sizeGib": "Size (GiB)",
+    "includeRam": "Includes RAM"
+  }
+}

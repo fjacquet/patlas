@@ -1,0 +1,24 @@
+{
+  "heading": "Snapshot-Wildwuchs",
+  "subtitle": "Noch vorhandene Gast-Checkpoints im gesamten Bestand",
+  "empty": {
+    "heading": "Kein Snapshot geladen",
+    "body": "Laden Sie einen Cluster-Snapshot, um den Checkpoint-Bestand zu sehen."
+  },
+  "kpi": {
+    "checkpoints": "Checkpoints",
+    "guests": "Gäste mit Checkpoints",
+    "totalSizeGib": "Gesamtgröße (GiB)",
+    "oldestDays": "Ältester Checkpoint (Tage)"
+  },
+  "none": "Keine Checkpoints in diesem Snapshot gefunden.",
+  "col": {
+    "guestName": "Gast",
+    "guestType": "Typ",
+    "node": "Knoten",
+    "name": "Checkpoint-Name",
+    "ageDays": "Alter (Tage)",
+    "sizeGib": "Größe (GiB)",
+    "includeRam": "Enthält RAM"
+  }
+}
