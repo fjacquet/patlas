@@ -1,12 +1,12 @@
 {
-  "heading": "Monster-VMs",
-  "subtitle": "Größte VMs nach konfigurierter Zuweisung",
+  "heading": "Monster-Gäste",
+  "subtitle": "Größte Gäste nach konfigurierter Zuweisung",
   "empty": {
     "heading": "Kein Snapshot geladen",
-    "body": "Laden Sie einen Snapshot, um die größten VMs nach konfigurierter Zuweisung zu sehen."
+    "body": "Laden Sie einen Snapshot, um die größten Gäste nach konfigurierter Zuweisung zu sehen."
   },
-  "count": "Monster-VMs",
-  "none": "Keine VMs erreichen die aktuellen Größengrenzen.",
+  "count": "Monster-Gäste",
+  "none": "Keine Gäste erreichen die aktuellen Größengrenzen.",
   "thresholds": {
     "heading": "Größengrenzen (bei Aktualisierung zurückgesetzt)",
     "minVcpu": "vCPU ≥",

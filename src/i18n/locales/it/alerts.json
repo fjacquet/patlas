@@ -2,15 +2,15 @@
   "config": {
     "heading": "Soglie",
     "fs": "Filesystem utilizzato %",
-    "ds": "Datastore utilizzato %",
+    "ds": "Archiviazione utilizzata %",
     "lu": "LU utilizzato %",
-    "echo": "Filesystem ≥ {{fs}}% · Datastore > {{ds}}% · LU > {{lu}}%"
+    "echo": "Filesystem ≥ {{fs}}% · Archiviazione > {{ds}}% · LU > {{lu}}%"
   },
   "fs": {
     "count": "{{count}} partizioni ≥ {{pct}}% utilizzate"
   },
   "ds": {
-    "count": "{{count}} datastore > {{pct}}% utilizzati"
+    "count": "{{count}} archiviazioni > {{pct}}% utilizzate"
   },
   "lu": {
     "count": "{{count}} unità logiche > {{pct}}% utilizzate"

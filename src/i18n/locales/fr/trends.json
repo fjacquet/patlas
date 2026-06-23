@@ -8,9 +8,9 @@
   "axisDate": "{{date}}",
   "delta": {
     "heading": "Évolution entre instantanés consécutifs",
-    "vmCount": "VM",
-    "poweredOnVms": "VM sous tension",
-    "hostCount": "Hôtes",
+    "vmCount": "Invités",
+    "poweredOnVms": "Invités sous tension",
+    "hostCount": "Nœuds",
     "clusterCount": "Clusters",
     "vcpuAllocated": "vCPU alloués",
     "vramAllocated": "vRAM allouée (Gio)",
@@ -18,6 +18,6 @@
   },
   "tooltip": {
     "date": "Date de capture : {{date}}",
-    "meta": "{{vcenter}} / RVTools {{version}}"
+    "meta": "{{cluster}} / Proxmox {{version}}"
   }
 }

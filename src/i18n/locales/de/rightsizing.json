@@ -9,7 +9,7 @@
     "single": "einzelner Snapshot",
     "max": "max über {{count}} Snapshots"
   },
-  "poweredOnOnly": "nur eingeschaltete VMs",
+  "poweredOnOnly": "nur eingeschaltete Gäste",
   "notDerivable": "— = nicht ableitbar",
   "category": {
     "oversized": "Zuweisung ≫ Nutzung",

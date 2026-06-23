@@ -9,7 +9,7 @@
     "single": "snapshot singolo",
     "max": "max su {{count}} snapshot"
   },
-  "poweredOnOnly": "solo VM accese",
+  "poweredOnOnly": "solo ospiti accesi",
   "notDerivable": "— = non calcolabile",
   "category": {
     "oversized": "Allocazione ≫ utilizzo",

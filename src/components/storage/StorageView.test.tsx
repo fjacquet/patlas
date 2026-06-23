@@ -81,7 +81,7 @@ describe('StorageView (D-05..D-08)', () => {
     render(<StorageView />)
     expect(screen.getByText('Consumption')).not.toBeNull()
     expect(screen.getByText('Capacity')).not.toBeNull()
-    expect(screen.getByText('Datastore')).not.toBeNull()
+    expect(screen.getByText('Storage')).not.toBeNull()
     // factual alerts count line (no verdict / no colour) — default fs 90 %
     expect(screen.getByText(/partitions ≥ 90% used/)).not.toBeNull()
   })

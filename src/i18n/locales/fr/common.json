@@ -1,6 +1,6 @@
 {
   "appName": "vatlas",
-  "tagline": "RVTools → atlas de votre parc VMware (100 % client)",
+  "tagline": "Proxmox → atlas de votre parc Proxmox (100 % client)",
   "footer": "100 % client · votre fichier ne quitte jamais votre navigateur",
   "error": {
     "title": "Une erreur est survenue"

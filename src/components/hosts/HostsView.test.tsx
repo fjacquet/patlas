@@ -79,7 +79,7 @@ describe('HostsView — ESX detail drill (LC-4, D-06)', () => {
     render(<HostsView />)
     await userEvent.click(screen.getByRole('button', { name: 'esx-1' }))
     // EsxDetail renders: title + the per-host switch + back affordance.
-    expect(screen.getByText(/ESX — esx-1/)).not.toBeNull()
+    expect(screen.getByText(/Node — esx-1/)).not.toBeNull()
     expect(screen.getByText('vSwitch0')).not.toBeNull()
     expect(screen.getByText(/Back/)).not.toBeNull()
   })

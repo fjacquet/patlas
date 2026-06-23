@@ -1,24 +1,24 @@
 {
   "hosts": {
-    "title": "Host",
+    "title": "Nodi",
     "rollup": {
-      "title": "Host del parco",
-      "hosts": "Host",
+      "title": "Nodi del parco",
+      "hosts": "Nodi",
       "cores": "Core fisici",
-      "memMib": "Memoria host (MiB)",
+      "memMib": "Memoria nodo (MiB)",
       "avgCpu": "CPU media %",
       "avgMem": "Memoria media %",
-      "poweredOnVms": "VM accese"
+      "poweredOnVms": "Ospiti accesi"
     },
     "col": {
-      "host": "Host",
+      "host": "Nodo",
       "cluster": "Cluster",
       "cores": "Core",
       "memMib": "Memoria (MiB)",
       "cpuPct": "CPU %",
       "ramPct": "RAM %",
-      "poweredOnVms": "VM accese",
-      "esxVersion": "Versione ESXi",
+      "poweredOnVms": "Ospiti accesi",
+      "esxVersion": "versione PVE",
       "faultDomain": "Dominio di guasto",
       "model": "Modello",
       "vendor": "Produttore"
@@ -33,13 +33,13 @@
     "provisioned": "Provisionato (MiB)",
     "usedStorage": "Spazio utilizzato (MiB)",
     "inUse": "Impegnato (MiB)",
-    "guestData": "Dati guest (MiB)",
+    "guestData": "Dati ospite (MiB)",
     "totalCores": "Totale core fisici",
-    "totalMem": "Totale memoria host (MiB)",
+    "totalMem": "Totale memoria nodo (MiB)",
     "power": {
-      "on": "{{count}} accese",
-      "off": "{{count}} spente",
-      "suspended": "{{count}} sospese",
+      "on": "{{count}} accesi",
+      "off": "{{count}} spenti",
+      "suspended": "{{count}} sospesi",
       "template": "{{count}} modelli"
     }
   },

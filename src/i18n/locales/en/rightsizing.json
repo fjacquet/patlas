@@ -9,7 +9,7 @@
     "single": "single snapshot",
     "max": "max across {{count}} snapshots"
   },
-  "poweredOnOnly": "powered-on VMs only",
+  "poweredOnOnly": "powered-on Guests only",
   "notDerivable": "— = not derivable",
   "category": {
     "oversized": "Allocation ≫ usage",

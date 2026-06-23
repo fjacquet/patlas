@@ -8,9 +8,9 @@
   "axisDate": "{{date}}",
   "delta": {
     "heading": "Change between consecutive snapshots",
-    "vmCount": "VMs",
-    "poweredOnVms": "Powered-on VMs",
-    "hostCount": "Hosts",
+    "vmCount": "Guests",
+    "poweredOnVms": "Powered-on Guests",
+    "hostCount": "Nodes",
     "clusterCount": "Clusters",
     "vcpuAllocated": "vCPU allocated",
     "vramAllocated": "vRAM allocated (GiB)",
@@ -18,6 +18,6 @@
   },
   "tooltip": {
     "date": "Capture date: {{date}}",
-    "meta": "{{vcenter}} / RVTools {{version}}"
+    "meta": "{{cluster}} / Proxmox {{version}}"
   }
 }

@@ -57,7 +57,7 @@ describe('EsxDetail (LC-4, augments Hosts)', () => {
     render(<EsxDetail detail={data()} onBack={() => {}} />)
     expect(screen.getByText(/esx-1/)).not.toBeNull()
     expect(screen.getByText('vSwitch0')).not.toBeNull()
-    expect(screen.getByText(/not in RVTools/)).not.toBeNull() // datastoresNote
+    expect(screen.getByText(/Per-node storage names are not available/)).not.toBeNull() // datastoresNote
     expect(screen.getAllByText('—').length).toBeGreaterThan(0)
   })
 

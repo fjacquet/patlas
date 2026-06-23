@@ -3,26 +3,26 @@
     "label": "Vista",
     "dashboard": "Dashboard",
     "inventory": "Inventario",
-    "hosts": "Host",
+    "hosts": "Nodi",
     "planning": "Pianificazione",
     "eos": "Fine supporto OS",
     "trends": "Andamenti",
     "storage": "Storage",
     "network": "Rete",
     "rightsizing": "Dimensionamento",
-    "monstervm": "VM mostruose"
+    "monstervm": "Ospiti mostruosi"
   },
   "tab": {
     "label": "Tipo di oggetto",
-    "vm": "VM",
-    "esx": "Host ESX",
-    "datastore": "Datastore"
+    "vm": "Ospiti",
+    "esx": "Nodi",
+    "datastore": "Archiviazioni"
   },
   "tree": {
     "label": "Albero dell'inventario",
-    "root": "vCenter",
+    "root": "Cluster",
     "empty": "Nessuno snapshot caricato",
-    "emptyBody": "Carica uno snapshot vCenter dalla barra laterale per esplorare l'inventario.",
+    "emptyBody": "Carica uno snapshot Cluster dalla barra laterale per esplorare l'inventario.",
     "loading": "Caricamento dell'inventario…",
     "error": "Impossibile analizzare lo snapshot. Ricarica lo snapshot o scegline un altro dalla barra laterale."
   },
@@ -31,7 +31,7 @@
     "active": "Limitato a {{node}}"
   },
   "filter": {
-    "placeholder": "Filtra per nome, OS, host…",
+    "placeholder": "Filtra per nome, OS, nodo…",
     "clear": "Cancella filtro"
   },
   "columns": {
@@ -50,9 +50,9 @@
     "emptyFiltered": "Nessun {{object}} corrisponde al filtro attuale."
   },
   "col": {
-    "vmName": "VM",
+    "vmName": "Ospite",
     "cluster": "Cluster",
-    "host": "Host",
+    "host": "Nodo",
     "vcpu": "vCPU",
     "vramMib": "vRAM (MiB)",
     "vramGib": "vRAM (GiB)",
@@ -66,24 +66,24 @@
     "os": "OS",
     "poweredOn": "Acceso",
     "provisionedMib": "Provisionato (MiB)",
-    "hostName": "Host",
+    "hostName": "Nodo",
     "sockets": "Socket",
     "cores": "Core",
     "speedMhz": "Frequenza (MHz)",
     "physicalGhz": "GHz fisici",
     "memoryMib": "Memoria (MiB)",
-    "vmCount": "VM",
+    "vmCount": "Ospiti",
     "vcpuAllocated": "vCPU allocate",
     "vramAllocatedMib": "vRAM allocata (MiB)",
     "cpuRatio": "CPU %",
     "ramRatio": "RAM %",
     "meanCpuReadinessPercent": "CPU Ready media %",
     "maxCpuReadinessPercent": "CPU Ready max %",
-    "vmsAboveReadinessWarning": "VM > 5% CPU Ready",
+    "vmsAboveReadinessWarning": "Ospiti > 5% CPU Ready",
     "serialNumber": "Numero di serie / Service tag",
     "model": "Modello",
     "vendor": "Produttore",
-    "key": "Chiave datastore",
+    "key": "Chiave archiviazione",
     "name": "Nome",
     "type": "Tipo",
     "capacityMib": "Capacità (MiB)",
@@ -98,8 +98,8 @@
     "freePorts": "Porte libere",
     "mtu": "MTU",
     "version": "Versione",
-    "hostMembers": "Host membri",
-    "vms": "VM",
+    "hostMembers": "Nodi membri",
+    "vms": "Ospiti",
     "maxMtu": "MTU max",
     "network": "Gruppo di porte",
     "guestType": "Tipo"

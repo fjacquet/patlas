@@ -7,25 +7,25 @@
   "scope": {
     "label": "Per",
     "cluster": "Cluster",
-    "esx": "ESX",
-    "vm": "VM",
-    "datastore": "Datastore"
+    "esx": "Nodo",
+    "vm": "Ospite",
+    "datastore": "Archiviazione"
   },
   "vsan": {
     "sharedAcross": "Condiviso su {{count}} cluster",
-    "unattributed": "Non attribuito (vSAN / locale host)"
+    "unattributed": "Non attribuito (condiviso / locale nodo)"
   },
   "detail": {
     "back": "Indietro",
-    "datastoreTitle": "Datastore — {{name}}",
-    "vmTitle": "VM — {{name}}",
+    "datastoreTitle": "Archiviazione — {{name}}",
+    "vmTitle": "Ospite — {{name}}",
     "capacity": "Capacità",
     "provisioned": "Provisionato",
     "inUse": "In uso",
     "free": "Libero",
     "used": "Utilizzato",
-    "vmsOnIt": "VM su questo datastore",
-    "hostCount": "Host",
+    "vmsOnIt": "Ospiti su questa archiviazione",
+    "hostCount": "Nodi",
     "cluster": "Cluster",
     "type": "Tipo",
     "vcpu": "vCPU",
@@ -34,6 +34,6 @@
     "partitions": "Partizioni",
     "portgroups": "Gruppi di porte",
     "switches": "Switch",
-    "datastores": "Datastore"
+    "datastores": "Archiviazioni"
   }
 }

@@ -96,7 +96,7 @@ describe('NetworkView (LC-3)', () => {
     render(<NetworkView />)
     expect(screen.getByText(/Standard switches/)).not.toBeNull()
     expect(screen.getByText(/Distributed switches/)).not.toBeNull()
-    expect(screen.getByText(/VM portgroups/)).not.toBeNull()
+    expect(screen.getByText(/Guest portgroups/)).not.toBeNull()
   })
 
   it('factual-degrades to a single line when no network sheets (no crash, no icon)', () => {

@@ -1,9 +1,9 @@
 {
   "dropzone": {
-    "instruction": "Glissez vos exports RVTools",
+    "instruction": "Glissez votre rapport Proxmox (.zip ou .xlsx)",
     "or": "ou",
     "browse": "parcourir vos fichiers",
-    "accepted": "Format accepté : .xlsx (export RVTools). Déposez un ou plusieurs fichiers.",
+    "accepted": "Format accepté : .zip ou .xlsx (export Proxmox). Déposez un ou plusieurs fichiers.",
     "active": "Déposez les fichiers ici"
   },
   "fileLoaded": {
@@ -11,28 +11,28 @@
     "remove": "Retirer"
   },
   "source": {
-    "rvtools": "RVTools",
+    "rvtools": "Proxmox",
     "unknown": "Inconnu"
   },
   "sources": {
     "list": {
       "title": "Classeurs importés"
     },
-    "summary": "{{n}} fichiers · {{vms}} VM · {{hosts}} hôtes",
-    "rowCounts": "{{vms}} VM · {{hosts}} hôtes"
+    "summary": "{{n}} fichiers · {{vms}} invités · {{hosts}} nœuds",
+    "rowCounts": "{{vms}} invités · {{hosts}} nœuds"
   },
   "errors": {
-    "rejected": "Format non reconnu. Glissez un export RVTools .xlsx.",
+    "rejected": "Format non reconnu. Glissez un rapport Proxmox (.zip ou .xlsx).",
     "parseFailed": "Impossible de lire le fichier : {{message}}"
   },
   "snapshots": {
-    "list": "Snapshots chargés",
-    "empty": "Aucun snapshot — déposez un classeur",
+    "list": "Instantanés chargés",
+    "empty": "Aucun instantané — déposez un classeur",
     "card": {
-      "vCenterLabel": "vCenter",
+      "vCenterLabel": "Cluster",
       "capturedAt": "Capturé",
-      "rvtoolsVersion": "RVTools",
-      "rows": "{{vms}} VM · {{hosts}} ESX · {{clusters}} clusters · {{datastores}} datastores"
+      "rvtoolsVersion": "Proxmox",
+      "rows": "{{vms}} invités · {{hosts}} nœuds · {{clusters}} clusters · {{datastores}} stockages"
     }
   }
 }

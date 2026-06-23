@@ -2,15 +2,15 @@
   "config": {
     "heading": "Thresholds",
     "fs": "Filesystem used %",
-    "ds": "Datastore used %",
+    "ds": "Storage used %",
     "lu": "LU used %",
-    "echo": "Filesystem ≥ {{fs}}% · Datastore > {{ds}}% · LU > {{lu}}%"
+    "echo": "Filesystem ≥ {{fs}}% · Storage > {{ds}}% · LU > {{lu}}%"
   },
   "fs": {
     "count": "{{count}} partitions ≥ {{pct}}% used"
   },
   "ds": {
-    "count": "{{count}} datastores > {{pct}}% used"
+    "count": "{{count}} storages > {{pct}}% used"
   },
   "lu": {
     "count": "{{count}} logical units > {{pct}}% used"

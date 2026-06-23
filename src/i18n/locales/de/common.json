@@ -1,6 +1,6 @@
 {
   "appName": "vatlas",
-  "tagline": "RVTools → Atlas Ihres VMware-Bestands (100 % clientseitig)",
+  "tagline": "Proxmox → Atlas Ihres Proxmox-Bestands (100 % clientseitig)",
   "footer": "100 % clientseitig · Ihre Datei verlässt nie Ihren Browser",
   "error": {
     "title": "Ein Fehler ist aufgetreten"

@@ -1,9 +1,9 @@
 {
   "dropzone": {
-    "instruction": "Trascina i tuoi export RVTools",
+    "instruction": "Trascina il tuo report Proxmox (.zip o .xlsx)",
     "or": "o",
     "browse": "sfoglia i tuoi file",
-    "accepted": "Formato accettato: .xlsx (export RVTools). Trascina uno o più file.",
+    "accepted": "Formato accettato: .zip o .xlsx (export Proxmox). Trascina uno o più file.",
     "active": "Trascina i file qui"
   },
   "fileLoaded": {
@@ -11,28 +11,28 @@
     "remove": "Rimuovi"
   },
   "source": {
-    "rvtools": "RVTools",
+    "rvtools": "Proxmox",
     "unknown": "Sconosciuto"
   },
   "sources": {
     "list": {
       "title": "Cartelle di lavoro importate"
     },
-    "summary": "{{n}} file · {{vms}} VM · {{hosts}} host",
-    "rowCounts": "{{vms}} VM · {{hosts}} host"
+    "summary": "{{n}} file · {{vms}} ospiti · {{hosts}} nodi",
+    "rowCounts": "{{vms}} ospiti · {{hosts}} nodi"
   },
   "errors": {
-    "rejected": "Formato non riconosciuto. Trascina un export RVTools .xlsx.",
+    "rejected": "Formato non riconosciuto. Trascina un report Proxmox (.zip o .xlsx).",
     "parseFailed": "Impossibile leggere il file: {{message}}"
   },
   "snapshots": {
     "list": "Snapshot caricati",
     "empty": "Nessuno snapshot — trascina una cartella di lavoro",
     "card": {
-      "vCenterLabel": "vCenter",
+      "vCenterLabel": "Cluster",
       "capturedAt": "Acquisito",
-      "rvtoolsVersion": "RVTools",
-      "rows": "{{vms}} VM · {{hosts}} ESX · {{clusters}} cluster · {{datastores}} datastore"
+      "rvtoolsVersion": "Proxmox",
+      "rows": "{{vms}} ospiti · {{hosts}} nodi · {{clusters}} cluster · {{datastores}} archiviazioni"
     }
   }
 }

@@ -1,9 +1,9 @@
 {
   "dropzone": {
-    "instruction": "Drop your RVTools exports",
+    "instruction": "Drop your Proxmox report (.zip or .xlsx)",
     "or": "or",
     "browse": "browse your files",
-    "accepted": "Accepted format: .xlsx (RVTools export). Drop one file or several at once.",
+    "accepted": "Accepted format: .zip or .xlsx (Proxmox export). Drop one file or several at once.",
     "active": "Drop the files here"
   },
   "fileLoaded": {
@@ -11,28 +11,28 @@
     "remove": "Remove"
   },
   "source": {
-    "rvtools": "RVTools",
+    "rvtools": "Proxmox",
     "unknown": "Unknown"
   },
   "sources": {
     "list": {
       "title": "Imported workbooks"
     },
-    "summary": "{{n}} files · {{vms}} VMs · {{hosts}} hosts",
-    "rowCounts": "{{vms}} VMs · {{hosts}} hosts"
+    "summary": "{{n}} files · {{vms}} Guests · {{hosts}} nodes",
+    "rowCounts": "{{vms}} Guests · {{hosts}} nodes"
   },
   "errors": {
-    "rejected": "Unrecognized format. Drop an RVTools .xlsx export.",
+    "rejected": "Unrecognized format. Drop a Proxmox report (.zip or .xlsx).",
     "parseFailed": "Failed to read the file: {{message}}"
   },
   "snapshots": {
     "list": "Loaded snapshots",
     "empty": "No snapshots yet — drop a workbook",
     "card": {
-      "vCenterLabel": "vCenter",
+      "vCenterLabel": "Cluster",
       "capturedAt": "Captured",
-      "rvtoolsVersion": "RVTools",
-      "rows": "{{vms}} VMs · {{hosts}} ESX · {{clusters}} clusters · {{datastores}} datastores"
+      "rvtoolsVersion": "Proxmox",
+      "rows": "{{vms}} Guests · {{hosts}} nodes · {{clusters}} clusters · {{datastores}} storages"
     }
   }
 }
