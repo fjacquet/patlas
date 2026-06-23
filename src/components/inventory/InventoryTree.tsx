@@ -45,7 +45,7 @@ export interface InventoryTreeProps {
   onSelect: (id: string, selection: TreeSelection) => void
 }
 
-type NodeKind = 'root' | 'cluster' | 'host' | 'vm'
+type NodeKind = 'root' | 'cluster' | 'host' | 'gtype' | 'vm'
 
 interface FlatNode {
   id: string
@@ -62,11 +62,14 @@ interface FlatNode {
 const ROOT_ID = 'root'
 const clusterId = (c: string) => `cl:${c}`
 const hostId = (h: string) => `esx:${h}`
+const gtypeId = (h: string, g: 'qemu' | 'lxc') => `gt:${h}:${g}`
 
 /**
  * Walk the pre-indexed maps producing only the rows currently visible: the
  * root, every cluster, and — only when the parent id is in `expanded` — that
  * parent's children. Length ≈ only-opened (lazy children).
+ *
+ * Hierarchy: root → Cluster → Host → [gtype group: VMs | Containers] → VM/CT.
  */
 function buildVisibleRows(
   rootLabel: string,
@@ -74,6 +77,7 @@ function buildVisibleRows(
   hostsByCluster: Map<string, EsxAggregate[]>,
   vmsByHost: Map<string, VmDisplayRow[]>,
   expanded: Set<string>,
+  t: (key: string) => string,
 ): FlatNode[] {
   const rootExpanded = expanded.has(ROOT_ID)
   const out: FlatNode[] = [
@@ -122,17 +126,37 @@ function buildVisibleRows(
       })
       if (!hExpanded) continue
 
-      for (const vm of vms) {
+      // Emit gtype group nodes for each guest kind present under this host.
+      const guestKinds: Array<'qemu' | 'lxc'> = ['qemu', 'lxc']
+      for (const kind of guestKinds) {
+        const guests = vms.filter((v) => v.guestType === kind)
+        if (guests.length === 0) continue
+        const gId = gtypeId(host.hostName, kind)
+        const gExpanded = expanded.has(gId)
         out.push({
-          id: `vm:${host.hostName}/${vm.vmName}`,
-          kind: 'vm',
-          label: vm.vmName,
+          id: gId,
+          kind: 'gtype',
+          label: t(`guestType.${kind}`),
           depth: 3,
-          count: 0,
-          expandable: false,
-          expanded: false,
+          count: guests.length,
+          expandable: true,
+          expanded: gExpanded,
           selection: { kind: 'host', cluster, host: host.hostName },
         })
+        if (!gExpanded) continue
+
+        for (const vm of guests) {
+          out.push({
+            id: `vm:${host.hostName}/${vm.vmName}`,
+            kind: 'vm',
+            label: vm.vmName,
+            depth: 4,
+            count: 0,
+            expandable: false,
+            expanded: false,
+            selection: { kind: 'host', cluster, host: host.hostName },
+          })
+        }
       }
     }
   }
@@ -160,7 +184,7 @@ export function InventoryTree({
     })
   }
 
-  const flat = buildVisibleRows(rootLabel, clustersOrdered, hostsByCluster, vmsByHost, expanded)
+  const flat = buildVisibleRows(rootLabel, clustersOrdered, hostsByCluster, vmsByHost, expanded, t)
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const virtualizer = useVirtualizer({
