@@ -1,8 +1,8 @@
 <!-- generated-by: gsd-doc-writer -->
 # pAtlas
 
-[![Deploy to GitHub Pages](https://github.com/fjacquet/vatlas/actions/workflows/static.yml/badge.svg?branch=main)](https://github.com/fjacquet/vatlas/actions/workflows/static.yml)
-[![Live app](https://img.shields.io/badge/live-fjacquet.github.io%2Fvatlas-2563eb)](https://fjacquet.github.io/vatlas/)
+[![Deploy to GitHub Pages](https://github.com/fjacquet/patlas/actions/workflows/static.yml/badge.svg?branch=main)](https://github.com/fjacquet/patlas/actions/workflows/static.yml)
+[![Live app](https://img.shields.io/badge/live-fjacquet.github.io%2Fpatlas-2563eb)](https://fjacquet.github.io/patlas/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![React 19](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -12,13 +12,13 @@
 [![Tested with Vitest](https://img.shields.io/badge/tested%20with-vitest-6e9f18?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![Code style: Biome](https://img.shields.io/badge/code%20style-biome-60a5fa?logo=biome&logoColor=white)](https://biomejs.dev/)
 [![Client-side only](https://img.shields.io/badge/processing-100%25%20client--side-22c55e)](#privacy-guarantee)
-[![RVTools only](https://img.shields.io/badge/input-RVTools%20.xlsx-0ea5e9)](#vatlas)
-[![CI](https://github.com/fjacquet/vatlas/actions/workflows/ci.yml/badge.svg)](https://github.com/fjacquet/vatlas/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/fjacquet/vatlas?sort=semver)](https://github.com/fjacquet/vatlas/releases/latest)
+[![RVTools only](https://img.shields.io/badge/input-RVTools%20.xlsx-0ea5e9)](#patlas)
+[![CI](https://github.com/fjacquet/patlas/actions/workflows/ci.yml/badge.svg)](https://github.com/fjacquet/patlas/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/fjacquet/patlas?sort=semver)](https://github.com/fjacquet/patlas/releases/latest)
 
 > Drop one or more RVTools `.xlsx` exports, get a navigable, visual **atlas of your VMware estate** — and a shareable HTML report + PPTX deck. **100 % client-side: your workbook never leaves the browser.**
 
-vatlas is the broader sibling of [vsizer](https://github.com/fjacquet/vsizer): same architectural mold (drop file → see numbers → export → leave), much larger feature surface — global dashboard, inventory tree, allocation/DR analysis, OS End-of-Support forecasting, and in-session trends. **The report is the product.**
+patlas is the broader sibling of [vsizer](https://github.com/fjacquet/vsizer): same architectural mold (drop file → see numbers → export → leave), much larger feature surface — global dashboard, inventory tree, allocation/DR analysis, OS End-of-Support forecasting, and in-session trends. **The report is the product.**
 
 ## Stack
 
@@ -28,7 +28,7 @@ React 19 · TypeScript (strict) · Vite 8 · Tailwind v4 · Zustand 5 · Zod 4 �
 
 ```bash
 npm install            # pins the SheetJS tarball — do NOT `npm install xlsx`
-npm run dev            # Vite dev server → http://localhost:5173/vatlas/
+npm run dev            # Vite dev server → http://localhost:5173/patlas/
 ```
 
 Drop a RVTools workbook into the running app to see the dashboard. Full prerequisites and first-run troubleshooting are in [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md).
@@ -42,7 +42,7 @@ The defining product invariant — enforced in code, not just promised: a runtim
 | Doc | What it covers |
 |-----|----------------|
 | [docs/PRD.md](docs/PRD.md) | Product requirements and scope |
-| [docs/USER-GUIDE.md](docs/USER-GUIDE.md) | How to use vatlas as an end user |
+| [docs/USER-GUIDE.md](docs/USER-GUIDE.md) | How to use patlas as an end user |
 | [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md) | Prerequisites, install, first run |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Engine spine, store, hook, module map |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Build scripts, code style, conventions |
@@ -52,7 +52,7 @@ The defining product invariant — enforced in code, not just promised: a runtim
 
 ## Status
 
-vatlas is built bottom-up across a 10-phase roadmap; Phases 1–6 have shipped (foundation, global dashboard, inventory navigation, multi-vCenter merge, rich cluster/host intelligence, allocation & DR). OS End-of-Support forecasting, in-session trends, detailed storage/network views, and the HTML/PPTX exports are still ahead. `.planning/ROADMAP.md` is the source of truth for current phase status.
+patlas is built bottom-up across a 10-phase roadmap; Phases 1–6 have shipped (foundation, global dashboard, inventory navigation, multi-vCenter merge, rich cluster/host intelligence, allocation & DR). OS End-of-Support forecasting, in-session trends, detailed storage/network views, and the HTML/PPTX exports are still ahead. `.planning/ROADMAP.md` is the source of truth for current phase status.
 
 ## License
 
