@@ -16,14 +16,5 @@
   "backups": {
     "heading": "File di backup",
     "none": "Nessun file di backup trovato in questo parco."
-  },
-  "col": {
-    "content": "Tipo di contenuto",
-    "storage": "Storage",
-    "count": "File",
-    "sizeGib": "Dimensione (GiB)",
-    "guestName": "Ospite",
-    "fileName": "File",
-    "ageDays": "Età (giorni)"
   }
 }

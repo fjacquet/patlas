@@ -16,14 +16,5 @@
   "backups": {
     "heading": "Backup files",
     "none": "No backup files found on this estate."
-  },
-  "col": {
-    "content": "Content type",
-    "storage": "Storage",
-    "count": "Files",
-    "sizeGib": "Size (GiB)",
-    "guestName": "Guest",
-    "fileName": "File",
-    "ageDays": "Age (days)"
   }
 }

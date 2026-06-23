@@ -16,14 +16,5 @@
   "backups": {
     "heading": "Fichiers de sauvegarde",
     "none": "Aucun fichier de sauvegarde trouvé sur ce parc."
-  },
-  "col": {
-    "content": "Type de contenu",
-    "storage": "Stockage",
-    "count": "Fichiers",
-    "sizeGib": "Taille (Gio)",
-    "guestName": "Invité",
-    "fileName": "Fichier",
-    "ageDays": "Âge (jours)"
   }
 }

@@ -16,14 +16,5 @@
   "backups": {
     "heading": "Sicherungsdateien",
     "none": "Keine Sicherungsdateien in diesem Bestand gefunden."
-  },
-  "col": {
-    "content": "Inhaltstyp",
-    "storage": "Speicher",
-    "count": "Dateien",
-    "sizeGib": "Größe (GiB)",
-    "guestName": "Gast",
-    "fileName": "Datei",
-    "ageDays": "Alter (Tage)"
   }
 }

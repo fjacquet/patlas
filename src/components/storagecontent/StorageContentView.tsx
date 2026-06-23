@@ -144,7 +144,7 @@ export function StorageContentView() {
             <DataTable
               data={sc.byContent}
               columns={contentColumns}
-              headerFor={(id) => t(`col.${id}`)}
+              headerFor={(id) => t(`col.${id}`, { ns: 'inventory' })}
               objectKind="vm"
             />
           </section>
@@ -156,7 +156,7 @@ export function StorageContentView() {
             <DataTable
               data={sc.byStorage}
               columns={storageColumns}
-              headerFor={(id) => t(`col.${id}`)}
+              headerFor={(id) => t(`col.${id}`, { ns: 'inventory' })}
               objectKind="vm"
             />
           </section>
@@ -171,7 +171,7 @@ export function StorageContentView() {
               <DataTable
                 data={sc.backups.rows}
                 columns={backupColumns}
-                headerFor={(id) => t(`col.${id}`)}
+                headerFor={(id) => t(`col.${id}`, { ns: 'inventory' })}
                 objectKind="vm"
               />
             )}
