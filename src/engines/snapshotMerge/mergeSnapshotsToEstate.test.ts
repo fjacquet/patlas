@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mhz, mib, sockets } from '@/engines/units'
 import type {
+  ProxmoxBackupJobRow,
+  ProxmoxHaResourceRow,
+  ProxmoxHaStatusRow,
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
   Snapshot,
@@ -65,6 +68,9 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   vmUsage: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
+  proxmoxHaResources: [],
+  proxmoxHaStatus: [],
+  proxmoxBackupJobs: [],
   vdatastore: [],
   vpartition: [],
   vnetwork: [],
@@ -337,5 +343,115 @@ describe('mergeSnapshotsToEstate — proxmoxStorageContent concatenation', () =>
     })
     const merged = mergeSnapshotsToEstate([a])
     expect(merged.proxmoxStorageContent).toHaveLength(0)
+  })
+})
+
+describe('mergeSnapshotsToEstate — proxmoxHaResources concatenation', () => {
+  const haRes = (over: Partial<ProxmoxHaResourceRow>): ProxmoxHaResourceRow => ({
+    sid: 'vm:100',
+    type: 'vm',
+    state: 'started',
+    group: 'ha-group',
+    failback: 'on',
+    maxRestart: 3,
+    maxRelocate: 1,
+    comment: '',
+    ...over,
+  })
+
+  it('concatenates proxmoxHaResources from two snapshots', () => {
+    const a = snap({ id: 'a', proxmoxHaResources: [haRes({ sid: 'vm:100' })] })
+    const b = snap({
+      id: 'b',
+      proxmoxHaResources: [haRes({ sid: 'vm:101' }), haRes({ sid: 'ct:200' })],
+    })
+    const merged = mergeSnapshotsToEstate([a, b])
+    expect(merged.proxmoxHaResources).toHaveLength(3)
+    expect(merged.proxmoxHaResources.map((r) => r.sid)).toEqual(['vm:100', 'vm:101', 'ct:200'])
+  })
+
+  it('empty selection yields empty proxmoxHaResources', () => {
+    expect(mergeSnapshotsToEstate([]).proxmoxHaResources).toHaveLength(0)
+  })
+
+  it('is resilient to a missing proxmoxHaResources field (??[])', () => {
+    const a = snap({ id: 'a', proxmoxHaResources: undefined as unknown as ProxmoxHaResourceRow[] })
+    const merged = mergeSnapshotsToEstate([a])
+    expect(merged.proxmoxHaResources).toHaveLength(0)
+  })
+})
+
+describe('mergeSnapshotsToEstate — proxmoxHaStatus concatenation', () => {
+  const haStatus = (over: Partial<ProxmoxHaStatusRow>): ProxmoxHaStatusRow => ({
+    id: 'ha-1',
+    type: 'service',
+    status: 'ok',
+    node: 'pve1',
+    sid: 'vm:100',
+    state: 'started',
+    crmState: 'master',
+    requestState: 'started',
+    quorate: 'X',
+    ...over,
+  })
+
+  it('concatenates proxmoxHaStatus from two snapshots', () => {
+    const a = snap({ id: 'a', proxmoxHaStatus: [haStatus({ id: 'ha-a' })] })
+    const b = snap({
+      id: 'b',
+      proxmoxHaStatus: [haStatus({ id: 'ha-b' }), haStatus({ id: 'ha-c' })],
+    })
+    const merged = mergeSnapshotsToEstate([a, b])
+    expect(merged.proxmoxHaStatus).toHaveLength(3)
+    expect(merged.proxmoxHaStatus.map((r) => r.id)).toEqual(['ha-a', 'ha-b', 'ha-c'])
+  })
+
+  it('empty selection yields empty proxmoxHaStatus', () => {
+    expect(mergeSnapshotsToEstate([]).proxmoxHaStatus).toHaveLength(0)
+  })
+
+  it('is resilient to a missing proxmoxHaStatus field (??[])', () => {
+    const a = snap({ id: 'a', proxmoxHaStatus: undefined as unknown as ProxmoxHaStatusRow[] })
+    const merged = mergeSnapshotsToEstate([a])
+    expect(merged.proxmoxHaStatus).toHaveLength(0)
+  })
+})
+
+describe('mergeSnapshotsToEstate — proxmoxBackupJobs concatenation', () => {
+  const backupJob = (over: Partial<ProxmoxBackupJobRow>): ProxmoxBackupJobRow => ({
+    id: 'backup-job-1',
+    enabled: true,
+    all: false,
+    vmId: '100,101',
+    mode: 'snapshot',
+    storage: 'backup-store',
+    startTime: '02:00',
+    schedule: 'daily',
+    dayOfWeek: 'mon,tue,wed,thu,fri',
+    compress: 'zstd',
+    type: 'vzdump',
+    node: 'pve1',
+    ...over,
+  })
+
+  it('concatenates proxmoxBackupJobs from two snapshots', () => {
+    const a = snap({ id: 'a', proxmoxBackupJobs: [backupJob({ id: 'job-a' })] })
+    const b = snap({
+      id: 'b',
+      proxmoxBackupJobs: [backupJob({ id: 'job-b' }), backupJob({ id: 'job-c' })],
+    })
+    const merged = mergeSnapshotsToEstate([a, b])
+    expect(merged.proxmoxBackupJobs).toHaveLength(3)
+    expect(merged.proxmoxBackupJobs.map((r) => r.id)).toEqual(['job-a', 'job-b', 'job-c'])
+  })
+
+  it('empty selection yields empty proxmoxBackupJobs', () => {
+    expect(mergeSnapshotsToEstate([]).proxmoxBackupJobs).toHaveLength(0)
+  })
+
+  it('is resilient to a missing proxmoxBackupJobs field (??[])', () => {
+    const a = snap({ id: 'a', proxmoxBackupJobs: undefined as unknown as ProxmoxBackupJobRow[] })
+    const merged = mergeSnapshotsToEstate([a])
+    expect(merged.proxmoxBackupJobs).toHaveLength(0)
   })
 })

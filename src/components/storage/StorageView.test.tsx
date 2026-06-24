@@ -46,6 +46,9 @@ const snapshot = (): Snapshot =>
     vmUsage: [],
     proxmoxSnapshots: [],
     proxmoxStorageContent: [],
+    proxmoxHaResources: [],
+    proxmoxHaStatus: [],
+    proxmoxBackupJobs: [],
     vdatastore: [
       {
         name: 'DS_A',

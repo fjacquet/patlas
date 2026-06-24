@@ -11,6 +11,10 @@ export interface ParsedSheet {
   name: string
   headers: string[]
   rows: Record<string, unknown>[]
+  /** The full raw 2-D cell grid (including the header row). Needed by the
+   *  stacked-sub-table extractor for composite sheets (Cluster / Cluster HA)
+   *  whose row-0 is a 1-cell title, so the header-keyed `rows` drops columns. */
+  cells: unknown[][]
 }
 
 export interface ParsedWorkbook {
@@ -47,7 +51,7 @@ export const parseXlsx = (buffer: ArrayBuffer | Uint8Array): ParsedWorkbook => {
     })
 
     if (aoa.length === 0) {
-      sheets.set(name, { name, headers: [], rows: [] })
+      sheets.set(name, { name, headers: [], rows: [], cells: [] })
       continue
     }
 
@@ -64,7 +68,7 @@ export const parseXlsx = (buffer: ArrayBuffer | Uint8Array): ParsedWorkbook => {
       return obj
     })
 
-    sheets.set(name, { name, headers, rows })
+    sheets.set(name, { name, headers, rows, cells: aoa })
   }
 
   return { sheets }

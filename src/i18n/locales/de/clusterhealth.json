@@ -1,0 +1,24 @@
+{
+  "heading": "Cluster-Zustand",
+  "subtitle": "HA-Status und geplante Sicherungsaufträge",
+  "empty": {
+    "heading": "Kein Bericht geladen",
+    "body": "Laden Sie einen Bericht, um den Cluster-Zustand zu sehen."
+  },
+  "kpi": {
+    "quorum": "Quorum",
+    "fencing": "Fencing",
+    "managed": "HA-Ressourcen",
+    "jobs": "Sicherungsaufträge"
+  },
+  "ha": {
+    "heading": "HA-Ressourcen",
+    "none": "Keine Gäste werden von der HA verwaltet."
+  },
+  "services": { "heading": "HA-Dienste" },
+  "backups": {
+    "heading": "Sicherungsaufträge",
+    "none": "Keine Sicherungsaufträge geplant."
+  },
+  "na": "—"
+}

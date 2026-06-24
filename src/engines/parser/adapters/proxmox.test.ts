@@ -13,6 +13,7 @@ const sheet = (headers: string[], rows: Record<string, unknown>[]): ParsedSheet 
   name: 'Cluster',
   headers,
   rows,
+  cells: [],
 })
 
 it('extracts the cluster name from row 0', () => {
@@ -49,6 +50,7 @@ it('maps a Node row to VHostRow with GiB→MiB memory', () => {
         'Pve Version': '8.2',
       },
     ],
+    cells: [],
   }
   const hosts = adaptProxmoxNodes(s, 'pve-prod')
   expect(hosts).toHaveLength(1)
@@ -97,6 +99,7 @@ const vms: ParsedSheet = {
       'Disk Usage GB': 20,
     },
   ],
+  cells: [],
 }
 const cts: ParsedSheet = {
   name: 'Containers',
@@ -124,6 +127,7 @@ const cts: ParsedSheet = {
       'Disk Usage GB': 2,
     },
   ],
+  cells: [],
 }
 
 it('maps VMs as qemu with vcpu = cores × sockets', () => {
@@ -166,6 +170,7 @@ it('maps Storage row with free = size − usage', () => {
         Shared: 'false',
       },
     ],
+    cells: [],
   }
   const [d] = adaptProxmoxStorages(s)
   if (!d) throw new Error('Expected datastore to be defined')
@@ -180,6 +185,7 @@ it('maps native usage % to vmUsage (null when absent)', () => {
     name: 'VMs',
     headers: ['Name', 'Vm Id', 'Memory Usage GB', 'Cpu Usage %'],
     rows: [{ Name: 'web01', 'Vm Id': 100, 'Memory Usage GB': 4, 'Cpu Usage %': '' }],
+    cells: [],
   }
   const [u] = adaptProxmoxUsage(vms_usage, undefined, 'pve-prod')
   if (!u) throw new Error('Expected usage row to be defined')
@@ -190,11 +196,17 @@ it('maps native usage % to vmUsage (null when absent)', () => {
 
 it('assembles a bundle from a workbook (Nodes + VMs required)', () => {
   const wb = { sheets: new Map<string, ParsedSheet>() }
-  wb.sheets.set('Cluster', { name: 'Cluster', headers: ['Name'], rows: [{ Name: 'pve-prod' }] })
+  wb.sheets.set('Cluster', {
+    name: 'Cluster',
+    headers: ['Name'],
+    rows: [{ Name: 'pve-prod' }],
+    cells: [],
+  })
   wb.sheets.set('Nodes', {
     name: 'Nodes',
     headers: ['Node', 'Cpu Cores', 'Memory Size GB'],
     rows: [{ Node: 'pve1', 'Cpu Cores': 4, 'Memory Size GB': 24 }],
+    cells: [],
   })
   wb.sheets.set('VMs', {
     name: 'VMs',
@@ -210,6 +222,7 @@ it('assembles a bundle from a workbook (Nodes + VMs required)', () => {
         Status: 'running',
       },
     ],
+    cells: [],
   })
   const b = adaptProxmox(wb)
   expect(b.clusterName).toBe('pve-prod')
@@ -220,7 +233,7 @@ it('assembles a bundle from a workbook (Nodes + VMs required)', () => {
 
 it('throws a ParseError when the Nodes sheet is missing', () => {
   const wb = { sheets: new Map<string, ParsedSheet>() }
-  wb.sheets.set('VMs', { name: 'VMs', headers: ['Name'], rows: [] })
+  wb.sheets.set('VMs', { name: 'VMs', headers: ['Name'], rows: [], cells: [] })
   expect(() => adaptProxmox(wb)).toThrow(/Nodes/)
 })
 
@@ -230,6 +243,7 @@ it('throws a ParseError when both VMs and Containers sheets are missing', () => 
     name: 'Nodes',
     headers: ['Node', 'Cpu Cores', 'Memory Size GB'],
     rows: [{ Node: 'pve1', 'Cpu Cores': 4, 'Memory Size GB': 24 }],
+    cells: [],
   })
   expect(() => adaptProxmox(wb)).toThrow(/VMs|Containers/)
 })
@@ -240,6 +254,7 @@ it('falls back to "proxmox" cluster name when no Cluster sheet is present', () =
     name: 'Nodes',
     headers: ['Node', 'Cpu Cores', 'Memory Size GB'],
     rows: [{ Node: 'pve1', 'Cpu Cores': 4, 'Memory Size GB': 24 }],
+    cells: [],
   })
   wb.sheets.set('VMs', {
     name: 'VMs',
@@ -255,6 +270,7 @@ it('falls back to "proxmox" cluster name when no Cluster sheet is present', () =
         Status: 'running',
       },
     ],
+    cells: [],
   })
   const b = adaptProxmox(wb)
   expect(b.clusterName).toBe('proxmox')

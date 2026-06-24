@@ -17,6 +17,7 @@ const sheet = (rows: Record<string, unknown>[]): ParsedSheet => ({
     'Description',
   ],
   rows,
+  cells: [],
 })
 
 describe('adaptProxmoxSnapshots', () => {

@@ -11,13 +11,13 @@ import { buildEstateView } from './estateView'
 const fixture = join(__dirname, '../parser/__fixtures__/proxmox-report.xlsx')
 const maybe = existsSync(fixture) ? it : it.skip
 
-describe('storage content health acceptance (real report)', () => {
-  maybe('aggregates real Storage Content; backups empty in this fixture', () => {
+describe('cluster health acceptance (real report)', () => {
+  maybe('aggregates real HA status; HA resources and backup jobs empty in this fixture', () => {
     const wb = parseXlsx(readFileSync(fixture))
     const bundle = adaptProxmox(wb)
 
     const snapshot: Snapshot = {
-      id: 'proxmox-sc-realfile',
+      id: 'proxmox-ch-realfile',
       filename: 'proxmox-report.xlsx',
       fileSize: bytes(0),
       capturedAt: new Date('2026-06-23T00:00:00Z'),
@@ -46,22 +46,17 @@ describe('storage content health acceptance (real report)', () => {
 
     const merged = mergeSnapshotsToEstate([snapshot])
     const view = buildEstateView(merged, [snapshot], 'active', new Date('2026-06-23T00:00:00Z'))
-    const { storageContent } = view
+    const { clusterHealth } = view
 
-    console.log('[storage-content] files:', storageContent.fileCount)
-    console.log(
-      '[storage-content] content types:',
-      storageContent.byContent.map((g) => g.content).join(', '),
-    )
-    console.log('[storage-content] backups:', storageContent.backups.count)
+    console.log('[cluster-health] quorum:', clusterHealth.ha.quorumStatus)
+    console.log('[cluster-health] fencing:', clusterHealth.ha.fencingStatus)
+    console.log('[cluster-health] HA resources:', clusterHealth.ha.managedCount)
+    console.log('[cluster-health] backup jobs:', clusterHealth.backups.jobCount)
 
-    // Rich storage content in the fixture (22 rows across DATA/local/local-lvm).
-    expect(storageContent.fileCount).toBeGreaterThan(0)
-    expect(storageContent.totalSizeMib).toBeGreaterThan(0)
-    expect(storageContent.byContent.some((g) => g.content === 'images')).toBe(true)
-    expect(storageContent.byStorage.some((g) => g.storage === 'DATA')).toBe(true)
-    // No 'backup' content rows in this fixture → backups honestly empty.
-    expect(storageContent.backups.count).toBe(0)
-    expect(storageContent.backups.oldestAgeDays).toBeNull()
+    // The fixture is a single-node lab: quorum present, no HA-managed guests,
+    // no scheduled backup jobs.
+    expect(clusterHealth.ha.quorumStatus).toBe('OK')
+    expect(clusterHealth.ha.managedCount).toBe(0)
+    expect(clusterHealth.backups.jobCount).toBe(0)
   })
 })

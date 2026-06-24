@@ -14,6 +14,7 @@ import type {
 } from '@/types/estate'
 import type { Snapshot } from '@/types/snapshot'
 import { aggregateClusters } from './aggregateClusters'
+import { computeClusterHealth } from './clusterHealth'
 import { buildDatastoreDetail, buildVmDetail } from './detailIndex'
 import { aggregateGlobals, emptySummary } from './globals'
 import { aggregateGuestData, type GuestData } from './guestData'
@@ -318,6 +319,13 @@ export function buildEstateView(
   // backup-file recency.
   const storageContent = computeStorageContentHealth(merged.proxmoxStorageContent, today)
 
+  // Plan 3C cluster HA & backup jobs — same single pass.
+  const clusterHealth = computeClusterHealth(
+    merged.proxmoxHaResources,
+    merged.proxmoxHaStatus,
+    merged.proxmoxBackupJobs,
+  )
+
   return {
     globals,
     clusters,
@@ -341,6 +349,7 @@ export function buildEstateView(
     monsters,
     snapshotSprawl,
     storageContent,
+    clusterHealth,
     datastoreDetail,
     vmDetail,
   }
@@ -473,6 +482,22 @@ const EMPTY_STORAGE_CONTENT = Object.freeze({
   fileCount: 0,
 })
 
+const EMPTY_CLUSTER_HEALTH = Object.freeze({
+  ha: Object.freeze({
+    resources: Object.freeze([]) as never[],
+    managedCount: 0,
+    quorumStatus: null,
+    fencingStatus: null,
+    services: Object.freeze([]) as never[],
+  }),
+  backups: Object.freeze({
+    jobs: Object.freeze([]) as never[],
+    jobCount: 0,
+    enabledCount: 0,
+    guestsCovered: 0,
+  }),
+})
+
 /**
  * The valid empty-but-typed view `useEstateView` returns when no snapshot
  * is active. Frozen (modeled on `globals.ts:emptySummary`) so consumers
@@ -501,6 +526,7 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   monsters: EMPTY_MONSTERS,
   snapshotSprawl: EMPTY_SPRAWL,
   storageContent: EMPTY_STORAGE_CONTENT,
+  clusterHealth: EMPTY_CLUSTER_HEALTH,
   datastoreDetail: new Map(),
   vmDetail: new Map(),
 })

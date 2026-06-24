@@ -1,0 +1,24 @@
+{
+  "heading": "Cluster Health",
+  "subtitle": "HA status and scheduled backup jobs",
+  "empty": {
+    "heading": "No report loaded",
+    "body": "Load a report to see cluster health."
+  },
+  "kpi": {
+    "quorum": "Quorum",
+    "fencing": "Fencing",
+    "managed": "HA resources",
+    "jobs": "Backup jobs"
+  },
+  "ha": {
+    "heading": "HA resources",
+    "none": "No guests are managed by HA."
+  },
+  "services": { "heading": "HA services" },
+  "backups": {
+    "heading": "Backup jobs",
+    "none": "No backup jobs are scheduled."
+  },
+  "na": "—"
+}

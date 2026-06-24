@@ -3,6 +3,7 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
 import deAlerts from './locales/de/alerts.json'
 import deAlloc from './locales/de/alloc.json'
+import deClusterHealth from './locales/de/clusterhealth.json'
 import deCommon from './locales/de/common.json'
 import deDashboard from './locales/de/dashboard.json'
 import deEos from './locales/de/eos.json'
@@ -21,6 +22,7 @@ import deTrends from './locales/de/trends.json'
 import deUpload from './locales/de/upload.json'
 import enAlerts from './locales/en/alerts.json'
 import enAlloc from './locales/en/alloc.json'
+import enClusterHealth from './locales/en/clusterhealth.json'
 import enCommon from './locales/en/common.json'
 import enDashboard from './locales/en/dashboard.json'
 import enEos from './locales/en/eos.json'
@@ -39,6 +41,7 @@ import enTrends from './locales/en/trends.json'
 import enUpload from './locales/en/upload.json'
 import frAlerts from './locales/fr/alerts.json'
 import frAlloc from './locales/fr/alloc.json'
+import frClusterHealth from './locales/fr/clusterhealth.json'
 import frCommon from './locales/fr/common.json'
 import frDashboard from './locales/fr/dashboard.json'
 import frEos from './locales/fr/eos.json'
@@ -57,6 +60,7 @@ import frTrends from './locales/fr/trends.json'
 import frUpload from './locales/fr/upload.json'
 import itAlerts from './locales/it/alerts.json'
 import itAlloc from './locales/it/alloc.json'
+import itClusterHealth from './locales/it/clusterhealth.json'
 import itCommon from './locales/it/common.json'
 import itDashboard from './locales/it/dashboard.json'
 import itEos from './locales/it/eos.json'
@@ -105,6 +109,7 @@ export const NAMESPACES = [
   'monstervm',
   'snapshots',
   'storagecontent',
+  'clusterhealth',
 ] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
@@ -128,6 +133,7 @@ export const resources = {
     monstervm: enMonstervm,
     snapshots: enSnapshots,
     storagecontent: enStorageContent,
+    clusterhealth: enClusterHealth,
   },
   fr: {
     common: frCommon,
@@ -148,6 +154,7 @@ export const resources = {
     monstervm: frMonstervm,
     snapshots: frSnapshots,
     storagecontent: frStorageContent,
+    clusterhealth: frClusterHealth,
   },
   de: {
     common: deCommon,
@@ -168,6 +175,7 @@ export const resources = {
     monstervm: deMonstervm,
     snapshots: deSnapshots,
     storagecontent: deStorageContent,
+    clusterhealth: deClusterHealth,
   },
   it: {
     common: itCommon,
@@ -188,6 +196,7 @@ export const resources = {
     monstervm: itMonstervm,
     snapshots: itSnapshots,
     storagecontent: itStorageContent,
+    clusterhealth: itClusterHealth,
   },
 } as const
 

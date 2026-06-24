@@ -72,6 +72,9 @@ const snapshot = (): Snapshot => ({
   vmUsage: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
+  proxmoxHaResources: [],
+  proxmoxHaStatus: [],
+  proxmoxBackupJobs: [],
   vinfo: [
     vm({ vmName: 'on-1', poweredOn: true, osConfig: 'Microsoft Windows Server 2019' }),
     vm({ vmName: 'on-2', poweredOn: true, osConfig: 'Ubuntu Linux (64-bit)' }),

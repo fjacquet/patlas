@@ -1,0 +1,24 @@
+{
+  "heading": "Salute del cluster",
+  "subtitle": "Stato HA e processi di backup pianificati",
+  "empty": {
+    "heading": "Nessun report caricato",
+    "body": "Carica un report per vedere la salute del cluster."
+  },
+  "kpi": {
+    "quorum": "Quorum",
+    "fencing": "Fencing",
+    "managed": "Risorse HA",
+    "jobs": "Processi di backup"
+  },
+  "ha": {
+    "heading": "Risorse HA",
+    "none": "Nessun ospite è gestito dalla HA."
+  },
+  "services": { "heading": "Servizi HA" },
+  "backups": {
+    "heading": "Processi di backup",
+    "none": "Nessun processo di backup pianificato."
+  },
+  "na": "—"
+}

@@ -19,6 +19,9 @@ export type {
 } from './estate'
 export type {
   ParseError,
+  ProxmoxBackupJobRow,
+  ProxmoxHaResourceRow,
+  ProxmoxHaStatusRow,
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
   Snapshot,
