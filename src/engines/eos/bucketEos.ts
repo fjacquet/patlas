@@ -1,13 +1,13 @@
-import type { EosBucketKey, EosProjection, EosRow, EsxiHostRow } from '@/types/estate'
+import type { EosBucketKey, EosProjection, EosRow, NodeHostRow } from '@/types/estate'
 import type { VHostRow } from '@/types/vhost'
 import type { VInfoRow } from '@/types/vinfo'
 import type { EosCatalogue } from './catalogueSchema'
-import { classifyEsxi } from './classifyEsxi'
+import { classifyPve } from './classifyPve'
 import { normalizeOs } from './normalizeOs'
 
 // EOS projection types live in @/types/estate (types→engines direction,
 // no cycle); re-exported here so the engine module still surfaces them.
-export type { EosBucketKey, EosProjection, EosRow, EsxiHostRow } from '@/types/estate'
+export type { EosBucketKey, EosProjection, EosRow, NodeHostRow } from '@/types/estate'
 
 /**
  * Lifecycle bucketer — pure, Zod-free. Receives the typed catalogue and the
@@ -144,7 +144,7 @@ export function buildEosProjection(args: {
     unknown: partition.unknown.length,
   }
 
-  const esxiCounts: Record<EosBucketKey, number> = {
+  const nodeCounts: Record<EosBucketKey, number> = {
     overdue: 0,
     w3: 0,
     w3to6: 0,
@@ -153,13 +153,13 @@ export function buildEosProjection(args: {
     beyond12: 0,
     unknown: 0,
   }
-  const hosts: EsxiHostRow[] = vhost.map((h) => {
-    const c = classifyEsxi(h.esxVersion, catalogue)
+  const hosts: NodeHostRow[] = vhost.map((h) => {
+    const c = classifyPve(h.esxVersion, catalogue)
     const bucket = bucketFor(c.majorEol, todayMs, m)
-    esxiCounts[bucket] += 1
+    nodeCounts[bucket] += 1
     return {
       hostName: h.hostName,
-      esxVersion: h.esxVersion,
+      pveVersion: h.esxVersion,
       major: c.major,
       majorEol: c.majorEol,
       patchEol: c.patchEol,
@@ -172,6 +172,6 @@ export function buildEosProjection(args: {
     partition,
     cumulative,
     rawUnknown: [...rawUnknownCounts].map(([osString, count]) => ({ osString, count })),
-    esxi: { hosts, partition: esxiCounts },
+    nodes: { hosts, partition: nodeCounts },
   }
 }

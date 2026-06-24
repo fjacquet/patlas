@@ -384,7 +384,7 @@ const EMPTY_EOS: EosProjection = Object.freeze({
   }),
   cumulative: Object.freeze({ overdue: 0, le3: 0, le6: 0, le9: 0, le12: 0, unknown: 0 }),
   rawUnknown: Object.freeze([]) as never[],
-  esxi: Object.freeze({
+  nodes: Object.freeze({
     hosts: Object.freeze([]) as never[],
     partition: Object.freeze({
       overdue: 0,

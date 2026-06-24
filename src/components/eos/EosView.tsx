@@ -205,7 +205,7 @@ export function EosView() {
               {' · '}
               {t('split', {
                 vms: fmtInt(vmTotal, loc),
-                hosts: fmtInt(eos.esxi.hosts.length, loc),
+                hosts: fmtInt(eos.nodes.hosts.length, loc),
               })}
             </p>
           </section>
@@ -261,13 +261,13 @@ export function EosView() {
                 </tr>
               </thead>
               <tbody className="font-mono tabular-nums text-slate-900 dark:text-slate-100">
-                {eos.esxi.hosts.map((h) => (
+                {eos.nodes.hosts.map((h) => (
                   <tr
                     key={h.hostName}
                     className="border-t border-slate-100 dark:border-surface-800"
                   >
                     <td className="break-all py-1 pr-4 font-sans">{h.hostName}</td>
-                    <td className="py-1 pr-4 font-sans">{h.esxVersion || '—'}</td>
+                    <td className="py-1 pr-4 font-sans">{h.pveVersion || '—'}</td>
                     <td className="py-1 pr-4">{h.major ?? '—'}</td>
                     <td className="py-1 pr-4">{fmtDate(h.majorEol ?? '', loc)}</td>
                     <td className="py-1">—</td>
