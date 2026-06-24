@@ -157,6 +157,28 @@
       "sizeGib": "Dimensione (GiB)"
     }
   },
+  "clusterHealth": {
+    "title": "Salute del cluster — stato HA e lavori di backup",
+    "kpi": {
+      "quorum": "Quorum",
+      "fencing": "Fencing",
+      "haResources": "Risorse HA",
+      "backupJobs": "Lavori di backup"
+    },
+    "services": {
+      "heading": "Servizi HA"
+    },
+    "jobs": {
+      "heading": "Lavori di backup"
+    },
+    "col": {
+      "service": "Servizio",
+      "status": "Stato",
+      "job": "Lavoro",
+      "schedule": "Pianificazione",
+      "enabled": "Abilitato"
+    }
+  },
   "storageContent": {
     "title": "Contenuto dello storage — inventario file per tipo e pool",
     "kpi": {

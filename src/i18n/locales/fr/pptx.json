@@ -157,6 +157,28 @@
       "sizeGib": "Taille (Gio)"
     }
   },
+  "clusterHealth": {
+    "title": "Santé du cluster — statut HA et tâches de sauvegarde",
+    "kpi": {
+      "quorum": "Quorum",
+      "fencing": "Fencing",
+      "haResources": "Ressources HA",
+      "backupJobs": "Tâches de sauvegarde"
+    },
+    "services": {
+      "heading": "Services HA"
+    },
+    "jobs": {
+      "heading": "Tâches de sauvegarde"
+    },
+    "col": {
+      "service": "Service",
+      "status": "Statut",
+      "job": "Tâche",
+      "schedule": "Planification",
+      "enabled": "Activé"
+    }
+  },
   "storageContent": {
     "title": "Contenu du stockage — inventaire des fichiers par type et pool",
     "kpi": {

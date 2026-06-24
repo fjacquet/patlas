@@ -157,6 +157,28 @@
       "sizeGib": "Größe (GiB)"
     }
   },
+  "clusterHealth": {
+    "title": "Cluster-Gesundheit — HA-Status und Sicherungsaufträge",
+    "kpi": {
+      "quorum": "Quorum",
+      "fencing": "Fencing",
+      "haResources": "HA-Ressourcen",
+      "backupJobs": "Sicherungsaufträge"
+    },
+    "services": {
+      "heading": "HA-Dienste"
+    },
+    "jobs": {
+      "heading": "Sicherungsaufträge"
+    },
+    "col": {
+      "service": "Dienst",
+      "status": "Status",
+      "job": "Auftrag",
+      "schedule": "Zeitplan",
+      "enabled": "Aktiviert"
+    }
+  },
   "storageContent": {
     "title": "Speicherinhalt — Dateibestand nach Typ und Pool",
     "kpi": {

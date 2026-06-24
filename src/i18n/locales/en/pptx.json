@@ -157,6 +157,28 @@
       "sizeGib": "Size (GiB)"
     }
   },
+  "clusterHealth": {
+    "title": "Cluster health — HA status & backup jobs",
+    "kpi": {
+      "quorum": "Quorum",
+      "fencing": "Fencing",
+      "haResources": "HA resources",
+      "backupJobs": "Backup jobs"
+    },
+    "services": {
+      "heading": "HA services"
+    },
+    "jobs": {
+      "heading": "Backup jobs"
+    },
+    "col": {
+      "service": "Service",
+      "status": "Status",
+      "job": "Job",
+      "schedule": "Schedule",
+      "enabled": "Enabled"
+    }
+  },
   "storageContent": {
     "title": "Storage content — file inventory by type and pool",
     "kpi": {
