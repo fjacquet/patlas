@@ -1,7 +1,7 @@
 {
   "name": "patlas",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.2.0",
   "type": "module",
   "description": "Drop your RVTools export, get a navigable visual atlas of your VMware estate. 100% client-side.",
   "scripts": {

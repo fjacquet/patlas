@@ -5,6 +5,27 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ---
 
+## [2.2.0] - 2026-06-24
+
+### Added
+
+- **Three Proxmox-native metrics in the PPTX deck** — Snapshot Sprawl, Storage Content, and Cluster Health slides (KPI band + native tables), each emitted only when its data is non-empty.
+- **Proxmox VE (node) End-of-Support** — node EOL is derived from the PVE version via a new `classifyPve`; the EOS catalogue gains a `proxmox-ve` product with EOL dates validated against endoflife.date. The EOS view's host section is relabeled "Node end-of-support" with the PVE version.
+- **Network topology diagram** — the `network-diagram.svg` shipped in the Proxmox `.zip` bundle is now rendered in the Network view (via a sandboxed `<img>` data-URI, never raw HTML injection) and embedded in the exported HTML report.
+- Wider guest-OS normalization for Proxmox/LXC strings (bare OS names and LXC template names), so more guests classify for EOS instead of "unknown".
+
+### Changed
+
+- Export filenames and the PPTX deck footer rebranded from "vatlas" to "patlas".
+- EOS host bucket renamed `esxi → nodes` end-to-end; the VMware `esxi` classifier and catalogue entry removed.
+
+### Notes
+
+- The network diagram appears in the web app and the HTML report; it is deliberately excluded from the PPTX deck (rasterized SVG text would not render).
+- DE/IT technical terminology still pending native review.
+
+---
+
 ## [2.1.0] - 2026-06-24
 
 ### Added
