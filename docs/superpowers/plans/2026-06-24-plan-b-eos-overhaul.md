@@ -42,10 +42,12 @@
 ### Task 1: Catalogue — add `proxmox-ve`, refresh dates, bump `lastVerified`
 
 **Files:**
+
 - Modify: `src/engines/eos/catalogue.json`
 - Test: `src/engines/eos/catalogue.test.ts`
 
 **Interfaces:**
+
 - Consumes: `EosCatalogueSchema` (unchanged).
 - Produces: a `proxmox-ve` product entry with releases keyed by major (`"6"`, `"7"`, `"8"`), each with real `eolFrom` dates.
 
@@ -86,11 +88,13 @@ git commit -m "feat(pB-01): add proxmox-ve EOL, refresh catalogue, drop esxi ent
 ### Task 2: `classifyPve` (replace `classifyEsxi`)
 
 **Files:**
+
 - Create: `src/engines/eos/classifyPve.ts`
 - Create: `src/engines/eos/classifyPve.test.ts`
 - Delete: `src/engines/eos/classifyEsxi.ts`, `src/engines/eos/classifyEsxi.test.ts` (in this task, after the new one is green and `bucketEos` is switched in Task 3 — to avoid a broken build, keep `classifyEsxi.ts` until Task 3 removes its last caller; do the deletes at the END of Task 3. In THIS task only add `classifyPve`.)
 
 **Interfaces:**
+
 - Consumes: `EosCatalogue`.
 - Produces: `export function classifyPve(pveVersion: string, catalogue: EosCatalogue): { major: string | null; majorEol: string | null; patchEol: null }`.
 
@@ -168,6 +172,7 @@ git commit -m "feat(pB-02): classifyPve maps PVE version to node EOL"
 ### Task 3: Rename `esxi → nodes` end-to-end and switch `bucketEos` to `classifyPve`
 
 **Files:**
+
 - Modify: `src/types/estate.ts` (`EsxiHostRow` → `NodeHostRow`; `EosProjection.esxi` → `.nodes`)
 - Modify: `src/engines/eos/bucketEos.ts` (`classifyEsxi`→`classifyPve`, `esxiCounts`→`nodeCounts`, build `nodes` sub-object)
 - Modify: `src/engines/aggregation/estateView.ts` (`EMPTY_EOS.esxi` → `.nodes`)
@@ -175,6 +180,7 @@ git commit -m "feat(pB-02): classifyPve maps PVE version to node EOL"
 - Delete: `src/engines/eos/classifyEsxi.ts`, `src/engines/eos/classifyEsxi.test.ts`
 
 **Interfaces:**
+
 - Consumes: `classifyPve` (Task 2).
 - Produces: `EosProjection.nodes: { hosts: NodeHostRow[]; partition: Record<EosBucketKey, number> }`; `NodeHostRow { hostName; pveVersion: string; major: string|null; majorEol: string|null; patchEol: null; bucket: EosBucketKey }`.
 
@@ -205,11 +211,13 @@ git commit -m "refactor(pB-03): rename eos.esxi→nodes, bucket nodes via classi
 ### Task 4: Relabel the EOS view node section (i18n)
 
 **Files:**
+
 - Modify: `src/components/eos/EosView.tsx` (the section heading + column labels — user-facing text only)
 - Modify: `src/i18n/locales/{en,fr,de,it}/eos.json`
 - Test: `src/components/eos/EosView.test.tsx` (assert the node section renders with the new label; if no such test file exists, add a focused one)
 
 **Interfaces:**
+
 - Consumes: `EosProjection.nodes` (Task 3, already wired mechanically).
 - Produces: user-facing "Node"/"Proxmox VE" labels (no "ESXi").
 
@@ -233,11 +241,13 @@ git commit -m "feat(pB-04): relabel EOS node section for Proxmox VE"
 ### Task 5: Tune `normalizeOs` for Proxmox / LXC guest strings
 
 **Files:**
+
 - Modify: `src/engines/eos/normalizeOs.ts`
 - Modify: `src/engines/eos/normalizeOs.test.ts`
 - Modify (if needed): `src/engines/eos/fixtures/real-os-strings.ts` (add real Proxmox guest OS strings if the current fixture is RVTools-only)
 
 **Interfaces:**
+
 - Consumes: nothing new.
 - Produces: `normalizeOs` matches Proxmox `OS name`/`OS version` forms and LXC template names (e.g. `debian-12-standard`, `ubuntu-22.04-standard`, `rockylinux-9-default`).
 

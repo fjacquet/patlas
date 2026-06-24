@@ -30,6 +30,7 @@
 ## File Structure
 
 **Modified:**
+
 - `src/types/vhost.ts` — add `serialNumber: string` to `VHostRow`.
 - `src/engines/parser/schemas.ts` — add `serialNumber: z.string().trim()` to `VHostRowSchema`.
 - `src/engines/parser/adapters/rvtools.ts` — add `serial` + `serviceTag` aliases to `VHOST_COLS`; coalesce in `adaptRvtoolsVHost`.
@@ -42,6 +43,7 @@
 - Many `*.test.ts(x)` fixtures — add `serialNumber: ''` (Task 3).
 
 **Created:**
+
 - `src/engines/export/pptx/slides/physicalInventorySlide.ts` — the new slide.
 
 ---
@@ -49,6 +51,7 @@
 ### Task 1: Parser — extract & coalesce `serialNumber`
 
 **Files:**
+
 - Modify: `src/types/vhost.ts`
 - Modify: `src/engines/parser/schemas.ts:92-105` (`VHostRowSchema`)
 - Modify: `src/engines/parser/adapters/rvtools.ts:151-181` (`VHOST_COLS`) and `:375-394` (`adaptRvtoolsVHost`)
@@ -174,6 +177,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ### Task 2: Aggregation — carry `serialNumber` onto `EsxAggregate`
 
 **Files:**
+
 - Modify: `src/types/estate.ts` (`EsxAggregate`)
 - Modify: `src/engines/aggregation/perEsx.ts:38-60`
 - Test: `src/engines/aggregation/perEsx.test.ts`
@@ -243,6 +247,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 Tasks 1 and 2 added a **required** `serialNumber` to `VHostRow` and `EsxAggregate`. vitest runs without typechecking, so prior tasks' tests passed — but `npm run typecheck` is now red across every fixture that builds one of these objects. This task makes the whole project typecheck again. The edit is mechanical and identical everywhere: add `serialNumber: '',`.
 
 **Files (VHostRow fixtures — add `serialNumber: ''` next to the existing `vendor` / `esxVersion` line):**
+
 - `src/components/dr/DrSimPanel.test.tsx`
 - `src/components/rightsizing/RightSizingView.test.tsx`
 - `src/components/monstervm/MonsterVmView.test.tsx`
@@ -266,6 +271,7 @@ Tasks 1 and 2 added a **required** `serialNumber` to `VHostRow` and `EsxAggregat
 - `src/hooks/useEstateView.test.ts`
 
 **Files (EsxAggregate fixtures — add `serialNumber: ''` next to the existing `vendor` / `poweredOnVms` line):**
+
 - `src/components/dr/DrSimPanel.test.tsx`
 - `src/components/inventory/InventoryTree.test.tsx`
 - `src/components/hosts/EsxDetail.test.tsx`
@@ -321,6 +327,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ### Task 4: Web — three columns in the host table + i18n
 
 **Files:**
+
 - Modify: `src/components/inventory/columns/esxColumns.ts`
 - Modify: `src/i18n/locales/en/inventory.json` (and `fr`, `de`, `it`)
 - Test: `src/components/inventory/columns/columns.test.ts`
@@ -398,6 +405,7 @@ Expected: PASS.
 In each of the four files, add three keys inside the existing `col` object (place them after the `vmsAboveReadinessWarning` key).
 
 `src/i18n/locales/en/inventory.json`:
+
 ```json
     "serialNumber": "Serial / Service tag",
     "model": "Model",
@@ -405,6 +413,7 @@ In each of the four files, add three keys inside the existing `col` object (plac
 ```
 
 `src/i18n/locales/fr/inventory.json`:
+
 ```json
     "serialNumber": "N° de série / Service tag",
     "model": "Modèle",
@@ -412,6 +421,7 @@ In each of the four files, add three keys inside the existing `col` object (plac
 ```
 
 `src/i18n/locales/de/inventory.json`:
+
 ```json
     "serialNumber": "Seriennummer / Service-Tag",
     "model": "Modell",
@@ -419,6 +429,7 @@ In each of the four files, add three keys inside the existing `col` object (plac
 ```
 
 `src/i18n/locales/it/inventory.json`:
+
 ```json
     "serialNumber": "Numero di serie / Service tag",
     "model": "Modello",
@@ -449,6 +460,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ### Task 5: PPTX — new "Physical inventory" slide
 
 **Files:**
+
 - Create: `src/engines/export/pptx/slides/physicalInventorySlide.ts`
 - Modify: `src/engines/export/pptx/builder.ts:24-32` (import), `:124-126` (registration)
 - Modify: `src/i18n/locales/en/pptx.json` (and `fr`, `de`, `it`)
@@ -619,6 +631,7 @@ Expected: PASS — 15 slides with serials, 14 without. The other slide-count ass
 In each `pptx.json`, add a new top-level `physical` object (sibling of `inventory`, `monster`, etc.). `useExport` flattens this to `physical.title`, `physical.colHost`, … automatically.
 
 `src/i18n/locales/en/pptx.json`:
+
 ```json
   "physical": {
     "title": "Physical inventory — serial / service tag",
@@ -634,6 +647,7 @@ In each `pptx.json`, add a new top-level `physical` object (sibling of `inventor
 ```
 
 `src/i18n/locales/fr/pptx.json`:
+
 ```json
   "physical": {
     "title": "Inventaire physique — n° de série / service tag",
@@ -649,6 +663,7 @@ In each `pptx.json`, add a new top-level `physical` object (sibling of `inventor
 ```
 
 `src/i18n/locales/de/pptx.json`:
+
 ```json
   "physical": {
     "title": "Physisches Inventar — Seriennummer / Service-Tag",
@@ -664,6 +679,7 @@ In each `pptx.json`, add a new top-level `physical` object (sibling of `inventor
 ```
 
 `src/i18n/locales/it/pptx.json`:
+
 ```json
   "physical": {
     "title": "Inventario fisico — numero di serie / service tag",

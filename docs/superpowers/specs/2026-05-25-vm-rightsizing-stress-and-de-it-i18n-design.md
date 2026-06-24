@@ -48,6 +48,7 @@ CPU utilization denominator uses `vcpu × host-core-MHz` (`VHostRow.speedMhz`, a
 **not** any RVTools "Max CPU" column (whose semantics are ambiguous across versions).
 
 Sources consulted:
+
 - [Nutanix sizing workshop — Analyzing RVTools Data](https://sizing-workshop.readthedocs.io/en/latest/datacollection/rvtools/rvtools.html)
 - [RVTools 3.7 column reference (PDF)](http://wiki.webperfect.ch/images/5/53/RVTools.pdf)
 - [RVTools 4.4.1 documentation overview](https://www.scribd.com/document/630805505/RVTools)
@@ -78,15 +79,18 @@ Each category is evaluated **per-resource** (CPU and/or memory, independently), 
 **user-customizable** (editable controls), with these defaults:
 
 **① Oversized** — allocation ≫ utilization
+
 - CPU: `cpuUsageMhz ÷ (vcpu × host-core-MHz)` ≤ **10 %** (default; editable)
 - Memory: `activeMib ÷ vramMib` ≤ **20 %** (default; editable) — `consumedMib ÷ vramMib`
   shown beside it, not thresholded
 
 **② Undersized** — utilization ≈ allocation
+
 - CPU: `cpuUsageMhz ÷ (vcpu × host-core-MHz)` ≥ **90 %** (default; editable)
 - Memory: `activeMib ÷ vramMib` ≥ **90 %** (default; editable)
 
 **③ Stressed** — runtime pressure symptoms
+
 - Memory: `balloonedMib > 0` **or** `swappedMib > 0` (default 0 MiB; editable)
 - CPU: `cpuReadinessPercent > 5 %` — **reuses** `CONTENTION_THRESHOLDS.warning`; **no new
   constant**
@@ -96,6 +100,7 @@ utilization*; Stressed measures *pressure symptoms*. A VM can be Undersized **an
 both flags show.
 
 **Binding caveats (ADR-0012 discipline):**
+
 - A VM whose usage cell is **absent/blank** is *"not derivable"* — excluded from every flag,
   **never** coerced to `0 %` (which would falsely mark it oversized). Same null discipline
   `parseReadinessCell` / `cpuReadinessPercent` already use.
@@ -162,6 +167,7 @@ New `src/engines/aggregation/sizing.ts`, mirroring `thresholdFlags.ts` + `conten
 Pure: no React/Zustand/Zod/DOM. Vitest-gated ≥ 75 %.
 
 Two steps to stay pure:
+
 1. `maxVmUsageAcrossSnapshots(snapshots)` → `Map<identity, MaxUsage>` (per-VM max of each
    metric over powered-on samples).
 2. `computeSizing(maxUsage, vinfo, vhost, thresholds)` → per-VM `VmSizing[]` + counts.
@@ -177,9 +183,11 @@ memUndersizePct: 90
 balloonMib:       0
 swapMib:          0
 ```
+
 (CPU-ready stress reuses `CONTENTION_THRESHOLDS.warning = 5`.)
 
 `VmSizing` per row:
+
 ```
 vmName, cluster, host, vcpu, vramMib
 cpuUtilPct:    number | null
@@ -193,6 +201,7 @@ flags: { cpuOversized, memOversized, cpuUndersized, memUndersized, memStressed, 
 ```
 
 Invariants:
+
 - Divide-by-zero guarded — `vcpu === 0` / `vramMib === 0` ⇒ util `null` (the `fsOver`
   precedent), never `Infinity`/`NaN`.
 - Any `null` input ⇒ that resource's flags `false` + util `null`; the VM still appears with
@@ -226,6 +235,7 @@ Trends / Planning). Built from existing primitives — no new table/toggle primi
 │  [ counts bar chart — SVG via <Chart> ]                        │
 └────────────────────────────────────────────────────────────────┘
 ```
+
 > The words "Oversized/Undersized/Stressed" in this sketch are **shorthand** for
 > the neutral visible strings defined below — they are not the literal UI labels.
 

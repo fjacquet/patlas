@@ -49,6 +49,7 @@
 ### Task 1: Parse the `Snapshots` sheet → `ProxmoxSnapshotRow[]`
 
 **Files:**
+
 - Modify: `src/types/snapshot.ts`
 - Modify: `src/types/index.ts`
 - Modify: `src/engines/parser/adapters/proxmoxColumns.ts`
@@ -58,6 +59,7 @@
 - Test: `src/engines/parser/adapters/proxmox.snapshots.test.ts` (new), `src/engines/parser/proxmox.realfile.test.ts` (extend)
 
 **Interfaces:**
+
 - Produces: `interface ProxmoxSnapshotRow { node, guestId, guestName, guestType: 'qemu'|'lxc', name, parent, dateSerial: number|null, includeRam: boolean, sizeMib: MiB }`; `Snapshot.proxmoxSnapshots: ProxmoxSnapshotRow[]` (required); `adaptProxmoxSnapshots(sheet: ParsedSheet | undefined): ProxmoxSnapshotRow[]`; `adaptProxmox(...)` return gains `proxmoxSnapshots: ProxmoxSnapshotRow[]`.
 - Consumes: `mapColumns`, `readCol`, `readNumber`, `readString`, `findSheet` from `./columnMap`; `gib`, `gibToMib` from `@/engines/units`.
 
@@ -237,6 +239,7 @@ export const SNAPSHOT_COLS = {
 ```
 
 In `src/engines/parser/adapters/proxmox.ts`:
+
 1. Extend the type import to include `ProxmoxSnapshotRow`:
 
 ```ts
@@ -250,13 +253,13 @@ import type {
 } from '@/types'
 ```
 
-2. Extend the columns import:
+1. Extend the columns import:
 
 ```ts
 import { CLUSTER_COLS, GUEST_COLS, NODE_COLS, SNAPSHOT_COLS, STORAGE_COLS } from './proxmoxColumns'
 ```
 
-3. Add the adapter function (place it just after `adaptProxmoxStorages`):
+1. Add the adapter function (place it just after `adaptProxmoxStorages`):
 
 ```ts
 export const adaptProxmoxSnapshots = (sheet: ParsedSheet | undefined): ProxmoxSnapshotRow[] => {
@@ -284,7 +287,7 @@ export const adaptProxmoxSnapshots = (sheet: ParsedSheet | undefined): ProxmoxSn
 }
 ```
 
-4. In `adaptProxmox`, after the `storageSheet` block, add the optional `Snapshots` sheet lookup + warning, then add the field to the return object:
+1. In `adaptProxmox`, after the `storageSheet` block, add the optional `Snapshots` sheet lookup + warning, then add the field to the return object:
 
 ```ts
   const snapshotsSheet = findSheet(workbook, ['snapshots'])
@@ -316,6 +319,7 @@ Then add `proxmoxSnapshots: []` to every other `Snapshot` literal in the test su
 Run: `cd /Users/fjacquet/Projects/patlas && rtk grep -rn "vmUsage:" src --include="*.ts" --include="*.tsx" -l`
 
 For EACH file listed (test fixtures and helpers that build a `Snapshot`), add a `proxmoxSnapshots: []` line adjacent to the existing `vmUsage:` line in every `Snapshot` literal. Known sites include at least:
+
 - `src/engines/parser/proxmox.realfile.test.ts` (no `Snapshot` literal — skip)
 - `src/engines/aggregation/proxmox-estate.realfile.test.ts`
 - `src/components/storage/StorageView.test.tsx`
@@ -327,9 +331,11 @@ Do NOT guess — the typecheck in Step 7 is the authority on completeness.
 - [ ] **Step 7: Run the adapter test + FULL typecheck**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx vitest run src/engines/parser/adapters/proxmox.snapshots.test.ts && npm run typecheck
 ```
+
 Expected: adapter test PASSES (4/4); typecheck reports 0 errors. If typecheck flags a `Snapshot` literal missing `proxmoxSnapshots`, add the field there and re-run.
 
 - [ ] **Step 8: Extend the parser realfile test**
@@ -347,9 +353,11 @@ In `src/engines/parser/proxmox.realfile.test.ts`, add inside the existing `maybe
 - [ ] **Step 9: Lint, run the parser tests, commit**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx @biomejs/biome check . && npx vitest run src/engines/parser
 ```
+
 Expected: Biome clean; parser tests PASS (realfile skips if the fixture is absent).
 
 ```
@@ -362,10 +370,12 @@ git commit -m "feat(3a-01): parse Proxmox Snapshots sheet into ProxmoxSnapshotRo
 ### Task 2: Concatenate `proxmoxSnapshots` through the merge
 
 **Files:**
+
 - Modify: `src/engines/snapshotMerge/mergeSnapshotsToEstate.ts`
 - Test: `src/engines/snapshotMerge/mergeSnapshotsToEstate.test.ts` (extend)
 
 **Interfaces:**
+
 - Consumes: `Snapshot.proxmoxSnapshots` (Task 1).
 - Produces: `MergedEstate.proxmoxSnapshots: ProxmoxSnapshotRow[]` (flat concatenation across selected snapshots, like `vdatastore`/`vpartition`).
 
@@ -406,6 +416,7 @@ Expected: FAIL — `merged.proxmoxSnapshots` is `undefined`.
 - [ ] **Step 3: Wire the field into `MergedEstate`**
 
 In `src/engines/snapshotMerge/mergeSnapshotsToEstate.ts`:
+
 1. Add `ProxmoxSnapshotRow` to the `@/types` import block.
 2. Add to the `MergedEstate` interface (after `dvport`):
 
@@ -415,8 +426,8 @@ In `src/engines/snapshotMerge/mergeSnapshotsToEstate.ts`:
   proxmoxSnapshots: ProxmoxSnapshotRow[]
 ```
 
-3. Add `proxmoxSnapshots: [],` to `EMPTY_MERGED`.
-4. Add an accumulator + loop alongside the other passthrough arrays:
+1. Add `proxmoxSnapshots: [],` to `EMPTY_MERGED`.
+2. Add an accumulator + loop alongside the other passthrough arrays:
 
 ```ts
   const outProxmoxSnapshots: ProxmoxSnapshotRow[] = []
@@ -428,7 +439,7 @@ and inside the existing `for (const snap of selected) { ... }` passthrough loop 
     for (const s of snap.proxmoxSnapshots ?? []) outProxmoxSnapshots.push(s)
 ```
 
-5. Add to the returned object: `proxmoxSnapshots: outProxmoxSnapshots,`.
+1. Add to the returned object: `proxmoxSnapshots: outProxmoxSnapshots,`.
 
 - [ ] **Step 4: Run the merge tests to confirm green**
 
@@ -448,11 +459,13 @@ git commit -m "feat(3a-02): concatenate proxmoxSnapshots through the estate merg
 ### Task 3: `computeSnapshotSprawl` pure engine
 
 **Files:**
+
 - Create: `src/engines/aggregation/snapshotSprawl.ts`
 - Modify: `src/engines/aggregation/index.ts`
 - Test: `src/engines/aggregation/snapshotSprawl.test.ts` (new)
 
 **Interfaces:**
+
 - Consumes: `ProxmoxSnapshotRow` from `@/types/snapshot` (Task 1); a `today: Date` reference clock.
 - Produces:
   - `excelSerialToUnixMs(serial: number): number`
@@ -658,11 +671,13 @@ git commit -m "feat(3a-03): add pure computeSnapshotSprawl aggregation engine"
 ### Task 4: Compose the `snapshotSprawl` slice on `EstateView`
 
 **Files:**
+
 - Modify: `src/types/estate.ts`
 - Modify: `src/engines/aggregation/estateView.ts`
 - Test: `src/engines/aggregation/estateView.snapshotSprawl.test.ts` (new)
 
 **Interfaces:**
+
 - Consumes: `MergedEstate.proxmoxSnapshots` (Task 2); `computeSnapshotSprawl` + `SnapshotSprawl` (Task 3); the `today: Date` already threaded into `buildEstateView`.
 - Produces: `EstateView.snapshotSprawl: SnapshotSprawl`; frozen `EMPTY_SPRAWL` on `EMPTY_VIEW`.
 
@@ -745,13 +760,14 @@ Expected: FAIL — `snapshotSprawl` is missing on the view / `EMPTY_VIEW`.
 - [ ] **Step 3: Add the field to the `EstateView` type**
 
 In `src/types/estate.ts`:
+
 1. Add the type-only import alongside the others at the top:
 
 ```ts
 import type { SnapshotSprawl } from '@/engines/aggregation/snapshotSprawl'
 ```
 
-2. Add the field to the `EstateView` interface, immediately after `monsters: MonsterEstate`:
+1. Add the field to the `EstateView` interface, immediately after `monsters: MonsterEstate`:
 
 ```ts
   /**
@@ -764,13 +780,14 @@ import type { SnapshotSprawl } from '@/engines/aggregation/snapshotSprawl'
 - [ ] **Step 4: Compose the slice in `buildEstateView`**
 
 In `src/engines/aggregation/estateView.ts`:
+
 1. Add to the imports from `./monsterVm` line area — add a new import:
 
 ```ts
 import { computeSnapshotSprawl } from './snapshotSprawl'
 ```
 
-2. After the `const monsters = computeMonsters(...)` block, add:
+1. After the `const monsters = computeMonsters(...)` block, add:
 
 ```ts
   // Plan 3A snapshot sprawl — same single pass. `today` is the injected
@@ -779,9 +796,9 @@ import { computeSnapshotSprawl } from './snapshotSprawl'
   const snapshotSprawl = computeSnapshotSprawl(merged.proxmoxSnapshots, today)
 ```
 
-3. Add `snapshotSprawl,` to the returned object (after `monsters,`).
+1. Add `snapshotSprawl,` to the returned object (after `monsters,`).
 
-4. Add the frozen empty just after `EMPTY_MONSTERS`:
+2. Add the frozen empty just after `EMPTY_MONSTERS`:
 
 ```ts
 const EMPTY_SPRAWL = Object.freeze({
@@ -793,14 +810,16 @@ const EMPTY_SPRAWL = Object.freeze({
 })
 ```
 
-5. Add `snapshotSprawl: EMPTY_SPRAWL,` to the `EMPTY_VIEW` literal (after `monsters: EMPTY_MONSTERS,`).
+1. Add `snapshotSprawl: EMPTY_SPRAWL,` to the `EMPTY_VIEW` literal (after `monsters: EMPTY_MONSTERS,`).
 
 - [ ] **Step 5: Run the test + FULL typecheck**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx vitest run src/engines/aggregation/estateView.snapshotSprawl.test.ts && npm run typecheck
 ```
+
 Expected: test PASSES; typecheck 0 errors.
 
 - [ ] **Step 6: Lint + commit**
@@ -816,6 +835,7 @@ git commit -m "feat(3a-04): compose snapshotSprawl slice on EstateView"
 ### Task 5: `SnapshotSprawlView` + nav + i18n
 
 **Files:**
+
 - Create: `src/components/snapshots/SnapshotSprawlView.tsx`
 - Modify: `src/components/ViewToggle.tsx`
 - Modify: `src/App.tsx`
@@ -825,6 +845,7 @@ git commit -m "feat(3a-04): compose snapshotSprawl slice on EstateView"
 - Test: `src/components/snapshots/SnapshotSprawlView.test.tsx` (new)
 
 **Interfaces:**
+
 - Consumes: `useEstateView('active').snapshotSprawl` (Task 4); `DataTable` from `@/components/inventory/DataTable`; `useSnapshotStore` + `selectActiveSnapshot`.
 - Produces: `SnapshotSprawlView` React component; `AppView` union gains `'snapshots'`.
 
@@ -945,6 +966,7 @@ Create `src/i18n/locales/it/snapshots.json`:
 - [ ] **Step 2: Register the namespace and add the nav label**
 
 In `src/i18n/index.ts`:
+
 1. Add 4 imports (mirror the `monstervm` lines):
 
 ```ts
@@ -954,10 +976,11 @@ import frSnapshots from './locales/fr/snapshots.json'
 import itSnapshots from './locales/it/snapshots.json'
 ```
 
-2. Add `'snapshots'` to the `NAMESPACES` array (after `'monstervm'`).
-3. Add `snapshots: enSnapshots,` / `frSnapshots` / `deSnapshots` / `itSnapshots` to the four `resources` locale objects (after the `monstervm:` line in each).
+1. Add `'snapshots'` to the `NAMESPACES` array (after `'monstervm'`).
+2. Add `snapshots: enSnapshots,` / `frSnapshots` / `deSnapshots` / `itSnapshots` to the four `resources` locale objects (after the `monstervm:` line in each).
 
 In each of `src/i18n/locales/{en,fr,de,it}/inventory.json`, add a `nav.snapshots` key inside the existing `nav` object:
+
 - en: `"snapshots": "Snapshots"`
 - fr: `"snapshots": "Snapshots"`
 - de: `"snapshots": "Snapshots"`
@@ -1198,17 +1221,19 @@ export function SnapshotSprawlView() {
 - [ ] **Step 6: Wire the view into the nav + dispatch**
 
 In `src/components/ViewToggle.tsx`:
+
 1. Add `| 'snapshots'` to the `AppView` union (after `'monstervm'`).
 2. Add `'snapshots',` to the `VIEWS` array (after `'monstervm'`).
 
 In `src/App.tsx`:
+
 1. Add the import:
 
 ```tsx
 import { SnapshotSprawlView } from './components/snapshots/SnapshotSprawlView'
 ```
 
-2. Add a dispatch branch before the final `: (` / `<GlobalDashboard />`:
+1. Add a dispatch branch before the final `: (` / `<GlobalDashboard />`:
 
 ```tsx
             ) : activeView === 'snapshots' ? (
@@ -1218,9 +1243,11 @@ import { SnapshotSprawlView } from './components/snapshots/SnapshotSprawlView'
 - [ ] **Step 7: Run the component test + key-parity + terminology + typecheck**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx vitest run src/components/snapshots src/i18n/keyParity.test.ts src/i18n/terminology.test.ts && npm run typecheck
 ```
+
 Expected: all PASS; typecheck 0 errors. If keyParity fails, a locale file is missing a key — reconcile the four `snapshots.json` files.
 
 - [ ] **Step 8: Lint + commit**
@@ -1236,9 +1263,11 @@ git commit -m "feat(3a-05): add SnapshotSprawlView, nav entry and snapshots i18n
 ### Task 6: Real-report acceptance test
 
 **Files:**
+
 - Create: `src/engines/aggregation/snapshotSprawl.realfile.test.ts`
 
 **Interfaces:**
+
 - Consumes: the full parse→merge→view pipeline (Tasks 1–4) and the git-ignored fixture `src/engines/parser/__fixtures__/proxmox-report.xlsx`.
 
 - [ ] **Step 1: Write the realfile acceptance test**
@@ -1314,9 +1343,11 @@ Expected: PASS if the fixture is present (logs `raw Snapshots rows: 7`, `real ch
 - [ ] **Step 3: Full suite + lint, then commit**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx @biomejs/biome check . && npm run typecheck && npx vitest run
 ```
+
 Expected: Biome clean; typecheck 0 errors; all tests pass (realfile tests skip without the fixture).
 
 ```
@@ -1329,6 +1360,7 @@ git commit -m "test(3a-06): real-report acceptance for snapshot sprawl"
 ## Self-Review
 
 **Spec coverage** (Plan 3 scope item "Snapshot sprawl"):
+
 - Parse `Snapshots` sheet → Task 1 ✓
 - Carry through Snapshot + merge → Tasks 1, 2 ✓
 - Pure reduction (count/guests/size/age, exclude `current`) → Task 3 ✓

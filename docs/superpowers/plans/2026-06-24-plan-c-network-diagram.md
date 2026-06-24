@@ -38,11 +38,13 @@
 ### Task 1: Carry `networkSvg` onto the `Snapshot` (type + worker)
 
 **Files:**
+
 - Modify: `src/types/snapshot.ts` (add `networkSvg?: string | null`)
 - Modify: `src/engines/parser/parser.worker.ts` (capture the SVG, assign to the snapshot)
 - Test: `src/engines/parser/parser.worker.test.ts` if it exists, else a focused test on the extract→assign path. If the worker is not directly unit-testable (Web Worker global scope), add the assertion to the real-report acceptance test that already drives a `.zip` (grep for the zip-upload acceptance test added in PR #6 / `extractZip.test.ts`).
 
 **Interfaces:**
+
 - Produces: `Snapshot.networkSvg?: string | null` — set to the bundle's SVG for a `.zip`, `null` for a bare `.xlsx`.
 
 - [ ] **Step 1: Write the failing test** — assert that parsing a `.zip` bundle containing a `network-diagram.svg` yields a snapshot with `networkSvg` containing `'<svg'`, and that a bare `.xlsx` yields `networkSvg == null`. Reuse the existing zip fixture from the PR #6 acceptance test (grep `extractProxmoxBundle`/`.zip` in `src/engines/parser/*.test.ts` to find it). If the worker itself is hard to invoke, test at the boundary the worker uses: assert `extractProxmoxBundle(zipBytes).networkSvg` is a string (this already passes) AND add a worker-level assertion if a worker harness exists. Prefer extending the highest-level existing zip acceptance test so the end-to-end assignment is covered.
@@ -90,10 +92,12 @@ git commit -m "feat(pC-01): carry network-diagram.svg onto the snapshot"
 ### Task 2: SVG → data-URI helper (pure, shared)
 
 **Files:**
+
 - Create: `src/engines/export/svgDataUri.ts`
 - Create: `src/engines/export/svgDataUri.test.ts`
 
 **Interfaces:**
+
 - Produces: `export function svgToDataUri(svg: string): string` — returns `data:image/svg+xml;base64,<b64>` (utf-8 safe). Used by both NetworkView (Task 3) and the HTML report (Task 4) — DRY.
 
 - [ ] **Step 1: Write the failing test** — `svgDataUri.test.ts`:
@@ -145,11 +149,13 @@ git commit -m "feat(pC-02): svgToDataUri helper for safe <img> embedding"
 ### Task 3: Render the diagram in `NetworkView`
 
 **Files:**
+
 - Modify: `src/components/network/NetworkView.tsx`
 - Modify: `src/i18n/locales/{en,fr,de,it}/network.json` (add a `diagram` heading + `img.alt`)
 - Test: `src/components/network/NetworkView.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `snapshot.networkSvg` (Task 1), `svgToDataUri` (Task 2).
 - Produces: NetworkView renders an `<img>` with an svg data-URI when `networkSvg` is present.
 
@@ -181,11 +187,13 @@ git commit -m "feat(pC-03): render Proxmox network diagram in the Network view"
 ### Task 4: Embed the diagram in the HTML report
 
 **Files:**
+
 - Modify: `src/engines/export/html/renderReport.tsx` (extend `RenderReportInput`; add a Network-diagram block)
 - Modify: the report caller that builds `RenderReportInput` (find it — grep `renderReport(` / `RenderReportInput`; likely `src/hooks/useExport.ts` or an `assembleHtml`/html `index.ts`)
 - Test: `src/engines/export/html/renderReport.test.tsx` (or the existing report test)
 
 **Interfaces:**
+
 - Consumes: `svgToDataUri` (Task 2), the active snapshot's `networkSvg` from the caller.
 - Produces: `RenderReportInput.networkSvg?: string | null`; an `<img>` in the existing/an adjacent Network section when present; omitted when null. PPTX unaffected.
 
