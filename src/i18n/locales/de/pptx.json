@@ -156,5 +156,26 @@
       "ageDays": "Alter (Tage)",
       "sizeGib": "Größe (GiB)"
     }
+  },
+  "storageContent": {
+    "title": "Speicherinhalt — Dateibestand nach Typ und Pool",
+    "kpi": {
+      "totalGib": "Gesamtgröße",
+      "files": "Dateien",
+      "contentTypes": "Inhaltstypen",
+      "backups": "Sicherungsdateien"
+    },
+    "byContent": {
+      "heading": "Nach Inhaltstyp"
+    },
+    "byStorage": {
+      "heading": "Nach Speicherpool"
+    },
+    "col": {
+      "content": "Inhalt",
+      "storage": "Speicher",
+      "count": "Anzahl",
+      "sizeGib": "Größe (GiB)"
+    }
   }
 }

@@ -156,5 +156,26 @@
       "ageDays": "Età (giorni)",
       "sizeGib": "Dimensione (GiB)"
     }
+  },
+  "storageContent": {
+    "title": "Contenuto dello storage — inventario file per tipo e pool",
+    "kpi": {
+      "totalGib": "Dimensione totale",
+      "files": "File",
+      "contentTypes": "Tipi di contenuto",
+      "backups": "File di backup"
+    },
+    "byContent": {
+      "heading": "Per tipo di contenuto"
+    },
+    "byStorage": {
+      "heading": "Per pool di storage"
+    },
+    "col": {
+      "content": "Contenuto",
+      "storage": "Storage",
+      "count": "Quantità",
+      "sizeGib": "Dimensione (GiB)"
+    }
   }
 }
