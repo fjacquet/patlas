@@ -5,6 +5,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ---
 
+## [2.2.2] - 2026-06-24
+
+### Fixed
+
+- **PPTX export no longer fails when the report includes a network diagram.** v2.2.1 embedded the diagram as a raw SVG, which PowerPoint cannot render and which threw in the browser export worker — failing the whole PPTX export. The diagram is now rasterized to PNG via the same `@resvg/resvg-wasm` pipeline used for every deck chart, embedded with a bundled font so its text labels render. Rasterization is best-effort: any failure degrades to a factual note and never breaks the export.
+
+### Added
+
+- Bundled the OFL-licensed **NotoSans** font (loaded only at export time) so rasterized SVG text renders in the deck.
+
+---
+
 ## [2.2.1] - 2026-06-24
 
 ### Fixed
