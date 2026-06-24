@@ -1,7 +1,7 @@
 {
   "title": {
     "identity": "{{clusters}} cluster · {{hosts}} nodi · {{vms}} ospiti · acquisito il {{captureDate}}",
-    "generated": "Generato da vatlas — sintesi fattuale del parco",
+    "generated": "Generato da patlas — sintesi fattuale del parco",
     "eyebrow": "INFRASTRUTTURA PROXMOX",
     "fallback": "infrastruttura Proxmox"
   },
@@ -140,5 +140,64 @@
     "ramCapPlanned": "Capacità vRAM (pianificata)",
     "ramDemand": "vRAM allocata (domanda)",
     "ramHeadroomPlanned": "Margine vRAM (pianificato)"
+  },
+  "snapshotSprawl": {
+    "title": "Istantanee — inventario dei punti di controllo",
+    "kpi": {
+      "snapshots": "Punti di controllo",
+      "guests": "Guest con punti di controllo",
+      "totalGib": "Dimensione totale",
+      "oldestDays": "Più vecchio (giorni)"
+    },
+    "col": {
+      "guest": "Guest",
+      "node": "Nodo",
+      "checkpoint": "Punto di controllo",
+      "ageDays": "Età (giorni)",
+      "sizeGib": "Dimensione (GiB)"
+    }
+  },
+  "clusterHealth": {
+    "title": "Salute del cluster — stato HA e lavori di backup",
+    "kpi": {
+      "quorum": "Quorum",
+      "fencing": "Fencing",
+      "haResources": "Risorse HA",
+      "backupJobs": "Lavori di backup"
+    },
+    "services": {
+      "heading": "Servizi HA"
+    },
+    "jobs": {
+      "heading": "Lavori di backup"
+    },
+    "col": {
+      "service": "Servizio",
+      "status": "Stato",
+      "job": "Lavoro",
+      "schedule": "Pianificazione",
+      "enabled": "Abilitato"
+    }
+  },
+  "storageContent": {
+    "title": "Contenuto dello storage — inventario file per tipo e pool",
+    "kpi": {
+      "totalGib": "Dimensione totale",
+      "files": "File",
+      "contentTypes": "Tipi di contenuto",
+      "backups": "File di backup"
+    },
+    "byContent": {
+      "heading": "Per tipo di contenuto"
+    },
+    "byStorage": {
+      "heading": "Per pool di storage"
+    },
+    "col": {
+      "content": "Contenuto",
+      "storage": "Storage",
+      "count": "Quantità",
+      "sizeGib": "Dimensione (GiB)"
+    }
   }
 }

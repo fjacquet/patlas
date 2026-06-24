@@ -1,7 +1,7 @@
 {
   "title": {
     "identity": "{{clusters}} Cluster · {{hosts}} Knoten · {{vms}} Gäste · erfasst am {{captureDate}}",
-    "generated": "Erstellt von vatlas — faktische Bestandssynthese",
+    "generated": "Erstellt von patlas — faktische Bestandssynthese",
     "eyebrow": "PROXMOX-BESTAND",
     "fallback": "Proxmox-Bestand"
   },
@@ -140,5 +140,64 @@
     "ramCapPlanned": "vRAM-Kapazität (geplant)",
     "ramDemand": "vRAM zugewiesen (Bedarf)",
     "ramHeadroomPlanned": "vRAM-Reserve (geplant)"
+  },
+  "snapshotSprawl": {
+    "title": "Snapshot-Verwaltung — Prüfpunktbestand",
+    "kpi": {
+      "snapshots": "Prüfpunkte",
+      "guests": "Gäste mit Prüfpunkten",
+      "totalGib": "Gesamtgröße",
+      "oldestDays": "Ältester (Tage)"
+    },
+    "col": {
+      "guest": "Gast",
+      "node": "Knoten",
+      "checkpoint": "Prüfpunkt",
+      "ageDays": "Alter (Tage)",
+      "sizeGib": "Größe (GiB)"
+    }
+  },
+  "clusterHealth": {
+    "title": "Cluster-Gesundheit — HA-Status und Sicherungsaufträge",
+    "kpi": {
+      "quorum": "Quorum",
+      "fencing": "Fencing",
+      "haResources": "HA-Ressourcen",
+      "backupJobs": "Sicherungsaufträge"
+    },
+    "services": {
+      "heading": "HA-Dienste"
+    },
+    "jobs": {
+      "heading": "Sicherungsaufträge"
+    },
+    "col": {
+      "service": "Dienst",
+      "status": "Status",
+      "job": "Auftrag",
+      "schedule": "Zeitplan",
+      "enabled": "Aktiviert"
+    }
+  },
+  "storageContent": {
+    "title": "Speicherinhalt — Dateibestand nach Typ und Pool",
+    "kpi": {
+      "totalGib": "Gesamtgröße",
+      "files": "Dateien",
+      "contentTypes": "Inhaltstypen",
+      "backups": "Sicherungsdateien"
+    },
+    "byContent": {
+      "heading": "Nach Inhaltstyp"
+    },
+    "byStorage": {
+      "heading": "Nach Speicherpool"
+    },
+    "col": {
+      "content": "Inhalt",
+      "storage": "Speicher",
+      "count": "Anzahl",
+      "sizeGib": "Größe (GiB)"
+    }
   }
 }

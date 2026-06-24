@@ -13,6 +13,7 @@
 **Dependency on Plan 1:** Execute **after** Plan 1. Plan 1 creates the `rightsizing` namespace and the new `inventory:col.*` / `pptx` right-sizing keys in `en`+`fr`; this plan translates the *current* set of namespaces, which by then includes `rightsizing`. The namespace count below is **17** = the 16 existing + `rightsizing`.
 
 **Conventions for every task:**
+
 - Lint/format with `npx @biomejs/biome check .` (NOT `npm run lint`). JSON files must be valid and Biome-formatted.
 - Tests with `npm run test:run`. Typecheck with `npm run typecheck`.
 - **Key parity is sacred:** `de/<ns>.json` and `it/<ns>.json` must have the EXACT same key paths as `en/<ns>.json` — no missing, no extra. The parity test enforces this.
@@ -32,10 +33,12 @@
 **Create (34 files):** `src/i18n/locales/de/<ns>.json` and `src/i18n/locales/it/<ns>.json` for each of the 17 namespaces.
 
 **Create (tests):**
+
 - `src/i18n/keyParity.test.ts` — every namespace has identical key paths across `en`/`fr`/`de`/`it`.
 - `src/i18n/localeSmoke.test.ts` — i18n initializes and resolves a known key under each locale.
 
 **Modify:**
+
 - `src/i18n/index.ts` — add `de`/`it` imports (17 each), add to `resources`, add `'de'`/`'it'` to `SUPPORTED_LANGUAGES`.
 - `src/i18n/locales/en/common.json`, `fr/common.json` — add `lang.de` + `lang.it` label keys (the switcher renders `t('lang.<code>')` for every supported language).
 
@@ -81,6 +84,7 @@ Use these renderings consistently across all namespaces. **Flag the `de`/`it` co
 ### Task 1: Key-parity test
 
 **Files:**
+
 - Create: `src/i18n/keyParity.test.ts`
 
 - [x] **Step 1: Write the test.** It compares the flattened key paths of each namespace across all four locales by reading the JSON files directly (so it does not depend on `index.ts` wiring):
@@ -141,6 +145,7 @@ git commit -m "feat(i18n-01): add cross-locale key-parity test"
 # Phase B — Translate namespaces (de + it)
 
 > **Method for every translation task below (applies to each namespace):**
+>
 > 1. Read `src/i18n/locales/en/<ns>.json` (the authoritative source) and `fr/<ns>.json` (a translation precedent for tone).
 > 2. Create `de/<ns>.json` and `it/<ns>.json` with the **identical key structure**.
 > 3. Translate each leaf string per the glossary. **Preserve** `{{tokens}}`, plural-suffix keys (`*_one`/`*_other`), HTML/markup, and unit symbols verbatim.
@@ -150,6 +155,7 @@ git commit -m "feat(i18n-01): add cross-locale key-parity test"
 ### Task 2: `common` (+ switcher label keys)
 
 **Files:**
+
 - Create: `src/i18n/locales/de/common.json`, `src/i18n/locales/it/common.json`
 - Modify: `src/i18n/locales/en/common.json`, `src/i18n/locales/fr/common.json`
 
@@ -161,6 +167,7 @@ git commit -m "feat(i18n-01): add cross-locale key-parity test"
     "de": "DE",
     "it": "IT"
 ```
+
 (Match the existing style of `lang.fr`/`lang.en` — they appear to be short codes; keep whatever convention those use. If they spell the language out, spell `de`/`it` out too: en → "German"/"Italian", fr → "Allemand"/"Italien".)
 
 - [x] **Step 3: Create `de/common.json` and `it/common.json`** mirroring the full `en/common.json` structure (translated), including the `lang` block. The `lang.*` values are the *display labels* shown in the switcher — they should read the same in every locale (e.g. `lang.de` = "DE"/"Deutsch", `lang.it` = "IT"/"Italiano"), not be re-translated per current language.
@@ -269,6 +276,7 @@ git commit -m "feat(i18n-07): de/it pptx, rightsizing — parity complete"
 ### Task 8: Register `de`/`it` in `src/i18n/index.ts`
 
 **Files:**
+
 - Modify: `src/i18n/index.ts`
 
 - [x] **Step 1: Add the imports.** After the `fr*` import block, add a `de*` and an `it*` import block — one import per namespace, mirroring the `en*`/`fr*` naming, e.g.:
@@ -288,6 +296,7 @@ import itRightsizing from './locales/it/rightsizing.json'
 ```ts
 export const SUPPORTED_LANGUAGES = ['fr', 'en', 'de', 'it'] as const
 ```
+
 (The `SupportedLanguage` type derives from this, so the switcher + detector pick the new codes up automatically. `fallbackLng` stays `'fr'`.)
 
 - [x] **Step 3: Add `rightsizing` to `NAMESPACES`** if Plan 1 didn't already (it should have — verify; the parity test's list must match `NAMESPACES`).
@@ -328,6 +337,7 @@ git commit -m "feat(i18n-08): register de/it locales + imports + resources"
 ### Task 9: Locale smoke test
 
 **Files:**
+
 - Create: `src/i18n/localeSmoke.test.ts`
 
 - [x] **Step 1: Write the test:**
@@ -391,4 +401,5 @@ git commit -m "docs(i18n-10): record de/it localization (4 locales) + review fol
 - **Ordering:** parity test first (drives completeness) → translate → wire `index.ts` (imports require files to exist) → smoke test → gate. ✓
 - **No placeholders:** every task has the file set, the method, exact run commands, and expected results. Per-key translated strings are produced at execution from the known `en` source under the glossary — the test gate guarantees completeness. The one fully-modeled file is `common` (the switcher labels), shown concretely. ✓
 - **Risk:** `de`/`it` technical-term quality needs native review — explicitly carried, not silently assumed correct.
+
 ```

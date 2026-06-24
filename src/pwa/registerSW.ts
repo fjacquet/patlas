@@ -15,7 +15,7 @@ import { shouldAutoReload } from './updatePolicy'
  *
  * Called once from main.tsx after the privacy guard is installed. SW
  * registration uses `navigator.serviceWorker` (not `fetch`), so the runtime
- * guard does not block it; the SW is same-origin under `/vatlas/`.
+ * guard does not block it; the SW is same-origin under `/patlas/`.
  */
 export function registerPwa(): void {
   const updateSW = registerSW({

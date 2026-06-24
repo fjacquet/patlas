@@ -11,6 +11,7 @@
 **Spec:** `docs/superpowers/specs/2026-05-25-vm-rightsizing-stress-and-de-it-i18n-design.md` (Workstream A). Workstream B (de/it localization) is **Plan 2**, written separately; this plan ships strings in `en`+`fr` only.
 
 **Conventions for every task:**
+
 - Lint with `npx @biomejs/biome check .` (NOT `npm run lint` — RTK intercepts it). Biome: single quotes, no semicolons, 2-space, 100-col.
 - Typecheck with `npm run typecheck`. Tests with `npm run test:run`.
 - Engines stay pure (no React/Zustand/Zod/DOM). Zod only at the parser boundary.
@@ -22,6 +23,7 @@
 ## File map
 
 **Create:**
+
 - `src/engines/aggregation/sizing.ts` — pure engine (thresholds, util math, flags, multi-snapshot max).
 - `src/engines/aggregation/sizing.test.ts` — engine tests (≥75% gate).
 - `src/engines/export/pptx/slides/rightSizingSlide.ts` — PPTX slide (native shapes/text only).
@@ -30,6 +32,7 @@
 - `src/i18n/locales/en/rightsizing.json`, `src/i18n/locales/fr/rightsizing.json` — strings.
 
 **Modify:**
+
 - `src/types/vinfo.ts` — add `VmUsageRow` interface (co-located with VM types) **or** `src/types/snapshot.ts`; export via `src/types/index.ts`.
 - `src/types/snapshot.ts` — add `vmUsage: VmUsageRow[]` to `Snapshot`.
 - `src/types/estate.ts` — add `sizing: EstateSizing` to `EstateView` + the `VmSizing`/`EstateSizing`/`SizingCounts` types.
@@ -58,6 +61,7 @@
 ### Task A1: `VmUsageRow` type + `Snapshot.vmUsage`
 
 **Files:**
+
 - Modify: `src/types/vinfo.ts`
 - Modify: `src/types/snapshot.ts:49` (the `Snapshot` row fields block)
 - Modify: `src/types/index.ts`
@@ -129,6 +133,7 @@ git commit -m "feat(rs-01): add VmUsageRow type and Snapshot.vmUsage field"
 ### Task A2: `VmUsageRowSchema` (parser boundary)
 
 **Files:**
+
 - Modify: `src/engines/parser/schemas.ts`
 - Test: `src/engines/parser/schemas` is exercised via `rvtools.test.ts`; add a focused test file `src/engines/parser/vmUsageSchema.test.ts`.
 
@@ -241,6 +246,7 @@ git commit -m "feat(rs-02): add VmUsageRowSchema with nullable branded metrics"
 ### Task A3: `vMemory` + `vCPU` adapters
 
 **Files:**
+
 - Modify: `src/engines/parser/adapters/rvtools.ts`
 - Test: `src/engines/parser/adapters/rvtools.test.ts` (extend)
 
@@ -445,6 +451,7 @@ git commit -m "feat(rs-03): parse vMemory+vCPU into a unioned VmUsageRow set"
 ### Task A4: `parseSnapshot` carries `vmUsage`
 
 **Files:**
+
 - Modify: `src/engines/parser/index.ts`
 - Test: `src/engines/parser/parseInWorker.test.ts` or a new assertion in an existing parse test.
 
@@ -515,6 +522,7 @@ git commit -m "feat(rs-04): thread vmUsage through parseSnapshot"
 ### Task A5: Worker boundary carries `vmUsage`
 
 **Files:**
+
 - Modify: `src/engines/parser/parser.worker.ts`
 - Modify: `src/engines/parser/parseInWorker.ts`
 - Test: `src/engines/parser/parseInWorker.test.ts` (extend)
@@ -553,6 +561,7 @@ git commit -m "feat(rs-05): carry vmUsage across the parser worker boundary"
 ### Task B1: `sizing.ts` pure engine
 
 **Files:**
+
 - Create: `src/engines/aggregation/sizing.ts`
 - Create: `src/engines/aggregation/sizing.test.ts`
 
@@ -888,6 +897,7 @@ git commit -m "feat(rs-06): add pure sizing engine (util, flags, multi-snapshot 
 ### Task B2: `EstateView.sizing` type + `EMPTY_SIZING`
 
 **Files:**
+
 - Modify: `src/types/estate.ts`
 - Modify: `src/engines/aggregation/index.ts`
 
@@ -896,6 +906,7 @@ git commit -m "feat(rs-06): add pure sizing engine (util, flags, multi-snapshot 
 ```ts
 import type { EstateSizing } from '@/engines/aggregation/sizing'
 ```
+
 > If `estate.ts` must stay import-free of engines (check the file header), instead re-declare `EstateSizing`/`VmSizing`/`SizingCounts`/`SizingThresholds` here and have `sizing.ts` import them from `@/types/estate` (the `ThresholdInput`-style "engine owns it, types re-export" pattern used by `thresholdFlags.ts`). Pick whichever matches the existing convention — `thresholdFlags.ts` defines `ThresholdInput` in the engine and `estate.ts` does not import it, so prefer: **engine owns the types; `EstateView.sizing` is typed `EstateSizing` via a type-only import**, mirroring how `EstateView` already references `EosProjection` etc.
 
 Add to the `EstateView` interface:
@@ -930,6 +941,7 @@ Expected: FAIL in `estateView.ts` (EMPTY_VIEW) and `buildEstateView` return — 
 ### Task B3: Compute `sizing` in `buildEstateView`
 
 **Files:**
+
 - Modify: `src/engines/aggregation/estateView.ts`
 - Test: `src/engines/aggregation/estateView.test.ts` (extend)
 
@@ -967,8 +979,8 @@ Expected: FAIL.
   )
 ```
 
-  - Add `sizing,` to the returned object.
-  - Add `EMPTY_SIZING` and put it in `EMPTY_VIEW`:
+- Add `sizing,` to the returned object.
+- Add `EMPTY_SIZING` and put it in `EMPTY_VIEW`:
 
 ```ts
 const EMPTY_SIZING = Object.freeze({
@@ -982,6 +994,7 @@ const EMPTY_SIZING = Object.freeze({
   hasUsageData: false,
 })
 ```
+
   Add `sizing: EMPTY_SIZING,` to `EMPTY_VIEW`.
 
 - [ ] **Step 4: Run typecheck + tests (expected: PASS)**
@@ -1003,6 +1016,7 @@ git commit -m "feat(rs-07): compute EstateView.sizing in the single estate pass"
 ### Task C1: `sizingThresholds` store slice
 
 **Files:**
+
 - Modify: `src/store/snapshotStore.ts`
 - Test: `src/store/snapshotStore.test.ts` (extend)
 
@@ -1062,6 +1076,7 @@ git commit -m "feat(rs-08): add in-memory sizingThresholds store slice"
 ### Task C2: Thread `sizingThresholds` through `useEstateView`
 
 **Files:**
+
 - Modify: `src/hooks/useEstateView.ts`
 - Test: `src/hooks/useEstateView.test.ts` (extend if it asserts opts threading; otherwise typecheck-covered)
 
@@ -1086,6 +1101,7 @@ git commit -m "feat(rs-09): thread sizingThresholds through the single useMemo"
 ### Task D1: `ExportView.sizing` (max across ALL snapshots)
 
 **Files:**
+
 - Modify: `src/engines/export/buildExportView.ts`
 - Test: `src/engines/export/buildExportView.test.ts` (extend)
 
@@ -1120,6 +1136,7 @@ export function buildExportView(active, all, mode, today, opts?): ExportView {
   }
 }
 ```
+
 > `EstateSizing` is exported from `@/types/estate` (it re-exports the engine type per Task B2). If you kept the type in the engine, import it from `@/engines/aggregation`.
 
 - [ ] **Step 4: Run it (expected: PASS)**
@@ -1139,6 +1156,7 @@ git commit -m "feat(rs-10): expose all-snapshots sizing on ExportView"
 ### Task D2: `rightSizingSlide` + builder wiring
 
 **Files:**
+
 - Create: `src/engines/export/pptx/slides/rightSizingSlide.ts`
 - Modify: `src/engines/export/pptx/builder.ts`
 - Modify: `src/engines/export/types.ts` (ExportStrings keys)
@@ -1167,6 +1185,7 @@ git commit -m "feat(rs-10): expose all-snapshots sizing on ExportView"
     colActivePct: string
   }
 ```
+
 > Match how other groups are typed/populated; `ExportStrings` is built from the `pptx` i18n namespace in the export worker — see Task F1 for the JSON keys.
 
 - [ ] **Step 3: Write the failing test** — add to `builder.test.ts`: build a `view` whose `sizing.hasUsageData === true` and assert the produced deck has one more slide than the same view with `hasUsageData === false` (the golden structural test counts slides). Pattern after the existing contention-annex conditional test in that file.
@@ -1217,6 +1236,7 @@ export const addRightSizingSlide = (
   slide.addText(`${basis} · ${s.poweredOnOnly} · ${s.thresholdsCaption}`, { /* small caption opts */ })
 }
 ```
+
 > Fill the `{ ... }` option blocks by copying the exact coordinates/fonts/colors from `eosSlide.ts`/`contentionAnnex.ts`. Use `strings`/`locale` exactly as those slides do. Numbers should be locale-formatted via the deck's existing formatter (see `format.ts`) rather than `.toFixed` if that's the established pattern — match the codebase.
 
 - [ ] **Step 6: Wire into `builder.ts`** — import `addRightSizingSlide` and, after the contention annex block (the "utilization/stress" neighborhood), add:
@@ -1231,6 +1251,7 @@ export const addRightSizingSlide = (
   const exportView = buildExportView(active, all, mode, today, opts)
   await buildPptx({ ...exportView.view, sizing: exportView.sizing }, exportView.trends, strings, locale, pptxOpts)
 ```
+
 > Read `export.worker.ts` first to match its exact call site and variable names; only change the `view` passed to `buildPptx` so the slide sees max-of-N sizing.
 
 - [ ] **Step 8: Run it (expected: PASS)**
@@ -1244,6 +1265,7 @@ Expected: PASS.
 # Generate a deck from a fixture with vMemory/vCPU (after Task G1), then:
 soffice --headless --convert-to pdf --outdir /tmp out.pptx && open /tmp/out.pdf
 ```
+
 Confirm the Right-sizing slide renders KPI cards + table + caption (no missing/blank text). Compare against the vsizer deck as the quality reference.
 
 - [ ] **Step 10: Commit**
@@ -1260,6 +1282,7 @@ git commit -m "feat(rs-11): add right-sizing PPTX slide (native shapes, conditio
 ### Task E1: `RightSizingView` scaffold + nav registration
 
 **Files:**
+
 - Create: `src/components/rightsizing/RightSizingView.tsx`
 - Create: `src/components/rightsizing/RightSizingView.test.tsx`
 - Modify: `src/App.tsx`, `src/components/ViewToggle.tsx`
@@ -1296,6 +1319,7 @@ describe('RightSizingView', () => {
   })
 })
 ```
+
 > Match the prop shape to how sibling views are invoked (prop vs `useEstateView`). If sibling views read the hook internally, mock the store instead (follow `CpuReadyPanel.test.tsx`).
 
 - [ ] **Step 4: Run it (expected: FAIL)**
@@ -1322,6 +1346,7 @@ git commit -m "feat(rs-12): add RightSizingView scaffold + nav tab"
 ### Task E2: Threshold controls, filter, VM table, counts chart
 
 **Files:**
+
 - Modify: `src/components/rightsizing/RightSizingView.tsx`
 - Modify: `src/components/rightsizing/RightSizingView.test.tsx`
 - Modify: `src/components/Chart.tsx` (only if the `bar` series isn't registered — verify first)
@@ -1363,6 +1388,7 @@ git commit -m "feat(rs-13): right-sizing thresholds, filter, VM table, counts ch
 ### Task F1: `rightsizing` namespace + column/slide keys (en+fr)
 
 **Files:**
+
 - Create: `src/i18n/locales/en/rightsizing.json`, `src/i18n/locales/fr/rightsizing.json`
 - Modify: `src/i18n/index.ts`
 - Modify: `src/i18n/locales/{en,fr}/inventory.json` (add `col.*`)
@@ -1453,6 +1479,7 @@ git commit -m "feat(rs-14): add rightsizing i18n (en+fr) + column/slide keys"
 ### Task G1: Emit `vMemory`/`vCPU` in the fixture generator
 
 **Files:**
+
 - Modify: `scripts/generate-inventory-10k.mjs` (and/or `scripts/seed-fixtures.mjs`)
 
 - [ ] **Step 1: Read** `scripts/generate-inventory-10k.mjs` to see how it builds the workbook (which library, how sheets/headers/rows are emitted, how `vInfo` rows are keyed).
@@ -1476,6 +1503,7 @@ git commit -m "feat(rs-15): emit vMemory/vCPU in the synthetic fixture"
 ### Task G2: End-to-end integration test
 
 **Files:**
+
 - Create: `src/__tests__/rightsizing-e2e.test.tsx`
 
 - [ ] **Step 1: Write the test** — drive the production pipeline (`parseXlsx → parseSnapshot → mergeSnapshotsToEstate → buildEstateView`) on the regenerated 10k fixture (mirror the setup in `inventory-stress.test.tsx`), then assert:
@@ -1508,6 +1536,7 @@ git commit -m "feat(rs-16): end-to-end right-sizing integration test"
 ### Task H1: Update project docs
 
 **Files:**
+
 - Modify: `ROADMAP`/`STATE`/`PROJECT` docs (per the standing "always update documentation" expectation), `CLAUDE.md` if a new gotcha emerged.
 
 - [ ] **Step 1:** Add the Right-sizing view + `vMemory`/`vCPU` parsing to the shipped-feature inventory; note `sizing.ts` is added to the ≥75% gated engines; record the CPU-utilization approximation (`vcpu × per-core MHz`) and the point-in-time/max-of-N caveat. Manually flip any phase checkbox/progress row (the SDK does not match this ROADMAP format).

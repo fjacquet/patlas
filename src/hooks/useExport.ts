@@ -18,7 +18,7 @@ import {
   useSnapshotStore,
 } from '@/store/snapshotStore'
 
-/** D-05: `vatlas_{vCenter|multi}_{ISO date}.{ext}`. Path-traversal-safe —
+/** D-05: `patlas_{vCenter|multi}_{ISO date}.{ext}`. Path-traversal-safe —
  *  sanitize to `[A-Za-z0-9_-]`, cap 64, fallback `estate` (T-10-19). */
 export function exportFilename(
   vCenterLabel: string,
@@ -29,7 +29,7 @@ export function exportFilename(
   const sanitize = (s: string): string => s.replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 64) || 'estate'
   const vc = snapshotCount > 1 ? 'multi' : sanitize(vCenterLabel)
   const iso = capturedAt.toISOString().slice(0, 10)
-  return `vatlas_${vc}_${iso}.${ext}`
+  return `patlas_${vc}_${iso}.${ext}`
 }
 
 let worker: Worker | null = null

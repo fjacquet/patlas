@@ -21,10 +21,12 @@
 - **Terminology guard** — `src/i18n/terminology.test.ts` forbids VMware tokens (`RVTools`/`vCenter`/`ESX`/`ESXi`/`datastore`) in i18n values. Use Proxmox terms: Guest, Node, Storage, Content, Backup.
 - **Privacy invariant (PAR-05)** — no network egress of dataset bytes; no `localStorage` of rows. `xlsx` import stays worker-only.
 - **Commit prefix** `<type>(3b-NN): …`. Signed commits required — never `--no-gpg-sign` / `-c commit.gpgsign=false`. End every commit body with:
+
   ```
   Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
   Claude-Session: https://claude.ai/code/session_01MwiWBcuAc1YW4W1oE9Na2Z
   ```
+
 - **Run the FULL `npm run typecheck`** (app + `tsconfig.test.json`) after adding a required field to a shared type. `rtk tsc` skips the test project.
 - **Lint with `npx @biomejs/biome check .`** (NOT `npm run lint`). Run before every commit; `--write` to fix.
 
@@ -64,11 +66,13 @@
 ### Task 1: Parse the `Storage Content` sheet → `ProxmoxStorageContentRow[]`
 
 **Files:**
+
 - Modify: `src/types/snapshot.ts`, `src/types/index.ts`, `src/engines/parser/adapters/proxmoxColumns.ts`, `src/engines/parser/adapters/proxmox.ts`, `src/engines/parser/parser.worker.ts`
 - Modify: every test file constructing a `Snapshot` literal (Step 6)
 - Test: `src/engines/parser/adapters/proxmox.storageContent.test.ts` (new), `src/engines/parser/proxmox.realfile.test.ts` (extend)
 
 **Interfaces:**
+
 - Produces: `interface ProxmoxStorageContentRow { node, storage, content, fileName, format, sizeMib: MiB, usagePercent: number|null, guestId, guestName, creationSerial: number|null }`; `Snapshot.proxmoxStorageContent: ProxmoxStorageContentRow[]` (required); `adaptProxmoxStorageContent(sheet: ParsedSheet | undefined): ProxmoxStorageContentRow[]`; `adaptProxmox(...)` return gains `proxmoxStorageContent: ProxmoxStorageContentRow[]`.
 - Consumes: `mapColumns`, `readCol`, `readNumber`, `readString`, `findSheet`; `gib`, `gibToMib`.
 
@@ -239,6 +243,7 @@ export const STORAGE_CONTENT_COLS = {
 ```
 
 In `src/engines/parser/adapters/proxmox.ts`:
+
 1. Add `ProxmoxStorageContentRow` to the `@/types` type import.
 2. Add `STORAGE_CONTENT_COLS` to the `./proxmoxColumns` import.
 3. Add the adapter (place after `adaptProxmoxSnapshots`):
@@ -274,7 +279,7 @@ export const adaptProxmoxStorageContent = (
 }
 ```
 
-4. In `adaptProxmox`, after the `snapshotsSheet` block, add the optional `Storage Content` lookup + warning, and add the field to the return type + object:
+1. In `adaptProxmox`, after the `snapshotsSheet` block, add the optional `Storage Content` lookup + warning, and add the field to the return type + object:
 
 ```ts
   const storageContentSheet = findSheet(workbook, ['storage content'])
@@ -309,9 +314,11 @@ Every file that sets `proxmoxSnapshots:` on a `Snapshot` literal needs `proxmoxS
 - [ ] **Step 7: Run the adapter test + FULL typecheck**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx vitest run src/engines/parser/adapters/proxmox.storageContent.test.ts && npm run typecheck
 ```
+
 Expected: adapter test PASSES (4/4); typecheck 0 errors. Add `proxmoxStorageContent: []` to any literal typecheck flags.
 
 - [ ] **Step 8: Extend the parser realfile test**
@@ -329,10 +336,12 @@ In `src/engines/parser/proxmox.realfile.test.ts`, inside the existing `maybe(...
 - [ ] **Step 9: Lint, run parser tests, verify NUL-clean, commit**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx @biomejs/biome check . && npx vitest run src/engines/parser
 for f in $(git diff --name-only); do printf "%s: " "$f"; tr -dc '\000' < "$f" | wc -c; done
 ```
+
 Expected: Biome clean; parser tests PASS; every changed file shows `0` NUL bytes.
 
 ```
@@ -345,10 +354,12 @@ git commit -m "feat(3b-01): parse Proxmox Storage Content sheet into ProxmoxStor
 ### Task 2: Concatenate `proxmoxStorageContent` through the merge
 
 **Files:**
+
 - Modify: `src/engines/snapshotMerge/mergeSnapshotsToEstate.ts`
 - Test: `src/engines/snapshotMerge/mergeSnapshotsToEstate.test.ts` (extend)
 
 **Interfaces:**
+
 - Consumes: `Snapshot.proxmoxStorageContent` (Task 1).
 - Produces: `MergedEstate.proxmoxStorageContent: ProxmoxStorageContentRow[]` (flat concatenation, like `proxmoxSnapshots`).
 
@@ -382,6 +393,7 @@ Expected: FAIL — `merged.proxmoxStorageContent` is `undefined`.
 - [ ] **Step 3: Wire the field into `MergedEstate`**
 
 In `src/engines/snapshotMerge/mergeSnapshotsToEstate.ts`:
+
 1. Add `ProxmoxStorageContentRow` to the `@/types` import.
 2. Add to the `MergedEstate` interface (after `proxmoxSnapshots`):
 
@@ -391,17 +403,19 @@ In `src/engines/snapshotMerge/mergeSnapshotsToEstate.ts`:
   proxmoxStorageContent: ProxmoxStorageContentRow[]
 ```
 
-3. Add `proxmoxStorageContent: [],` to `EMPTY_MERGED`.
-4. Add an accumulator `const outProxmoxStorageContent: ProxmoxStorageContentRow[] = []` and, in the existing passthrough loop, `for (const r of snap.proxmoxStorageContent ?? []) outProxmoxStorageContent.push(r)`.
-5. Add `proxmoxStorageContent: outProxmoxStorageContent,` to the returned object.
+1. Add `proxmoxStorageContent: [],` to `EMPTY_MERGED`.
+2. Add an accumulator `const outProxmoxStorageContent: ProxmoxStorageContentRow[] = []` and, in the existing passthrough loop, `for (const r of snap.proxmoxStorageContent ?? []) outProxmoxStorageContent.push(r)`.
+3. Add `proxmoxStorageContent: outProxmoxStorageContent,` to the returned object.
 
 - [ ] **Step 4: Run merge tests + verify NUL-clean**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx vitest run src/engines/snapshotMerge
 tr -dc '\000' < src/engines/snapshotMerge/mergeSnapshotsToEstate.ts | wc -c
 ```
+
 Expected: PASS; NUL count `0`.
 
 - [ ] **Step 5: Lint + commit**
@@ -417,11 +431,13 @@ git commit -m "feat(3b-02): concatenate proxmoxStorageContent through the estate
 ### Task 3: `computeStorageContentHealth` pure engine
 
 **Files:**
+
 - Create: `src/engines/aggregation/storageContentHealth.ts`
 - Modify: `src/engines/aggregation/index.ts`
 - Test: `src/engines/aggregation/storageContentHealth.test.ts` (new)
 
 **Interfaces:**
+
 - Consumes: `ProxmoxStorageContentRow` from `@/types/snapshot`; `excelSerialToUnixMs` from `./snapshotSprawl` (shipped in Plan 3A); a `today: Date`.
 - Produces:
   - `interface StorageContentTypeGroup { content: string; count: number; totalSizeMib: number }`
@@ -664,10 +680,12 @@ export {
 - [ ] **Step 5: Run the engine test + verify NUL-clean**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx vitest run src/engines/aggregation/storageContentHealth.test.ts
 for f in src/engines/aggregation/storageContentHealth.ts src/engines/aggregation/index.ts; do printf "%s: " "$f"; tr -dc '\000' < "$f" | wc -c; done
 ```
+
 Expected: PASS (3/3); both NUL counts `0`.
 
 - [ ] **Step 6: Lint + commit**
@@ -683,10 +701,12 @@ git commit -m "feat(3b-03): add pure computeStorageContentHealth aggregation eng
 ### Task 4: Compose the `storageContent` slice on `EstateView`
 
 **Files:**
+
 - Modify: `src/types/estate.ts`, `src/engines/aggregation/estateView.ts`
 - Test: `src/engines/aggregation/estateView.storageContent.test.ts` (new)
 
 **Interfaces:**
+
 - Consumes: `MergedEstate.proxmoxStorageContent` (Task 2); `computeStorageContentHealth` + `StorageContentHealth` (Task 3); the `today: Date` already in `buildEstateView`.
 - Produces: `EstateView.storageContent: StorageContentHealth`; frozen `EMPTY_STORAGE_CONTENT` on `EMPTY_VIEW`.
 
@@ -771,13 +791,14 @@ Expected: FAIL — `storageContent` missing on the view / `EMPTY_VIEW`.
 - [ ] **Step 3: Add the field to `EstateView`**
 
 In `src/types/estate.ts`:
+
 1. Add the type-only import alongside the others at the top:
 
 ```ts
 import type { StorageContentHealth } from '@/engines/aggregation/storageContentHealth'
 ```
 
-2. Add the field to the `EstateView` interface, immediately after `snapshotSprawl`:
+1. Add the field to the `EstateView` interface, immediately after `snapshotSprawl`:
 
 ```ts
   /**
@@ -790,13 +811,14 @@ import type { StorageContentHealth } from '@/engines/aggregation/storageContentH
 - [ ] **Step 4: Compose the slice in `buildEstateView`**
 
 In `src/engines/aggregation/estateView.ts`:
+
 1. Add the import (near the `snapshotSprawl` import):
 
 ```ts
 import { computeStorageContentHealth } from './storageContentHealth'
 ```
 
-2. After the `const snapshotSprawl = computeSnapshotSprawl(...)` line, add:
+1. After the `const snapshotSprawl = computeSnapshotSprawl(...)` line, add:
 
 ```ts
   // Plan 3B storage-content health — same single pass; `today` reused for
@@ -804,9 +826,9 @@ import { computeStorageContentHealth } from './storageContentHealth'
   const storageContent = computeStorageContentHealth(merged.proxmoxStorageContent, today)
 ```
 
-3. Add `storageContent,` to the returned object (after `snapshotSprawl,`).
+1. Add `storageContent,` to the returned object (after `snapshotSprawl,`).
 
-4. Add the frozen empty just after `EMPTY_SPRAWL`:
+2. Add the frozen empty just after `EMPTY_SPRAWL`:
 
 ```ts
 const EMPTY_STORAGE_CONTENT = Object.freeze({
@@ -825,15 +847,17 @@ const EMPTY_STORAGE_CONTENT = Object.freeze({
 })
 ```
 
-5. Add `storageContent: EMPTY_STORAGE_CONTENT,` to the `EMPTY_VIEW` literal (after `snapshotSprawl: EMPTY_SPRAWL,`).
+1. Add `storageContent: EMPTY_STORAGE_CONTENT,` to the `EMPTY_VIEW` literal (after `snapshotSprawl: EMPTY_SPRAWL,`).
 
 - [ ] **Step 5: Run the test + FULL typecheck + NUL check**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx vitest run src/engines/aggregation/estateView.storageContent.test.ts && npm run typecheck
 for f in src/types/estate.ts src/engines/aggregation/estateView.ts; do printf "%s: " "$f"; tr -dc '\000' < "$f" | wc -c; done
 ```
+
 Expected: test PASSES; typecheck 0 errors; both NUL counts `0`.
 
 - [ ] **Step 6: Lint + commit**
@@ -849,6 +873,7 @@ git commit -m "feat(3b-04): compose storageContent slice on EstateView"
 ### Task 5: `StorageContentView` + nav + i18n
 
 **Files:**
+
 - Create: `src/components/storagecontent/StorageContentView.tsx`
 - Modify: `src/components/ViewToggle.tsx`, `src/App.tsx`, `src/components/ViewToggle.test.tsx`
 - Create: `src/i18n/locales/{en,fr,de,it}/storagecontent.json`
@@ -856,6 +881,7 @@ git commit -m "feat(3b-04): compose storageContent slice on EstateView"
 - Test: `src/components/storagecontent/StorageContentView.test.tsx` (new)
 
 **Interfaces:**
+
 - Consumes: `useEstateView('active').storageContent` (Task 4); `DataTable`; `useSnapshotStore` + `selectActiveSnapshot`; `fmtInt` from `@/utils/format`.
 - Produces: `StorageContentView`; `AppView` union gains `'storagecontent'`.
 
@@ -1000,6 +1026,7 @@ Create `src/i18n/locales/it/storagecontent.json`:
 - [ ] **Step 2: Register the namespace and add the nav label**
 
 In `src/i18n/index.ts`:
+
 1. Add 4 imports (mirror the `snapshots` lines added in Plan 3A):
 
 ```ts
@@ -1009,10 +1036,11 @@ import frStorageContent from './locales/fr/storagecontent.json'
 import itStorageContent from './locales/it/storagecontent.json'
 ```
 
-2. Add `'storagecontent'` to the `NAMESPACES` array (after `'snapshots'`).
-3. Add `storagecontent: enStorageContent,` / `fr…` / `de…` / `it…` to the four `resources` locale objects.
+1. Add `'storagecontent'` to the `NAMESPACES` array (after `'snapshots'`).
+2. Add `storagecontent: enStorageContent,` / `fr…` / `de…` / `it…` to the four `resources` locale objects.
 
 In each of `src/i18n/locales/{en,fr,de,it}/inventory.json`, add a `nav.storagecontent` key inside the existing `nav` object:
+
 - en: `"storagecontent": "Storage Content"`
 - fr: `"storagecontent": "Contenu stockage"`
 - de: `"storagecontent": "Speicherinhalt"`
@@ -1281,6 +1309,7 @@ and a dispatch branch before the final `<GlobalDashboard />`:
 ```
 
 In `src/components/ViewToggle.test.tsx` (Plan 3A left this asserting 11 segments with `snapshots` last): this task makes `storagecontent` the new last segment. Update:
+
 - the describe title and the "renders all N segments" count: `11` → `12`;
 - add `'Storage Content'` to the label list (after `'Snapshot Sprawl'`);
 - both `toHaveLength(11)` → `toHaveLength(12)`;
@@ -1289,10 +1318,12 @@ In `src/components/ViewToggle.test.tsx` (Plan 3A left this asserting 11 segments
 - [ ] **Step 7: Run component test + parity + terminology + ViewToggle + typecheck + NUL**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx vitest run src/components/storagecontent src/components/ViewToggle.test.tsx src/i18n/keyParity.test.ts src/i18n/terminology.test.ts && npm run typecheck
 for f in $(git status --porcelain | awk '{print $2}'); do printf "%s: " "$f"; tr -dc '\000' < "$f" 2>/dev/null | wc -c; done
 ```
+
 Expected: all PASS; typecheck 0 errors; every changed/created file `0` NUL bytes.
 
 - [ ] **Step 8: Lint + commit**
@@ -1308,9 +1339,11 @@ git commit -m "feat(3b-05): add StorageContentView, nav entry and storagecontent
 ### Task 6: Real-report acceptance test
 
 **Files:**
+
 - Create: `src/engines/aggregation/storageContentHealth.realfile.test.ts`
 
 **Interfaces:**
+
 - Consumes: the full parse→merge→view pipeline (Tasks 1–4) and the git-ignored fixture `src/engines/parser/__fixtures__/proxmox-report.xlsx`.
 
 - [ ] **Step 1: Write the realfile acceptance test**
@@ -1389,10 +1422,12 @@ Expected: PASS (logs `files: 22`, content types incl. `images`, `backups: 0`). I
 - [ ] **Step 3: Full suite + gates, then commit**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx @biomejs/biome check . && npm run typecheck && npx vitest run
 tr -dc '\000' < src/engines/aggregation/storageContentHealth.realfile.test.ts | wc -c
 ```
+
 Expected: Biome clean; typecheck 0; whole suite green; NUL `0`.
 
 ```
@@ -1405,6 +1440,7 @@ git commit -m "test(3b-06): real-report acceptance for storage content health"
 ## Self-Review
 
 **Spec coverage** (Plan 3 scope item "Storage & backups health", flat-sheet portion):
+
 - Parse `Storage Content` sheet → Task 1 ✓
 - Carry through Snapshot + merge → Tasks 1, 2 ✓
 - Pure reduction (by content type, by storage, backup-file inventory with recency) → Task 3 ✓

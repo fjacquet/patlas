@@ -24,7 +24,7 @@ export interface DataTableProps<T> {
   columns: ColumnDef<T>[]
   /** Maps a leaf column id to its localized header text (for the CSV header row). */
   headerFor: (id: string) => string
-  /** Drives the CSV filename: `vatlas-{objectKind}-{YYYYMMDD}.csv`. */
+  /** Drives the CSV filename: `patlas-{objectKind}-{YYYYMMDD}.csv`. */
   objectKind: 'vm' | 'esx' | 'datastore'
   /** Optional default column-visibility seed (ColumnPicker "Reset" restores it). */
   defaultColumnVisibility?: VisibilityState
@@ -132,7 +132,7 @@ export function DataTable<T>({
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
     const a = document.createElement('a')
     a.href = url
-    a.download = `vatlas-${objectKind}-${yyyymmdd(new Date())}.csv`
+    a.download = `patlas-${objectKind}-${yyyymmdd(new Date())}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }

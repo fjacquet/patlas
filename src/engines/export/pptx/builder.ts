@@ -17,6 +17,7 @@ import type { EstateView, TrendSeries } from '@/types/estate'
 import type { PngBundle } from '../chartBundle'
 import type { ExportStrings } from '../types'
 import type { ExportLocale } from './format'
+import { addClusterHealthSlide } from './slides/clusterHealthSlide'
 import { addClusterSlide } from './slides/clusterSlide'
 import { addContentionAnnex, type ContentionRow } from './slides/contentionAnnex'
 import { addEosSlide } from './slides/eosSlide'
@@ -27,6 +28,8 @@ import { addOverviewSlide } from './slides/overviewSlide'
 import { addPhysicalInventorySlide } from './slides/physicalInventorySlide'
 import { addPlannedSlide } from './slides/plannedSlide'
 import { addRightSizingSlide } from './slides/rightSizingSlide'
+import { addSnapshotSprawlSlide } from './slides/snapshotSprawlSlide'
+import { addStorageContentSlide } from './slides/storageContentSlide'
 import { addStorageSlide } from './slides/storageSlide'
 import { addTitleSlide } from './slides/titleSlide'
 import { addTrendsSlide } from './slides/trendsSlide'
@@ -111,6 +114,20 @@ export async function buildPptx(
   // configured-size lines; otherwise omitted (no empty page).
   if (view.monsters.count > 0) {
     addMonsterSlide(pptx, view.monsters, strings, locale)
+  }
+
+  if (view.snapshotSprawl.count > 0) {
+    addSnapshotSprawlSlide(pptx, view.snapshotSprawl, strings, locale)
+  }
+  if (view.storageContent.fileCount > 0) {
+    addStorageContentSlide(pptx, view.storageContent, strings, locale)
+  }
+  if (
+    view.clusterHealth.ha.services.length > 0 ||
+    view.clusterHealth.ha.managedCount > 0 ||
+    view.clusterHealth.backups.jobCount > 0
+  ) {
+    addClusterHealthSlide(pptx, view.clusterHealth, strings, locale)
   }
 
   addEosSlide(pptx, view.eos, png('eosBar'), strings, locale)

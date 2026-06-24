@@ -22,6 +22,7 @@
 ## File Structure
 
 **Deleted:**
+
 - `src/engines/drSim/` (3 files: `runScenario.ts`, `allocate.ts`, `index.ts` + 2 tests)
 - `src/components/dr/DrSimPanel.tsx` (+ test), `src/components/stretched/StretchedPill.tsx`
 - `src/engines/export/pptx/slides/drSimSlide.ts`
@@ -30,6 +31,7 @@
 - `src/__fixtures__/rvtools-inventory-10k.xlsx`, `src/__fixtures__/rvtools-mib-canary.xlsx`, and `src/engines/parser/canary.test.ts` (consumes the canary fixture)
 
 **Modified:**
+
 - `src/engines/aggregation/estateView.ts` — drop `runScenario` import + `drSim`/`plannedDrSim` blocks + return fields + `EMPTY_VIEW` entries.
 - `src/types/estate.ts` — drop `DrScenario`/`DrMode`/`DrSimResult`, `EstateView.drSim`/`plannedDrSim`, and `ClusterAggregate` DR-reservation fields.
 - `src/engines/aggregation/aggregateClusters.ts` — drop `stretchedClusters` param + reservation derivation.
@@ -49,20 +51,24 @@
 Delete the DR what-if engine, its UI, its store slices, its export sections, and its i18n — and the stretched-cluster reservation logic it depends on. End green.
 
 **Files:**
+
 - Delete: `src/engines/drSim/runScenario.ts`, `allocate.ts`, `index.ts`, `runScenario.test.ts`, `allocate.test.ts`; `src/components/dr/DrSimPanel.tsx`, `DrSimPanel.test.tsx`; `src/components/stretched/StretchedPill.tsx`; `src/engines/export/pptx/slides/drSimSlide.ts`; `src/i18n/locales/{en,fr,de,it}/dr.json`, `src/i18n/locales/{en,fr,de,it}/str.json`
 - Modify: `src/types/estate.ts`, `src/engines/aggregation/estateView.ts`, `src/engines/aggregation/aggregateClusters.ts`, `src/hooks/useEstateView.ts`, `src/store/snapshotStore.ts`, `src/components/planning/PlanningView.tsx`, `src/engines/export/html/renderReport.tsx`, `src/engines/export/chartBundle.ts`, `src/engines/export/pptx/builder.ts`
 - Plus: any test that asserts on `drSim`/`plannedDrSim`/`stretchedClusters`/`drReserved*` (find them in step 1).
 
 **Interfaces:**
+
 - Produces: `EstateView` without `drSim`/`plannedDrSim`; `ClusterAggregate` without `drReservedGhz`/`drReservedRamMib`/`reservationFor`/`siteData`/`siteACapacity*`/`siteBCapacity*`; `aggregateClusters` signature without the `stretchedClusters` parameter; `buildEstateView` options without `scenario`/`plannedRatios`-driven DR.
 
 - [ ] **Step 1: Inventory the blast radius**
 
 Run, to find every reference that must be cleaned:
+
 ```bash
 cd /Users/fjacquet/Projects/patlas
 grep -rln "drSim\|DrSim\|plannedDrSim\|stretched\|Stretched\|runScenario\|DrScenario\|DrMode\|DrSimResult\|drReserved\|reservationFor\|selectScenario\|selectStretchedClusters\|siteACapacity\|siteBCapacity\|drSimSlide\|StretchedPill\|'dr'\|\"dr\"\|/dr.json\|str.json" src/ | sort
 ```
+
 Expected: the files listed above plus their tests. Treat this list as the work set.
 
 - [ ] **Step 2: Delete the DR engine, UI, export slide, and i18n files**
@@ -76,6 +82,7 @@ git rm src/engines/export/pptx/slides/drSimSlide.ts
 git rm src/i18n/locales/en/dr.json src/i18n/locales/fr/dr.json src/i18n/locales/de/dr.json src/i18n/locales/it/dr.json
 git rm src/i18n/locales/en/str.json src/i18n/locales/fr/str.json src/i18n/locales/de/str.json src/i18n/locales/it/str.json
 ```
+
 (If `StretchedPill` proves to have a sibling test, `git rm` that too — the step-1 grep reveals it.)
 
 - [ ] **Step 3: Remove DR types from `types/estate.ts`**
@@ -106,10 +113,12 @@ For every remaining test surfaced by step 1 (e.g. `estateView.test.ts`, export t
 - [ ] **Step 8: Verify green**
 
 Run:
+
 ```bash
 cd /Users/fjacquet/Projects/patlas
 npm run typecheck && npx @biomejs/biome check . && npm run test:run 2>&1 | grep -E "Test Files|Tests "
 ```
+
 Expected: typecheck clean, biome clean, all tests pass (count drops by the deleted DR/stretched tests). The i18n keyParity test passes (dr/str removed symmetrically across all four locales).
 
 - [ ] **Step 9: Commit**
@@ -127,10 +136,12 @@ git commit -m "refactor(patlas-2a-01): remove DR what-if and stretched-cluster s
 Delete the RVTools adapter and its glue (`normalizeColumns`, `synthesizeOrphanClusters`) plus the RVTools-only tests and Excel fixtures. The worker already uses `adaptProxmox` and imports none of these, so no production wiring changes.
 
 **Files:**
+
 - Delete: `src/engines/parser/adapters/rvtools.ts`, `rvtools.test.ts`; `src/engines/parser/normalizeColumns.ts`, `normalizeColumns.test.ts`; `src/engines/parser/synthesizeOrphanClusters.ts`; `src/engines/parser/canary.test.ts`; `src/__fixtures__/rvtools-inventory-10k.xlsx`, `src/__fixtures__/rvtools-mib-canary.xlsx`
 - Plus: `src/engines/parser/parserEdges.test.ts` if it only tests the RVTools path (inspect in step 1; if it tests `parseXlsx`/shared helpers too, keep those parts).
 
 **Interfaces:**
+
 - Consumes: nothing new.
 - Produces: a parser surface with `parseXlsx`, `columnMap`, `proxmox.ts`, `proxmoxColumns.ts`, `extractZip.ts`, `schemas.ts`, `vmUsage*` as the only adapters.
 
@@ -140,6 +151,7 @@ Delete the RVTools adapter and its glue (`normalizeColumns`, `synthesizeOrphanCl
 cd /Users/fjacquet/Projects/patlas
 grep -rln "adaptRvtools\|normalizeColumns\|synthesizeOrphanClusters\|parseSnapshot" src/ | grep -v ".test." | grep -v "/adapters/rvtools.ts\|/normalizeColumns.ts\|/synthesizeOrphanClusters.ts"
 ```
+
 Expected: NO output (the worker uses `adaptProxmox`). If anything prints, STOP and report — there is an unexpected consumer.
 Then inspect `src/engines/parser/parserEdges.test.ts` and `src/engines/parser/canary.test.ts` to see exactly what they import.
 
@@ -161,10 +173,12 @@ If step 1 showed `parserEdges.test.ts` imports `adaptRvtools`/`synthesizeOrphanC
 - [ ] **Step 4: Verify green**
 
 Run:
+
 ```bash
 cd /Users/fjacquet/Projects/patlas
 npm run typecheck && npx @biomejs/biome check . && npm run test:run 2>&1 | grep -E "Test Files|Tests "
 ```
+
 Expected: clean; test count drops by the removed RVTools/canary/parserEdges tests. The Proxmox realfile tests still run and pass.
 
 - [ ] **Step 5: Commit**
@@ -182,10 +196,12 @@ git commit -m "refactor(patlas-2a-02): remove RVTools adapter, normalizeColumns,
 Drop `'rvtools'` from the union and sweep every fixture that still constructs it.
 
 **Files:**
+
 - Modify: `src/types/snapshot.ts` (the `source` field)
 - Modify: ~26 test files constructing `source: 'rvtools'` (full list below)
 
 **Interfaces:**
+
 - Produces: `Snapshot.source: 'proxmox'` (single literal).
 
 - [ ] **Step 1: Narrow the type**
@@ -200,6 +216,7 @@ Expected: FAIL — one error per fixture still using `source: 'rvtools'`. This i
 - [ ] **Step 3: Sweep `'rvtools'` → `'proxmox'` in all fixtures**
 
 Replace `source: 'rvtools'` with `source: 'proxmox'` in each of:
+
 ```
 src/components/network/NetworkView.test.tsx
 src/components/rightsizing/RightSizingView.test.tsx
@@ -225,11 +242,14 @@ src/hooks/useSnapshotUpload.test.ts
 src/hooks/useEstateView.test.ts
 src/store/snapshotStore.test.ts
 ```
+
 A repo-wide sed makes this exact and complete:
+
 ```bash
 cd /Users/fjacquet/Projects/patlas
 grep -rl "source: 'rvtools'" src/ | xargs sed -i '' "s/source: 'rvtools'/source: 'proxmox'/g"
 ```
+
 (The `parser.worker.ts` already emits `'proxmox'`, so it is unaffected.)
 
 - [ ] **Step 4: Verify no `'rvtools'` source literal remains**
@@ -240,10 +260,12 @@ Expected: no matches.
 - [ ] **Step 5: Verify green**
 
 Run:
+
 ```bash
 cd /Users/fjacquet/Projects/patlas
 npm run typecheck && npx @biomejs/biome check . && npm run test:run 2>&1 | grep -E "Test Files|Tests "
 ```
+
 Expected: clean; all tests pass.
 
 - [ ] **Step 6: Commit**
@@ -261,10 +283,12 @@ git commit -m "refactor(patlas-2a-03): harden Snapshot.source to 'proxmox' only"
 Make `guestType` non-optional in the type and the Zod schema; the Proxmox adapter already sets it on every row, so only fixtures that build a `VInfoRow` without it (if any) need a value.
 
 **Files:**
+
 - Modify: `src/types/vinfo.ts` (`guestType`), `src/engines/parser/schemas.ts` (Zod entry)
 - Plus: any fixture building a `VInfoRow` literal without `guestType` (typecheck reveals them).
 
 **Interfaces:**
+
 - Produces: `VInfoRow.guestType: 'qemu' | 'lxc'` (required); Zod `guestType: z.enum(['qemu','lxc'])`.
 
 - [ ] **Step 1: Make the type required**
@@ -287,10 +311,12 @@ For each location flagged in step 3, add `guestType: 'qemu'` to the `VInfoRow` l
 - [ ] **Step 5: Verify green**
 
 Run:
+
 ```bash
 cd /Users/fjacquet/Projects/patlas
 npm run typecheck && npx @biomejs/biome check . && npm run test:run 2>&1 | grep -E "Test Files|Tests "
 ```
+
 Expected: clean; all tests pass; the Proxmox realfile tests still pass (the adapter always sets `guestType`).
 
 - [ ] **Step 6: Commit**
@@ -306,6 +332,7 @@ git commit -m "refactor(patlas-2a-04): make VInfoRow.guestType required (type + 
 ## Self-Review
 
 **Spec coverage (Plan 2A scope = the spec's "Cut: DR" §6.2 + the deferred "RVTools removal / type hardening" from Plan 1's tracked deviations):**
+
 - DR/stretched removal (spec §6.2) → Task 1 ✓
 - RVTools adapter removal (spec §3 "Strip") → Task 2 ✓
 - `source` hardening (Plan 1 tracked deviation) → Task 3 ✓

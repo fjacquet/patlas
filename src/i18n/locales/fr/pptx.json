@@ -1,7 +1,7 @@
 {
   "title": {
     "identity": "{{clusters}} clusters · {{hosts}} nœuds · {{vms}} invités · capturé le {{captureDate}}",
-    "generated": "Généré par vatlas — synthèse factuelle du parc",
+    "generated": "Généré par patlas — synthèse factuelle du parc",
     "eyebrow": "PARC PROXMOX",
     "fallback": "parc Proxmox"
   },
@@ -140,5 +140,64 @@
     "ramCapPlanned": "Capacité vRAM (planifiée)",
     "ramDemand": "vRAM alloué (demande)",
     "ramHeadroomPlanned": "Marge vRAM (planifiée)"
+  },
+  "snapshotSprawl": {
+    "title": "Instantanés — inventaire des points de contrôle",
+    "kpi": {
+      "snapshots": "Points de contrôle",
+      "guests": "Invités avec points de contrôle",
+      "totalGib": "Taille totale",
+      "oldestDays": "Plus ancien (jours)"
+    },
+    "col": {
+      "guest": "Invité",
+      "node": "Nœud",
+      "checkpoint": "Point de contrôle",
+      "ageDays": "Âge (jours)",
+      "sizeGib": "Taille (Gio)"
+    }
+  },
+  "clusterHealth": {
+    "title": "Santé du cluster — statut HA et tâches de sauvegarde",
+    "kpi": {
+      "quorum": "Quorum",
+      "fencing": "Fencing",
+      "haResources": "Ressources HA",
+      "backupJobs": "Tâches de sauvegarde"
+    },
+    "services": {
+      "heading": "Services HA"
+    },
+    "jobs": {
+      "heading": "Tâches de sauvegarde"
+    },
+    "col": {
+      "service": "Service",
+      "status": "Statut",
+      "job": "Tâche",
+      "schedule": "Planification",
+      "enabled": "Activé"
+    }
+  },
+  "storageContent": {
+    "title": "Contenu du stockage — inventaire des fichiers par type et pool",
+    "kpi": {
+      "totalGib": "Taille totale",
+      "files": "Fichiers",
+      "contentTypes": "Types de contenu",
+      "backups": "Fichiers de sauvegarde"
+    },
+    "byContent": {
+      "heading": "Par type de contenu"
+    },
+    "byStorage": {
+      "heading": "Par pool de stockage"
+    },
+    "col": {
+      "content": "Contenu",
+      "storage": "Stockage",
+      "count": "Quantité",
+      "sizeGib": "Taille (Gio)"
+    }
   }
 }

@@ -19,15 +19,18 @@
 - **Reused-DataTable header rule (binding — see 3B):** `DataTable` resolves VISIBLE headers via `useTranslation('inventory') → t('col.<id>')`. Any NEW column id MUST have an `inventory:col.<id>` key in all four locales, AND the view's `headerFor` must read the inventory namespace: `headerFor={(id) => t(`col.${id}`, { ns: 'inventory' })}`. Do NOT invent a per-view `col` block (3B removed those).
 - **Privacy (PAR-05)** — no network egress; no `localStorage` of rows; `xlsx` worker-only.
 - **Commit prefix** `<type>(3c-NN): …`. Signed commits — never `--no-gpg-sign`. End every commit body with:
+
   ```
   Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
   Claude-Session: https://claude.ai/code/session_01MwiWBcuAc1YW4W1oE9Na2Z
   ```
+
 - **Run the FULL `npm run typecheck`** (app + `tsconfig.test.json`) after adding required `Snapshot` fields. Lint with `npx @biomejs/biome check .` (NOT `npm run lint`).
 
 ## Real sheet schemas (from the fixture)
 
 `Cluster HA` (stacked):
+
 ```
 row 0: ["Index"]
 row 1: ["Resources","Status"]                         (TOC — 2 cells)
@@ -41,6 +44,7 @@ row 7: ["fencing","fencing","standby (CRM watchdog standby)","promox",null,null,
 ```
 
 `Cluster` → `Backup Jobs` sub-table:
+
 ```
 row 20: ["Backup Jobs"]                               (section title)
 row 21: ["Id","Enabled","All","Vm Id","Mode","Storage","Start Time","Schedule","Day Of Week","Compress","Type","Mailto","Mail Notification","Notes Template","Pool","Node","Quiet","Next Run"]
@@ -80,11 +84,13 @@ So in this fixture: HA Resources = **empty** (no HA-managed guests), HA Status =
 ### Task 1: Raw cell grid + `extractStackedSection`
 
 **Files:**
+
 - Modify: `src/engines/parser/parseXlsx.ts`
 - Create: `src/engines/parser/adapters/stackedSection.ts`
 - Test: `src/engines/parser/adapters/stackedSection.test.ts` (new)
 
 **Interfaces:**
+
 - Produces: `ParsedSheet.cells: unknown[][]` (the full 2-D grid incl. the header row); `extractStackedSection(cells: unknown[][], title: string): { headers: string[]; rows: Record<string, unknown>[] }`.
 
 - [ ] **Step 1: Write the failing extractor test**
@@ -206,6 +212,7 @@ export const extractStackedSection = (
 - [ ] **Step 4: Expose the raw grid on `ParsedSheet`**
 
 In `src/engines/parser/parseXlsx.ts`:
+
 1. Add to the `ParsedSheet` interface:
 
 ```ts
@@ -215,7 +222,7 @@ In `src/engines/parser/parseXlsx.ts`:
   cells: unknown[][]
 ```
 
-2. In the two places a `ParsedSheet` is built, set `cells`:
+1. In the two places a `ParsedSheet` is built, set `cells`:
    - The empty-sheet branch: `sheets.set(name, { name, headers: [], rows: [], cells: [] })`
    - The main branch: add `cells: aoa` to the object (the `aoa` already computed).
 
@@ -238,11 +245,13 @@ git commit -m "feat(3c-01): raw cell grid on ParsedSheet + extractStackedSection
 ### Task 2: Parse HA resources, HA status, and backup jobs
 
 **Files:**
+
 - Modify: `src/types/snapshot.ts`, `src/types/index.ts`, `src/engines/parser/adapters/proxmoxColumns.ts`, `src/engines/parser/adapters/proxmox.ts`, `src/engines/parser/parser.worker.ts`
 - Modify: every test file with a `Snapshot` literal (Step 7)
 - Test: `src/engines/parser/adapters/proxmox.clusterHa.test.ts` (new), `src/engines/parser/proxmox.realfile.test.ts` (extend)
 
 **Interfaces:**
+
 - Produces three row types + three required `Snapshot` fields + three adapters:
   - `ProxmoxHaResourceRow { sid, type, state, group, failback, maxRestart: number|null, maxRelocate: number|null, comment }`
   - `ProxmoxHaStatusRow { id, type, status, node, sid, state, crmState, requestState, quorate }`
@@ -449,6 +458,7 @@ export const BACKUP_JOB_COLS = {
 ```
 
 In `src/engines/parser/adapters/proxmox.ts`:
+
 1. Add the three types to the `@/types` import and the three COLS to the `./proxmoxColumns` import; add `import { extractStackedSection } from './stackedSection'`.
 2. Add a boolean reader near `cellOrNull`:
 
@@ -461,7 +471,7 @@ const readBool = (v: unknown): boolean => {
 }
 ```
 
-3. Add the three adapters (after `adaptProxmoxStorageContent`):
+1. Add the three adapters (after `adaptProxmoxStorageContent`):
 
 ```ts
 export const adaptProxmoxHaResources = (sheet: ParsedSheet | undefined): ProxmoxHaResourceRow[] => {
@@ -524,7 +534,7 @@ export const adaptProxmoxBackupJobs = (sheet: ParsedSheet | undefined): ProxmoxB
 }
 ```
 
-4. In `adaptProxmox`, locate the `Cluster HA` and `Cluster` sheets and wire the fields. Add after the `storageContentSheet` block:
+1. In `adaptProxmox`, locate the `Cluster HA` and `Cluster` sheets and wire the fields. Add after the `storageContentSheet` block:
 
 ```ts
   // Composite sheets — the stacked-sub-table extractor reads the raw grid.
@@ -599,10 +609,12 @@ git commit -m "feat(3c-02): parse Cluster HA resources/status and backup jobs"
 ### Task 3: Concatenate the three arrays through the merge
 
 **Files:**
+
 - Modify: `src/engines/snapshotMerge/mergeSnapshotsToEstate.ts`
 - Test: `src/engines/snapshotMerge/mergeSnapshotsToEstate.test.ts` (extend)
 
 **Interfaces:**
+
 - Produces: `MergedEstate.proxmoxHaResources / proxmoxHaStatus / proxmoxBackupJobs` (flat concatenation, like `proxmoxStorageContent`).
 
 - [ ] **Step 1: Write the failing test** — REUSE the file's existing `Snapshot` factory; assert the three arrays concatenate across two snapshots. Construct rows with the Task-2 field names. Example assertion:
@@ -625,6 +637,7 @@ it('concatenates HA + backup-job arrays across snapshots', () => {
 - [ ] **Step 4: Run merge tests + NUL check.** `npx vitest run src/engines/snapshotMerge` and confirm the merge file has `0` NUL bytes.
 
 - [ ] **Step 5: Lint + commit**
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx @biomejs/biome check .
 git add -A
@@ -636,11 +649,13 @@ git commit -m "feat(3c-03): concatenate Cluster HA + backup-job rows through the
 ### Task 4: `computeClusterHealth` pure engine
 
 **Files:**
+
 - Create: `src/engines/aggregation/clusterHealth.ts`
 - Modify: `src/engines/aggregation/index.ts`
 - Test: `src/engines/aggregation/clusterHealth.test.ts` (new)
 
 **Interfaces:**
+
 - Consumes: the three row types from `@/types/snapshot`.
 - Produces:
   - `interface ClusterHealth { ha: { resources: ProxmoxHaResourceRow[]; managedCount: number; quorumStatus: string|null; fencingStatus: string|null; services: ProxmoxHaStatusRow[] }; backups: { jobs: ProxmoxBackupJobRow[]; jobCount: number; enabledCount: number; guestsCovered: number } }`
@@ -795,6 +810,7 @@ export { type ClusterHealth, computeClusterHealth } from './clusterHealth'
 - [ ] **Step 5: Run engine test + NUL check.** `npx vitest run src/engines/aggregation/clusterHealth.test.ts`; both new files `0` NUL.
 
 - [ ] **Step 6: Lint + commit**
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx @biomejs/biome check .
 git add -A
@@ -806,10 +822,12 @@ git commit -m "feat(3c-04): add pure computeClusterHealth aggregation engine"
 ### Task 5: Compose the `clusterHealth` slice on `EstateView`
 
 **Files:**
+
 - Modify: `src/types/estate.ts`, `src/engines/aggregation/estateView.ts`
 - Test: `src/engines/aggregation/estateView.clusterHealth.test.ts` (new)
 
 **Interfaces:**
+
 - Consumes: `MergedEstate.proxmoxHaResources/proxmoxHaStatus/proxmoxBackupJobs`; `computeClusterHealth` + `ClusterHealth`.
 - Produces: `EstateView.clusterHealth: ClusterHealth`; frozen `EMPTY_CLUSTER_HEALTH` on `EMPTY_VIEW`.
 
@@ -856,6 +874,7 @@ const EMPTY_CLUSTER_HEALTH = Object.freeze({
 - [ ] **Step 5: Run test + FULL typecheck + NUL check.**
 
 - [ ] **Step 6: Lint + commit**
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx @biomejs/biome check .
 git add -A
@@ -867,6 +886,7 @@ git commit -m "feat(3c-05): compose clusterHealth slice on EstateView"
 ### Task 6: `ClusterHealthView` + nav + i18n
 
 **Files:**
+
 - Create: `src/components/clusterhealth/ClusterHealthView.tsx`
 - Modify: `src/components/ViewToggle.tsx`, `src/App.tsx`, `src/components/ViewToggle.test.tsx`
 - Create: `src/i18n/locales/{en,fr,de,it}/clusterhealth.json`
@@ -874,6 +894,7 @@ git commit -m "feat(3c-05): compose clusterHealth slice on EstateView"
 - Test: `src/components/clusterhealth/ClusterHealthView.test.tsx` (new)
 
 **Interfaces:**
+
 - Consumes: `useEstateView('active').clusterHealth`; `DataTable`; `useSnapshotStore` + `selectActiveSnapshot`; `fmtInt`.
 - Produces: `ClusterHealthView`; `AppView` gains `'clusterhealth'`.
 
@@ -1000,6 +1021,7 @@ Create `src/i18n/locales/it/clusterhealth.json`:
 In `src/i18n/index.ts`: add 4 imports, add `'clusterhealth'` to `NAMESPACES`, add to the 4 `resources` objects (mirror `storagecontent`).
 
 In each `src/i18n/locales/{en,fr,de,it}/inventory.json`:
+
 - Add `nav.clusterhealth`: en `"Cluster Health"`, fr `"Santé cluster"`, de `"Cluster-Zustand"`, it `"Salute cluster"`.
 - Add these NEW `col.*` header keys (used by the three tables; some may already exist — add only the missing). Keep `col` keys sorted:
   - `sid`: en "Service ID" / fr "ID service" / de "Dienst-ID" / it "ID servizio"
@@ -1016,6 +1038,7 @@ In each `src/i18n/locales/{en,fr,de,it}/inventory.json`:
 - [ ] **Step 3: Write the failing component test**
 
 Create `src/components/clusterhealth/ClusterHealthView.test.tsx` — mirror `StorageContentView.test.tsx`. The `snapshot(...)` factory sets ALL required `Snapshot` fields (incl. the three new arrays). Cases:
+
 1. no snapshot → empty-state heading renders.
 2. a snapshot with a `quorum`/`OK` HA-status row → the quorum KPI value `OK` renders; the "No guests are managed by HA." message renders (resources empty); the "No backup jobs are scheduled." message renders.
 3. header-resolution guard: with an HA resource present, assert a resolved header (e.g. `screen.getByText('Service ID')`) and `queryByText('col.sid')` is null.
@@ -1037,13 +1060,16 @@ Create `src/components/clusterhealth/ClusterHealthView.tsx` (modeled on `Storage
 - [ ] **Step 7: Component + parity + terminology + ViewToggle + typecheck + WHOLE suite + NUL**
 
 Run:
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx vitest run src/components/clusterhealth src/components/ViewToggle.test.tsx src/i18n/keyParity.test.ts src/i18n/terminology.test.ts && npm run typecheck && npx vitest run
 for f in $(git status --porcelain | awk '{print $2}'); do printf "%s: " "$f"; tr -dc '\000' < "$f" 2>/dev/null | wc -c; done
 ```
+
 Expected: all PASS; typecheck 0; whole suite green; every file `0` NUL.
 
 - [ ] **Step 8: Lint + commit**
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx @biomejs/biome check .
 git add -A
@@ -1055,6 +1081,7 @@ git commit -m "feat(3c-06): add ClusterHealthView, nav entry and clusterhealth i
 ### Task 7: Real-report acceptance test
 
 **Files:**
+
 - Create: `src/engines/aggregation/clusterHealth.realfile.test.ts`
 
 - [ ] **Step 1: Write the realfile test** — mirror `storageContentHealth.realfile.test.ts` (skip-guard + Snapshot assembly with ALL fields incl. the three new `proxmox…` arrays from `bundle`). Assert:
@@ -1077,6 +1104,7 @@ If `quorumStatus` is not `'OK'` or any count is non-zero, STOP and report — do
 - [ ] **Step 2: Run it.** `npx vitest run src/engines/aggregation/clusterHealth.realfile.test.ts` — must PASS (not skip), logging `quorum: OK`, `HA resources: 0`, `backup jobs: 0`.
 
 - [ ] **Step 3: Full gates + commit**
+
 ```
 cd /Users/fjacquet/Projects/patlas && npx @biomejs/biome check . && npm run typecheck && npx vitest run
 tr -dc '\000' < src/engines/aggregation/clusterHealth.realfile.test.ts | wc -c
@@ -1089,6 +1117,7 @@ git commit -m "test(3c-07): real-report acceptance for cluster health"
 ## Self-Review
 
 **Spec coverage** (Plan 3 final items — HA status + the backup-job schedules deferred from 3B):
+
 - Stacked-sub-table extractor (the shared foundation) → Task 1 ✓
 - Parse HA resources / HA status / backup jobs → Task 2 ✓
 - Merge → Task 3 ✓; pure reduction (quorum/fencing/managed + job summary) → Task 4 ✓

@@ -39,6 +39,7 @@
 Create the patlas repo as a fork of vatlas, rebrand identifiers, and confirm the **unchanged** (still-VMware) app builds and tests pass. This is the safe baseline before any Proxmox change.
 
 **Files:**
+
 - Modify: `package.json` (name `vatlas`→`patlas`), `vite.config.ts` (base `/vatlas/`→`/patlas/`), `index.html` title, `src/store/*` + theme/lang hooks (`vatlas-theme`→`patlas-theme`, `vatlas-lang`→`patlas-lang`), `README.md`, `CLAUDE.md` project name.
 - The supply-chain/bundle-size check scripts referencing the name.
 
@@ -59,12 +60,14 @@ Replace every `vatlas` token with `patlas` in the files listed above (storage ke
 - [ ] **Step 3: Verify the baseline builds and tests pass (still VMware)**
 
 Run:
+
 ```bash
 npm install
 npm run typecheck
 npx @biomejs/biome check .
 npm run test:run
 ```
+
 Expected: typecheck clean, lint clean, all existing tests PASS. (We have changed nothing functional yet.)
 
 - [ ] **Step 4: Commit**
@@ -79,16 +82,19 @@ git commit -m "chore(patlas-01): fork vatlas, rebrand identifiers and storage ke
 ### Task 2: Add `guestType` to VInfoRow + `gibToMib` converter
 
 **Files:**
+
 - Modify: `src/types/vinfo.ts`
 - Modify: `src/engines/units/converters.ts`
 - Test: `src/engines/units/converters.test.ts`
 
 **Interfaces:**
+
 - Produces: `VInfoRow.guestType: 'qemu' | 'lxc'`; `gibToMib(n: GiB): MiB`.
 
 - [ ] **Step 1: Write the failing test for the converter**
 
 Add to `src/engines/units/converters.test.ts`:
+
 ```ts
 import { gib, mib } from './types'
 import { gibToMib } from './converters'
@@ -107,14 +113,17 @@ Expected: FAIL — `gibToMib is not a function`.
 - [ ] **Step 3: Implement the converter**
 
 Add to `src/engines/units/converters.ts` (it already imports `MIB_PER_GIB`, `mib`, `GiB`, `MiB`):
+
 ```ts
 export const gibToMib = (n: GiB): MiB => mib(n * MIB_PER_GIB)
 ```
+
 (If `gib`/`GiB` aren't imported there yet, add them to the existing import from `./types` and `./constants`.)
 
 - [ ] **Step 4: Add `guestType` to `VInfoRow`**
 
 In `src/types/vinfo.ts`, add to the `VInfoRow` interface:
+
 ```ts
   /** Proxmox guest kind: 'qemu' (KVM VM) or 'lxc' (container). patlas-only
    *  extension — the shared engines ignore it; views segment by it. */
@@ -138,15 +147,18 @@ git commit -m "feat(patlas-02): add guestType to VInfoRow and gibToMib converter
 ### Task 3: Proxmox column-alias maps
 
 **Files:**
+
 - Create: `src/engines/parser/adapters/proxmoxColumns.ts`
 - Test: `src/engines/parser/adapters/proxmoxColumns.test.ts`
 
 **Interfaces:**
+
 - Produces: `NODE_COLS`, `GUEST_COLS`, `STORAGE_COLS`, `CLUSTER_COLS` — each a `Record<string, readonly string[]>` consumable by `mapColumns`.
 
 - [ ] **Step 1: Write the failing test**
 
 `src/engines/parser/adapters/proxmoxColumns.test.ts`:
+
 ```ts
 import { mapColumns } from './columnMap'
 import { GUEST_COLS, NODE_COLS, STORAGE_COLS } from './proxmoxColumns'
@@ -180,6 +192,7 @@ Expected: FAIL — module not found.
 - [ ] **Step 3: Implement the column maps**
 
 `src/engines/parser/adapters/proxmoxColumns.ts`:
+
 ```ts
 /** Proxmox report column aliases. Headers are normalised (lower-cased,
  *  trimmed) by `mapColumns` before comparison; first match wins. */
@@ -249,15 +262,18 @@ git commit -m "feat(patlas-03): add Proxmox column-alias maps"
 The Cluster sheet is composite (stacked sub-tables). For Plan 1 we extract only the cluster **name** (row 0, first `Name` column). Full HA/backup parsing is Plan 4.
 
 **Files:**
+
 - Modify: `src/engines/parser/adapters/proxmox.ts` (create with this function)
 - Test: `src/engines/parser/adapters/proxmox.test.ts`
 
 **Interfaces:**
+
 - Produces: `extractClusterName(sheet: ParsedSheet | undefined): string` — `''` when sheet/column/value absent.
 
 - [ ] **Step 1: Write the failing test**
 
 `src/engines/parser/adapters/proxmox.test.ts`:
+
 ```ts
 import type { ParsedSheet } from '../parseXlsx'
 import { extractClusterName } from './proxmox'
@@ -284,6 +300,7 @@ Expected: FAIL — module not found.
 - [ ] **Step 3: Implement**
 
 `src/engines/parser/adapters/proxmox.ts`:
+
 ```ts
 import { mib, mhz, cores, sockets } from '@/engines/units'
 import { gibToMib } from '@/engines/units/converters'
@@ -317,15 +334,18 @@ git commit -m "feat(patlas-04): extract Proxmox cluster name from composite shee
 ### Task 5: Nodes → `VHostRow`
 
 **Files:**
+
 - Modify: `src/engines/parser/adapters/proxmox.ts`
 - Test: `src/engines/parser/adapters/proxmox.test.ts`
 
 **Interfaces:**
+
 - Produces: `adaptProxmoxNodes(sheet: ParsedSheet, clusterName: string): VHostRow[]`.
 
 - [ ] **Step 1: Write the failing test**
 
 Add to `proxmox.test.ts`:
+
 ```ts
 import { adaptProxmoxNodes } from './proxmox'
 import { mib, mhz, cores, sockets } from '@/engines/units'
@@ -357,6 +377,7 @@ Expected: FAIL — `adaptProxmoxNodes is not a function`.
 - [ ] **Step 3: Implement**
 
 Add to `proxmox.ts`:
+
 ```ts
 export const adaptProxmoxNodes = (sheet: ParsedSheet, clusterName: string): VHostRow[] => {
   const cols = mapColumns(sheet.headers, NODE_COLS)
@@ -397,15 +418,18 @@ git commit -m "feat(patlas-05): adapt Proxmox Nodes to VHostRow"
 ### Task 6: VMs + Containers → unified `VInfoRow[]`
 
 **Files:**
+
 - Modify: `src/engines/parser/adapters/proxmox.ts`
 - Test: `src/engines/parser/adapters/proxmox.test.ts`
 
 **Interfaces:**
+
 - Produces: `adaptProxmoxGuests(vmsSheet: ParsedSheet | undefined, ctSheet: ParsedSheet | undefined, clusterName: string): VInfoRow[]`.
 
 - [ ] **Step 1: Write the failing test**
 
 Add to `proxmox.test.ts`:
+
 ```ts
 import { adaptProxmoxGuests } from './proxmox'
 import { cores as coresOf, mib as mibOf } from '@/engines/units'
@@ -452,6 +476,7 @@ Expected: FAIL — `adaptProxmoxGuests is not a function`.
 - [ ] **Step 3: Implement**
 
 Add to `proxmox.ts`:
+
 ```ts
 const mapGuestRow = (
   row: Record<string, unknown>,
@@ -524,15 +549,18 @@ git commit -m "feat(patlas-06): adapt Proxmox VMs+Containers to unified VInfoRow
 ### Task 7: Storages → `VDatastoreRow` + native usage → `vmUsage`
 
 **Files:**
+
 - Modify: `src/engines/parser/adapters/proxmox.ts`
 - Test: `src/engines/parser/adapters/proxmox.test.ts`
 
 **Interfaces:**
+
 - Produces: `adaptProxmoxStorages(sheet: ParsedSheet | undefined): VDatastoreRow[]`; `adaptProxmoxUsage(vmsSheet, ctSheet, clusterName): VmUsageRow[]`.
 
 - [ ] **Step 1: Write the failing test**
 
 Add to `proxmox.test.ts`:
+
 ```ts
 import { adaptProxmoxStorages, adaptProxmoxUsage } from './proxmox'
 
@@ -570,6 +598,7 @@ Expected: FAIL — functions not defined.
 - [ ] **Step 3: Implement**
 
 Add to `proxmox.ts` (import `VmUsageRow`, `mhz` already imported):
+
 ```ts
 export const adaptProxmoxStorages = (sheet: ParsedSheet | undefined): VDatastoreRow[] => {
   if (!sheet) return []
@@ -650,16 +679,19 @@ git commit -m "feat(patlas-07): adapt Proxmox storages and native usage metrics"
 ### Task 8: `adaptProxmox` entry — assemble the canonical bundle
 
 **Files:**
+
 - Modify: `src/engines/parser/adapters/proxmox.ts`
 - Test: `src/engines/parser/adapters/proxmox.test.ts`
 
 **Interfaces:**
+
 - Consumes: `adaptProxmoxNodes`, `adaptProxmoxGuests`, `adaptProxmoxStorages`, `adaptProxmoxUsage`, `extractClusterName`.
 - Produces: `adaptProxmox(workbook: ParsedWorkbook): { vinfo, vhost, vdatastore, vmUsage, clusterName, warnings }`.
 
 - [ ] **Step 1: Write the failing test**
 
 Add to `proxmox.test.ts`:
+
 ```ts
 import { adaptProxmox } from './proxmox'
 
@@ -690,6 +722,7 @@ Expected: FAIL — `adaptProxmox is not a function`.
 - [ ] **Step 3: Implement**
 
 Add to `proxmox.ts` (mirror `rvtools.ts`'s `parseError` helper — copy it in, or import if exported):
+
 ```ts
 const parseError = (message: string, meta: { sheet?: string; kind: ParseError['kind'] }): never => {
   const e = new Error(message) as Error & { sheet?: string; kind?: ParseError['kind'] }
@@ -754,11 +787,13 @@ git commit -m "feat(patlas-08): assemble canonical bundle in adaptProxmox entry"
 ### Task 9: `.zip` extraction with fflate
 
 **Files:**
+
 - Create: `src/engines/parser/extractZip.ts`
 - Test: `src/engines/parser/extractZip.test.ts`
 - Modify: `package.json` (ensure `fflate` dependency present — vatlas lineage carries `fflate@^0.8.2`)
 
 **Interfaces:**
+
 - Produces: `extractProxmoxBundle(buffer: Uint8Array): { xlsx: Uint8Array; networkSvg: string | null }`.
 
 - [ ] **Step 1: Ensure fflate is installed**
@@ -769,6 +804,7 @@ Expected: `fflate@0.8.x` resolved.
 - [ ] **Step 2: Write the failing test**
 
 `src/engines/parser/extractZip.test.ts` (build a zip in-memory with fflate's `zipSync`):
+
 ```ts
 import { strToU8, zipSync } from 'fflate'
 import { extractProxmoxBundle } from './extractZip'
@@ -797,6 +833,7 @@ Expected: FAIL — module not found.
 - [ ] **Step 4: Implement**
 
 `src/engines/parser/extractZip.ts`:
+
 ```ts
 import { unzipSync } from 'fflate'
 
@@ -835,18 +872,21 @@ git commit -m "feat(patlas-09): extract Proxmox .zip bundle with fflate"
 ### Task 10: Wire the worker — zip-or-xlsx → `adaptProxmox` → `Snapshot`
 
 **Files:**
+
 - Modify: `src/engines/parser/parser.worker.ts`
 - Modify: `src/types/snapshot.ts` (`source: 'proxmox'`)
 - Modify: `src/engines/parser/schemas.ts` (add `guestType` to VInfo schema)
 - Test: `src/engines/parser/proxmox.realfile.test.ts`
 
 **Interfaces:**
+
 - Consumes: `extractProxmoxBundle`, `parseXlsx`, `adaptProxmox`.
 - Produces: a `Snapshot` with `source: 'proxmox'`, populated `vinfo`/`vhost`/`vdatastore`/`vmUsage`, VMware-only arrays `[]`, `viSdkUuid: null`, `vMetaData: []`.
 
 - [ ] **Step 1: Add `guestType` to the VInfo Zod schema**
 
 In `src/engines/parser/schemas.ts`, add to the VInfo row schema object:
+
 ```ts
   guestType: z.enum(['qemu', 'lxc']),
 ```
@@ -854,6 +894,7 @@ In `src/engines/parser/schemas.ts`, add to the VInfo row schema object:
 - [ ] **Step 2: Detect zip magic and branch in the worker**
 
 In `parser.worker.ts`, before `parseXlsx`, detect the PKZip signature (`0x50 0x4B`) and extract:
+
 ```ts
 import { extractProxmoxBundle } from './extractZip'
 import { adaptProxmox } from './adapters/proxmox'
@@ -866,11 +907,13 @@ const { xlsx, networkSvg } = isZip
 const workbook = parseXlsx(xlsx)
 const bundle = adaptProxmox(workbook)
 ```
+
 Then assemble the `Snapshot` shape (replace the RVTools assembly) with `source: 'proxmox'`, `bundle.vinfo/vhost/vdatastore/vmUsage`, empty `vpartition/vnetwork/vswitch/dvswitch/dvport`, `vMetaData: []`, `viSdkUuid: null`, `parseErrors: bundle.warnings`. (Keep `networkSvg` in a local for Plan 4; not yet on the type.)
 
 - [ ] **Step 3: Write the real-file test**
 
 Copy the real `report.xlsx` into `src/engines/parser/__fixtures__/proxmox-report.xlsx` (git-ignore it like vatlas's real workbook, or commit a sanitized copy). `src/engines/parser/proxmox.realfile.test.ts`:
+
 ```ts
 import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
@@ -913,6 +956,7 @@ git commit -m "feat(patlas-10): wire worker to Proxmox adapter, source=proxmox"
 ### Task 11: Verify the dashboard renders the real estate (slice acceptance)
 
 **Files:**
+
 - Modify (only if compile/runtime errors surface): RVTools-specific UI imports.
 
 - [ ] **Step 1: Build**
@@ -928,10 +972,12 @@ Expected: Global Dashboard shows non-zero node count, guest count (VMs + contain
 - [ ] **Step 3: Run the full test + lint gate**
 
 Run:
+
 ```bash
 npm run test:run
 npx @biomejs/biome check .
 ```
+
 Expected: all PASS, lint clean.
 
 - [ ] **Step 4: Commit any unblocking fixes**
