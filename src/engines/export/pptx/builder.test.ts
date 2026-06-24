@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
-import type { Snapshot } from '@/types/snapshot'
+import type {
+  ProxmoxBackupJobRow,
+  ProxmoxHaResourceRow,
+  ProxmoxHaStatusRow,
+  ProxmoxSnapshotRow,
+  ProxmoxStorageContentRow,
+  Snapshot,
+} from '@/types/snapshot'
 import type { VHostRow } from '@/types/vhost'
 import type { VInfoRow } from '@/types/vinfo'
 import { buildExportView } from '../buildExportView'
@@ -191,6 +198,123 @@ describe('buildPptx — golden structural snapshot', () => {
     const exNone = buildExportView(a, [a], MODE, TODAY)
     expect(exNone.view.monsters.count).toBe(0)
     expect(slideCount(await buildPptx(exNone.view, exNone.trends, strings, 'en'))).toBe(13)
+  })
+
+  it('Plan A — snapshotSprawl: a view WITH snapshots adds exactly one slide', async () => {
+    const a = snap('a', 3, new Date('2026-01-01'))
+    const snapRow: ProxmoxSnapshotRow = {
+      node: 'n1',
+      guestId: '100',
+      guestName: 'Debian',
+      guestType: 'qemu',
+      name: 'checkpoint-1',
+      parent: 'no-parent',
+      dateSerial: 46100,
+      includeRam: false,
+      sizeMib: mib(1024),
+    }
+    const withSnaps: Snapshot = { ...a, proxmoxSnapshots: [snapRow] }
+    const ex = buildExportView(withSnaps, [withSnaps], MODE, TODAY)
+    expect(ex.view.snapshotSprawl.count).toBeGreaterThan(0)
+    const ab = await buildPptx(ex.view, ex.trends, strings, 'en')
+    expect(slideCount(ab)).toBe(11) // 10 baseline + 1 snapshot sprawl
+
+    const exNone = buildExportView(a, [a], MODE, TODAY)
+    expect(exNone.view.snapshotSprawl.count).toBe(0)
+    const abNone = await buildPptx(exNone.view, exNone.trends, strings, 'en')
+    expect(slideCount(abNone)).toBe(10)
+  })
+
+  it('Plan A — storageContent: a view WITH storage content adds exactly one slide', async () => {
+    const a = snap('a', 3, new Date('2026-01-01'))
+    const contentRow: ProxmoxStorageContentRow = {
+      node: 'n1',
+      storage: 'DATA',
+      content: 'images',
+      fileName: 'disk.qcow2',
+      format: 'qcow2',
+      sizeMib: mib(10240),
+      usagePercent: null,
+      guestId: '100',
+      guestName: 'Debian',
+      creationSerial: null,
+    }
+    const withContent: Snapshot = { ...a, proxmoxStorageContent: [contentRow] }
+    const ex = buildExportView(withContent, [withContent], MODE, TODAY)
+    expect(ex.view.storageContent.fileCount).toBeGreaterThan(0)
+    const ab = await buildPptx(ex.view, ex.trends, strings, 'en')
+    expect(slideCount(ab)).toBe(11) // 10 baseline + 1 storage content
+
+    const exNone = buildExportView(a, [a], MODE, TODAY)
+    expect(exNone.view.storageContent.fileCount).toBe(0)
+    const abNone = await buildPptx(exNone.view, exNone.trends, strings, 'en')
+    expect(slideCount(abNone)).toBe(10)
+  })
+
+  it('Plan A — clusterHealth: a view WITH HA status adds exactly one slide', async () => {
+    const a = snap('a', 3, new Date('2026-01-01'))
+    const haStatus: ProxmoxHaStatusRow = {
+      id: 'quorum',
+      type: 'quorum',
+      status: 'OK',
+      node: 'n1',
+      sid: '',
+      state: '',
+      crmState: '',
+      requestState: '',
+      quorate: 'X',
+    }
+    const withHealth: Snapshot = { ...a, proxmoxHaStatus: [haStatus] }
+    const ex = buildExportView(withHealth, [withHealth], MODE, TODAY)
+    expect(ex.view.clusterHealth.ha.services.length).toBeGreaterThan(0)
+    const ab = await buildPptx(ex.view, ex.trends, strings, 'en')
+    expect(slideCount(ab)).toBe(11) // 10 baseline + 1 cluster health
+
+    const exNone = buildExportView(a, [a], MODE, TODAY)
+    expect(exNone.view.clusterHealth.ha.services.length).toBe(0)
+    expect(exNone.view.clusterHealth.ha.managedCount).toBe(0)
+    expect(exNone.view.clusterHealth.backups.jobCount).toBe(0)
+    const abNone = await buildPptx(exNone.view, exNone.trends, strings, 'en')
+    expect(slideCount(abNone)).toBe(10)
+  })
+
+  it('Plan A — clusterHealth: a view with HA resources but no status also adds the slide', async () => {
+    const a = snap('a', 3, new Date('2026-01-01'))
+    const haRes: ProxmoxHaResourceRow = {
+      sid: 'vm:100',
+      type: 'vm',
+      state: 'started',
+      group: '',
+      failback: '',
+      maxRestart: 1,
+      maxRelocate: 1,
+      comment: '',
+    }
+    const withRes: Snapshot = { ...a, proxmoxHaResources: [haRes] }
+    const ex = buildExportView(withRes, [withRes], MODE, TODAY)
+    expect(ex.view.clusterHealth.ha.managedCount).toBeGreaterThan(0)
+    const ab = await buildPptx(ex.view, ex.trends, strings, 'en')
+    expect(slideCount(ab)).toBe(11) // 10 baseline + 1 cluster health
+
+    const backupJob: ProxmoxBackupJobRow = {
+      id: 'job-1',
+      enabled: true,
+      all: false,
+      vmId: '100,101',
+      mode: 'snapshot',
+      storage: 'DATA',
+      startTime: '02:00',
+      schedule: 'daily',
+      dayOfWeek: 'mon',
+      compress: 'zstd',
+      type: 'vzdump',
+      node: 'n1',
+    }
+    const withJob: Snapshot = { ...a, proxmoxBackupJobs: [backupJob] }
+    const exJob = buildExportView(withJob, [withJob], MODE, TODAY)
+    expect(exJob.view.clusterHealth.backups.jobCount).toBeGreaterThan(0)
+    const abJob = await buildPptx(exJob.view, exJob.trends, strings, 'en')
+    expect(slideCount(abJob)).toBe(11) // 10 baseline + 1 cluster health
   })
 
   it('P-HWID: a view with host serials adds exactly one physical-inventory slide', async () => {
