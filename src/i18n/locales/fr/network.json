@@ -4,9 +4,9 @@
   },
   "section": {
     "diagram": "Topologie réseau",
-    "vswitch": "Commutateurs standard (vSwitch)",
-    "dvswitch": "Commutateurs distribués (dvSwitch)",
-    "vnetwork": "Groupes de ports invités (vNetwork)"
+    "vswitch": "Commutateurs standard",
+    "dvswitch": "Commutateurs distribués",
+    "vnetwork": "Groupes de ports invités"
   },
   "img": {
     "alt": "Diagramme réseau Proxmox"
