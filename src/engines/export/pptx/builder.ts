@@ -43,10 +43,12 @@ export interface BuildPptxOpts {
   /** The active snapshot's capture date (ISO `YYYY-MM-DD`), used verbatim
    *  on the D-03 title slide — NOT the vCenter label. */
   capturedAt?: string
-  /** Raw SVG string from `Snapshot.networkSvg` (zip bundle network diagram).
-   *  When present it is embedded as a vector image on the Network slide.
-   *  When null/undefined the slide shows a factual Proxmox-correct note. */
-  networkSvg?: string | null
+  /** Rasterized network diagram PNG (the worker resvg-rasterizes
+   *  `Snapshot.networkSvg` with a bundled font). When present it is embedded
+   *  as a PowerPoint-safe image on the Network slide (PowerPoint cannot render
+   *  embedded SVG — Pitfall 1). When null/undefined the slide shows a factual
+   *  Proxmox-correct note. */
+  networkPng?: Uint8Array | null
 }
 
 export async function buildPptx(
@@ -101,7 +103,7 @@ export async function buildPptx(
   // F-2 (D-05): Storage + Network after the per-cluster narrative,
   // before the conditional annex. Network has no chart (D-08).
   addStorageSlide(pptx, view, png('storageTreemap'), strings, locale)
-  addNetworkSlide(pptx, opts.networkSvg ?? null, strings, locale)
+  addNetworkSlide(pptx, opts.networkPng ?? null, strings, locale)
 
   // Conditional CPU-Ready annex.
   if (opts.contentionRows && opts.contentionRows.length > 0) {

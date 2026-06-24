@@ -102,6 +102,24 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
       }
       const charts: PngBundle = { shared: sharedPng, perCluster: perClusterPng }
 
+      // F-2 (Pitfall 1): the network diagram is an SVG too — PowerPoint can't
+      // render embedded SVG, so rasterize it to PNG like every chart. Resvg-wasm
+      // ships no default font, so the diagram's text labels need an explicit
+      // bundled font (NotoSans, loaded as a same-origin Vite asset). Best-effort:
+      // a diagram failure must never sink the whole export.
+      let networkPng: Uint8Array | null = null
+      if (req.active.networkSvg) {
+        try {
+          const fontUrl = new URL('../../assets/fonts/NotoSans.ttf', import.meta.url)
+          const fontBytes = new Uint8Array(await (await fetch(fontUrl)).arrayBuffer())
+          networkPng = await chartSvgToPng(req.active.networkSvg, CHART_W, CHART_H, wasmSource(), [
+            fontBytes,
+          ])
+        } catch {
+          networkPng = null // diagram is best-effort — never fail the whole export over it
+        }
+      }
+
       // pptxgenjs evaluated lazily AFTER the window shim above.
       const { buildPptx } = await import('./pptx/builder')
       // P-RS: the deck's right-sizing slide reflects ALL loaded snapshots
@@ -112,8 +130,8 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
         charts,
         // Active snapshot's real capture date for the D-03 title slide.
         capturedAt: new Date(req.active.capturedAt).toISOString().slice(0, 10),
-        // Network diagram SVG from the zip bundle (mirrors the HTML report path).
-        networkSvg: req.active.networkSvg ?? null,
+        // PowerPoint-safe rasterized network diagram (Pitfall 1).
+        networkPng,
       })
     }
 
