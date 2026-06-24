@@ -5,6 +5,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ---
 
+## [2.2.1] - 2026-06-24
+
+### Fixed
+
+- **PPTX Network slide** — now embeds the Proxmox `network-diagram.svg` (when the report was loaded as a `.zip` bundle) directly as a vector image, so the topology appears in the deck with crisp labels. Previously the slide was the inherited VMware one: for a Proxmox report it always rendered an empty note listing VMware sheet names (`vNetwork / vSwitch / dvSwitch / dvPort`). When no diagram is present it now shows a plain factual note.
+
+### Changed
+
+- Removed residual VMware terminology from PPTX and Network-view strings across all four locales (dropped the always-empty vSwitch/dvSwitch KPIs and `(vSwitch)`/`(dvSwitch)` parentheticals).
+- Tightened the `terminology` test to forbid `vSwitch`, `dvSwitch`, `vNetwork`, `dvPort`, `vSphere`, `vSAN` so this jargon cannot regress.
+
+---
+
 ## [2.2.0] - 2026-06-24
 
 ### Added
