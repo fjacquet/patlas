@@ -98,29 +98,16 @@ export function addClusterHealthSlide(
     .slice(0, TOP_N)
     .map((r) => [cell(r.id), cell(r.status)])
 
-  if (servicesDataRows.length > 0) {
-    s.addTable([servicesHeader, ...servicesDataRows], {
-      x: M,
-      y: tableStartY + 0.3,
-      w: halfW,
-      colW: [halfW * 0.55, halfW * 0.45],
-      rowH: 0.28,
-      valign: 'middle',
-      border: { type: 'solid', pt: 0.5, color: PPTX_COLORS.hairline },
-      autoPage: false,
-    })
-  } else {
-    s.addTable([servicesHeader], {
-      x: M,
-      y: tableStartY + 0.3,
-      w: halfW,
-      colW: [halfW * 0.55, halfW * 0.45],
-      rowH: 0.28,
-      valign: 'middle',
-      border: { type: 'solid', pt: 0.5, color: PPTX_COLORS.hairline },
-      autoPage: false,
-    })
-  }
+  s.addTable([servicesHeader, ...servicesDataRows], {
+    x: M,
+    y: tableStartY + 0.3,
+    w: halfW,
+    colW: [halfW * 0.55, halfW * 0.45],
+    rowH: 0.28,
+    valign: 'middle',
+    border: { type: 'solid', pt: 0.5, color: PPTX_COLORS.hairline },
+    autoPage: false,
+  })
 
   // Backup jobs table: Job (id) | Schedule | Enabled
   const jobsHeading = strings['clusterHealth.jobs.heading'] ?? 'Backup jobs'
@@ -155,27 +142,14 @@ export function addClusterHealthSlide(
     .slice(0, TOP_N)
     .map((r) => [cell(r.id), cell(r.schedule), cell(r.enabled ? '✓' : '—')])
 
-  if (jobsDataRows.length > 0) {
-    s.addTable([jobsHeader, ...jobsDataRows], {
-      x: M + halfW + 0.2,
-      y: tableStartY + 0.3,
-      w: halfW,
-      colW: [halfW * 0.45, halfW * 0.35, halfW * 0.2],
-      rowH: 0.28,
-      valign: 'middle',
-      border: { type: 'solid', pt: 0.5, color: PPTX_COLORS.hairline },
-      autoPage: false,
-    })
-  } else {
-    s.addTable([jobsHeader], {
-      x: M + halfW + 0.2,
-      y: tableStartY + 0.3,
-      w: halfW,
-      colW: [halfW * 0.45, halfW * 0.35, halfW * 0.2],
-      rowH: 0.28,
-      valign: 'middle',
-      border: { type: 'solid', pt: 0.5, color: PPTX_COLORS.hairline },
-      autoPage: false,
-    })
-  }
+  s.addTable([jobsHeader, ...jobsDataRows], {
+    x: M + halfW + 0.2,
+    y: tableStartY + 0.3,
+    w: halfW,
+    colW: [halfW * 0.45, halfW * 0.35, halfW * 0.2],
+    rowH: 0.28,
+    valign: 'middle',
+    border: { type: 'solid', pt: 0.5, color: PPTX_COLORS.hairline },
+    autoPage: false,
+  })
 }
