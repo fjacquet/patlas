@@ -10,7 +10,11 @@ describe('svgToDataUri', () => {
   })
 
   it('round-trips non-ASCII content (utf-8 safe)', () => {
-    const uri = svgToDataUri('<svg><text>nœud — réseau</text></svg>')
+    const input = '<svg><text>nœud — réseau</text></svg>'
+    const uri = svgToDataUri(input)
     expect(uri.startsWith('data:image/svg+xml;base64,')).toBe(true)
+    const b64 = uri.slice('data:image/svg+xml;base64,'.length)
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))
+    expect(new TextDecoder().decode(bytes)).toBe(input)
   })
 })
