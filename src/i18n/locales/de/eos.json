@@ -16,14 +16,14 @@
   "split": "Gäste: {{vms}} · PVE-Knoten: {{hosts}}",
   "unknownHeading": "Nicht erkannte OS-Zeichenfolgen",
   "occurrences": "{{count}} Vorkommen",
-  "esxiHeading": "PVE-Knoten",
+  "nodesHeading": "Support-Ende der Knoten",
   "col": {
     "vmName": "Gast",
     "cluster": "Cluster",
     "host": "Knoten",
     "os": "OS",
     "eolFrom": "Support-Ende",
-    "esxVersion": "PVE-Version",
+    "pveVersion": "PVE-Version",
     "major": "Hauptversion",
     "majorEol": "Support-Ende",
     "patchEol": "Patch-Support-Ende"

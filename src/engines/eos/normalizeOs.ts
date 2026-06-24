@@ -37,19 +37,33 @@ const RULES: {
     re: /oracle\s*(?:enterprise\s*)?linux(?:\s*server)?\s*(\d+)/i,
     ver: (m) => m[1] ?? null,
   },
-  { slug: 'centos', re: /cent\s*os\s*(\d+)/i, ver: (m) => m[1] ?? null },
-  { slug: 'almalinux', re: /alma\s*linux/i, ver: () => null },
-  { slug: 'rocky-linux', re: /rocky\s*linux/i, ver: () => null },
-  { slug: 'debian', re: /debian\s*gnu\/?linux\s*(\d+)/i, ver: (m) => m[1] ?? null },
+  // CentOS: LXC template "centos-7-default" or bare "CentOS 7 (64-bit)"
+  { slug: 'centos', re: /cent[-\s]*os[-\s]*(\d+)/i, ver: (m) => m[1] ?? null },
+  // AlmaLinux: LXC template "almalinux-9-default" or bare "AlmaLinux 9"
+  { slug: 'almalinux', re: /alma\s*linux[-\s]*(\d+)/i, ver: (m) => m[1] ?? null },
+  // Rocky Linux: LXC template "rockylinux-9-default" or bare "Rocky Linux 9"
+  { slug: 'rocky-linux', re: /rocky[-\s]*linux[-\s]*(\d+)/i, ver: (m) => m[1] ?? null },
+  // Debian: RVTools "Debian GNU/Linux 12 (64-bit)", Proxmox QEMU "Debian 12",
+  // Proxmox LXC template "debian-12-standard"
+  {
+    slug: 'debian',
+    re: /debian[-\s](?:gnu\/linux[-\s])?(\d+)/i,
+    ver: (m) => m[1] ?? null,
+  },
   { slug: 'sles', re: /suse\s*linux\s*enterprise\s*(\d+)/i, ver: (m) => m[1] ?? null },
-  { slug: 'ubuntu', re: /ubuntu/i, ver: () => null },
+  // Ubuntu: extract "NN.NN" when present (Proxmox QEMU "Ubuntu 22.04",
+  // LXC template "ubuntu-22.04-standard"); versionless forms → null (D-10)
+  {
+    slug: 'ubuntu',
+    re: /ubuntu[-\s]*(\d+\.\d+)?/i,
+    ver: (m) => m[1] ?? null,
+  },
   {
     slug: 'windows-server',
     re: /windows\s*server\s*(\d{4}(?:\s*r2)?)/i,
     ver: (m) => m[1]?.replace(/\s+/, ' ') ?? null,
   },
   { slug: 'windows', re: /windows\s*(\d+|xp|vista|2000)/i, ver: (m) => m[1] ?? null },
-  { slug: 'esxi', re: /esxi\s*\d+\.\d+/i, ver: () => null },
 ]
 
 export function normalizeOs(raw: string): { slug: string; version: string } | null {

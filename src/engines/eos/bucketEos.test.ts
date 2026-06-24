@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mhz, mib, sockets } from '@/engines/units'
+import type { NodeHostRow } from '@/types/estate'
 import type { VHostRow } from '@/types/vhost'
 import type { VInfoRow } from '@/types/vinfo'
 import { buildEosProjection } from './bucketEos'
@@ -156,10 +157,45 @@ describe('buildEosProjection — host vs VM cardinality never conflated (D-09b)'
       p.partition.beyond12.length +
       p.partition.unknown.length
     expect(vmSum).toBe(vinfo.length) // 1, NOT 1 + 2 hosts
-    expect(p.esxi.hosts).toHaveLength(2)
-    expect(p.esxi.hosts[0]?.major).toBe('8.0')
-    expect(p.esxi.hosts[0]?.majorEol).toBe('2027-10-11')
-    expect(p.esxi.hosts[0]?.patchEol).toBeNull()
+    expect(p.nodes.hosts).toHaveLength(2)
+    // classifyPve extracts the leading digit group; '8' for 'VMware ESXi 8.0.3…'
+    expect(p.nodes.hosts[0]?.major).toBe('8')
+    // catalogue has no proxmox-ve product → majorEol is null (no catalogue match)
+    expect(p.nodes.hosts[0]?.majorEol).toBeNull()
+    expect(p.nodes.hosts[0]?.patchEol).toBeNull()
+    // pveVersion is the projected field name (parser esxVersion → projected pveVersion)
+    const firstRow: NodeHostRow | undefined = p.nodes.hosts[0]
+    expect(firstRow?.pveVersion).toBe('VMware ESXi 8.0.3 build-24674464')
+  })
+})
+
+describe('buildEosProjection — pve node classification (pB-03)', () => {
+  it('a host with esxVersion 8.2 lands major "8" with non-null majorEol in result.nodes', () => {
+    const cat: EosCatalogue = {
+      lastVerified: '2026-01-01',
+      products: {
+        'proxmox-ve': {
+          name: 'Proxmox VE',
+          releases: [
+            {
+              name: '8',
+              label: '8',
+              releaseDate: null,
+              isEol: false,
+              eolFrom: '2027-06-30',
+              isMaintained: true,
+            },
+          ],
+        },
+      },
+    }
+    const vhost = [host({ esxVersion: '8.2' })]
+    const p = buildEosProjection({ vinfo: [], vhost, catalogue: cat, today: TODAY })
+    expect(p.nodes.hosts).toHaveLength(1)
+    const row: NodeHostRow | undefined = p.nodes.hosts[0]
+    expect(row?.major).toBe('8')
+    expect(row?.majorEol).not.toBeNull()
+    expect(row?.pveVersion).toBe('8.2')
   })
 })
 

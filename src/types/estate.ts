@@ -382,7 +382,7 @@ export interface TrendSeries {
  * reconcile to the VM entity total (D-06/D-10). `cumulative` is a derived
  * display overlay. ESXi hosts are a SEPARATE kind, never summed with VMs
  * (D-09b). `reference.today` is the injected workbook-load date (D-07);
- * `EsxiHostRow.patchEol` is always the null em-dash sentinel (D-09c).
+ * `NodeHostRow.patchEol` is always the null em-dash sentinel (D-09c).
  */
 export type EosBucketKey = 'overdue' | 'w3' | 'w3to6' | 'w6to9' | 'w9to12' | 'beyond12' | 'unknown'
 
@@ -398,9 +398,9 @@ export interface EosRow {
   bucket: EosBucketKey
 }
 
-export interface EsxiHostRow {
+export interface NodeHostRow {
   hostName: string
-  esxVersion: string
+  pveVersion: string
   major: string | null
   majorEol: string | null
   patchEol: null
@@ -419,7 +419,7 @@ export interface EosProjection {
     unknown: number
   }
   rawUnknown: { osString: string; count: number }[]
-  esxi: { hosts: EsxiHostRow[]; partition: Record<EosBucketKey, number> }
+  nodes: { hosts: NodeHostRow[]; partition: Record<EosBucketKey, number> }
 }
 
 /**

@@ -16,14 +16,14 @@
   "split": "Invités : {{vms}} · Nœuds PVE : {{hosts}}",
   "unknownHeading": "Chaînes d'OS non reconnues",
   "occurrences": "{{count}} occurrences",
-  "esxiHeading": "Nœuds PVE",
+  "nodesHeading": "Fin de support des nœuds",
   "col": {
     "vmName": "Invité",
     "cluster": "Cluster",
     "host": "Nœud",
     "os": "OS",
     "eolFrom": "Fin de support",
-    "esxVersion": "version PVE",
+    "pveVersion": "version PVE",
     "major": "Version majeure",
     "majorEol": "Fin de support",
     "patchEol": "Fin de support du correctif"

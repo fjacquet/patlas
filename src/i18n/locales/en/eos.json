@@ -16,14 +16,14 @@
   "split": "Guests: {{vms}} · PVE nodes: {{hosts}}",
   "unknownHeading": "Unrecognized OS strings",
   "occurrences": "{{count}} occurrences",
-  "esxiHeading": "PVE nodes",
+  "nodesHeading": "Node end-of-support",
   "col": {
     "vmName": "Guest",
     "cluster": "Cluster",
     "host": "Node",
     "os": "OS",
     "eolFrom": "End of support",
-    "esxVersion": "PVE version",
+    "pveVersion": "PVE version",
     "major": "Major version",
     "majorEol": "End of support",
     "patchEol": "Patch end of support"

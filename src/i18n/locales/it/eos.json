@@ -16,14 +16,14 @@
   "split": "Ospiti: {{vms}} · Nodi PVE: {{hosts}}",
   "unknownHeading": "Stringhe OS non riconosciute",
   "occurrences": "{{count}} occorrenze",
-  "esxiHeading": "Nodi PVE",
+  "nodesHeading": "Fine supporto dei nodi",
   "col": {
     "vmName": "Ospite",
     "cluster": "Cluster",
     "host": "Nodo",
     "os": "OS",
     "eolFrom": "Fine supporto",
-    "esxVersion": "versione PVE",
+    "pveVersion": "versione PVE",
     "major": "Versione principale",
     "majorEol": "Fine supporto",
     "patchEol": "Fine supporto patch"

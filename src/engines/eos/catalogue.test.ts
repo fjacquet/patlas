@@ -68,6 +68,28 @@ describe('loadEosCatalogue (parse-once boundary)', () => {
   it('the committed catalogue.json round-trips through the schema', () => {
     const parsed = EosCatalogueSchema.parse(catalogueJson)
     expect(parsed.lastVerified).toMatch(/^\d{4}-\d{2}-\d{2}$/)
-    expect(parsed.products.esxi).toBeDefined()
+    expect(Object.keys(parsed.products).length).toBeGreaterThan(0)
+  })
+})
+
+describe('proxmox-ve catalogue entry', () => {
+  it('contains proxmox-ve with major releases and EOL dates', () => {
+    const cat = loadEosCatalogue()
+    const pve = cat.products['proxmox-ve']
+    expect(pve).toBeDefined()
+    // PVE 9 is intentionally omitted: endoflife.date currently reports eol: false
+    // (no EOL date published by Proxmox yet); it will be added once Proxmox publishes one.
+    if (!pve) throw new Error('proxmox-ve missing from catalogue')
+    const majors = pve.releases.map((r) => r.name)
+    expect(majors).toEqual(expect.arrayContaining(['7', '8']))
+    // every release carries an eolFrom (proxmox-ve has firm EOLs)
+    const releases = pve.releases
+    expect(releases.length).toBeGreaterThan(0)
+    for (const r of releases) expect(typeof r.eolFrom).toBe('string')
+  })
+
+  it('lastVerified was refreshed for this release', () => {
+    const cat = loadEosCatalogue()
+    expect(cat.lastVerified >= '2026-06-24').toBe(true)
   })
 })
