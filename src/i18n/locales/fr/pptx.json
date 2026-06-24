@@ -109,11 +109,8 @@
   },
   "network": {
     "title": "Réseau",
-    "vswitches": "vSwitches",
-    "dvswitches": "dvSwitches",
-    "portgroups": "Groupes de ports",
-    "vnetwork": "Adjacences invités",
-    "absent": "Les feuilles optionnelles vNetwork / vSwitch / dvSwitch / dvPort sont absentes de cet export Proxmox — aucune topologie réseau à présenter."
+    "diagramAlt": "Diagramme de topologie réseau",
+    "absent": "Aucun schéma réseau n'est inclus dans ce rapport."
   },
   "os": {
     "title": "Systèmes d'exploitation",

@@ -4,9 +4,9 @@
   },
   "section": {
     "diagram": "Topologia di rete",
-    "vswitch": "Switch standard (vSwitch)",
-    "dvswitch": "Switch distribuiti (dvSwitch)",
-    "vnetwork": "Gruppi di porte ospiti (vNetwork)"
+    "vswitch": "Switch standard",
+    "dvswitch": "Switch distribuiti",
+    "vnetwork": "Gruppi di porte ospiti"
   },
   "img": {
     "alt": "Diagramma di rete Proxmox"

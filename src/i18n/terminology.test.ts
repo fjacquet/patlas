@@ -3,7 +3,8 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 const LOCALES = ['en', 'fr', 'de', 'it']
-const FORBIDDEN = /\b(RVTools|vCenter|ESXi?|datastore)\b/i // VMware terms that must not survive in values
+const FORBIDDEN =
+  /\b(RVTools|vCenter|ESXi?|datastore|vSwitch|dvSwitch|vNetwork|dvPort|vSphere|vSAN)\b/i // VMware terms that must not survive in values
 const root = join(__dirname, 'locales')
 
 describe('no VMware terminology in user-facing strings', () => {

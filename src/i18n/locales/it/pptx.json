@@ -109,11 +109,8 @@
   },
   "network": {
     "title": "Rete",
-    "vswitches": "vSwitches",
-    "dvswitches": "dvSwitches",
-    "portgroups": "Gruppi di porte",
-    "vnetwork": "Adiacenze ospiti",
-    "absent": "I fogli opzionali vNetwork / vSwitch / dvSwitch / dvPort non sono presenti in questo export Proxmox — nessuna topologia di rete da riportare."
+    "diagramAlt": "Diagramma della topologia di rete",
+    "absent": "Nessuno schema di rete è incluso in questo rapporto."
   },
   "os": {
     "title": "Sistemi operativi",

@@ -1,58 +1,40 @@
-/** Phase 11 (F-2) — Network: KPI-only slide (vSwitch / dvSwitch /
- *  portgroup / VM-adjacency counts). No chart (D-08: network has no
- *  natural executive visual). Absent optional sheets ⇒ factual 0. */
+/** Phase 11 (F-2) — Network slide.
+ *  When the active snapshot carries a `networkSvg` (from the `.zip` bundle),
+ *  the SVG is embedded as a full-width vector image (PowerPoint renders it
+ *  natively as crisp vectors — no rasterisation needed).
+ *  When absent a Proxmox-correct factual note is shown instead. */
 import type PptxGenJS from 'pptxgenjs'
-import type { EstateView } from '@/types/estate'
+import { svgToDataUri } from '@/engines/export/svgDataUri'
 import type { ExportStrings } from '../../types'
-import { type ExportLocale, pptxNumber } from '../format'
-import { addHeader, addKpiRow, addNote } from './_layout'
+import type { ExportLocale } from '../format'
+import { SLIDE } from '../theme'
+import { addHeader, addNote, CONTENT_W, M } from './_layout'
 
 export function addNetworkSlide(
   pptx: PptxGenJS,
-  view: EstateView,
+  networkSvg: string | null,
   strings: ExportStrings,
-  locale: ExportLocale,
+  // _locale is retained for slide-builder API consistency; no locale-specific
+  // number formatting is needed here — the slide embeds an image or a static note.
+  _locale: ExportLocale,
 ): void {
   const s = pptx.addSlide()
-  const n = view.network
   const y = addHeader(s, strings['network.title'] ?? 'Network')
-  // The vNetwork/vSwitch/dvSwitch/dvPort sheets are OPTIONAL in RVTools. When
-  // absent the rollup is empty — say so factually instead of four misleading
-  // zeros (user feedback).
-  const empty =
-    n.vswitches.length === 0 &&
-    n.dvswitches.length === 0 &&
-    n.portgroups.length === 0 &&
-    n.vmPortgroupCount === 0
-  if (empty) {
-    addNote(
-      s,
-      strings['network.absent'] ??
-        'Optional network sheets are not present in this RVTools export.',
+
+  if (networkSvg && networkSvg.trim().length > 0) {
+    // Embed the SVG diagram — pptxgenjs addImage accepts SVG data URIs and
+    // PowerPoint 2016+ renders them as crisp vectors (no font bundling needed).
+    const contentH = SLIDE.h - y - M
+    s.addImage({
+      data: svgToDataUri(networkSvg),
+      x: M,
       y,
-    )
-    return
+      w: CONTENT_W,
+      h: contentH,
+      sizing: { type: 'contain', w: CONTENT_W, h: contentH },
+      altText: strings['network.diagramAlt'] ?? 'Network topology diagram',
+    })
+  } else {
+    addNote(s, strings['network.absent'] ?? 'No network diagram is included in this report.', y)
   }
-  addKpiRow(
-    s,
-    [
-      {
-        label: strings['network.vswitches'] ?? 'vSwitches',
-        value: pptxNumber(n.vswitches.length, locale),
-      },
-      {
-        label: strings['network.dvswitches'] ?? 'dvSwitches',
-        value: pptxNumber(n.dvswitches.length, locale),
-      },
-      {
-        label: strings['network.portgroups'] ?? 'Portgroups',
-        value: pptxNumber(n.portgroups.length, locale),
-      },
-      {
-        label: strings['network.vnetwork'] ?? 'VM adjacencies',
-        value: pptxNumber(n.vmPortgroupCount, locale),
-      },
-    ],
-    y,
-  )
 }

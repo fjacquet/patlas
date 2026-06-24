@@ -4,9 +4,9 @@
   },
   "section": {
     "diagram": "Netzwerktopologie",
-    "vswitch": "Standard-Switches (vSwitch)",
-    "dvswitch": "Verteilte Switches (dvSwitch)",
-    "vnetwork": "Gast-Portgruppen (vNetwork)"
+    "vswitch": "Standard-Switches",
+    "dvswitch": "Verteilte Switches",
+    "vnetwork": "Gast-Portgruppen"
   },
   "img": {
     "alt": "Proxmox-Netzwerkdiagramm"

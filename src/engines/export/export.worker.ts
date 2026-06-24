@@ -112,6 +112,8 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
         charts,
         // Active snapshot's real capture date for the D-03 title slide.
         capturedAt: new Date(req.active.capturedAt).toISOString().slice(0, 10),
+        // Network diagram SVG from the zip bundle (mirrors the HTML report path).
+        networkSvg: req.active.networkSvg ?? null,
       })
     }
 
