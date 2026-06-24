@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { REAL_OS_STRINGS, REAL_PROXMOX_OS_STRINGS } from './fixtures/real-os-strings'
+import { PROXMOX_OS_STRINGS, REAL_OS_STRINGS } from './fixtures/real-os-strings'
 import { normalizeOs } from './normalizeOs'
 
 // Strings the normalizer is EXPECTED to leave unresolved (→ first-class
@@ -136,13 +136,13 @@ describe('normalizeOs — Proxmox LXC template name forms', () => {
   })
 })
 
-describe('normalizeOs — Proxmox REAL_PROXMOX_OS_STRINGS fixture coverage', () => {
+describe('normalizeOs — PROXMOX_OS_STRINGS fixture coverage', () => {
   const PROXMOX_UNKNOWN = new Set<string>(['alpine 3.19'])
 
   it('every non-alpine Proxmox OS string resolves; alpine is null', () => {
     const wronglyUnknown: string[] = []
     const wronglyMatched: string[] = []
-    for (const s of REAL_PROXMOX_OS_STRINGS) {
+    for (const s of PROXMOX_OS_STRINGS) {
       const r = normalizeOs(s)
       if (PROXMOX_UNKNOWN.has(s)) {
         if (r !== null) wronglyMatched.push(`${s} → ${JSON.stringify(r)}`)
