@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: Offline-Capable, Redesigned, Better Deck
-status: Awaiting next milestone
-stopped_at: v2.0 milestone CLOSED — archived (ROADMAP/REQUIREMENTS/audit → milestones/), PROJECT evolved, tagged v2.0
-last_updated: "2026-05-20T12:20:00.000Z"
-last_activity: 2026-05-20 — Milestone v2.0 completed and archived
+milestone: v2.1
+milestone_name: Proxmox-Native Views (Snapshot Sprawl, Storage Content, Cluster Health)
+status: Shipped
+stopped_at: v2.1.0 milestone CLOSED — three Proxmox-native views + .zip upload fix merged to main, tagged v2.1.0, live at https://fjacquet.github.io/patlas/
+last_updated: "2026-06-24T00:00:00.000Z"
+last_activity: 2026-06-24 — Milestone v2.1.0 completed and shipped
 progress:
   total_phases: 7
   completed_phases: 7
@@ -18,28 +18,30 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-20 after v2.0 milestone)
+See: .planning/PROJECT.md (updated 2026-06-24 after v2.1.0 milestone)
 
-**Core value:** A user drops a RVTools workbook and walks away with a polished, shareable HTML report and PPTX deck describing their VMware estate — without uploading a single byte. The report is the product.
-**Current focus:** None — v2.0 shipped & tagged (installable offline PWA, redesigned UI, vsizer-grade deck). Start the next milestone with `/gsd-new-milestone`.
+**Core value:** A user drops a Proxmox VE report (`.zip` bundle or bare `.xlsx`) and walks away with a polished, shareable HTML report and PPTX deck describing their Proxmox estate — without uploading a single byte. The report is the product.
+**Current focus:** None — v2.1.0 shipped & tagged (three Proxmox-native views: Snapshot Sprawl, Storage Content, Cluster Health; `.zip` upload fix). Start the next milestone with `/gsd-new-milestone`.
 
 ## Current Position
 
-Phase: Milestone v2.0 complete
+Phase: Milestone v2.1.0 complete
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-25 — out-of-milestone Right-sizing + Monster-VM extracts shipped on `feat/vm-rightsizing-stress`.
+Status: Shipped — awaiting next milestone
+Last activity: 2026-06-24 — v2.1.0 shipped: Snapshot Sprawl, Storage Content, Cluster Health views + .zip upload fix merged to main; app live at https://fjacquet.github.io/patlas/.
 
-> **Out-of-milestone (2026-05-25, branch `feat/vm-rightsizing-stress`, via the
-> superpowers spec/plan flow — `docs/superpowers/`):** shipped two new
-> analytics extracts — **Right-sizing** (oversized/undersized/stressed from
-> RVTools `vMemory`+`vCPU`) and **Monster VMs** (largest by configured vCPU/
-> vRAM). New parser sheets → `VmUsageRow`; `sizing.ts`/`monsterVm.ts` engines;
-> `sizingThresholds`/`monsterThresholds` store slices; `RightSizingView`/
-> `MonsterVmView` + two native PPTX slides; en+fr i18n. Full gate green (545
-> tests, `sizing.ts` 100%). Pending: app-wide `de`+`it` localization (Plan 2 —
-> `docs/superpowers/plans/2026-05-25-de-it-localization.md`). Fold into a new
-> GSD milestone when convenient.
+> **v2.1.0 (2026-06-24, branch `docs/proxmox-refresh`, merged to main):**
+> Three Proxmox-native views: **Snapshot Sprawl** (guest snapshots on the
+> estate — count, guests-with-snapshots, total size, oldest age; excludes the
+> Proxmox `current` live-state marker), **Storage Content** (what occupies each
+> storage by content type — images/rootdir/iso/vztmpl/backup — + backup-file
+> inventory with per-guest recency), **Cluster Health** (HA quorum/fencing
+> service state, HA-managed guest resources, scheduled backup jobs via
+> `extractStackedSection` helper for composite Cluster sheets). All three are
+> web-only (excluded from HTML report + PPTX deck). Also fixed the `.zip`
+> upload bug (upload zone now accepts Proxmox `.zip` report bundles in addition
+> to bare `.xlsx`). Inherited analytics relabeled to Proxmox; DR analysis
+> removed.
 
 ## Performance Metrics
 
@@ -92,16 +94,18 @@ Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
 - Roadmap: 7 phases under horizontal-layers structure (Foundation → Aggregation → Inventory → Analytics Core → EOS → Trends → Exports+Deploy)
-- Stack: vsizer's stack at 2026-05 versions + ECharts (SVG renderer, tree-shaken) + live-DOM HTML report serialization
+- Stack: vatlas stack at 2026-05 versions + ECharts (SVG renderer, tree-shaken) + live-DOM HTML report serialization + fflate (zip extraction for Proxmox .zip bundles)
 - Privacy: runtime fetch/XHR/WS/Beacon guard lands in Phase 1 before any feature is tempted to add telemetry
 - Math: branded `MiB`/`GiB`/`GHz` types in Phase 1 make MB-is-MiB and MHz-vs-GHz bugs unrepresentable
-- Multi-vCenter: keyed on `(VI SDK UUID, vm_bios_uuid)`, never silent merge on names — lands in Phase 4
+- Cluster pivot: Proxmox cluster name (standalone node ⇒ implicit "proxmox" bucket); replaces multi-vCenter merge
+- Guests = unified QEMU VMs + LXC containers with `guestType` flag; UI segments by type
+- DR analysis dropped: no Proxmox analog in scope
+- Three Proxmox-native views (v2.1.0) are web-only — excluded from HTML report + PPTX deck by design
 - [Phase ?]: react-i18next 17 ships cleanly on TS 5.9 strict; v16 fallback not needed
 - [Phase ?]: Vitest 4 + jsdom 29 + Node 26: jsdom needs explicit url + setup forwards localStorage from globalThis.jsdom.window
 - [Phase ?]: FallbackError reads only error.name + error.message (never error.cause/stack/String) — hardened beyond vsizer's original
 - [Phase ?]: Class-strategy dark mode (NOT data-theme) locked in plan 01-01
 - [Phase ?]: Plan 02 privacy-guard import slot reserved as the first non-trivial line of src/main.tsx
-- [Phase ?]: 06-03: DrSimPanel reworked to two-mode physical-impact (Server stepper + Site picker + lost line), Custom-Failover in-panel toggle, no confidence; wired into PlanningView. Phase 6 COMPLETE.
 
 ### Pending Todos
 
@@ -109,11 +113,8 @@ None yet.
 
 ### Blockers/Concerns
 
-- **Phase 15 BLOCKED on user action:** the `/Users/fjacquet/Projects/icons` `render_icon` MCP is not connected to the session. Enable it (`claude mcp add icons …` then restart) so the exact KPI icon set can be vendored into `src/components/icons/`. Icon-agnostic structure (StatTile/TileSection + 4-component refactor) can proceed first if desired; icons drop into the slot after.
-- Phase 1 must harvest 4+ real RVTools workbooks (one per generation: 3.10, 3.11, 4.0, 4.4) from `~/Downloads/`, `~/Library/CloudStorage/OneDrive-Home/`, and `vsizer/public/samples/rvtools-sample.xlsx` to lock in column-alias dictionary and MB-is-MiB canary
-- Phase 4 must verify whether RVTools `vCluster` exposes host fault-domain or site tag in current versions (if not, engine surfaces `confidence: 'medium'` with "assumed symmetric" chip)
-- Phase 5 needs research pass: OS-naming-variant matrix (harvest 50+ real OS strings; assert <5% unknown-OS rate) and `endoflife.date` v1 API Beta schema stability
-- Phase 7 needs research pass: HTML-report font-embedding mechanism (subset selection, corporate-VPN CSP proxy testing, file:// vs http:// vs proxy rendering)
+- **UIX icons:** the `/Users/fjacquet/Projects/icons` `render_icon` MCP is not connected to the session. Enable it (`claude mcp add icons …` then restart) to swap hand-authored KPI icon placeholders for the icons-project exact set (deferred from v2.0).
+- DE/IT technical terminology is pending native review before release (shipped 2026-05-25 across 18 namespaces).
 
 ### Quick Tasks Completed
 
@@ -129,8 +130,8 @@ Items acknowledged and deferred at milestone close:
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
 | uat | Consolidated Playwright browser UAT — PWA offline cold-boot (PWA-02) + web-layout visuals (installability already browser-confirmed) | open | v2.0 (2026-05-20) |
-| pptx | DR slide bare when no scenario — optional stretched-cluster reservation summary | open | v2.0 (2026-05-20) |
 | ui | UIX-03 icons are hand-authored placeholders — swap for the icons-project render_icon exact set once that MCP is enabled | open | v2.0 (2026-05-20) |
+| i18n | DE/IT technical terminology pending native review | open | v2.1.0 (2026-06-24) |
 
 ## Session Continuity
 
@@ -141,4 +142,4 @@ Resume file: .planning/phases/11-report-and-deck-gap-closure-surface-phase-9-sto
 ## Operator Next Steps
 
 - **Start the next milestone:** `/gsd-new-milestone`.
-- Optional carry-forwards (deferred at v2.0 close — see Deferred Items): consolidated Playwright UAT (offline cold-boot + web-layout visuals; installability already confirmed); DR bare-slide stretched summary; swap UIX icons for the icons-project exact set. Reference deck for the PPTX bar: vsizer `~/Downloads/RVTools_export_all_2026-01-07_10_23_35_vsizer.pptx`.
+- Optional carry-forwards (deferred — see Deferred Items): consolidated Playwright UAT (offline cold-boot + web-layout visuals; installability already confirmed); swap UIX icons for the icons-project exact set; DE/IT native terminology review.

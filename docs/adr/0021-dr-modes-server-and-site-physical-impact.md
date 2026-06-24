@@ -6,6 +6,8 @@
 **Project:** vatlas
 **Phase:** 6 — Allocation & DR (re-derived)
 
+> **Note (patlas fork):** Superseded by ADR-0023 (patlas fork) — not applicable to patlas; DR analysis was dropped in the Proxmox fork.
+
 ## Context
 
 The shipped Phase-4 DR simulator (`engines/drSim`, old requirements
