@@ -77,10 +77,15 @@ describe('proxmox-ve catalogue entry', () => {
     const cat = loadEosCatalogue()
     const pve = cat.products['proxmox-ve']
     expect(pve).toBeDefined()
-    const majors = pve?.releases.map((r) => r.name) ?? []
+    // PVE 9 is intentionally omitted: endoflife.date currently reports eol: false
+    // (no EOL date published by Proxmox yet); it will be added once Proxmox publishes one.
+    if (!pve) throw new Error('proxmox-ve missing from catalogue')
+    const majors = pve.releases.map((r) => r.name)
     expect(majors).toEqual(expect.arrayContaining(['7', '8']))
     // every release carries an eolFrom (proxmox-ve has firm EOLs)
-    for (const r of pve?.releases ?? []) expect(typeof r.eolFrom).toBe('string')
+    const releases = pve.releases
+    expect(releases.length).toBeGreaterThan(0)
+    for (const r of releases) expect(typeof r.eolFrom).toBe('string')
   })
 
   it('lastVerified was refreshed for this release', () => {
