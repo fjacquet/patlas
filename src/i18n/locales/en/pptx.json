@@ -110,7 +110,7 @@
   "network": {
     "title": "Network",
     "diagramAlt": "Network topology diagram",
-    "absent": "No network diagram is included in this report — open the report as a zip bundle to include the topology."
+    "absent": "No network diagram is included in this report."
   },
   "os": {
     "title": "Operating systems",

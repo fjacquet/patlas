@@ -110,7 +110,7 @@
   "network": {
     "title": "Rete",
     "diagramAlt": "Diagramma della topologia di rete",
-    "absent": "Nessun diagramma di rete è incluso in questo report — aprire il report come archivio zip per includere la topologia."
+    "absent": "Nessuno schema di rete è incluso in questo rapporto."
   },
   "os": {
     "title": "Sistemi operativi",

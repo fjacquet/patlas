@@ -14,6 +14,8 @@ export function addNetworkSlide(
   pptx: PptxGenJS,
   networkSvg: string | null,
   strings: ExportStrings,
+  // _locale is retained for slide-builder API consistency; no locale-specific
+  // number formatting is needed here — the slide embeds an image or a static note.
   _locale: ExportLocale,
 ): void {
   const s = pptx.addSlide()
@@ -33,11 +35,6 @@ export function addNetworkSlide(
       altText: strings['network.diagramAlt'] ?? 'Network topology diagram',
     })
   } else {
-    addNote(
-      s,
-      strings['network.absent'] ??
-        'No network diagram is included in this report — open the report as a zip bundle to include the topology.',
-      y,
-    )
+    addNote(s, strings['network.absent'] ?? 'No network diagram is included in this report.', y)
   }
 }

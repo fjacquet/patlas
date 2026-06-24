@@ -110,7 +110,7 @@
   "network": {
     "title": "Netzwerk",
     "diagramAlt": "Netzwerktopologie-Diagramm",
-    "absent": "Kein Netzwerkdiagramm ist in diesem Bericht enthalten — öffnen Sie den Bericht als ZIP-Archiv, um die Topologie einzuschließen."
+    "absent": "In diesem Bericht ist kein Netzwerkdiagramm enthalten."
   },
   "os": {
     "title": "Betriebssysteme",
