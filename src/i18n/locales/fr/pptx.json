@@ -1,7 +1,7 @@
 {
   "title": {
     "identity": "{{clusters}} clusters · {{hosts}} nœuds · {{vms}} invités · capturé le {{captureDate}}",
-    "generated": "Généré par vatlas — synthèse factuelle du parc",
+    "generated": "Généré par patlas — synthèse factuelle du parc",
     "eyebrow": "PARC PROXMOX",
     "fallback": "parc Proxmox"
   },

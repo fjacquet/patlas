@@ -9,7 +9,7 @@ import { DataTable } from './DataTable'
  * INV-05 × INV-06 end-to-end contract: the CSV "Export current view"
  * serialises EXACTLY the filtered rows × the visible columns, with RAW
  * values (no locale grouping, no unit suffix), an embedded newline
- * preserved and RFC-4180 quoted, and a `vatlas-{kind}-YYYYMMDD.csv`
+ * preserved and RFC-4180 quoted, and a `patlas-{kind}-YYYYMMDD.csv`
  * filename. Component-test idiom lifted from `AccountingModeToggle.test.tsx`
  * (`render`/`screen`/`userEvent`, `i18n.changeLanguage('en')`); the
  * `inventory` namespace is registered in 03-03, so `headerFor` resolves to
@@ -128,7 +128,7 @@ describe('DataTable CSV-of-current-view (INV-05 × INV-06)', () => {
     expect(lines).toHaveLength(3)
   })
 
-  it('names the file vatlas-{objectKind}-YYYYMMDD.csv', async () => {
+  it('names the file patlas-{objectKind}-YYYYMMDD.csv', async () => {
     const user = userEvent.setup()
     render(
       <DataTable
@@ -139,6 +139,6 @@ describe('DataTable CSV-of-current-view (INV-05 × INV-06)', () => {
       />,
     )
     await user.click(screen.getByRole('button', { name: /export csv/i }))
-    expect(capturedDownloadName).toMatch(/^vatlas-datastore-\d{8}\.csv$/)
+    expect(capturedDownloadName).toMatch(/^patlas-datastore-\d{8}\.csv$/)
   })
 })

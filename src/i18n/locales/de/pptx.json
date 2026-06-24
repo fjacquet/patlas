@@ -1,7 +1,7 @@
 {
   "title": {
     "identity": "{{clusters}} Cluster · {{hosts}} Knoten · {{vms}} Gäste · erfasst am {{captureDate}}",
-    "generated": "Erstellt von vatlas — faktische Bestandssynthese",
+    "generated": "Erstellt von patlas — faktische Bestandssynthese",
     "eyebrow": "PROXMOX-BESTAND",
     "fallback": "Proxmox-Bestand"
   },
