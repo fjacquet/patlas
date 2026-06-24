@@ -9,22 +9,22 @@ export interface UploadZoneProps {
   variant?: 'hero' | 'compact'
 }
 
-const ACCEPTED_EXTENSIONS = ['.xlsx'] as const
+const ACCEPTED_EXTENSIONS = ['.zip', '.xlsx'] as const
 const ACCEPT_ATTR = ACCEPTED_EXTENSIONS.join(',')
-const ACCEPT_RE = /\.xlsx$/i
+const ACCEPT_RE = /\.(zip|xlsx)$/i
 
 const isAcceptable = (file: File): boolean => ACCEPT_RE.test(file.name)
 
 /**
  * Drag-and-drop zone with a click-to-browse fallback. Emits the chosen
- * `File`s upward via `onFiles`; parsing happens downstream (Plan 05's
- * `useSnapshotUpload` will be the consumer; Plan 01 wires a stub
- * `console.warn` in App.tsx).
+ * `File`s upward via `onFiles`; `useSnapshotUpload` reads the bytes and
+ * dispatches each file to the parser worker.
  *
- * RVTools-only: vatlas accepts `.xlsx` exclusively (PROJECT.md "Input format")
- * — `.xlsm/.xlsb/.csv/.ods/.zip` are filtered out. Multi-file drops are
- * supported (Plan 05 dispatches each file independently to its own
- * parser-worker call to produce N snapshots).
+ * patlas accepts the Proxmox export in either form: the `.zip` report bundle
+ * (`report.xlsx` + optional `network-diagram.svg`) OR a bare `.xlsx`. The
+ * worker sniffs the `PK` zip magic and routes accordingly (`extractProxmoxBundle`).
+ * Other formats (`.xlsm/.xlsb/.csv/.ods`) are filtered out here. Multi-file
+ * drops are supported (each file dispatched independently → N snapshots).
  *
  * Privacy invariant (PROJECT.md): the files never leave this component tree
  * — they're read by `FileReader` downstream and the bytes are dropped after
