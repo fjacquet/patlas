@@ -74,6 +74,34 @@ export const REAL_OS_STRINGS = [
   'FortiAnalyzer-VM64 v7.4.8-build2744 250926 (GA.M)',
 ] as const
 
+// REAL Proxmox guest OS strings harvested 2026-06-24 from:
+//   - src/engines/parser/adapters/proxmox.test.ts (QEMU VM: Os Name + Os Version join)
+//   - src/engines/parser/adapters/proxmox.test.ts (LXC: Os Version = template name)
+// Proxmox QEMU: adapter joins Os Name + Os Version with a space → "Debian 12", "Ubuntu 22.04", etc.
+// Proxmox LXC:  adapter uses Os Version alone → LXC template name, e.g. "debian-12-standard"
+export const REAL_PROXMOX_OS_STRINGS = [
+  // QEMU guests: bare "OsName OsVersion" forms (Proxmox adapter joins the two columns)
+  'Debian 12',
+  'Debian 11',
+  'Ubuntu 22.04',
+  'Ubuntu 24.04',
+  'Ubuntu 20.04',
+  'Rocky Linux 9',
+  'AlmaLinux 9',
+  'CentOS 7',
+  // LXC containers: Os Version = Proxmox LXC template name
+  'debian-12-standard',
+  'debian-11-standard',
+  'ubuntu-22.04-standard',
+  'ubuntu-24.04-standard',
+  'ubuntu-20.04-standard',
+  'rockylinux-9-default',
+  'almalinux-9-default',
+  'centos-7-default',
+  // LXC alpine template — legitimately unknown (alpine not in catalogue)
+  'alpine 3.19',
+] as const
+
 // ESX Version strings (vHost "ESX Version") — all four real fixtures are 8.0.3:
 export const REAL_ESX_VERSIONS = [
   'VMware ESXi 8.0.3 build-24674464',

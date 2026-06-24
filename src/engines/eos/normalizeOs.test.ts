@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { REAL_OS_STRINGS } from './fixtures/real-os-strings'
+import { REAL_OS_STRINGS, REAL_PROXMOX_OS_STRINGS } from './fixtures/real-os-strings'
 import { normalizeOs } from './normalizeOs'
 
 // Strings the normalizer is EXPECTED to leave unresolved (→ first-class
@@ -87,6 +87,77 @@ describe('normalizeOs — D-12 raw string never mutated', () => {
     const before = raw
     expect(normalizeOs(raw)).toEqual({ slug: 'rhel', version: '8' })
     expect(raw).toBe(before) // caller preserves verbatim — normalizeOs never mutates
+  })
+})
+
+// Proxmox QEMU strings: "OsName OsVersion" (adapter joins the two columns with a space)
+// Proxmox LXC strings: LXC template name (Os Version column only)
+// Catalogue version keying verified 2026-06-24:
+//   debian  → major only ("12", "11") | ubuntu → "22.04", "24.04", "20.04"
+//   rocky-linux → major only ("9")    | almalinux → major only ("9")
+//   centos  → major only ("7")
+describe('normalizeOs — Proxmox QEMU bare "OsName OsVersion" forms', () => {
+  it.each([
+    ['Debian 12', { slug: 'debian', version: '12' }],
+    ['Debian 11', { slug: 'debian', version: '11' }],
+    ['Ubuntu 22.04', { slug: 'ubuntu', version: '22.04' }],
+    ['Ubuntu 24.04', { slug: 'ubuntu', version: '24.04' }],
+    ['Ubuntu 20.04', { slug: 'ubuntu', version: '20.04' }],
+    ['Rocky Linux 9', { slug: 'rocky-linux', version: '9' }],
+    ['AlmaLinux 9', { slug: 'almalinux', version: '9' }],
+    ['CentOS 7', { slug: 'centos', version: '7' }],
+  ] as [
+    string,
+    { slug: string; version: string },
+  ][])('normalizes Proxmox QEMU "%s"', (raw, expected) => {
+    expect(normalizeOs(raw)).toEqual(expected)
+  })
+})
+
+describe('normalizeOs — Proxmox LXC template name forms', () => {
+  it.each([
+    ['debian-12-standard', { slug: 'debian', version: '12' }],
+    ['debian-11-standard', { slug: 'debian', version: '11' }],
+    ['ubuntu-22.04-standard', { slug: 'ubuntu', version: '22.04' }],
+    ['ubuntu-24.04-standard', { slug: 'ubuntu', version: '24.04' }],
+    ['ubuntu-20.04-standard', { slug: 'ubuntu', version: '20.04' }],
+    ['rockylinux-9-default', { slug: 'rocky-linux', version: '9' }],
+    ['almalinux-9-default', { slug: 'almalinux', version: '9' }],
+    ['centos-7-default', { slug: 'centos', version: '7' }],
+  ] as [
+    string,
+    { slug: string; version: string },
+  ][])('normalizes LXC template "%s"', (raw, expected) => {
+    expect(normalizeOs(raw)).toEqual(expected)
+  })
+
+  it('returns null for alpine LXC template (not in catalogue)', () => {
+    expect(normalizeOs('alpine 3.19')).toBeNull()
+  })
+})
+
+describe('normalizeOs — Proxmox REAL_PROXMOX_OS_STRINGS fixture coverage', () => {
+  const PROXMOX_UNKNOWN = new Set<string>(['alpine 3.19'])
+
+  it('every non-alpine Proxmox OS string resolves; alpine is null', () => {
+    const wronglyUnknown: string[] = []
+    const wronglyMatched: string[] = []
+    for (const s of REAL_PROXMOX_OS_STRINGS) {
+      const r = normalizeOs(s)
+      if (PROXMOX_UNKNOWN.has(s)) {
+        if (r !== null) wronglyMatched.push(`${s} → ${JSON.stringify(r)}`)
+      } else if (r === null) {
+        wronglyUnknown.push(s)
+      }
+    }
+    expect(
+      wronglyUnknown,
+      `Proxmox OS strings not resolved:\n${wronglyUnknown.join('\n')}`,
+    ).toEqual([])
+    expect(
+      wronglyMatched,
+      `Proxmox unknown strings wrongly force-fit:\n${wronglyMatched.join('\n')}`,
+    ).toEqual([])
   })
 })
 
