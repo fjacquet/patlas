@@ -68,6 +68,23 @@ describe('loadEosCatalogue (parse-once boundary)', () => {
   it('the committed catalogue.json round-trips through the schema', () => {
     const parsed = EosCatalogueSchema.parse(catalogueJson)
     expect(parsed.lastVerified).toMatch(/^\d{4}-\d{2}-\d{2}$/)
-    expect(parsed.products.esxi).toBeDefined()
+    expect(Object.keys(parsed.products).length).toBeGreaterThan(0)
+  })
+})
+
+describe('proxmox-ve catalogue entry', () => {
+  it('contains proxmox-ve with major releases and EOL dates', () => {
+    const cat = loadEosCatalogue()
+    const pve = cat.products['proxmox-ve']
+    expect(pve).toBeDefined()
+    const majors = pve?.releases.map((r) => r.name) ?? []
+    expect(majors).toEqual(expect.arrayContaining(['7', '8']))
+    // every release carries an eolFrom (proxmox-ve has firm EOLs)
+    for (const r of pve?.releases ?? []) expect(typeof r.eolFrom).toBe('string')
+  })
+
+  it('lastVerified was refreshed for this release', () => {
+    const cat = loadEosCatalogue()
+    expect(cat.lastVerified >= '2026-06-24').toBe(true)
   })
 })

@@ -1,79 +1,31 @@
 {
-  "lastVerified": "2026-05-17",
+  "lastVerified": "2026-06-24",
   "products": {
-    "esxi": {
-      "name": "esxi",
+    "proxmox-ve": {
+      "name": "proxmox-ve",
       "releases": [
         {
-          "name": "9.0",
-          "label": "9.0",
-          "releaseDate": "2025-06-17",
+          "name": "8",
+          "label": "8",
+          "releaseDate": "2023-06-22",
           "isEol": false,
-          "eolFrom": null,
+          "eolFrom": "2026-08-31",
           "isMaintained": true
         },
         {
-          "name": "8.0",
-          "label": "8.0",
-          "releaseDate": "2022-10-11",
-          "isEol": false,
-          "eolFrom": "2027-10-11",
-          "isMaintained": true
-        },
-        {
-          "name": "7.0",
-          "label": "7.0",
-          "releaseDate": "2020-04-02",
+          "name": "7",
+          "label": "7",
+          "releaseDate": "2021-07-06",
           "isEol": true,
-          "eolFrom": "2025-10-02",
+          "eolFrom": "2024-07-31",
           "isMaintained": false
         },
         {
-          "name": "6.7",
-          "label": "6.7",
-          "releaseDate": "2018-04-17",
+          "name": "6",
+          "label": "6",
+          "releaseDate": "2019-07-16",
           "isEol": true,
-          "eolFrom": "2022-10-15",
-          "isMaintained": false
-        },
-        {
-          "name": "6.5",
-          "label": "6.5",
-          "releaseDate": "2016-11-15",
-          "isEol": true,
-          "eolFrom": "2022-10-15",
-          "isMaintained": false
-        },
-        {
-          "name": "6.0",
-          "label": "6.0",
-          "releaseDate": "2015-03-12",
-          "isEol": true,
-          "eolFrom": "2020-03-12",
-          "isMaintained": false
-        },
-        {
-          "name": "5.5",
-          "label": "5.5",
-          "releaseDate": "2013-09-19",
-          "isEol": true,
-          "eolFrom": "2018-09-19",
-          "isMaintained": false
-        },
-        {
-          "name": "5.1",
-          "label": "5.1",
-          "releaseDate": "2012-08-27",
-          "isEol": true,
-          "eolFrom": "2016-08-24",
-          "isMaintained": false
-        },
-        {
-          "name": "5.0",
-          "label": "5.0",
-          "releaseDate": "2011-07-12",
-          "isEol": true,
-          "eolFrom": "2016-08-24",
+          "eolFrom": "2022-09-30",
           "isMaintained": false
         }
       ]
