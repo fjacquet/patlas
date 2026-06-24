@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { describe, expect, it } from 'vitest'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
@@ -13,7 +15,12 @@ import type { VHostRow } from '@/types/vhost'
 import type { VInfoRow } from '@/types/vinfo'
 import { buildExportView } from '../buildExportView'
 import { buildPptx } from './builder'
+import { chartSvgToPng } from './primitives/chartSvg'
 import type { ContentionRow } from './slides/contentionAnnex'
+
+// node-fs wasm bytes for producing a real network PNG (mirrors chartSvg.test).
+const require = createRequire(import.meta.url)
+const wasmBytes = readFileSync(require.resolve('@resvg/resvg-wasm/index_bg.wasm'))
 
 const TODAY = new Date('2026-01-01T00:00:00Z')
 const MODE: AccountingMode = 'configured'
@@ -371,6 +378,35 @@ describe('buildPptx — golden structural snapshot', () => {
     expect(txt).toContain('Planned vs measured estate')
     // 2 + 3 clusters + storage+network(2) + eos(1) + planned(1) + inventory(1)
     expect(slideCount(ab)).toBe(10)
+  })
+
+  it('REAL WRITE: a non-null networkPng serializes to a valid OOXML deck (no throw)', async () => {
+    // Regression guard for the v2.2.1 export-breaking bug: the network slide
+    // used to embed a raw SVG data URI, which throws on a real pptxgenjs write
+    // in the browser worker (PowerPoint can't render embedded SVG). The old
+    // tests SPIED on addImage and never reached write(), so it shipped. This
+    // test produces a REAL PNG and exercises the REAL serialization — assert it
+    // RESOLVES and the network slide is present in the output.
+    const a = snap('a', 3, TODAY)
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    const networkPng = await chartSvgToPng(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="#0a0"/></svg>',
+      40,
+      40,
+      wasmBytes,
+    )
+    expect(networkPng[0]).toBe(0x89) // PNG magic — the bytes are a real PNG
+
+    const withPng = await buildPptx(view, trends, strings, 'en', { networkPng })
+    expect(isZip(withPng)).toBe(true)
+    expect(withPng.byteLength).toBeGreaterThan(1000)
+    // Slide count is unchanged vs the note path (the network slide always
+    // emits exactly one slide); the win is that write() no longer throws.
+    const withNote = await buildPptx(view, trends, strings, 'en')
+    expect(slideCount(withPng)).toBe(slideCount(withNote))
+    // The embedded PNG media adds real bytes the note path lacks → the PNG deck
+    // is strictly larger, proving the image was serialized into the package.
+    expect(withPng.byteLength).toBeGreaterThan(withNote.byteLength)
   })
 
   it('PPT-02: overview + cluster slides surface the previously-dropped facts', async () => {
