@@ -6,6 +6,8 @@
 **Project:** vatlas
 **Phase:** 6 — Allocation & DR (re-derived)
 
+> **Note (patlas fork):** Superseded by ADR-0023 (patlas fork) — not applicable to patlas; DR analysis was dropped in the Proxmox fork.
+
 ## Context
 
 The original stretched-cluster design (old requirement STR-04) computed an

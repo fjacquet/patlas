@@ -1,7 +1,7 @@
 <!-- generated-by: gsd-doc-writer -->
 # Development
 
-This guide covers the day-to-day development workflow for vatlas: the dev loop, type
+This guide covers the day-to-day development workflow for patlas: the dev loop, type
 checking, linting, the binding engineering principles, and the project-specific rules
 that keep the privacy and correctness invariants intact.
 
@@ -11,14 +11,14 @@ module structure (`engines/` → `store/` → `useEstateView` → components) se
 
 ## Local setup
 
-vatlas is a 100% client-side Vite app. There is no backend, no database, and no
+patlas is a 100% client-side Vite app. There is no backend, no database, and no
 environment file to provision.
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/fjacquet/vatlas.git
-   cd vatlas
+   git clone https://github.com/fjacquet/patlas.git
+   cd patlas
    ```
 
 2. Install dependencies:
@@ -41,8 +41,8 @@ environment file to provision.
    npm run dev
    ```
 
-   The app serves at `http://localhost:5173/vatlas/` (note the `/vatlas/` base path —
-   it mirrors the GitHub Pages deploy target). Drop an RVTools `.xlsx` export into the
+   The app serves at `http://localhost:5173/patlas/` (note the `/patlas/` base path —
+   it mirrors the GitHub Pages deploy target). Drop a Proxmox report (`.zip` bundle or bare `.xlsx`) into the
    browser to exercise the full pipeline.
 
 ## Build commands
@@ -51,7 +51,7 @@ All scripts are defined in `package.json`.
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Start the Vite dev server with HMR at `http://localhost:5173/vatlas/`. |
+| `npm run dev` | Start the Vite dev server with HMR at `http://localhost:5173/patlas/`. |
 | `npm run build` | Production build: `tsc -b && vite build`. The `prebuild` hook runs the supply-chain gate first. |
 | `npm run preview` | Serve the production build locally for a final smoke check. |
 | `npm run typecheck` | Type-check the app (`tsc --noEmit`) and the test project (`tsc --noEmit -p tsconfig.test.json`). No emit. |
@@ -112,17 +112,16 @@ These are non-negotiable for new code:
 
 ### Branded units (ADR-0010)
 
-Never write a raw `* 1.048576` conversion. RVTools reports "MB" but the values are
+Never write a raw `* 1.048576` conversion. Proxmox reports "MB" but the values are
 actually MiB. Use the branded unit types (`MiB`/`GiB`/`MHz`/`GHz`/…) and their
 conversion helpers so the binary-vs-decimal distinction stays in the type system.
 
 ### Internationalisation
 
-- Every i18n key must land in **both** `en/` and `fr/` locale files. A key in one
-  language without its counterpart is a bug.
+- Every i18n key must land in **all four** locale files (`en/`, `fr/`, `de/`, `it/`). A key missing from any locale is a bug.
 - No pre-formatted numbers inside translation strings — formatting is the renderer's
   job, not the string's.
-- No editorial verbs in copy ("recommend", "should", "poor", "good"). vatlas reports
+- No editorial verbs in copy ("recommend", "should", "poor", "good"). patlas reports
   facts; the user draws conclusions.
 
 ### Privacy guard (intentional hard failure)
@@ -131,8 +130,8 @@ The app installs a privacy guard that **throws synchronously** on any non-same-o
 `fetch`, `XHR`, `WebSocket`, or `sendBeacon`. This is by design: a silent block would
 be undetectable, so the guard fails loudly instead. Adding any network call that ships
 data off-origin will break the app on purpose. There is no telemetry, no upload of
-workbook bytes, and no `localStorage` of dataset rows — only the `vatlas-theme` and
-`vatlas-lang` UI-preference keys are permitted. Refresh equals data gone; that is a
+report bytes, and no `localStorage` of dataset rows — only the `patlas-theme` and
+`patlas-lang` UI-preference keys are permitted. Refresh equals data gone; that is a
 product promise, not an accident.
 
 ## Branch conventions
@@ -145,8 +144,8 @@ Commit messages use the prefix `<type>(NN-NN): …` where `NN-NN` is the phase-p
 for example:
 
 ```
-feat(03-02): add datastore allocation engine
-docs(06-03): complete two-mode DrSimPanel
+feat(03-02): add storage allocation engine
+docs(06-03): complete cluster health view
 ```
 
 Use Conventional-Commit-style types (`feat`, `fix`, `docs`, `test`, `chore`, …).

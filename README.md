@@ -1,7 +1,7 @@
 <!-- generated-by: gsd-doc-writer -->
 # pAtlas
 
-[![Deploy to GitHub Pages](https://github.com/fjacquet/patlas/actions/workflows/static.yml/badge.svg?branch=main)](https://github.com/fjacquet/patlas/actions/workflows/static.yml)
+[![Deploy to GitHub Pages](https://github.com/fjacquet/patlas/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/fjacquet/patlas/actions/workflows/deploy.yml)
 [![Live app](https://img.shields.io/badge/live-fjacquet.github.io%2Fpatlas-2563eb)](https://fjacquet.github.io/patlas/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![React 19](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
@@ -12,17 +12,17 @@
 [![Tested with Vitest](https://img.shields.io/badge/tested%20with-vitest-6e9f18?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![Code style: Biome](https://img.shields.io/badge/code%20style-biome-60a5fa?logo=biome&logoColor=white)](https://biomejs.dev/)
 [![Client-side only](https://img.shields.io/badge/processing-100%25%20client--side-22c55e)](#privacy-guarantee)
-[![RVTools only](https://img.shields.io/badge/input-RVTools%20.xlsx-0ea5e9)](#patlas)
+[![Proxmox input](https://img.shields.io/badge/input-Proxmox%20.zip%20%2F%20.xlsx-0ea5e9)](#patlas)
 [![CI](https://github.com/fjacquet/patlas/actions/workflows/ci.yml/badge.svg)](https://github.com/fjacquet/patlas/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/fjacquet/patlas?sort=semver)](https://github.com/fjacquet/patlas/releases/latest)
 
-> Drop one or more RVTools `.xlsx` exports, get a navigable, visual **atlas of your VMware estate** — and a shareable HTML report + PPTX deck. **100 % client-side: your workbook never leaves the browser.**
+> Drop one or more Proxmox VE reports, get a navigable, visual **atlas of your Proxmox estate** — and a shareable HTML report + PPTX deck. **100 % client-side: your data never leaves the browser.**
 
-patlas is the broader sibling of [vsizer](https://github.com/fjacquet/vsizer): same architectural mold (drop file → see numbers → export → leave), much larger feature surface — global dashboard, inventory tree, allocation/DR analysis, OS End-of-Support forecasting, and in-session trends. **The report is the product.**
+patlas is a fork of [vatlas](https://github.com/fjacquet/vatlas) (the VMware/RVTools sibling): same architectural mold (drop file → see numbers → export → leave), remapped for Proxmox VE. Guests are QEMU VMs and LXC containers, unified into one inventory. **The report is the product.**
 
 ## Stack
 
-React 19 · TypeScript (strict) · Vite 8 · Tailwind v4 · Zustand 5 · Zod 4 · react-i18next (FR · EN · DE · IT) · SheetJS (`xlsx@0.20.3` from the official CDN tarball, **not** the CVE-affected npm package) · Apache ECharts 6 (SVG renderer, tree-shaken) · pptxgenjs 4 · Biome · Vitest. Pure-function `engines/`, an inputs-only Zustand store, and a single `useEstateView` hook bridging store → UI/exports. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full picture.
+React 19 · TypeScript (strict) · Vite 8 · Tailwind v4 · Zustand 5 · Zod 4 · react-i18next (EN · FR · DE · IT) · SheetJS (`xlsx@0.20.3` from the official CDN tarball, **not** the CVE-affected npm package) · `fflate` (zip extraction) · Apache ECharts 6 (SVG renderer, tree-shaken) · pptxgenjs 4 · Biome · Vitest. Pure-function `engines/`, an inputs-only Zustand store, and a single `useEstateView` hook bridging store → UI/exports. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full picture.
 
 ## Quick start
 
@@ -31,7 +31,7 @@ npm install            # pins the SheetJS tarball — do NOT `npm install xlsx`
 npm run dev            # Vite dev server → http://localhost:5173/patlas/
 ```
 
-Drop a RVTools workbook into the running app to see the dashboard. Full prerequisites and first-run troubleshooting are in [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md).
+Drop a Proxmox report bundle (`.zip`) or a bare `report.xlsx` into the running app to see the dashboard. Full prerequisites and first-run troubleshooting are in [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md).
 
 ## Privacy guarantee
 
@@ -52,8 +52,19 @@ The defining product invariant — enforced in code, not just promised: a runtim
 
 ## Status
 
-patlas is built bottom-up across a 10-phase roadmap; Phases 1–6 have shipped (foundation, global dashboard, inventory navigation, multi-vCenter merge, rich cluster/host intelligence, allocation & DR). OS End-of-Support forecasting, in-session trends, detailed storage/network views, and the HTML/PPTX exports are still ahead. `.planning/ROADMAP.md` is the source of truth for current phase status.
+patlas v2.1.0 ships the following features:
+
+**Inherited analytics (Proxmox-relabeled):** global dashboard, inventory tree, nodes view, capacity planning, OS End-of-Support forecasting, in-session trends (multiple reports loaded at once), storage capacity by storage pool, network, right-sizing, monster guests.
+
+**Proxmox-native views (v2.1.0):**
+- **Snapshot Sprawl** — guest snapshots held on the estate: count, guests-with-snapshots, total size, oldest age. Parses the `Snapshots` sheet; excludes the Proxmox `current` live-state marker.
+- **Storage Content** — what occupies each storage pool, broken down by content type (images / rootdir / iso / vztmpl / backup …) plus a backup-file inventory with per-guest recency. Parses the `Storage Content` sheet.
+- **Cluster Health** — HA status (quorum / fencing service state, HA-managed guest resources) and scheduled backup jobs. Parses the stacked `Cluster HA` / `Cluster` composite sheets.
+
+**Exports:** HTML report + PPTX deck (inherited analytics). The three Proxmox-native views are web-only.
+
+`.planning/ROADMAP.md` is the source of truth for current phase status.
 
 ## License
 
-MIT. <!-- VERIFY: LICENSE file is referenced by the badge but not present in the repository root -->
+MIT.

@@ -1,7 +1,7 @@
 <!-- generated-by: gsd-doc-writer -->
 # Configuration
 
-vatlas is a 100% client-side static web app. It has **no server, no backend, no API keys, and no environment-variable runtime configuration**. The privacy invariant forbids any network call that ships workbook bytes, so there are no service endpoints, secrets, or `.env` files to configure.
+patlas is a 100% client-side static web app. It has **no server, no backend, no API keys, and no environment-variable runtime configuration**. The privacy invariant forbids any network call that ships report bytes, so there are no service endpoints, secrets, or `.env` files to configure.
 
 What *is* configurable is the **build, lint, test, and supply-chain tooling**. This document covers those files, the CI quality gates, the small set of allowed browser-storage keys, and how the in-app locale is resolved.
 
@@ -23,7 +23,7 @@ All configuration lives in standard tooling config files at the project root. Th
 
 | Key | Value | Purpose |
 |-----|-------|---------|
-| `base` | `'/vatlas/'` | Base public path for the GitHub Pages deployment <!-- VERIFY: deployed site URL https://fjacquet.github.io/vatlas/ --> |
+| `base` | `'/patlas/'` | Base public path for the GitHub Pages deployment (`https://fjacquet.github.io/patlas/`) |
 | `plugins` | `react()`, `tailwindcss()` | React Fast Refresh/JSX + Tailwind v4 first-party Vite plugin |
 | `resolve.alias` | `@`, `@engines`, `@components`, `@store`, `@types`, `@utils`, `@hooks` | Path aliases mapping to `./src/*` subdirectories |
 | `build.target` | `'esnext'` | Output target |
@@ -107,9 +107,9 @@ Defined in `src/i18n/index.ts`:
 | Setting | Default | Source |
 |---------|---------|--------|
 | `fallbackLng` | `'fr'` | i18next init — used when the detected locale is not translated |
-| `supportedLngs` | `['fr', 'en']` | `SUPPORTED_LANGUAGES` |
+| `supportedLngs` | `['fr', 'en', 'de', 'it']` | `SUPPORTED_LANGUAGES` |
 | `defaultNS` | `'common'` | `DEFAULT_NS` |
-| Namespaces | `common`, `upload`, `dashboard`, `inventory`, `mvc`, `str`, `alloc`, `dr`, `rci` | `NAMESPACES`; JSON files under `src/i18n/locales/{en,fr}/` |
+| Namespaces | `common`, `upload`, `dashboard`, `inventory`, `mvc`, `str`, `alloc`, `rci`, and Proxmox-native namespaces | `NAMESPACES`; JSON files under `src/i18n/locales/{en,fr,de,it}/` |
 | `interpolation.escapeValue` | `false` | React already escapes interpolated values |
 
 #### Locale resolution order
@@ -117,20 +117,20 @@ Defined in `src/i18n/index.ts`:
 The `i18next-browser-languagedetector` `detection.order` is:
 
 1. **Query string** — `?lang=` (`lookupQuerystring: 'lang'`)
-2. **localStorage** — the `vatlas-lang` key (`lookupLocalStorage: 'vatlas-lang'`)
+2. **localStorage** — the `patlas-lang` key (`lookupLocalStorage: 'patlas-lang'`)
 3. **navigator** — the browser's language setting
 4. **fallback** — `fr` (`fallbackLng`)
 
-The resolved locale is cached back to `localStorage` under `vatlas-lang` (`caches: ['localStorage']`). A `vatlas-lang` value stores only a locale code (`fr` / `en`) — it contains no dataset content and so does not breach the privacy invariant.
+The resolved locale is cached back to `localStorage` under `patlas-lang` (`caches: ['localStorage']`). A `patlas-lang` value stores only a locale code (`fr` / `en` / `de` / `it`) — it contains no dataset content and so does not breach the privacy invariant.
 
 ## Browser Storage Keys
 
-The privacy invariant forbids persisting any parsed RVTools row to `localStorage`, `sessionStorage`, IndexedDB, or OPFS. Refresh-equals-data-gone is a product promise. Only **two** keys are written, and both store UI preferences only:
+The privacy invariant forbids persisting any parsed report row to `localStorage`, `sessionStorage`, IndexedDB, or OPFS. Refresh-equals-data-gone is a product promise. Only **two** keys are written, and both store UI preferences only:
 
 | Key | Written by | Allowed values | Purpose |
 |-----|-----------|-----------------|---------|
-| `vatlas-theme` | `src/hooks/useTheme.ts` | `'light'` \| `'dark'` (key is *removed* for `'auto'`) | 3-state dashboard theme preference |
-| `vatlas-lang` | `src/i18n/index.ts` (language detector cache) | `'fr'` \| `'en'` | Persisted UI locale |
+| `patlas-theme` | `src/hooks/useTheme.ts` | `'light'` \| `'dark'` (key is *removed* for `'auto'`) | 3-state dashboard theme preference |
+| `patlas-lang` | `src/i18n/index.ts` (language detector cache) | `'fr'` \| `'en'` \| `'de'` \| `'it'` | Persisted UI locale |
 
 No other browser-storage key is permitted. Dataset state lives only in the in-memory Zustand store and is garbage-collected on refresh.
 
@@ -139,8 +139,8 @@ No other browser-storage key is permitted. Dataset state lives only in the in-me
 There is **one build profile**. The app does not have development/staging/production runtime configuration because it has no runtime configuration at all.
 
 - There are no `.env.development`, `.env.production`, or `.env.test` files, and no `NODE_ENV`-conditional config-loading code.
-- The only environment-shaped difference is the **build base path**: `vite.config.ts` sets `base: '/vatlas/'` so the static bundle resolves assets correctly when served from the GitHub Pages project subpath. <!-- VERIFY: GitHub Pages deployment URL and hosting configuration -->
-- `npm run dev` serves the app locally under the same base path (`http://localhost:5173/vatlas/`). <!-- VERIFY: local dev server port/path -->
+- The only environment-shaped difference is the **build base path**: `vite.config.ts` sets `base: '/patlas/'` so the static bundle resolves assets correctly when served from the GitHub Pages project subpath (`https://fjacquet.github.io/patlas/`).
+- `npm run dev` serves the app locally under the same base path (`http://localhost:5173/patlas/`).
 - Test runs override only the test environment (jsdom with an explicit `http://localhost/` origin in `vitest.config.ts`), not application configuration.
 
 To produce an environment-specific build, change build-time config (e.g. `base` in `vite.config.ts`) and rebuild — there is no secret manager, no platform env-var injection, and no runtime feature flagging.
