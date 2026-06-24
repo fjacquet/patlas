@@ -140,5 +140,21 @@
     "ramCapPlanned": "Capacité vRAM (planifiée)",
     "ramDemand": "vRAM alloué (demande)",
     "ramHeadroomPlanned": "Marge vRAM (planifiée)"
+  },
+  "snapshotSprawl": {
+    "title": "Instantanés — inventaire des points de contrôle",
+    "kpi": {
+      "snapshots": "Points de contrôle",
+      "guests": "Invités avec points de contrôle",
+      "totalGib": "Taille totale",
+      "oldestDays": "Plus ancien (jours)"
+    },
+    "col": {
+      "guest": "Invité",
+      "node": "Nœud",
+      "checkpoint": "Point de contrôle",
+      "ageDays": "Âge (jours)",
+      "sizeGib": "Taille (Gio)"
+    }
   }
 }

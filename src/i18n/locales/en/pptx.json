@@ -140,5 +140,21 @@
     "ramCapPlanned": "vRAM capacity (planned)",
     "ramDemand": "vRAM allocated (demand)",
     "ramHeadroomPlanned": "vRAM headroom (planned)"
+  },
+  "snapshotSprawl": {
+    "title": "Snapshot sprawl — checkpoint inventory",
+    "kpi": {
+      "snapshots": "Checkpoints",
+      "guests": "Guests w/ checkpoints",
+      "totalGib": "Total size",
+      "oldestDays": "Oldest (days)"
+    },
+    "col": {
+      "guest": "Guest",
+      "node": "Node",
+      "checkpoint": "Checkpoint",
+      "ageDays": "Age (days)",
+      "sizeGib": "Size (GiB)"
+    }
   }
 }

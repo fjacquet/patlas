@@ -140,5 +140,21 @@
     "ramCapPlanned": "vRAM-Kapazität (geplant)",
     "ramDemand": "vRAM zugewiesen (Bedarf)",
     "ramHeadroomPlanned": "vRAM-Reserve (geplant)"
+  },
+  "snapshotSprawl": {
+    "title": "Snapshot-Verwaltung — Prüfpunktbestand",
+    "kpi": {
+      "snapshots": "Prüfpunkte",
+      "guests": "Gäste mit Prüfpunkten",
+      "totalGib": "Gesamtgröße",
+      "oldestDays": "Ältester (Tage)"
+    },
+    "col": {
+      "guest": "Gast",
+      "node": "Knoten",
+      "checkpoint": "Prüfpunkt",
+      "ageDays": "Alter (Tage)",
+      "sizeGib": "Größe (GiB)"
+    }
   }
 }
