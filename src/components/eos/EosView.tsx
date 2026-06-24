@@ -248,13 +248,13 @@ export function EosView() {
 
           <section className="panel">
             <h3 className="mb-3 text-base font-semibold text-slate-700 dark:text-slate-200">
-              {t('esxiHeading')}
+              {t('nodesHeading')}
             </h3>
             <table className="w-full text-left text-sm">
               <thead className="text-slate-500 dark:text-slate-400">
                 <tr>
                   <th className="py-1 pr-4">{t('col.host')}</th>
-                  <th className="py-1 pr-4">{t('col.esxVersion')}</th>
+                  <th className="py-1 pr-4">{t('col.pveVersion')}</th>
                   <th className="py-1 pr-4">{t('col.major')}</th>
                   <th className="py-1 pr-4">{t('col.majorEol')}</th>
                   <th className="py-1">{t('col.patchEol')}</th>
