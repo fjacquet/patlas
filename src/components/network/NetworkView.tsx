@@ -1,5 +1,6 @@
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
+import { svgToDataUri } from '@/engines/export/svgDataUri'
 import { useEstateView } from '@/hooks/useEstateView'
 import { selectActiveSnapshot, useSnapshotStore } from '@/store/snapshotStore'
 import {
@@ -43,13 +44,15 @@ export function NetworkView() {
     )
   }
 
+  const svg = snapshot.networkSvg ?? null
+
   const empty =
     n.vswitches.length === 0 &&
     n.dvswitches.length === 0 &&
     n.portgroups.length === 0 &&
     n.vmPortgroupCount === 0
 
-  if (empty) {
+  if (empty && !svg) {
     return (
       <main className="flex-1 p-8">
         <p className="text-[12px] text-slate-500 dark:text-slate-400">{t('empty.unavailable')}</p>
@@ -63,6 +66,14 @@ export function NetworkView() {
     <main className="flex-1 overflow-y-auto p-8">
       <ErrorBoundary FallbackComponent={NetworkError}>
         <div className="flex flex-col gap-6">
+          {svg && (
+            <section className="flex flex-col gap-2">
+              <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-200">
+                {t('section.diagram')}
+              </h2>
+              <img src={svgToDataUri(svg)} alt={t('img.alt')} className="max-w-full" />
+            </section>
+          )}
           <section className="flex flex-col gap-2">
             <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-200">
               {t('section.vswitch')}

@@ -32,10 +32,12 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
   try {
     const u8 = new Uint8Array(e.data.buf)
     const isZip = u8.byteLength >= 2 && u8[0] === 0x50 && u8[1] === 0x4b
+    let networkSvg: string | null = null
     let xlsxBytes: Uint8Array = u8
     if (isZip) {
-      const bundle = extractProxmoxBundle(u8)
-      if (bundle.xlsx) xlsxBytes = bundle.xlsx // Proxmox .zip bundle
+      const zip = extractProxmoxBundle(u8)
+      if (zip.xlsx) xlsxBytes = zip.xlsx // Proxmox .zip bundle
+      networkSvg = zip.networkSvg
       // else: a bare .xlsx (itself a zip with no inner .xlsx) → parse u8 directly
     }
 
@@ -76,6 +78,7 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
       dvswitch: [],
       dvport: [],
       parseErrors: bundle.warnings,
+      networkSvg,
     }
     self.postMessage({ kind: 'ok', snapshot, warnings: bundle.warnings })
   } catch (err) {

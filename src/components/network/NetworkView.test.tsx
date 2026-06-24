@@ -27,7 +27,7 @@ const baseVm = {
   path: '[DS_A] vm-1/vm-1.vmx',
 }
 
-const snapshot = (withNetwork: boolean): Snapshot =>
+const snapshot = (withNetwork: boolean, networkSvg?: string | null): Snapshot =>
   ({
     id: 's1',
     filename: 's1.xlsx',
@@ -38,6 +38,7 @@ const snapshot = (withNetwork: boolean): Snapshot =>
     parsedAt: new Date('2026-01-02'),
     source: 'proxmox',
     viSdkUuid: null,
+    networkSvg: networkSvg ?? null,
     vMetaData: [],
     vinfo: [baseVm],
     vhost: [],
@@ -104,5 +105,21 @@ describe('NetworkView (LC-3)', () => {
     render(<NetworkView />)
     expect(screen.getByText('Network inventory not available in this export.')).not.toBeNull()
     expect(screen.queryByText(/Standard switches/)).toBeNull()
+  })
+
+  it('renders <img> with svg data-URI when networkSvg is set and arrays are empty', () => {
+    const svgStr = '<svg xmlns="http://www.w3.org/2000/svg"><text>topo</text></svg>'
+    useSnapshotStore.getState().addSnapshot(snapshot(false, svgStr))
+    render(<NetworkView />)
+    const img = screen.getByRole('img')
+    expect(img.getAttribute('src')).toMatch(/^data:image\/svg\+xml;base64,/)
+    expect(screen.queryByText('Network inventory not available in this export.')).toBeNull()
+  })
+
+  it('shows empty-state and no <img> when networkSvg is null and arrays are empty', () => {
+    useSnapshotStore.getState().addSnapshot(snapshot(false, null))
+    render(<NetworkView />)
+    expect(screen.getByText('Network inventory not available in this export.')).not.toBeNull()
+    expect(screen.queryByRole('img')).toBeNull()
   })
 })

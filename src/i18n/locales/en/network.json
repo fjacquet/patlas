@@ -3,9 +3,13 @@
     "unavailable": "Network inventory not available in this export."
   },
   "section": {
+    "diagram": "Network topology",
     "vswitch": "Standard switches (vSwitch)",
     "dvswitch": "Distributed switches (dvSwitch)",
     "vnetwork": "Guest portgroups (vNetwork)"
+  },
+  "img": {
+    "alt": "Proxmox network diagram"
   },
   "detail": {
     "back": "Back",

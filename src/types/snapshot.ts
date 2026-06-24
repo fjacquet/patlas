@@ -181,6 +181,13 @@ export interface Snapshot {
   dvport: VDvPortRow[]
   parseErrors: ParseError[]
   /**
+   * The `network-diagram.svg` from a Proxmox `.zip` bundle, as a raw SVG
+   * string. `null` for a bare `.xlsx` (no bundle). Per-active-snapshot asset;
+   * NOT merged into `EstateView`. Rendered only via a sandboxed `<img>`
+   * data-URI (never raw-injected). In-memory only (PAR-05).
+   */
+  networkSvg?: string | null
+  /**
    * DD-C: `true` once this snapshot's raw rows have been released to cap
    * memory when > 4 snapshots are loaded. The active/latest snapshot is
    * never released. Set by `releaseRawRows` (plan 08-02).
