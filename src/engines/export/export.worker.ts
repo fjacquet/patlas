@@ -77,7 +77,14 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
       // empty slot, never fabricated).
       const treemap = optBundle.shared.storageTreemap
       if (treemap) charts.set('storage-treemap', chartToSvg(treemap, CHART_W, CHART_H))
-      const html = assembleHtml({ view, trends, charts, strings, locale: req.locale })
+      const html = assembleHtml({
+        view,
+        trends,
+        charts,
+        strings,
+        locale: req.locale,
+        networkSvg: req.active.networkSvg ?? null,
+      })
       bytes = new TextEncoder().encode(html).buffer
     } else {
       // PPTX: PowerPoint can't render SVG → rasterize every chart to PNG

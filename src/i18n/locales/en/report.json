@@ -31,7 +31,8 @@
     "vswitches": "vSwitches",
     "dvswitches": "dvSwitches",
     "portgroups": "Portgroups",
-    "vnetwork": "Guest adjacencies"
+    "vnetwork": "Guest adjacencies",
+    "diagramAlt": "Network topology diagram"
   },
   "planned": {
     "title": "Planned vs measured estate",

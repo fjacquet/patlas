@@ -31,7 +31,8 @@
     "vswitches": "vSwitches",
     "dvswitches": "dvSwitches",
     "portgroups": "Portgruppen",
-    "vnetwork": "Gast-Adjazenzen"
+    "vnetwork": "Gast-Adjazenzen",
+    "diagramAlt": "Netzwerktopologie-Diagramm"
   },
   "planned": {
     "title": "Geplanter vs. gemessener Bestand",

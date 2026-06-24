@@ -35,6 +35,9 @@ export interface AssembleInput {
   charts: ChartMap
   strings: ExportStrings
   locale: Locale
+  /** Optional Proxmox network diagram SVG (Task pC-01). Forwarded to
+   *  `renderReport` — rendered as `<img>` data-URI when present. */
+  networkSvg?: string | null
 }
 
 /**
@@ -42,8 +45,8 @@ export interface AssembleInput {
  * stays in plan 05's main-thread hook — this is a pure string function.
  */
 export function assembleHtml(input: AssembleInput): string {
-  const { view, trends, charts, strings, locale } = input
-  const body = renderReport({ view, trends, strings, locale }).replace(
+  const { view, trends, charts, strings, locale, networkSvg } = input
+  const body = renderReport({ view, trends, strings, locale, networkSvg }).replace(
     SLOT_RE,
     (_match, id: string) => {
       const svg = charts.get(id)

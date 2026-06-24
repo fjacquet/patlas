@@ -168,6 +168,33 @@ describe('renderReport — F-2/F-1 Phase 9 + planned sections', () => {
   })
 })
 
+describe('renderReport — network diagram (pC-04)', () => {
+  it('renders <img> with svg data-URI when networkSvg is set', () => {
+    const a = snap({ id: 'a' })
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>'
+    const html = renderReport({ view, trends, strings, locale: 'en', networkSvg: svg })
+    expect(html).toContain('data:image/svg+xml;base64,')
+    const imgIdx = html.indexOf('<img')
+    expect(imgIdx).toBeGreaterThan(-1)
+    expect(html.slice(imgIdx)).toContain('data:image/svg+xml;base64,')
+  })
+
+  it('omits any svg data-URI when networkSvg is null', () => {
+    const a = snap({ id: 'a' })
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    const html = renderReport({ view, trends, strings, locale: 'en', networkSvg: null })
+    expect(html).not.toContain('data:image/svg+xml;base64,')
+  })
+
+  it('omits any svg data-URI when networkSvg is absent', () => {
+    const a = snap({ id: 'a' })
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    const html = renderReport({ view, trends, strings, locale: 'en' })
+    expect(html).not.toContain('data:image/svg+xml;base64,')
+  })
+})
+
 describe('renderReport — security', () => {
   it('a cluster name containing a script tag is HTML-escaped (no executable tag)', () => {
     const evil = '<script>alert(1)</script>'

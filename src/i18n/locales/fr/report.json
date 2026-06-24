@@ -31,7 +31,8 @@
     "vswitches": "vSwitches",
     "dvswitches": "dvSwitches",
     "portgroups": "Groupes de ports",
-    "vnetwork": "Adjacences invités"
+    "vnetwork": "Adjacences invités",
+    "diagramAlt": "Schéma de topologie réseau"
   },
   "planned": {
     "title": "Parc planifié vs mesuré",

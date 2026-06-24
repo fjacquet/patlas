@@ -22,6 +22,7 @@
  * placeholders mapped to plain CSS by `inlineAssets`).
  */
 import { renderToStaticMarkup } from 'react-dom/server'
+import { svgToDataUri } from '@/engines/export/svgDataUri'
 import type { EstateView, TrendSeries } from '@/types/estate'
 import { fmtInt, fmtPercentWhole } from '@/utils/format'
 import type { ExportStrings } from '../types'
@@ -74,9 +75,18 @@ export interface RenderReportInput {
   trends: TrendSeries | null
   strings: ExportStrings
   locale: Locale
+  /** Optional Proxmox network diagram SVG (Task pC-01). When present, rendered
+   *  as an `<img>` data-URI in the network section. Omitted when null/absent. */
+  networkSvg?: string | null
 }
 
-function Report({ view, trends, strings, locale }: RenderReportInput): React.ReactElement {
+function Report({
+  view,
+  trends,
+  strings,
+  locale,
+  networkSvg,
+}: RenderReportInput): React.ReactElement {
   const loc = bcp47(locale)
   const g = view.globals
   const oi = view.operationalInsights
@@ -257,6 +267,13 @@ function Report({ view, trends, strings, locale }: RenderReportInput): React.Rea
           label={strings['network.vnetwork'] ?? 'VM adjacencies'}
           value={fmtInt(view.network.vmPortgroupCount, loc)}
         />
+        {networkSvg ? (
+          <img
+            src={svgToDataUri(networkSvg)}
+            alt={strings['network.diagramAlt'] ?? 'Network diagram'}
+            className="network-diagram"
+          />
+        ) : null}
       </Section>
 
       <Section id="eos" title={strings['eos.title'] ?? 'OS end-of-support forecast'}>
