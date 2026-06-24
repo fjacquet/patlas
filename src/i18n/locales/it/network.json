@@ -3,9 +3,13 @@
     "unavailable": "Inventario di rete non disponibile in questo export."
   },
   "section": {
+    "diagram": "Topologia di rete",
     "vswitch": "Switch standard (vSwitch)",
     "dvswitch": "Switch distribuiti (dvSwitch)",
     "vnetwork": "Gruppi di porte ospiti (vNetwork)"
+  },
+  "img": {
+    "alt": "Diagramma di rete Proxmox"
   },
   "detail": {
     "back": "Indietro",
