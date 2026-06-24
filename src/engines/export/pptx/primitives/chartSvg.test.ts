@@ -30,6 +30,27 @@ describe('chartSvgToPng — PowerPoint-safe raster', () => {
     expect(isPng(png)).toBe(true)
   })
 
+  it('fontBuffers render <text> labels (larger PNG than fontless)', async () => {
+    // resvg-wasm ships no default font → without a font the <text> glyphs draw
+    // nothing (transparent), so the PNG compresses smaller. With the bundled
+    // NotoSans the glyphs render real ink → a strictly larger PNG. This proves
+    // the network-diagram font path works (labels no longer vanish).
+    const font = new Uint8Array(readFileSync(join(process.cwd(), 'src/assets/fonts/NotoSans.ttf')))
+    const svg =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120">' +
+      '<rect width="400" height="120" fill="#ffffff"/>' +
+      '<text x="20" y="70" font-size="40" font-family="Noto Sans" fill="#000000">' +
+      'Network ABCDEF 123456</text></svg>'
+
+    const withoutFont = await chartSvgToPng(svg, 400, 120, wasmBytes)
+    const withFont = await chartSvgToPng(svg, 400, 120, wasmBytes, [font])
+
+    expect(isPng(withoutFont)).toBe(true)
+    expect(isPng(withFont)).toBe(true)
+    // Rendered glyphs add detail → a larger PNG payload.
+    expect(withFont.length).toBeGreaterThan(withoutFont.length)
+  })
+
   it('addChartImage emits an image/png data URI, never image/svg+xml', () => {
     const captured: { data: string }[] = []
     const slide: ImageSink = { addImage: (o) => captured.push(o) }

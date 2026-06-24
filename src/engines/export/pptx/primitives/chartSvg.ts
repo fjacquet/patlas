@@ -39,15 +39,27 @@ async function ensureWasm(source: WasmSource): Promise<void> {
 /**
  * Rasterize an ECharts-SSR SVG string to PNG bytes — NO DOM. The locked
  * `chartSvgToPng` contract for plan 04/05.
+ *
+ * `fontBuffers` is optional: when provided, resvg uses those fonts and
+ * disables system font loading (needed for the network diagram, whose text
+ * labels vanish without an explicit font — resvg-wasm ships no default font).
+ * Charts omit it and keep the existing call unchanged.
  */
 export async function chartSvgToPng(
   svg: string,
   width: number,
   _height: number,
   wasmSource: WasmSource,
+  fontBuffers?: Uint8Array[],
 ): Promise<Uint8Array> {
   await ensureWasm(wasmSource)
-  const r = new Resvg(svg, { fitTo: { mode: 'width', value: width } })
+  const opts = fontBuffers
+    ? {
+        fitTo: { mode: 'width' as const, value: width },
+        font: { fontBuffers, loadSystemFonts: false },
+      }
+    : { fitTo: { mode: 'width' as const, value: width } }
+  const r = new Resvg(svg, opts)
   // try/finally so a render()/asPng() throw still frees the wasm-backed
   // Resvg + RenderedImage handles (CodeRabbit — chartSvg.ts:47 leak).
   let rendered: ReturnType<typeof r.render> | null = null
