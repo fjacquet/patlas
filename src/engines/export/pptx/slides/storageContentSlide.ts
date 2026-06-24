@@ -86,8 +86,38 @@ export function addStorageContentSlide(
       cell(pptxMemMib(r.totalSizeMib, locale), { align: 'right' }),
     ])
 
-  const tableY = y2 + 0.15
+  const tableStartY = y2 + 0.15
   const halfW = (CONTENT_W - 0.2) / 2
+
+  // By-content heading
+  const byContentHeading = strings['storageContent.byContent.heading'] ?? 'By content type'
+  s.addText(pptxSafeFormat(byContentHeading), {
+    x: M,
+    y: tableStartY,
+    w: halfW,
+    h: 0.28,
+    fontFace: 'Arial',
+    fontSize: 11,
+    bold: true,
+    color: PPTX_COLORS.ink,
+    margin: 0,
+  })
+
+  // By-storage heading
+  const byStorageHeading = strings['storageContent.byStorage.heading'] ?? 'By storage'
+  s.addText(pptxSafeFormat(byStorageHeading), {
+    x: M + halfW + 0.2,
+    y: tableStartY,
+    w: halfW,
+    h: 0.28,
+    fontFace: 'Arial',
+    fontSize: 11,
+    bold: true,
+    color: PPTX_COLORS.ink,
+    margin: 0,
+  })
+
+  const tableY = tableStartY + 0.3
 
   s.addTable([byContentHeader, ...byContentRows], {
     x: M,

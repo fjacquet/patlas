@@ -42,7 +42,7 @@ export function addSnapshotSprawlSlide(
       },
       {
         label: strings['snapshotSprawl.kpi.oldestDays'] ?? 'Oldest (days)',
-        value: pptxNumber(sprawl.oldestAgeDays ?? 0, locale),
+        value: sprawl.oldestAgeDays !== null ? pptxNumber(sprawl.oldestAgeDays, locale) : '—',
       },
     ],
     y,
