@@ -212,27 +212,6 @@ Architecture not yet mapped. Follow existing patterns found in the codebase.
 No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.
 <!-- GSD:skills-end -->
 
-<!-- GSD:workflow-start source:GSD defaults -->
-## GSD Workflow Enforcement
-
-Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
-
-Use these entry points:
-
-- `/gsd-quick` for small fixes, doc updates, and ad-hoc tasks
-- `/gsd-debug` for investigation and bug fixing
-- `/gsd-execute-phase` for planned phase work
-
-Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
-<!-- GSD:workflow-end -->
-
-<!-- GSD:profile-start -->
-## Developer Profile
-
-> Profile not yet configured. Run `/gsd-profile-user` to generate your developer profile.
-> This section is managed by `generate-claude-profile` -- do not edit manually.
-<!-- GSD:profile-end -->
-
 <!-- project-notes: hand-maintained, NOT a GSD-managed fence -->
 ## Commands
 
@@ -268,8 +247,6 @@ npm run check:bundle-size         # fails if echarts chunk > 300 KB gz
 
 - **`npm run lint` is intercepted by RTK** and prints a bogus `ESLint output (JSON parse failed)` — the linter is Biome. Run `npx @biomejs/biome check .` directly.
 - **Privacy guard throws, it does not silently block.** Any non-same-origin `fetch`/`XHR`/`WS`/`sendBeacon` throws synchronously (intentional — silent block is undetectable). Adding any network call breaks the app by design.
-- **`gsd-sdk query roadmap update-plan-progress` does not match this ROADMAP's format** — after every `/gsd-execute-phase`, manually flip the phase `[ ]→[x]` and the Progress-table row.
-- Worktree isolation is unavailable in sessions where the repo wasn't a git repo at startup → GSD plans run sequentially on `main`.
 - **Reusing `components/inventory/DataTable.tsx`:** it resolves visible column headers via `useTranslation('inventory')` → `t('col.<id>')` — the `headerFor` prop is **CSV-only**. A new column `id` needs an `inventory:col.<id>` key in `i18n/locales/{en,fr}/inventory.json` or the header renders the raw key. The virtualized `<tbody>` rows are `flex w-full` + per-cell `flex-1`; the `<thead>` must use the **same** flex layout (not default table-cell sizing) or header/body columns desync (latent bug fixed in P7 — affected all consumers).
 - **`rtk tsc` only typechecks the app project** (`tsconfig.app`). Test-file type errors — e.g. a `Snapshot`/`EstateView` literal missing a newly-required field — surface ONLY under the full `npm run typecheck` (app + `tsconfig.test.json`). After adding a required field to a shared type, run `npm run typecheck`, not just `rtk tsc`.
 - **`vsanRelink.realfile.test.ts` can time out (5 s) under `--coverage`** when the real workbook is present (instrumentation slows the 3-vCenter parse) — not a regression. Use `npm run test:coverage -- --testTimeout=60000` for a clean coverage gate.
