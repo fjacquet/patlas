@@ -108,3 +108,16 @@ export const BACKUP_JOB_COLS = {
   type: ['type'],
   node: ['node'],
 } as const
+
+/** Column map for the "RRD Nodes" time-series sheet. Each row is one sample
+ *  for one node. P3 uses node/timeDate/cpuUsagePct to derive cpuRatio;
+ *  the remaining columns are mapped now so P8 can reuse without touching
+ *  this file again. */
+export const RRD_NODE_COLS = {
+  node: ['node'],
+  timeDate: ['time date'],
+  cpuUsagePct: ['cpu usage %'],
+  memUsagePct: ['memory usage %'],
+  ioWaitPct: ['io wait %'],
+  loadavg: ['loadavg'],
+} as const

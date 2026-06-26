@@ -47,7 +47,7 @@
     "consumedGhz": "GHz verbraucht",
     "availableGhz": "GHz verfügbar",
     "ramAvailable": "RAM verfügbar",
-    "footer": "Quelle: Proxmox — Knoten (CPU/RAM-Auslastung %, Speed × Cores, Memory) + Gast-Info (vCPUs, Memory)"
+    "footer": "Quelle: Proxmox — RRD-Zeitreihe (CPU-Auslastung % des Knotens) + Knoten (RAM-Auslastung %, Speed × Cores, Memory) + Gast-Info (vCPUs, Memory)"
   },
   "eos": {
     "title": "Prognose zum OS-Support-Ende",

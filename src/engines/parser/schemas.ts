@@ -180,6 +180,21 @@ export const VMetaDataRowSchema: z.ZodType<VMetaDataRow> = z.object({
 })
 
 /**
+ * Minimal validated shape for one "RRD Nodes" time-series sample. Used at the
+ * parser boundary by `adaptProxmoxRrdNodes` to build a per-node cpuRatio map;
+ * engines downstream never see raw RRD rows.
+ *
+ * cpuUsagePct is a 0-1 fraction in the Proxmox report (real values ~0.01–0.32);
+ * max 1.5 to absorb transient spikes without rejecting the row.
+ */
+export const RrdNodeSampleSchema = z.object({
+  node: z.string().trim().min(1),
+  timeDate: z.string(),
+  cpuUsagePct: z.number().min(0).max(1.5),
+})
+export type RrdNodeSample = z.infer<typeof RrdNodeSampleSchema>
+
+/**
  * Per-VM runtime metrics from `vMemory`+`vCPU`. Branded MiB/MHz; every metric
  * is nullable ("not derivable" when the cell is absent/blank — never 0).
  * `cluster`/uuid columns are allowed empty (vMemory/vCPU may omit them).

@@ -1,9 +1,11 @@
+import { aggregateHostsPerCluster } from '@/engines/aggregation/perCluster'
 import { cores, mhz, mib, sockets } from '@/engines/units'
 import type { ParsedSheet } from '../parseXlsx'
 import {
   adaptProxmox,
   adaptProxmoxGuests,
   adaptProxmoxNodes,
+  adaptProxmoxRrdNodes,
   adaptProxmoxStorages,
   adaptProxmoxUsage,
   extractClusterName,
@@ -276,4 +278,177 @@ it('falls back to "proxmox" cluster name when no Cluster sheet is present', () =
   expect(b.clusterName).toBe('proxmox')
   expect(b.nodes[0]?.cluster).toBe('proxmox')
   expect(b.guests[0]?.cluster).toBe('proxmox')
+})
+
+// ── RRD Nodes CPU fix (P3) ───────────────────────────────────────────────────
+
+const rrdNodesSheet = (rows: Record<string, unknown>[]): ParsedSheet => ({
+  name: 'RRD Nodes',
+  headers: ['Node', 'Time Date', 'Cpu Usage %', 'Memory Usage %'],
+  rows,
+  cells: [],
+})
+
+it('adaptProxmoxRrdNodes: returns empty map for undefined sheet', () => {
+  expect(adaptProxmoxRrdNodes(undefined).size).toBe(0)
+})
+
+it('adaptProxmoxRrdNodes: picks the LATEST sample per node', () => {
+  const map = adaptProxmoxRrdNodes(
+    rrdNodesSheet([
+      { Node: 'pve1', 'Time Date': '2024-01-01 00:00:00', 'Cpu Usage %': 0.05 },
+      { Node: 'pve1', 'Time Date': '2024-01-01 01:00:00', 'Cpu Usage %': 0.15 },
+      { Node: 'pve1', 'Time Date': '2024-01-01 00:30:00', 'Cpu Usage %': 0.32 },
+    ]),
+  )
+  // latest timestamp wins → 01:00:00 → 0.15
+  expect(map.get('pve1')).toBeCloseTo(0.15)
+})
+
+it('adaptProxmoxRrdNodes: skips rows with missing Cpu Usage %', () => {
+  const map = adaptProxmoxRrdNodes(
+    rrdNodesSheet([{ Node: 'pve1', 'Time Date': '2024-01-01 00:00:00', 'Cpu Usage %': '' }]),
+  )
+  expect(map.size).toBe(0)
+})
+
+it('adaptProxmoxNodes: cpuRatio comes from RRD map (non-zero)', () => {
+  const s: ParsedSheet = {
+    name: 'Nodes',
+    headers: ['Node', 'Cpu Sockets', 'Cpu Cores', 'Cpu Mhz', 'Memory Size GB', 'Memory Usage %'],
+    rows: [
+      {
+        Node: 'pve1',
+        'Cpu Sockets': 1,
+        'Cpu Cores': 4,
+        'Cpu Mhz': 2400,
+        'Memory Size GB': 16,
+        'Memory Usage %': 40,
+      },
+    ],
+    cells: [],
+  }
+  const rrdMap = new Map([['pve1', 0.22]])
+  const [h] = adaptProxmoxNodes(s, 'pve-prod', rrdMap)
+  if (!h) throw new Error('Expected host')
+  expect(h.cpuRatio).toBeCloseTo(0.22)
+})
+
+it('cluster avgCpuPct is non-zero when nodes have RRD-derived cpuRatio', () => {
+  const nodes = [
+    {
+      hostName: 'pve1',
+      cluster: 'pve-prod',
+      sockets: sockets(1),
+      cores: cores(8),
+      speedMhz: mhz(2400),
+      memoryMib: mib(32768),
+      cpuRatio: 0.18, // from RRD
+      ramRatio: 0.4,
+      faultDomain: '',
+      model: '',
+      vendor: '',
+      serialNumber: '',
+      esxVersion: '8.2',
+    },
+  ]
+  const [c] = aggregateHostsPerCluster(nodes)
+  if (!c) throw new Error('Expected cluster stat')
+  // meanCpuRatio = consumed/physical; consumed = 8*2400*0.18 → physical=8*2400 → ratio=0.18
+  expect(c.meanCpuRatio).toBeCloseTo(0.18)
+  expect(c.meanCpuRatio).toBeGreaterThan(0)
+})
+
+it('adaptProxmoxUsage: derives cpuUsageMhz from cpuUsagePct × vcpu × coreMhz', () => {
+  const vmsSheet: ParsedSheet = {
+    name: 'VMs',
+    headers: ['Name', 'Node', 'Vm Id', 'Cores', 'Sockets', 'Memory Usage GB', 'Cpu Usage %'],
+    rows: [
+      {
+        Name: 'web01',
+        Node: 'pve1',
+        'Vm Id': 100,
+        Cores: 2,
+        Sockets: 1,
+        'Memory Usage GB': 4,
+        'Cpu Usage %': 0.15,
+      },
+    ],
+    cells: [],
+  }
+  const nodeSpeedByName = new Map([['pve1', 2400]])
+  const [u] = adaptProxmoxUsage(vmsSheet, undefined, 'pve-prod', nodeSpeedByName)
+  if (!u) throw new Error('Expected usage row')
+  // cpuUsageMhz = 0.15 × 2 vcpu × 2400 MHz = 720 MHz
+  expect(u.cpuUsageMhz).toBeCloseTo(720)
+  expect(u.cpuUsageMhz).not.toBeNull()
+})
+
+it('adaptProxmoxUsage: cpuUsageMhz is null when node speed is unknown', () => {
+  const vmsSheet: ParsedSheet = {
+    name: 'VMs',
+    headers: ['Name', 'Node', 'Vm Id', 'Cores', 'Sockets', 'Cpu Usage %'],
+    rows: [
+      {
+        Name: 'web01',
+        Node: 'unknown-node',
+        'Vm Id': 100,
+        Cores: 2,
+        Sockets: 1,
+        'Cpu Usage %': 0.15,
+      },
+    ],
+    cells: [],
+  }
+  // empty nodeSpeedByName → coreMhz undefined → null
+  const [u] = adaptProxmoxUsage(vmsSheet, undefined, 'pve-prod')
+  if (!u) throw new Error('Expected usage row')
+  expect(u.cpuUsageMhz).toBeNull()
+})
+
+it('adaptProxmox: wires RRD Nodes into node cpuRatio end-to-end', () => {
+  const wb = { sheets: new Map<string, ParsedSheet>() }
+  wb.sheets.set('Nodes', {
+    name: 'Nodes',
+    headers: ['Node', 'Cpu Cores', 'Cpu Mhz', 'Memory Size GB'],
+    rows: [{ Node: 'pve1', 'Cpu Cores': 4, 'Cpu Mhz': 2400, 'Memory Size GB': 16 }],
+    cells: [],
+  })
+  wb.sheets.set('VMs', {
+    name: 'VMs',
+    headers: [
+      'Name',
+      'Node',
+      'Vm Id',
+      'Cores',
+      'Sockets',
+      'Memory Size GB',
+      'Status',
+      'Cpu Usage %',
+    ],
+    rows: [
+      {
+        Name: 'web01',
+        Node: 'pve1',
+        'Vm Id': 100,
+        Cores: 2,
+        Sockets: 1,
+        'Memory Size GB': 8,
+        Status: 'running',
+        'Cpu Usage %': 0.2,
+      },
+    ],
+    cells: [],
+  })
+  wb.sheets.set('RRD Nodes', {
+    name: 'RRD Nodes',
+    headers: ['Node', 'Time Date', 'Cpu Usage %'],
+    rows: [{ Node: 'pve1', 'Time Date': '2024-01-01 12:00:00', 'Cpu Usage %': 0.25 }],
+    cells: [],
+  })
+  const b = adaptProxmox(wb)
+  // node cpuRatio from RRD (0.25, not 0)
+  expect(b.nodes[0]?.cpuRatio).toBeCloseTo(0.25)
+  // VM cpuUsageMhz derived: 0.20 × 2 × 2400 = 960 MHz
+  expect(b.vmUsage[0]?.cpuUsageMhz).toBeCloseTo(960)
 })
