@@ -4,9 +4,11 @@ import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
 import { useEstateView } from '@/hooks/useEstateView'
 import { selectActiveSnapshot, selectThresholds, useSnapshotStore } from '@/store/snapshotStore'
+import { fmtInt, fmtMemMb } from '@/utils/format'
 import { Chart } from '../Chart'
 import { datastoreColumns } from '../inventory/columns/datastoreColumns'
 import { DataTable } from '../inventory/DataTable'
+import { StatTile, type TileAccent } from '../StatTile'
 import { DatastoreDetail } from './DatastoreDetail'
 import { StorageLensToggle } from './StorageLensToggle'
 import { ThresholdConfig } from './ThresholdConfig'
@@ -35,8 +37,9 @@ function StorageError({ error }: FallbackProps) {
  * render the em-dash in the drill (never a fabricated cluster).
  */
 export function StorageView() {
-  const { t } = useTranslation('storage')
+  const { t, i18n } = useTranslation('storage')
   const { t: tA } = useTranslation('alerts')
+  const loc = i18n.language
   const view = useEstateView('active')
   const snapshot = useSnapshotStore(selectActiveSnapshot)
   const thresholds = useSnapshotStore(selectThresholds)
@@ -119,11 +122,40 @@ export function StorageView() {
           ],
         }
 
+  // Storage-by-role band (cv4pve VM data / backup / local). Real datastore
+  // used / capacity — never the always-zero per-VM "Disk Usage GB".
+  const mem = (m: number): string => fmtMemMb(Number(m), loc)
+  const roleAccent: Record<string, TileAccent> = {
+    vmdata: 'primary',
+    backup: 'gold',
+    local: 'neutral',
+    other: 'neutral',
+  }
+
   return (
     <main className="flex-1 overflow-y-auto p-8">
       <ErrorBoundary FallbackComponent={StorageError}>
         <div className="flex flex-col gap-6">
           <ThresholdConfig />
+
+          {s.byRole.length > 0 ? (
+            <section aria-label={t('role.heading')} className="flex flex-col gap-2">
+              <h2 className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                {t('role.heading')}
+              </h2>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {s.byRole.map((g) => (
+                  <StatTile
+                    key={g.role}
+                    label={t(`role.${g.role}`)}
+                    value={`${mem(g.usedMib as number)} / ${mem(g.capacityMib as number)}`}
+                    sub={`${fmtInt(g.count, loc)} · ${mem(g.freeMib as number)} ${t('role.free')}`}
+                    accent={roleAccent[g.role] ?? 'neutral'}
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           <div className="flex flex-wrap items-center gap-4">
             <StorageLensToggle value={lens} onChange={setLens} />

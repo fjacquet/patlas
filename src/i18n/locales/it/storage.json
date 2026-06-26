@@ -4,6 +4,14 @@
     "consumption": "Consumo",
     "capacity": "Capacità"
   },
+  "role": {
+    "heading": "Per ruolo di archiviazione",
+    "vmdata": "Storage VM",
+    "backup": "Backup",
+    "local": "Locale / avvio",
+    "other": "Altro",
+    "free": "libero"
+  },
   "scope": {
     "label": "Per",
     "cluster": "Cluster",

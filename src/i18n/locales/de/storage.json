@@ -4,6 +4,14 @@
     "consumption": "Verbrauch",
     "capacity": "Kapazität"
   },
+  "role": {
+    "heading": "Nach Speicherrolle",
+    "vmdata": "VM-Speicher",
+    "backup": "Sicherung",
+    "local": "Lokal / Boot",
+    "other": "Andere",
+    "free": "frei"
+  },
   "scope": {
     "label": "Nach",
     "cluster": "Cluster",
