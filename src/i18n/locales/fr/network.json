@@ -4,9 +4,8 @@
   },
   "section": {
     "diagram": "Topologie réseau",
-    "vswitch": "Commutateurs standard",
-    "dvswitch": "Commutateurs distribués",
-    "vnetwork": "Groupes de ports invités"
+    "interfaces": "Interfaces des nœuds",
+    "vmNics": "Cartes réseau invités"
   },
   "img": {
     "alt": "Diagramme réseau Proxmox"
@@ -16,9 +15,6 @@
     "title": "Nœud — {{name}}",
     "datastores": "Stockages montés",
     "datastoresNote": "Les noms de stockages par nœud ne sont pas disponibles (Nœuds stockage est un décompte).",
-    "vswitches": "Commutateurs standard",
-    "dvswitches": "Commutateurs distribués",
-    "uplinks": "Liens montants",
     "cluster": "Cluster",
     "esxVersion": "version PVE"
   },

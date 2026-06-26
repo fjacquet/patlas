@@ -65,10 +65,9 @@ const snapshot = (id: string): Snapshot => ({
   ],
   storages: [],
   vpartition: [],
-  vnetwork: [],
-  vswitch: [],
-  dvswitch: [],
-  dvport: [],
+  nodeInterfaces: [],
+
+  vmNics: [],
   parseErrors: [],
 })
 

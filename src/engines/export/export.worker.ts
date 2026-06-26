@@ -99,6 +99,10 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
 
       const sharedPng = new Map<string, Uint8Array>()
       for (const [k, opt] of Object.entries(optBundle.shared)) {
+        // storageSlide no longer accepts a PNG — the slot is still in the
+        // HTML-report path (SVG inline) but the PPTX slide uses a native
+        // text table instead. Skip rasterization to avoid wasted work.
+        if (k === 'storageTreemap') continue
         sharedPng.set(k, await raster(opt))
       }
       const perClusterPng = new Map<string, Uint8Array>()

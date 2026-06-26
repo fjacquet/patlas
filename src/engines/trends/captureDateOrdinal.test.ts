@@ -26,10 +26,9 @@ const snap = (over: Partial<Snapshot> & { id: string }): Snapshot => ({
   proxmoxBackupJobs: [],
   storages: [],
   vpartition: [],
-  vnetwork: [],
-  vswitch: [],
-  dvswitch: [],
-  dvport: [],
+  nodeInterfaces: [],
+
+  vmNics: [],
   parseErrors: [],
   ...over,
 })

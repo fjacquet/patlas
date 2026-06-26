@@ -23,10 +23,9 @@ const minimalSnapshot = (content: ProxmoxStorageContentRow[]): Snapshot => ({
   vmUsage: [],
   storages: [],
   vpartition: [],
-  vnetwork: [],
-  vswitch: [],
-  dvswitch: [],
-  dvport: [],
+  nodeInterfaces: [],
+
+  vmNics: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: content,
   proxmoxHaResources: [],

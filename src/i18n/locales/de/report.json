@@ -13,6 +13,26 @@
   "footer": {
     "methodology": "Erstellt von patlas — faktische Bestandssynthese. Quelle: Proxmox-Export, erfasst am {{captureDate}}. Die Zahlen beziehen sich nur auf den aktiven Snapshot."
   },
+  "cover": {
+    "title": "Proxmox-Bestandsbericht",
+    "vms": "Gäste",
+    "hosts": "Knoten",
+    "clusters": "Cluster"
+  },
+  "headlines": {
+    "title": "Wichtigste Kennzahlen",
+    "vcpuPerPcpu": "vCPU : pCPU",
+    "cpuPct": "Mittlere CPU %",
+    "memPct": "Mittlerer Speicher %",
+    "poweredOn": "Eingeschaltete Gäste"
+  },
+  "cluster": {
+    "title": "Pro Cluster",
+    "hosts": "Knoten",
+    "vms": "Gäste",
+    "vcpuPerPcpu": "vCPU : pCPU",
+    "datastores": "Speicher"
+  },
   "storage": {
     "title": "Speicher",
     "byCluster": "Speicher nach Cluster",
@@ -28,11 +48,23 @@
   },
   "network": {
     "title": "Netzwerk",
-    "vswitches": "vSwitches",
-    "dvswitches": "dvSwitches",
-    "portgroups": "Portgruppen",
-    "vnetwork": "Gast-Adjazenzen",
-    "diagramAlt": "Netzwerktopologie-Diagramm"
+    "nics": "Physische NICs",
+    "bonds": "Bonds",
+    "bridges": "Bridges",
+    "vlans": "VLANs",
+    "vmNics": "Gast-NIC-Zuordnungen",
+    "diagramAlt": "Netzwerktopologie-Diagramm",
+    "oversizedNote": "Das vollständige Netzwerkdiagramm ist im HTML-Bericht verfügbar.",
+    "absent": "Kein Netzwerkdiagramm in diesem Bericht enthalten."
+  },
+  "eos": {
+    "title": "OS-Support-Ende-Prognose",
+    "overdue": "Überfällig",
+    "le3": "≤ 3 Monate",
+    "le6": "≤ 6 Monate",
+    "le9": "≤ 9 Monate",
+    "le12": "≤ 12 Monate",
+    "unknown": "Unbekannt"
   },
   "planned": {
     "title": "Geplanter vs. gemessener Bestand",
@@ -45,5 +77,17 @@
     "colCluster": "Cluster",
     "colMeasured": "Gemessen",
     "colPlanned": "Geplant"
+  },
+  "trends": {
+    "title": "Sitzungsinterne Trends",
+    "points": "Zeitpunkte",
+    "deltas": "Änderungen"
+  },
+  "annex": {
+    "title": "Anhang",
+    "cluster": "Cluster",
+    "hosts": "Knoten",
+    "vms": "Gäste",
+    "datastores": "Speicher"
   }
 }

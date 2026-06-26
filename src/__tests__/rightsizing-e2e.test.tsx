@@ -180,10 +180,9 @@ function makeProxmoxEstate(vmCount: number): Snapshot {
     proxmoxBackupJobs: [],
     storages: [],
     vpartition: [],
-    vnetwork: [],
-    vswitch: [],
-    dvswitch: [],
-    dvport: [],
+    nodeInterfaces: [],
+
+    vmNics: [],
     parseErrors: [],
   }
 }

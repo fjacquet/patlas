@@ -252,25 +252,29 @@ function Report({
 
       <Section id="network" title={strings['network.title'] ?? 'Network'}>
         <Metric
-          label={strings['network.vswitches'] ?? 'vSwitches'}
-          value={fmtInt(view.network.vswitches.length, loc)}
+          label={strings['network.nics'] ?? 'Physical NICs'}
+          value={fmtInt(view.network.totalNics, loc)}
         />
         <Metric
-          label={strings['network.dvswitches'] ?? 'dvSwitches'}
-          value={fmtInt(view.network.dvswitches.length, loc)}
+          label={strings['network.bonds'] ?? 'Bonds'}
+          value={fmtInt(view.network.totalBonds, loc)}
         />
         <Metric
-          label={strings['network.portgroups'] ?? 'Portgroups'}
-          value={fmtInt(view.network.portgroups.length, loc)}
+          label={strings['network.bridges'] ?? 'Bridges'}
+          value={fmtInt(view.network.totalBridges, loc)}
         />
         <Metric
-          label={strings['network.vnetwork'] ?? 'VM adjacencies'}
-          value={fmtInt(view.network.vmPortgroupCount, loc)}
+          label={strings['network.vlans'] ?? 'VLANs'}
+          value={fmtInt(view.network.totalVlans, loc)}
+        />
+        <Metric
+          label={strings['network.vmNics'] ?? 'Guest NIC attachments'}
+          value={fmtInt(view.network.vmNicCount, loc)}
         />
         {networkSvg ? (
           <img
             src={svgToDataUri(networkSvg)}
-            alt={strings['network.diagramAlt'] ?? 'Network diagram'}
+            alt={strings['network.diagramAlt'] ?? 'Network topology diagram'}
             className="network-diagram"
           />
         ) : null}

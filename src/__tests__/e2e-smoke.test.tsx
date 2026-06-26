@@ -93,10 +93,9 @@ vi.mock('@/engines/parser', () => ({
       proxmoxBackupJobs: [],
       storages: [],
       vpartition: [],
-      vnetwork: [],
-      vswitch: [],
-      dvswitch: [],
-      dvport: [],
+      nodeInterfaces: [],
+
+      vmNics: [],
       parseErrors: [],
     }
     return { snapshot, warnings: [] }
@@ -174,10 +173,9 @@ describe('Proxmox end-to-end smoke: drop → parse → render', () => {
       proxmoxBackupJobs: [],
       storages: [],
       vpartition: [],
-      vnetwork: [],
-      vswitch: [],
-      dvswitch: [],
-      dvport: [],
+      nodeInterfaces: [],
+
+      vmNics: [],
       parseErrors: [],
     })
     expect(useSnapshotStore.getState().snapshots.size).toBe(1)

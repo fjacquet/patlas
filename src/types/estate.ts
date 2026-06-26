@@ -479,8 +479,8 @@ export interface EstateView {
    * `naa ?? name` datastore key. Same single-pass origin. */
   vsan: VsanRelinkResult
   /**
-   * P9 network topology rollup (D-11) — vSwitch/dvSwitch/portgroup/
-   * uplink aggregates; empty when the OPTIONAL network sheets were
+   * P9 network topology rollup (D-11) — Proxmox-native NIC/bond/bridge/VLAN
+   * aggregates; empty when the OPTIONAL network sheets were
    * absent (factual-degrade). Same single-pass origin. */
   network: NetworkRollup
   /**
@@ -617,6 +617,6 @@ export interface VmDetailEntry {
   inUseMib: MiB
   poweredOn: boolean
   partitions: VmPartitionEntry[]
-  portgroups: { network: string; switch: string }[]
+  bridges: { bridge: string; tag: string }[]
   datastores: string[]
 }

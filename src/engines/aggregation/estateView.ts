@@ -422,10 +422,12 @@ const EMPTY_VSAN = Object.freeze({
 })
 
 const EMPTY_NETWORK = Object.freeze({
-  vswitches: Object.freeze([]) as never[],
-  dvswitches: Object.freeze([]) as never[],
-  portgroups: Object.freeze([]) as never[],
-  vmPortgroupCount: 0,
+  byNode: Object.freeze([]) as never[],
+  totalNics: 0,
+  totalBonds: 0,
+  totalBridges: 0,
+  totalVlans: 0,
+  vmNicCount: 0,
 })
 
 const EMPTY_FLAGS = Object.freeze({

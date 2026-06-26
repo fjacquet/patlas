@@ -73,10 +73,8 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
       proxmoxBackupJobs: bundle.proxmoxBackupJobs,
       storages: bundle.storages,
       vpartition: [],
-      vnetwork: [],
-      vswitch: [],
-      dvswitch: [],
-      dvport: [],
+      nodeInterfaces: bundle.nodeInterfaces,
+      vmNics: bundle.vmNics,
       parseErrors: bundle.warnings,
       networkSvg,
     }

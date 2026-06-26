@@ -85,10 +85,9 @@ const snap = (id: string, nClusters: number, capturedAt: Date): Snapshot => ({
   proxmoxBackupJobs: [],
   storages: [],
   vpartition: [],
-  vnetwork: [],
-  vswitch: [],
-  dvswitch: [],
-  dvport: [],
+  nodeInterfaces: [],
+
+  vmNics: [],
   parseErrors: [],
 })
 

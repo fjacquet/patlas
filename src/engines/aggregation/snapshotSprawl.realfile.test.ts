@@ -45,10 +45,9 @@ describe('snapshotSprawl acceptance (real Proxmox report)', () => {
         proxmoxBackupJobs: bundle.proxmoxBackupJobs,
         storages: bundle.storages,
         vpartition: [],
-        vnetwork: [],
-        vswitch: [],
-        dvswitch: [],
-        dvport: [],
+        nodeInterfaces: [],
+
+        vmNics: [],
         parseErrors: bundle.warnings,
       }
 

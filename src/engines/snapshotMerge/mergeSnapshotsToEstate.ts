@@ -1,5 +1,6 @@
 import type {
   GuestRow,
+  NodeInterfaceRow,
   NodeRow,
   ProxmoxBackupJobRow,
   ProxmoxHaResourceRow,
@@ -8,11 +9,8 @@ import type {
   ProxmoxStorageContentRow,
   Snapshot,
   StorageRow,
-  VDvPortRow,
-  VDvSwitchRow,
-  VNetworkRow,
+  VmNicRow,
   VPartitionRow,
-  VSwitchRow,
 } from '@/types'
 import { buildVCenterIndex, type VCenterEntry } from './vCenterIndex'
 
@@ -31,12 +29,13 @@ export interface MergedEstate {
   /** Concatenated guest-disk partitions of the selected snapshots (P5
    *  guest-data). Empty when no vPartition sheet was present. */
   vpartition: VPartitionRow[]
-  /** Concatenated network rows (P9 D-11). Empty when the OPTIONAL network
-   *  sheets were absent — factual-degrade, never undefined. */
-  vnetwork: VNetworkRow[]
-  vswitch: VSwitchRow[]
-  dvswitch: VDvSwitchRow[]
-  dvport: VDvPortRow[]
+  /** Concatenated Proxmox node interface rows across selected snapshots
+   *  (P5 — "Nodes Networks" sub-table of the Network sheet). Empty when the
+   *  OPTIONAL Network sheet is absent — factual-degrade, never undefined. */
+  nodeInterfaces: NodeInterfaceRow[]
+  /** Concatenated Proxmox guest NIC rows across selected snapshots
+   *  (P5 — "VM Networks" sub-table of the Network sheet). Empty when absent. */
+  vmNics: VmNicRow[]
   /** Concatenated Proxmox guest snapshot rows across selected snapshots.
    *  Empty when the Snapshots sheet was absent — factual-degrade, never undefined. */
   proxmoxSnapshots: ProxmoxSnapshotRow[]
@@ -60,10 +59,8 @@ const EMPTY_MERGED: MergedEstate = {
   nodes: [],
   storages: [],
   vpartition: [],
-  vnetwork: [],
-  vswitch: [],
-  dvswitch: [],
-  dvport: [],
+  nodeInterfaces: [],
+  vmNics: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
   proxmoxHaResources: [],
@@ -167,10 +164,8 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
 
   const outVdatastore: StorageRow[] = []
   const outVpartition: VPartitionRow[] = []
-  const outVnetwork: VNetworkRow[] = []
-  const outVswitch: VSwitchRow[] = []
-  const outDvswitch: VDvSwitchRow[] = []
-  const outDvport: VDvPortRow[] = []
+  const outNodeInterfaces: NodeInterfaceRow[] = []
+  const outVmNics: VmNicRow[] = []
   const outProxmoxSnapshots: ProxmoxSnapshotRow[] = []
   const outProxmoxStorageContent: ProxmoxStorageContentRow[] = []
   const outProxmoxHaResources: ProxmoxHaResourceRow[] = []
@@ -179,14 +174,10 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
   for (const snap of selected) {
     for (const d of snap.storages) outVdatastore.push(d)
     for (const p of snap.vpartition) outVpartition.push(p)
-    // P9 D-11: the four network arrays are new required Snapshot fields.
-    // `?? []` keeps the merge resilient to Snapshot objects constructed
-    // before they existed (older synthetic fixtures / future callers) —
-    // an absent array is the same factual-degrade as an empty one.
-    for (const n of snap.vnetwork ?? []) outVnetwork.push(n)
-    for (const s of snap.vswitch ?? []) outVswitch.push(s)
-    for (const ds of snap.dvswitch ?? []) outDvswitch.push(ds)
-    for (const dp of snap.dvport ?? []) outDvport.push(dp)
+    // P5: Proxmox network arrays. `?? []` keeps the merge resilient to
+    // Snapshot objects constructed before this phase landed.
+    for (const ni of snap.nodeInterfaces ?? []) outNodeInterfaces.push(ni)
+    for (const vn of snap.vmNics ?? []) outVmNics.push(vn)
     for (const ps of snap.proxmoxSnapshots ?? []) outProxmoxSnapshots.push(ps)
     for (const sc of snap.proxmoxStorageContent ?? []) outProxmoxStorageContent.push(sc)
     for (const hr of snap.proxmoxHaResources ?? []) outProxmoxHaResources.push(hr)
@@ -199,10 +190,8 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
     nodes: outVhost,
     storages: outVdatastore,
     vpartition: outVpartition,
-    vnetwork: outVnetwork,
-    vswitch: outVswitch,
-    dvswitch: outDvswitch,
-    dvport: outDvport,
+    nodeInterfaces: outNodeInterfaces,
+    vmNics: outVmNics,
     proxmoxSnapshots: outProxmoxSnapshots,
     proxmoxStorageContent: outProxmoxStorageContent,
     proxmoxHaResources: outProxmoxHaResources,

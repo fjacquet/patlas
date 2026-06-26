@@ -20,6 +20,7 @@ export type {
 export type { GuestRow, VmUsageRow, VPowerState } from './guest'
 export type { NodeRow } from './node'
 export type {
+  NodeInterfaceRow,
   ParseError,
   ProxmoxBackupJobRow,
   ProxmoxHaResourceRow,
@@ -28,11 +29,8 @@ export type {
   ProxmoxStorageContentRow,
   Snapshot,
   StorageRow,
-  VDvPortRow,
-  VDvSwitchRow,
   VMetaDataEntry,
   VMetaDataRow,
-  VNetworkRow,
+  VmNicRow,
   VPartitionRow,
-  VSwitchRow,
 } from './snapshot'

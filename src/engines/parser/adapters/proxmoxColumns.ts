@@ -121,3 +121,44 @@ export const RRD_NODE_COLS = {
   ioWaitPct: ['io wait %'],
   loadavg: ['loadavg'],
 } as const
+
+/**
+ * Column map for the "Nodes Networks" stacked sub-table inside the "Network"
+ * sheet. Headers normalised to lower-case by `mapColumns`.
+ * The `type` column is the Proxmox primitive: eth | bond | bridge | vlan |
+ * ovs_* | vxlan. (P5.)
+ */
+export const NETWORK_NODES_COLS = {
+  node: ['node'],
+  active: ['active'],
+  autostart: ['auto start'],
+  type: ['type'],
+  name: ['interface'],
+  method: ['method'],
+  cidr: ['cidr'],
+  address: ['address'],
+  gateway: ['gateway'],
+  mtu: ['mtu'],
+  bondMode: ['bond mode'],
+  slaves: ['slaves'],
+  bridgePorts: ['bridge ports'],
+  bridgeVlanAware: ['bridge vlan aware'],
+  vlanId: ['vlan id'],
+  vlanRawDevice: ['vlan raw device'],
+  comments: ['comments'],
+} as const
+
+/**
+ * Column map for the "VM Networks" stacked sub-table inside the "Network"
+ * sheet. One row per guest NIC. (P5.)
+ */
+export const NETWORK_VMS_COLS = {
+  node: ['node'],
+  vmId: ['vm id'],
+  vmName: ['name'],
+  vmType: ['type'],
+  macAddress: ['mac address'],
+  bridge: ['bridge'],
+  tag: ['tag'],
+  model: ['model'],
+} as const

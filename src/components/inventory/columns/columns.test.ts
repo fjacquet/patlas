@@ -224,10 +224,9 @@ const sharedLunSnapshot = (): Snapshot => ({
     },
   ],
   vpartition: [],
-  vnetwork: [],
-  vswitch: [],
-  dvswitch: [],
-  dvport: [],
+  nodeInterfaces: [],
+
+  vmNics: [],
   parseErrors: [],
 })
 

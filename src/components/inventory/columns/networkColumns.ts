@@ -1,76 +1,59 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import type { DvSwitchAgg, PortgroupAgg, VSwitchAgg } from '@/engines/aggregation'
+import type { NodeNetworkStats } from '@/engines/aggregation/network'
+import type { VmNicRow } from '@/types/snapshot'
 import { fmtInt } from '@/utils/format'
 
 /**
- * P9 network table column definitions (LC-3). Pure config modeled on
- * `datastoreColumns.ts` VERBATIM (zero React, zero `useMemo`, zero engine
- * runtime import — the type import is erased). Every `id` has a matching
- * `inventory:col.<id>` key in BOTH `en/` + `fr/` (Pitfall-3). Counts tier
- * via the shipped `fmtInt`; the CSV path bypasses cells (raw accessor).
+ * P5 Proxmox network table column definitions. Pure config modeled on
+ * `datastoreColumns.ts` (zero React, zero `useMemo`, zero engine runtime
+ * import — the type import is erased). Every `id` needs a matching
+ * `inventory:col.<id>` key in all four locale files (Pitfall-3).
+ * Counts tier via the shipped `fmtInt`; the CSV path bypasses cells.
  */
-export const vswitchColumns: ColumnDef<VSwitchAgg>[] = [
-  { accessorKey: 'host', id: 'host', header: 'inventory.col.host', enableHiding: false },
-  { accessorKey: 'cluster', id: 'cluster', header: 'inventory.col.cluster' },
-  { accessorKey: 'switch', id: 'switch', header: 'inventory.col.switch' },
+
+/** Per-node interface type counts (used in the Node Interfaces section). */
+export const nodeNetworkColumns: ColumnDef<NodeNetworkStats>[] = [
+  { accessorKey: 'node', id: 'node', header: 'inventory.col.node', enableHiding: false },
   {
-    accessorKey: 'ports',
-    id: 'ports',
-    header: 'inventory.col.ports',
+    accessorKey: 'nics',
+    id: 'nics',
+    header: 'inventory.col.nics',
     cell: (c) => fmtInt(c.getValue<number>()),
   },
   {
-    accessorKey: 'freePorts',
-    id: 'freePorts',
-    header: 'inventory.col.freePorts',
+    accessorKey: 'bonds',
+    id: 'bonds',
+    header: 'inventory.col.bonds',
     cell: (c) => fmtInt(c.getValue<number>()),
   },
   {
-    accessorKey: 'mtu',
-    id: 'mtu',
-    header: 'inventory.col.mtu',
+    accessorKey: 'bridges',
+    id: 'bridges',
+    header: 'inventory.col.bridges',
     cell: (c) => fmtInt(c.getValue<number>()),
   },
   {
-    accessorKey: 'vmCount',
-    id: 'vmCount',
-    header: 'inventory.col.vmCount',
+    accessorKey: 'vlans',
+    id: 'vlans',
+    header: 'inventory.col.vlans',
     cell: (c) => fmtInt(c.getValue<number>()),
   },
 ]
 
-export const dvswitchColumns: ColumnDef<DvSwitchAgg>[] = [
-  { accessorKey: 'switch', id: 'switch', header: 'inventory.col.switch', enableHiding: false },
-  { accessorKey: 'name', id: 'name', header: 'inventory.col.name' },
-  { accessorKey: 'version', id: 'version', header: 'inventory.col.version' },
-  { accessorKey: 'hostMembers', id: 'hostMembers', header: 'inventory.col.hostMembers' },
+/** Guest NIC attachment columns (used in the VM NICs section). */
+export const vmNicColumns: ColumnDef<VmNicRow>[] = [
+  { accessorKey: 'node', id: 'node', header: 'inventory.col.node', enableHiding: false },
+  { accessorKey: 'vmName', id: 'vmName', header: 'inventory.col.vmName' },
+  { accessorKey: 'bridge', id: 'bridge', header: 'inventory.col.bridge' },
   {
-    accessorKey: 'ports',
-    id: 'ports',
-    header: 'inventory.col.ports',
-    cell: (c) => fmtInt(c.getValue<number>()),
+    accessorKey: 'tag',
+    id: 'tag',
+    header: 'inventory.col.tag',
+    cell: (c) => {
+      const v = c.getValue<number | null>()
+      return v === null ? '—' : fmtInt(v)
+    },
   },
-  {
-    accessorKey: 'vms',
-    id: 'vms',
-    header: 'inventory.col.vms',
-    cell: (c) => fmtInt(c.getValue<number>()),
-  },
-  {
-    accessorKey: 'maxMtu',
-    id: 'maxMtu',
-    header: 'inventory.col.maxMtu',
-    cell: (c) => fmtInt(c.getValue<number>()),
-  },
-]
-
-export const vnetworkColumns: ColumnDef<PortgroupAgg>[] = [
-  { accessorKey: 'network', id: 'network', header: 'inventory.col.network', enableHiding: false },
-  { accessorKey: 'switch', id: 'switch', header: 'inventory.col.switch' },
-  {
-    accessorKey: 'vmCount',
-    id: 'vmCount',
-    header: 'inventory.col.vmCount',
-    cell: (c) => fmtInt(c.getValue<number>()),
-  },
+  { accessorKey: 'model', id: 'model', header: 'inventory.col.model' },
+  { accessorKey: 'macAddress', id: 'macAddress', header: 'inventory.col.macAddress' },
 ]

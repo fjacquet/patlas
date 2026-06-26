@@ -114,10 +114,8 @@ const snapshot = (): Snapshot => ({
     },
   ],
   vpartition: [],
-  vnetwork: [],
-  vswitch: [],
-  dvswitch: [],
-  dvport: [],
+  nodeInterfaces: [],
+  vmNics: [],
   parseErrors: [],
 })
 
@@ -221,12 +219,12 @@ describe('buildEstateView', () => {
     expect(view.storage.estate).toHaveProperty('provisionedMib')
     expect(Array.isArray(view.storage.byCluster)).toBe(true)
     expect(view.vsan.attributed instanceof Map).toBe(true)
-    expect(view.network).toHaveProperty('vswitches')
+    expect(view.network).toHaveProperty('byNode')
     expect(view.flags.counts).toEqual({ fs: 0, ds: 0, lu: 0 })
     expect(EMPTY_VIEW.storage.byDatastore).toEqual([])
     expect(EMPTY_VIEW.storage.estate.capacityMib as number).toBe(0)
     expect(EMPTY_VIEW.vsan.unrelinkable.size).toBe(0)
-    expect(EMPTY_VIEW.network.vmPortgroupCount).toBe(0)
+    expect(EMPTY_VIEW.network.vmNicCount).toBe(0)
     expect(EMPTY_VIEW.flags.counts).toEqual({ fs: 0, ds: 0, lu: 0 })
   })
 

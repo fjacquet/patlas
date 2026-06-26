@@ -15,7 +15,6 @@ import { addHeader, CONTENT_W, M } from './_layout'
 export function addStorageSlide(
   pptx: PptxGenJS,
   view: EstateView,
-  _chartPng: Uint8Array | undefined,
   strings: ExportStrings,
   locale: ExportLocale,
 ): void {

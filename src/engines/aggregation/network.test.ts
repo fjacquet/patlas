@@ -1,91 +1,113 @@
 import { describe, expect, it } from 'vitest'
-import type { VDvPortRow, VDvSwitchRow, VNetworkRow, VSwitchRow } from '@/types/snapshot'
+import type { NodeInterfaceRow, VmNicRow } from '@/types/snapshot'
 import { networkRollup } from './network'
 
-const net = (over: Partial<VNetworkRow>): VNetworkRow => ({
-  vm: 'vm-1',
-  network: 'PG-Prod',
-  switch: 'vSwitch0',
-  adapter: 'vmxnet3',
-  connected: 'True',
-  cluster: 'CL_1',
-  host: 'esx-1',
+const iface = (over: Partial<NodeInterfaceRow>): NodeInterfaceRow => ({
+  node: 'pve-01',
+  name: 'eno1',
+  type: 'eth',
+  active: true,
+  autostart: true,
+  method: 'manual',
+  cidr: '',
+  address: '',
+  gateway: '',
+  mtu: null,
+  bondMode: '',
+  slaves: [],
+  bridgePorts: '',
+  bridgeVlanAware: false,
+  vlanId: null,
+  vlanRawDevice: '',
+  comments: '',
   ...over,
 })
 
-const sw = (over: Partial<VSwitchRow>): VSwitchRow => ({
-  host: 'esx-1',
-  cluster: 'CL_1',
-  switch: 'vSwitch0',
-  ports: 128,
-  freePorts: 96,
-  mtu: 1500,
+const nic = (over: Partial<VmNicRow>): VmNicRow => ({
+  node: 'pve-01',
+  vmId: '100',
+  vmName: 'web-01',
+  vmType: 'qemu',
+  macAddress: 'BC:24:11:00:00:01',
+  bridge: 'vmbr1',
+  tag: 3,
+  model: 'virtio',
   ...over,
 })
 
-const dvs = (over: Partial<VDvSwitchRow>): VDvSwitchRow => ({
-  switch: 'DVS-1',
-  name: 'prod-dvs',
-  version: '8.0.0',
-  hostMembers: 'esx-1, esx-2',
-  ports: 512,
-  vms: 40,
-  maxMtu: 9000,
-  ...over,
-})
-
-const dvp = (over: Partial<VDvPortRow>): VDvPortRow => ({
-  port: 'dvpg-10',
-  switch: 'DVS-1',
-  vlan: '10',
-  activeUplink: 'uplink1',
-  standbyUplink: 'uplink2',
-  ...over,
-})
-
-describe('networkRollup — populated topology (D-11)', () => {
-  it('rolls up vSwitch with the VM count from vNetwork', () => {
+describe('networkRollup — populated topology (P5)', () => {
+  it('counts eth/bond/bridge/vlan interfaces per node and estate-wide', () => {
     const out = networkRollup({
-      vnetwork: [net({ vm: 'a' }), net({ vm: 'b' })],
-      vswitch: [sw({})],
-      dvswitch: [],
-      dvport: [],
+      nodeInterfaces: [
+        iface({ type: 'eth', name: 'eno1' }),
+        iface({ type: 'eth', name: 'eno2' }),
+        iface({ type: 'bond', name: 'bond0' }),
+        iface({ type: 'bridge', name: 'vmbr0' }),
+        iface({ type: 'vlan', name: 'COROSYNC' }),
+        iface({ type: 'vlan', name: 'MGMT' }),
+        iface({ node: 'pve-02', type: 'eth', name: 'eno1' }),
+        iface({ node: 'pve-02', type: 'bridge', name: 'vmbr0' }),
+      ],
+      vmNics: [nic({}), nic({ vmId: '101', vmName: 'db-01' })],
     })
-    expect(out.vswitches).toHaveLength(1)
-    expect(out.vswitches[0]?.ports).toBe(128)
-    expect(out.vswitches[0]?.vmCount).toBe(2)
-    expect(out.portgroups[0]).toMatchObject({ network: 'PG-Prod', switch: 'vSwitch0', vmCount: 2 })
-    expect(out.vmPortgroupCount).toBe(2)
+
+    expect(out.totalNics).toBe(3) // 2 on pve-01 + 1 on pve-02
+    expect(out.totalBonds).toBe(1)
+    expect(out.totalBridges).toBe(2) // 1 on pve-01 + 1 on pve-02
+    expect(out.totalVlans).toBe(2)
+    expect(out.vmNicCount).toBe(2)
+
+    const n1 = out.byNode.find((n) => n.node === 'pve-01')
+    expect(n1?.nics).toBe(2)
+    expect(n1?.bonds).toBe(1)
+    expect(n1?.bridges).toBe(1)
+    expect(n1?.vlans).toBe(2)
+
+    const n2 = out.byNode.find((n) => n.node === 'pve-02')
+    expect(n2?.nics).toBe(1)
+    expect(n2?.bridges).toBe(1)
   })
 
-  it('groups dvPort portgroups under the owning dvSwitch', () => {
+  it('OVS/VXLAN types are tolerated but not counted in the four totals', () => {
     const out = networkRollup({
-      vnetwork: [],
-      vswitch: [],
-      dvswitch: [dvs({})],
-      dvport: [dvp({ port: 'pg-a' }), dvp({ port: 'pg-b', vlan: '20' })],
+      nodeInterfaces: [
+        iface({ type: 'ovs_bridge', name: 'ovsbr0' }),
+        iface({ type: 'vxlan', name: 'vxlan10' }),
+        iface({ type: 'eth', name: 'eno1' }),
+      ],
     })
-    expect(out.dvswitches).toHaveLength(1)
-    expect(out.dvswitches[0]?.maxMtu).toBe(9000)
-    expect(out.dvswitches[0]?.portgroups).toHaveLength(2)
-    expect(out.dvswitches[0]?.portgroups[1]).toMatchObject({ port: 'pg-b', vlan: '20' })
+    expect(out.totalNics).toBe(1)
+    expect(out.totalBonds).toBe(0)
+    expect(out.totalBridges).toBe(0)
+    expect(out.totalVlans).toBe(0)
+  })
+
+  it('sorts byNode alphabetically', () => {
+    const out = networkRollup({
+      nodeInterfaces: [
+        iface({ node: 'pve-03', type: 'eth' }),
+        iface({ node: 'pve-01', type: 'eth' }),
+        iface({ node: 'pve-02', type: 'eth' }),
+      ],
+    })
+    expect(out.byNode.map((n) => n.node)).toEqual(['pve-01', 'pve-02', 'pve-03'])
   })
 })
 
-describe('networkRollup — empty input tolerated (Pitfall 1, no throw)', () => {
-  it('returns empty aggregates for all-empty input', () => {
-    const out = networkRollup({ vnetwork: [], vswitch: [], dvswitch: [], dvport: [] })
-    expect(out.vswitches).toEqual([])
-    expect(out.dvswitches).toEqual([])
-    expect(out.portgroups).toEqual([])
-    expect(out.vmPortgroupCount).toBe(0)
+describe('networkRollup — empty input tolerated (factual-degrade, no throw)', () => {
+  it('returns all-zero aggregates for empty arrays', () => {
+    const out = networkRollup({ nodeInterfaces: [], vmNics: [] })
+    expect(out.byNode).toEqual([])
+    expect(out.totalNics).toBe(0)
+    expect(out.totalBonds).toBe(0)
+    expect(out.totalBridges).toBe(0)
+    expect(out.totalVlans).toBe(0)
+    expect(out.vmNicCount).toBe(0)
   })
 
-  it('returns empty aggregates when the arrays are entirely absent', () => {
+  it('returns all-zero aggregates when arrays are entirely absent', () => {
     const out = networkRollup({})
-    expect(out.vswitches).toEqual([])
-    expect(out.dvswitches).toEqual([])
-    expect(out.portgroups).toEqual([])
-    expect(out.vmPortgroupCount).toBe(0)
+    expect(out.totalNics).toBe(0)
+    expect(out.vmNicCount).toBe(0)
   })
 })

@@ -3,6 +3,7 @@ import { gibToMib } from '@/engines/units/converters'
 import { gib } from '@/engines/units/types'
 import type {
   GuestRow,
+  NodeInterfaceRow,
   NodeRow,
   ParseError,
   ProxmoxBackupJobRow,
@@ -11,6 +12,7 @@ import type {
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
   StorageRow,
+  VmNicRow,
   VmUsageRow,
 } from '@/types'
 import type { ParsedSheet, ParsedWorkbook } from '../parseXlsx'
@@ -21,6 +23,8 @@ import {
   GUEST_COLS,
   HA_RESOURCE_COLS,
   HA_STATUS_COLS,
+  NETWORK_NODES_COLS,
+  NETWORK_VMS_COLS,
   NODE_COLS,
   RRD_NODE_COLS,
   SNAPSHOT_COLS,
@@ -382,6 +386,85 @@ export const adaptProxmoxUsage = (
 }
 
 /**
+ * Parse the "Nodes Networks" stacked sub-table from the Proxmox "Network"
+ * sheet. Uses `extractStackedSection` (same helper as Cluster HA). Returns
+ * an empty array when the sheet or sub-table is absent (factual-degrade).
+ */
+export const adaptProxmoxNodeInterfaces = (sheet: ParsedSheet | undefined): NodeInterfaceRow[] => {
+  if (!sheet) return []
+  const sec = extractStackedSection(sheet.cells, 'Nodes Networks')
+  if (sec.headers.length === 0) return []
+  const cols = mapColumns(sec.headers, NETWORK_NODES_COLS)
+  const readX = (v: unknown): boolean => readString(v).trim() === 'X'
+  const readMaybeInt = (v: unknown): number | null => {
+    const raw = readCol({ _: v }, '_')
+    if (raw === undefined || raw === null || readString(raw) === '') return null
+    const n = Math.round(readNumber(raw))
+    return Number.isFinite(n) && n >= 0 ? n : null
+  }
+  return sec.rows
+    .map((row): NodeInterfaceRow => {
+      const slavesRaw = readString(readCol(row, cols.slaves)).trim()
+      const slaves = slavesRaw === '' ? [] : slavesRaw.split(/\s+/).filter(Boolean)
+      const bridgeVlanAwareRaw = readCol(row, cols.bridgeVlanAware)
+      const bridgeVlanAware =
+        bridgeVlanAwareRaw === true ||
+        readString(bridgeVlanAwareRaw).toLowerCase() === 'true' ||
+        readString(bridgeVlanAwareRaw) === '1'
+      return {
+        node: readString(readCol(row, cols.node)),
+        name: readString(readCol(row, cols.name)),
+        type: readString(readCol(row, cols.type)).toLowerCase(),
+        active: readX(readCol(row, cols.active)),
+        autostart: readX(readCol(row, cols.autostart)),
+        method: readString(readCol(row, cols.method)),
+        cidr: readString(readCol(row, cols.cidr)),
+        address: readString(readCol(row, cols.address)),
+        gateway: readString(readCol(row, cols.gateway)),
+        mtu: readMaybeInt(readCol(row, cols.mtu)),
+        bondMode: readString(readCol(row, cols.bondMode)),
+        slaves,
+        bridgePorts: readString(readCol(row, cols.bridgePorts)),
+        bridgeVlanAware,
+        vlanId: readMaybeInt(readCol(row, cols.vlanId)),
+        vlanRawDevice: readString(readCol(row, cols.vlanRawDevice)),
+        comments: readString(readCol(row, cols.comments)),
+      }
+    })
+    .filter((r) => r.node !== '' && r.name !== '')
+}
+
+/**
+ * Parse the "VM Networks" stacked sub-table from the Proxmox "Network"
+ * sheet. One row per guest NIC. Returns an empty array when absent.
+ */
+export const adaptProxmoxVmNics = (sheet: ParsedSheet | undefined): VmNicRow[] => {
+  if (!sheet) return []
+  const sec = extractStackedSection(sheet.cells, 'VM Networks')
+  if (sec.headers.length === 0) return []
+  const cols = mapColumns(sec.headers, NETWORK_VMS_COLS)
+  return sec.rows
+    .map((row): VmNicRow => {
+      const tagRaw = readCol(row, cols.tag)
+      const tag =
+        tagRaw === null || tagRaw === undefined || readString(tagRaw) === ''
+          ? null
+          : Math.round(readNumber(tagRaw))
+      return {
+        node: readString(readCol(row, cols.node)),
+        vmId: readString(readCol(row, cols.vmId)),
+        vmName: readString(readCol(row, cols.vmName)),
+        vmType: readString(readCol(row, cols.vmType)).toLowerCase(),
+        macAddress: readString(readCol(row, cols.macAddress)),
+        bridge: readString(readCol(row, cols.bridge)),
+        tag: Number.isFinite(tag) && tag !== null && tag >= 0 ? tag : null,
+        model: readString(readCol(row, cols.model)),
+      }
+    })
+    .filter((r) => r.node !== '' && r.vmId !== '')
+}
+
+/**
  * Throw a structured fatal `ParseError`. `name === 'ParseError'` is the
  * discriminator the worker boundary serializes; `sheet`/`kind` ride along
  * as own properties (mirrors rvtools.ts parseError — NO `cause`, STRIDE T-04-04).
@@ -414,15 +497,28 @@ export const adaptProxmox = (
   proxmoxHaResources: ProxmoxHaResourceRow[]
   proxmoxHaStatus: ProxmoxHaStatusRow[]
   proxmoxBackupJobs: ProxmoxBackupJobRow[]
+  nodeInterfaces: NodeInterfaceRow[]
+  vmNics: VmNicRow[]
   clusterName: string
   warnings: ParseError[]
 } => {
   const warnings: ParseError[] = []
-  // Standalone Proxmox has no cluster name; a non-empty bucket keeps the estate
-  // visible (aggregateClusters drops empty-cluster hosts). Matches design decision
-  // D4: cluster pivot = Proxmox cluster name; standalone ⇒ single implicit bucket.
+  // When the Cluster sheet is absent (standalone Proxmox node), fall back to
+  // the first node's hostname rather than the opaque literal 'proxmox' — gives
+  // the estate a meaningful label in the UI (Part C — P5 clarity fix).
   const clusterSheet = findSheet(workbook, ['cluster'])
-  const clusterName = extractClusterName(clusterSheet) || 'proxmox'
+  const clusterNameFromSheet = extractClusterName(clusterSheet)
+  const clusterName: string = (() => {
+    if (clusterNameFromSheet) return clusterNameFromSheet
+    // Peek at the first row of Nodes to derive a standalone label.
+    const nodesPreview = findSheet(workbook, ['nodes'])
+    if (nodesPreview && nodesPreview.rows.length > 0) {
+      const cols = mapColumns(nodesPreview.headers, NODE_COLS)
+      const firstName = readString(readCol(nodesPreview.rows[0] ?? {}, cols.node))
+      if (firstName) return firstName
+    }
+    return 'standalone'
+  })()
 
   const nodesSheet = findSheet(workbook, ['nodes'])
   if (!nodesSheet) {
@@ -470,6 +566,7 @@ export const adaptProxmox = (
   }
 
   const clusterHaSheet = findSheet(workbook, ['cluster ha'])
+  const networkSheet = findSheet(workbook, ['network'])
 
   // --- RRD Nodes: derive per-node CPU ratio from time-series data ------------
   // Primary source: "RRD Nodes" sheet (optional). Contains one row per
@@ -505,6 +602,8 @@ export const adaptProxmox = (
     proxmoxHaResources: adaptProxmoxHaResources(clusterHaSheet),
     proxmoxHaStatus: adaptProxmoxHaStatus(clusterHaSheet),
     proxmoxBackupJobs: adaptProxmoxBackupJobs(clusterSheet),
+    nodeInterfaces: adaptProxmoxNodeInterfaces(networkSheet),
+    vmNics: adaptProxmoxVmNics(networkSheet),
     clusterName,
     warnings,
   }

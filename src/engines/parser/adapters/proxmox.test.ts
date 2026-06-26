@@ -250,7 +250,7 @@ it('throws a ParseError when both VMs and Containers sheets are missing', () => 
   expect(() => adaptProxmox(wb)).toThrow(/VMs|Containers/)
 })
 
-it('falls back to "proxmox" cluster name when no Cluster sheet is present', () => {
+it('falls back to first node hostname as cluster name when no Cluster sheet is present', () => {
   const wb = { sheets: new Map<string, ParsedSheet>() }
   wb.sheets.set('Nodes', {
     name: 'Nodes',
@@ -275,9 +275,10 @@ it('falls back to "proxmox" cluster name when no Cluster sheet is present', () =
     cells: [],
   })
   const b = adaptProxmox(wb)
-  expect(b.clusterName).toBe('proxmox')
-  expect(b.nodes[0]?.cluster).toBe('proxmox')
-  expect(b.guests[0]?.cluster).toBe('proxmox')
+  // When no Cluster sheet: derive cluster name from first node hostname (not 'proxmox').
+  expect(b.clusterName).toBe('pve1')
+  expect(b.nodes[0]?.cluster).toBe('pve1')
+  expect(b.guests[0]?.cluster).toBe('pve1')
 })
 
 // ── RRD Nodes CPU fix (P3) ───────────────────────────────────────────────────

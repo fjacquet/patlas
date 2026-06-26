@@ -1,11 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import type { DvSwitchAgg, VSwitchAgg } from '@/engines/aggregation'
 import type { EsxAggregate } from '@/types/estate'
 
 export interface EsxDetailData {
   host: EsxAggregate
-  vswitches: VSwitchAgg[]
-  dvswitches: DvSwitchAgg[]
 }
 
 export interface EsxDetailProps {
@@ -14,13 +11,10 @@ export interface EsxDetailProps {
 }
 
 /**
- * P9 LC-4 per-host storage+network drill. AUGMENTS the shipped Hosts view
- * (lifted drill state in `HostsView`) — it does NOT duplicate the P5
- * cluster-detail drill. Screen-fit ClusterDetail idiom (`overflow-hidden
- * p-8`, fixed grid, no internal scroll → one PPTX slide). Factual only;
- * per-host datastore NAMES are not in RVTools (vDatastore Hosts is a
- * count — binding memory) so that row is an em-dash + a factual caption,
- * never fabricated. `dark:` twin on every colour.
+ * P9 LC-4 per-host drill. Shows cluster, PVE version, and a factual
+ * note about datastore names. Interface-level network detail lives in
+ * the dedicated NetworkView — no vSwitch/dvSwitch panels here (Proxmox
+ * does not have those constructs). Screen-fit ClusterDetail idiom.
  */
 export function EsxDetail({ detail: d, onBack }: EsxDetailProps) {
   const { t } = useTranslation('network')
@@ -60,34 +54,6 @@ export function EsxDetail({ detail: d, onBack }: EsxDetailProps) {
             <p className="pt-1 text-[12px] font-normal text-slate-500 dark:text-slate-400">
               {t('detail.datastoresNote')}
             </p>
-          </div>
-          <div className="overflow-hidden">
-            <p className="pb-1 text-sm text-slate-600 dark:text-slate-400">
-              {t('detail.vswitches')}
-            </p>
-            {d.vswitches.length === 0 ? (
-              <p className="text-[12px] text-slate-500 dark:text-slate-400">{na}</p>
-            ) : (
-              d.vswitches.map((s) => (
-                <Row
-                  key={s.switch}
-                  label={s.switch}
-                  value={`${s.ports} / ${s.freePorts} · MTU ${s.mtu}`}
-                />
-              ))
-            )}
-          </div>
-          <div className="overflow-hidden">
-            <p className="pb-1 text-sm text-slate-600 dark:text-slate-400">
-              {t('detail.dvswitches')}
-            </p>
-            {d.dvswitches.length === 0 ? (
-              <p className="text-[12px] text-slate-500 dark:text-slate-400">{na}</p>
-            ) : (
-              d.dvswitches.map((dv) => (
-                <Row key={dv.switch} label={dv.name || dv.switch} value={dv.version || na} />
-              ))
-            )}
           </div>
         </div>
       </div>

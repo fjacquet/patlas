@@ -70,10 +70,9 @@ const snapshot = (): Snapshot =>
         freeMib: mib(10),
       },
     ],
-    vnetwork: [],
-    vswitch: [],
-    dvswitch: [],
-    dvport: [],
+    nodeInterfaces: [],
+
+    vmNics: [],
     parseErrors: [],
   }) satisfies Snapshot
 

@@ -106,8 +106,15 @@ export async function buildPptx(
 
   // F-2 (D-05): Storage + Network after the per-cluster narrative,
   // before the conditional annex. Network has no chart (D-08).
-  addStorageSlide(pptx, view, png('storageTreemap'), strings, locale)
-  addNetworkSlide(pptx, opts.networkPng ?? null, strings, locale, opts.networkOversized ?? false)
+  addStorageSlide(pptx, view, strings, locale)
+  addNetworkSlide(
+    pptx,
+    opts.networkPng ?? null,
+    strings,
+    locale,
+    opts.networkOversized ?? false,
+    view.network,
+  )
 
   // Conditional CPU-Ready annex.
   if (opts.contentionRows && opts.contentionRows.length > 0) {

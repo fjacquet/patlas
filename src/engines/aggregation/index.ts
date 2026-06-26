@@ -17,11 +17,9 @@ export {
   type MonsterVm,
 } from './monsterVm'
 export {
-  type DvSwitchAgg,
   type NetworkRollup,
+  type NodeNetworkStats,
   networkRollup,
-  type PortgroupAgg,
-  type VSwitchAgg,
 } from './network'
 export { classifyOsFamily, type OsFamily } from './osFamily'
 export { aggregateHostsPerCluster } from './perCluster'

@@ -32,7 +32,7 @@
     "vram": "vRAM",
     "disks": "Disques",
     "partitions": "Partitions",
-    "portgroups": "Groupes de ports",
+    "bridges": "Ponts",
     "switches": "Commutateurs",
     "datastores": "Stockages"
   }

@@ -3,11 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { svgToDataUri } from '@/engines/export/svgDataUri'
 import { useEstateView } from '@/hooks/useEstateView'
 import { selectActiveSnapshot, useSnapshotStore } from '@/store/snapshotStore'
-import {
-  dvswitchColumns,
-  vnetworkColumns,
-  vswitchColumns,
-} from '../inventory/columns/networkColumns'
+import { nodeNetworkColumns, vmNicColumns } from '../inventory/columns/networkColumns'
 import { DataTable } from '../inventory/DataTable'
 
 function NetworkError({ error }: FallbackProps) {
@@ -20,12 +16,15 @@ function NetworkError({ error }: FallbackProps) {
 }
 
 /**
- * P9 LC-3 Network view. The single `useEstateView` consumer; three P3
- * `DataTable` sections (standard vSwitch / distributed dvSwitch / VM
- * portgroups) consuming `view.network` as plain props (no child memo).
- * When the workbook carries no network sheets the four arrays are empty
- * (the trimmed 8-sheet export) — render ONE factual caption line, no
- * error styling, no icon, no crash, no editorial verb (D-11 degrade).
+ * P5 Proxmox network view. Proxmox-native sections (replaces VMware network
+ * model):
+ *   1. Network topology diagram (when the zip bundle included the SVG)
+ *   2. Node interfaces table (NodeNetworkStats per-node — nics/bonds/bridges/vlans)
+ *   3. VM NICs table (guest NIC attachments from "VM Networks" sheet)
+ *
+ * When the workbook carries no network sheets all arrays are empty (the
+ * trimmed 8-sheet export) — render ONE factual caption line, no error
+ * styling, no icon, no crash (D-11 factual-degrade).
  */
 export function NetworkView() {
   const { t } = useTranslation('network')
@@ -46,11 +45,7 @@ export function NetworkView() {
 
   const svg = snapshot.networkSvg ?? null
 
-  const empty =
-    n.vswitches.length === 0 &&
-    n.dvswitches.length === 0 &&
-    n.portgroups.length === 0 &&
-    n.vmPortgroupCount === 0
+  const empty = n.byNode.length === 0 && n.vmNicCount === 0
 
   if (empty && !svg) {
     return (
@@ -81,33 +76,22 @@ export function NetworkView() {
           )}
           <section className="flex flex-col gap-2">
             <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-200">
-              {t('section.vswitch')}
+              {t('section.interfaces')}
             </h2>
             <DataTable
-              data={n.vswitches}
-              columns={vswitchColumns}
+              data={n.byNode}
+              columns={nodeNetworkColumns}
               headerFor={headerFor}
               objectKind="esx"
             />
           </section>
           <section className="flex flex-col gap-2">
             <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-200">
-              {t('section.dvswitch')}
+              {t('section.vmNics')}
             </h2>
             <DataTable
-              data={n.dvswitches}
-              columns={dvswitchColumns}
-              headerFor={headerFor}
-              objectKind="esx"
-            />
-          </section>
-          <section className="flex flex-col gap-2">
-            <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-200">
-              {t('section.vnetwork')}
-            </h2>
-            <DataTable
-              data={n.portgroups}
-              columns={vnetworkColumns}
+              data={snapshot.vmNics}
+              columns={vmNicColumns}
               headerFor={headerFor}
               objectKind="vm"
             />

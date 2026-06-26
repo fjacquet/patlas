@@ -32,10 +32,9 @@ describe('storage content health acceptance (real report)', () => {
       vmUsage: bundle.vmUsage,
       storages: bundle.storages,
       vpartition: [],
-      vnetwork: [],
-      vswitch: [],
-      dvswitch: [],
-      dvport: [],
+      nodeInterfaces: [],
+
+      vmNics: [],
       proxmoxSnapshots: bundle.proxmoxSnapshots,
       proxmoxStorageContent: bundle.proxmoxStorageContent,
       proxmoxHaResources: bundle.proxmoxHaResources,

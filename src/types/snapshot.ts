@@ -173,15 +173,13 @@ export interface Snapshot {
   /** Proxmox storage rows from the report `Storages` sheet. */
   storages: StorageRow[]
   vpartition: VPartitionRow[]
-  /** RVTools `vNetwork` rows (VM→portgroup). `[]` when the OPTIONAL sheet
-   *  is absent — never undefined (P9 D-11 factual-degrade). */
-  vnetwork: VNetworkRow[]
-  /** RVTools `vSwitch` rows (standard switches). `[]` when absent. */
-  vswitch: VSwitchRow[]
-  /** RVTools `dvSwitch` rows (distributed switches). `[]` when absent. */
-  dvswitch: VDvSwitchRow[]
-  /** RVTools `dvPort` rows (distributed portgroups). `[]` when absent. */
-  dvport: VDvPortRow[]
+  /** Proxmox node interface rows from the "Network" sheet "Nodes Networks"
+   *  sub-table. `[]` when the OPTIONAL Network sheet is absent — never
+   *  undefined (P5 factual-degrade). */
+  nodeInterfaces: NodeInterfaceRow[]
+  /** Proxmox guest NIC attachment rows from the "Network" sheet "VM Networks"
+   *  sub-table. `[]` when absent — never undefined (P5 factual-degrade). */
+  vmNics: VmNicRow[]
   parseErrors: ParseError[]
   /**
    * The `network-diagram.svg` from a Proxmox `.zip` bundle, as a raw SVG
@@ -238,81 +236,73 @@ export interface VPartitionRow {
 }
 
 /**
- * A VM→portgroup row from the RVTools `vNetwork` sheet. Plain strings; no
- * branded units. Empty string when a column is absent. (P9 D-11.)
+ * A per-node network interface row from the Proxmox "Network" sheet,
+ * "Nodes Networks" sub-table.
+ *
+ * `type` ∈ {'eth', 'bond', 'bridge', 'vlan', 'ovs_bridge', 'ovs_bond',
+ * 'ovs_port', 'ovs_intport', 'vxlan'} — the Proxmox network primitives.
+ * `mtu`/`vlanId` are `null` when the column cell is blank ("not derivable").
+ * `slaves` is always an array (empty when not a bond). Parsed via the
+ * stacked-section helper, same pattern as Cluster HA. (P5.)
  */
-export interface VNetworkRow {
-  /** RVTools `vNetwork.VM`. */
-  vm: string
-  /** RVTools `vNetwork.Network` — the portgroup name. */
-  network: string
-  /** RVTools `vNetwork.Switch` — the owning vSwitch/dvSwitch name. */
-  switch: string
-  /** RVTools `vNetwork.Adapter` — the virtual NIC adapter type. */
-  adapter: string
-  /** RVTools `vNetwork.Connected` (raw text, e.g. `True`/`False`). */
-  connected: string
-  /** RVTools `vNetwork.Cluster`. */
-  cluster: string
-  /** RVTools `vNetwork.Host`. */
-  host: string
-}
-
-/**
- * A standard-switch row from the RVTools `vSwitch` sheet. Port counts are
- * plain non-negative numbers (NOT MiB-branded). (P9 D-11.)
- */
-export interface VSwitchRow {
-  /** RVTools `vSwitch.Host`. */
-  host: string
-  /** RVTools `vSwitch.Cluster`. */
-  cluster: string
-  /** RVTools `vSwitch.Switch` — the standard vSwitch name. */
-  switch: string
-  /** RVTools `vSwitch.# Ports`. */
-  ports: number
-  /** RVTools `vSwitch.Free Ports`. */
-  freePorts: number
-  /** RVTools `vSwitch.MTU`. */
-  mtu: number
-}
-
-/**
- * A distributed-switch row from the RVTools `dvSwitch` sheet. Counts are
- * plain non-negative numbers (NOT MiB-branded). (P9 D-11.)
- */
-export interface VDvSwitchRow {
-  /** RVTools `dvSwitch.Switch`. */
-  switch: string
-  /** RVTools `dvSwitch.Name`. */
+export interface NodeInterfaceRow {
+  /** Proxmox node hostname. */
+  node: string
+  /** Interface name (e.g. eno1, bond0, vmbr0, COROSYNC). */
   name: string
-  /** RVTools `dvSwitch.Version`. */
-  version: string
-  /** RVTools `dvSwitch.Host members`. */
-  hostMembers: string
-  /** RVTools `dvSwitch.# Ports`. */
-  ports: number
-  /** RVTools `dvSwitch.# VMs`. */
-  vms: number
-  /** RVTools `dvSwitch.Max MTU`. */
-  maxMtu: number
+  /** Proxmox interface type: eth | bond | bridge | vlan | ovs* | vxlan. */
+  type: string
+  /** True when the interface is currently active ('X' in the sheet). */
+  active: boolean
+  /** True when the interface is set to auto-start on boot. */
+  autostart: boolean
+  /** IPv4 method: 'static' | 'dhcp' | 'manual' | ''. */
+  method: string
+  /** IPv4 CIDR (e.g. '10.4.32.1/28'). Empty when absent. */
+  cidr: string
+  /** IPv4 address. Empty when absent. */
+  address: string
+  /** IPv4 gateway. Empty when absent. */
+  gateway: string
+  /** MTU in bytes; `null` when the cell is blank. */
+  mtu: number | null
+  /** Bond mode (e.g. '802.3ad', 'active-backup'). Empty for non-bond. */
+  bondMode: string
+  /** Bond slave interface names. Empty array for non-bond. */
+  slaves: string[]
+  /** Linux bridge port(s), e.g. 'bond1'. Empty for non-bridge. */
+  bridgePorts: string
+  /** True when the bridge has VLAN-awareness enabled. */
+  bridgeVlanAware: boolean
+  /** VLAN id; `null` when absent (non-VLAN iface). */
+  vlanId: number | null
+  /** The device this VLAN is sliced from (e.g. 'bond0'). Empty for non-VLAN. */
+  vlanRawDevice: string
+  /** Freeform comments from the "Comments" column. */
+  comments: string
 }
 
 /**
- * A distributed-portgroup row from the RVTools `dvPort` sheet. Empty string
- * when a column is absent. (P9 D-11.)
+ * A guest NIC attachment row from the Proxmox "Network" sheet,
+ * "VM Networks" sub-table. One row per NIC per guest. (P5.)
  */
-export interface VDvPortRow {
-  /** RVTools `dvPort.Port` — the distributed portgroup name. */
-  port: string
-  /** RVTools `dvPort.Switch` — the owning dvSwitch name. */
-  switch: string
-  /** RVTools `dvPort.VLAN` (raw text — can be a range or trunk spec). */
-  vlan: string
-  /** RVTools `dvPort.Active Uplink`. */
-  activeUplink: string
-  /** RVTools `dvPort.Standby Uplink`. */
-  standbyUplink: string
+export interface VmNicRow {
+  /** Node hosting the guest. */
+  node: string
+  /** Proxmox VMID (numeric string). */
+  vmId: string
+  /** Guest display name. */
+  vmName: string
+  /** Guest type: 'qemu' (KVM VM) or 'lxc' (container). */
+  vmType: string
+  /** MAC address. */
+  macAddress: string
+  /** Linux bridge the NIC is attached to (e.g. 'vmbr1'). */
+  bridge: string
+  /** VLAN tag; `null` when the NIC is untagged. */
+  tag: number | null
+  /** NIC model (e.g. 'virtio', 'e1000'). */
+  model: string
 }
 
 /**

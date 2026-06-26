@@ -2,15 +2,13 @@ import { z } from 'zod'
 import type { Cores, MHz, MiB, Sockets } from '@/engines/units'
 import type {
   GuestRow,
+  NodeInterfaceRow,
   NodeRow,
   StorageRow,
-  VDvPortRow,
-  VDvSwitchRow,
   VMetaDataRow,
+  VmNicRow,
   VmUsageRow,
-  VNetworkRow,
   VPartitionRow,
-  VSwitchRow,
 } from '@/types'
 
 /**
@@ -130,43 +128,35 @@ export const VPartitionRowSchema: z.ZodType<VPartitionRow> = z.object({
   freeMib: MibSchema,
 })
 
-const NonNegIntSchema = z.number().int().nonnegative()
-
-export const VNetworkRowSchema: z.ZodType<VNetworkRow> = z.object({
-  vm: z.string().trim().min(1),
-  network: z.string().trim(),
-  switch: z.string().trim(),
-  adapter: z.string().trim(),
-  connected: z.string().trim(),
-  cluster: z.string().trim(),
-  host: z.string().trim(),
+export const NodeInterfaceRowSchema: z.ZodType<NodeInterfaceRow> = z.object({
+  node: z.string().trim().min(1),
+  name: z.string().trim().min(1),
+  type: z.string().trim(),
+  active: z.boolean(),
+  autostart: z.boolean(),
+  method: z.string().trim(),
+  cidr: z.string().trim(),
+  address: z.string().trim(),
+  gateway: z.string().trim(),
+  mtu: z.number().int().nonnegative().nullable(),
+  bondMode: z.string().trim(),
+  slaves: z.array(z.string()),
+  bridgePorts: z.string().trim(),
+  bridgeVlanAware: z.boolean(),
+  vlanId: z.number().int().nonnegative().nullable(),
+  vlanRawDevice: z.string().trim(),
+  comments: z.string().trim(),
 })
 
-export const VSwitchRowSchema: z.ZodType<VSwitchRow> = z.object({
-  host: z.string().trim().min(1),
-  cluster: z.string().trim(),
-  switch: z.string().trim().min(1),
-  ports: NonNegIntSchema,
-  freePorts: NonNegIntSchema,
-  mtu: NonNegIntSchema,
-})
-
-export const VDvSwitchRowSchema: z.ZodType<VDvSwitchRow> = z.object({
-  switch: z.string().trim().min(1),
-  name: z.string().trim(),
-  version: z.string().trim(),
-  hostMembers: z.string().trim(),
-  ports: NonNegIntSchema,
-  vms: NonNegIntSchema,
-  maxMtu: NonNegIntSchema,
-})
-
-export const VDvPortRowSchema: z.ZodType<VDvPortRow> = z.object({
-  port: z.string().trim().min(1),
-  switch: z.string().trim(),
-  vlan: z.string().trim(),
-  activeUplink: z.string().trim(),
-  standbyUplink: z.string().trim(),
+export const VmNicRowSchema: z.ZodType<VmNicRow> = z.object({
+  node: z.string().trim().min(1),
+  vmId: z.string().trim(),
+  vmName: z.string().trim(),
+  vmType: z.string().trim(),
+  macAddress: z.string().trim(),
+  bridge: z.string().trim(),
+  tag: z.number().int().nonnegative().nullable(),
+  model: z.string().trim(),
 })
 
 export const VMetaDataRowSchema: z.ZodType<VMetaDataRow> = z.object({

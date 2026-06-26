@@ -4,9 +4,8 @@
   },
   "section": {
     "diagram": "Netzwerktopologie",
-    "vswitch": "Standard-Switches",
-    "dvswitch": "Verteilte Switches",
-    "vnetwork": "Gast-Portgruppen"
+    "interfaces": "Knoten-Schnittstellen",
+    "vmNics": "Gast-Netzwerkkarten"
   },
   "img": {
     "alt": "Proxmox-Netzwerkdiagramm"
@@ -16,9 +15,6 @@
     "title": "Knoten — {{name}}",
     "datastores": "Eingehängter Speicher",
     "datastoresNote": "Speicher-Namen pro Knoten sind nicht verfügbar (Speicher-Knoten ist eine Anzahl).",
-    "vswitches": "Standard-Switches",
-    "dvswitches": "Verteilte Switches",
-    "uplinks": "Uplinks",
     "cluster": "Cluster",
     "esxVersion": "PVE-Version"
   },

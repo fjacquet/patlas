@@ -43,10 +43,9 @@ describe('proxmox estate-totals acceptance (real report)', () => {
       proxmoxBackupJobs: bundle.proxmoxBackupJobs,
       storages: bundle.storages,
       vpartition: [],
-      vnetwork: [],
-      vswitch: [],
-      dvswitch: [],
-      dvport: [],
+      nodeInterfaces: [],
+
+      vmNics: [],
       parseErrors: bundle.warnings,
     }
 
