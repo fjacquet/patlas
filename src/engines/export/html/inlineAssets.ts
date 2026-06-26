@@ -51,6 +51,7 @@ body{margin:0;background:#f8fafc;color:#0f172a;font-family:${SYSTEM_FONT};font-s
 .annex-table th,.annex-table td{text-align:left;padding:6px 8px;border-bottom:1px solid #e2e8f0}
 .annex-table td.num{font-family:${MONO_FONT};font-variant-numeric:tabular-nums;text-align:right}
 .factual-note{color:#475569;font-size:13px}
+.network-diagram{max-width:100%;max-height:900px;display:block;overflow:auto}
 .methodology{margin-top:48px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:12px}
 `.trim()
 

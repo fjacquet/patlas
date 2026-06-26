@@ -110,7 +110,8 @@
   "network": {
     "title": "Netzwerk",
     "diagramAlt": "Netzwerktopologie-Diagramm",
-    "absent": "In diesem Bericht ist kein Netzwerkdiagramm enthalten."
+    "absent": "In diesem Bericht ist kein Netzwerkdiagramm enthalten.",
+    "oversizedNote": "Das vollständige Netzwerkdiagramm ist im HTML-Bericht verfügbar."
   },
   "os": {
     "title": "Betriebssysteme",

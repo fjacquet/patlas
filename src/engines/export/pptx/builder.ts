@@ -49,6 +49,10 @@ export interface BuildPptxOpts {
    *  embedded SVG — Pitfall 1). When null/undefined the slide shows a factual
    *  Proxmox-correct note. */
   networkPng?: Uint8Array | null
+  /** True when the SVG was extreme-portrait (e.g. 1762×14092); the worker
+   *  capped the raster height to avoid a 12 000-px PNG, and the slide should
+   *  reserve space for a "see HTML report" note. */
+  networkOversized?: boolean
 }
 
 export async function buildPptx(
@@ -103,7 +107,7 @@ export async function buildPptx(
   // F-2 (D-05): Storage + Network after the per-cluster narrative,
   // before the conditional annex. Network has no chart (D-08).
   addStorageSlide(pptx, view, png('storageTreemap'), strings, locale)
-  addNetworkSlide(pptx, opts.networkPng ?? null, strings, locale)
+  addNetworkSlide(pptx, opts.networkPng ?? null, strings, locale, opts.networkOversized ?? false)
 
   // Conditional CPU-Ready annex.
   if (opts.contentionRows && opts.contentionRows.length > 0) {

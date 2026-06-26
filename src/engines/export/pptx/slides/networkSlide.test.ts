@@ -106,4 +106,51 @@ describe('addNetworkSlide', () => {
     addNetworkSlide(pptx, await tinyPng(), strings, 'fr')
     expect((pptx as unknown as { slides: unknown[] }).slides.length).toBe(1)
   })
+
+  it('oversized: adds both an image and a note text when oversized=true', async () => {
+    const pptx = new PptxGenJS()
+    const slide = {
+      addImage: vi.fn(),
+      addText: vi.fn(),
+      addShape: vi.fn(),
+    } as unknown as PptxGenJS.Slide
+    const addSlideSpy = vi.spyOn(pptx, 'addSlide').mockReturnValue(slide)
+
+    const png = await tinyPng()
+    addNetworkSlide(
+      pptx,
+      png,
+      { 'network.oversizedNote': 'Full network diagram available in the HTML report.' },
+      'en',
+      true,
+    )
+
+    expect(addSlideSpy).toHaveBeenCalledOnce()
+    // Image still placed (even if small)
+    expect(slide.addImage).toHaveBeenCalledOnce()
+    // Note text appended below
+    const textCalls = (slide.addText as ReturnType<typeof vi.fn>).mock.calls
+    const noteCall = textCalls.find(
+      (c: unknown[]) => typeof c[0] === 'string' && c[0].includes('HTML report'),
+    )
+    expect(noteCall).toBeDefined()
+
+    addSlideSpy.mockRestore()
+  })
+
+  it('oversized: when no PNG, still shows absent note (no image)', () => {
+    const pptx = new PptxGenJS()
+    const slide = {
+      addImage: vi.fn(),
+      addText: vi.fn(),
+      addShape: vi.fn(),
+    } as unknown as PptxGenJS.Slide
+    const addSlideSpy = vi.spyOn(pptx, 'addSlide').mockReturnValue(slide)
+
+    addNetworkSlide(pptx, null, strings, 'en', true)
+
+    expect(slide.addImage).not.toHaveBeenCalled()
+
+    addSlideSpy.mockRestore()
+  })
 })

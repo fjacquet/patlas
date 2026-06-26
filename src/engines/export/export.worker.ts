@@ -15,6 +15,11 @@ import { assembleHtml } from './html/assembleHtml'
 import { chartToSvg } from './html/renderCharts'
 import { exportChartSlots } from './html/renderReport'
 import { chartSvgToPng } from './pptx/primitives/chartSvg'
+import {
+  cappedRenderWidth,
+  isSvgOversized,
+  parseSvgDimensions,
+} from './pptx/primitives/svgDimensions'
 import type { ExportRequest, ExportResponse } from './types'
 
 // PPT-01: render at print-grade resolution at the slide's 16:9 aspect
@@ -107,14 +112,38 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
       // ships no default font, so the diagram's text labels need an explicit
       // bundled font (NotoSans, loaded as a same-origin Vite asset). Best-effort:
       // a diagram failure must never sink the whole export.
+      //
+      // Oversized guard: a large estate produces a 1762×14092 SVG. Fitting to
+      // CHART_W=1600 yields a 1600×12844 PNG (huge) that PowerPoint then
+      // letterboxes into a 0.7"-wide sliver on the slide (unreadable). When the
+      // SVG is extreme-portrait, cap the raster height at CHART_H instead and
+      // set networkOversized so the slide can add a "see HTML report" note.
       let networkPng: Uint8Array | null = null
+      let networkOversized = false
       if (req.active.networkSvg) {
         try {
           const fontUrl = new URL('../../assets/fonts/NotoSans.ttf', import.meta.url)
           const fontBytes = new Uint8Array(await (await fetch(fontUrl)).arrayBuffer())
-          networkPng = await chartSvgToPng(req.active.networkSvg, CHART_W, CHART_H, wasmSource(), [
-            fontBytes,
-          ])
+          const dims = parseSvgDimensions(req.active.networkSvg)
+          if (dims && isSvgOversized(dims)) {
+            networkOversized = true
+            const renderW = cappedRenderWidth(dims, CHART_H)
+            networkPng = await chartSvgToPng(
+              req.active.networkSvg,
+              renderW,
+              CHART_H,
+              wasmSource(),
+              [fontBytes],
+            )
+          } else {
+            networkPng = await chartSvgToPng(
+              req.active.networkSvg,
+              CHART_W,
+              CHART_H,
+              wasmSource(),
+              [fontBytes],
+            )
+          }
         } catch {
           networkPng = null // diagram is best-effort — never fail the whole export over it
         }
@@ -132,6 +161,7 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
         capturedAt: new Date(req.active.capturedAt).toISOString().slice(0, 10),
         // PowerPoint-safe rasterized network diagram (Pitfall 1).
         networkPng,
+        networkOversized,
       })
     }
 
