@@ -14,7 +14,8 @@
     "snapshots": "Snapshot-Wildwuchs",
     "storagecontent": "Speicherinhalt",
     "clusterhealth": "Cluster-Zustand",
-    "protection": "Schutz"
+    "protection": "Schutz",
+    "governance": "Governance"
   },
   "tab": {
     "label": "Objekttyp",

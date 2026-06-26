@@ -2,11 +2,17 @@ import type {
   GuestRow,
   NodeInterfaceRow,
   NodeRow,
+  ProxmoxAccessAclRow,
+  ProxmoxAccessRoleRow,
+  ProxmoxAccessTokenRow,
+  ProxmoxAccessUserRow,
   ProxmoxBackupJobRow,
   ProxmoxDiskRow,
   ProxmoxHaResourceRow,
   ProxmoxHaStatusRow,
+  ProxmoxIssueRow,
   ProxmoxPartitionRow,
+  ProxmoxPoolMemberRow,
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
   ProxmoxTaskRow,
@@ -63,6 +69,18 @@ export interface MergedEstate {
   /** Concatenated Proxmox task rows across selected snapshots.
    *  Empty when the Cluster Tasks sheet was absent — factual-degrade, never undefined. */
   proxmoxTasks: ProxmoxTaskRow[]
+  /** Concatenated Proxmox issue rows (Pack C). `?? []` when absent. */
+  proxmoxIssues: ProxmoxIssueRow[]
+  /** Concatenated Proxmox access user rows (Pack C). `?? []` when absent. */
+  proxmoxAccessUsers: ProxmoxAccessUserRow[]
+  /** Concatenated Proxmox API token rows (Pack C). `?? []` when absent. */
+  proxmoxAccessTokens: ProxmoxAccessTokenRow[]
+  /** Concatenated Proxmox role rows (Pack C). `?? []` when absent. */
+  proxmoxAccessRoles: ProxmoxAccessRoleRow[]
+  /** Concatenated Proxmox ACL rows (Pack C). `?? []` when absent. */
+  proxmoxAccessAcls: ProxmoxAccessAclRow[]
+  /** Concatenated Proxmox pool member rows (Pack C). `?? []` when absent. */
+  proxmoxPoolMembers: ProxmoxPoolMemberRow[]
   vcenters: VCenterEntry[]
 }
 
@@ -81,6 +99,12 @@ const EMPTY_MERGED: MergedEstate = {
   proxmoxPartitions: [],
   proxmoxDisks: [],
   proxmoxTasks: [],
+  proxmoxIssues: [],
+  proxmoxAccessUsers: [],
+  proxmoxAccessTokens: [],
+  proxmoxAccessRoles: [],
+  proxmoxAccessAcls: [],
+  proxmoxPoolMembers: [],
   vcenters: [],
 }
 
@@ -189,6 +213,12 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
   const outProxmoxPartitions: ProxmoxPartitionRow[] = []
   const outProxmoxDisks: ProxmoxDiskRow[] = []
   const outProxmoxTasks: ProxmoxTaskRow[] = []
+  const outProxmoxIssues: ProxmoxIssueRow[] = []
+  const outProxmoxAccessUsers: ProxmoxAccessUserRow[] = []
+  const outProxmoxAccessTokens: ProxmoxAccessTokenRow[] = []
+  const outProxmoxAccessRoles: ProxmoxAccessRoleRow[] = []
+  const outProxmoxAccessAcls: ProxmoxAccessAclRow[] = []
+  const outProxmoxPoolMembers: ProxmoxPoolMemberRow[] = []
   for (const snap of selected) {
     for (const d of snap.storages) outVdatastore.push(d)
     for (const p of snap.vpartition) outVpartition.push(p)
@@ -204,6 +234,13 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
     for (const pp of snap.proxmoxPartitions ?? []) outProxmoxPartitions.push(pp)
     for (const pd of snap.proxmoxDisks ?? []) outProxmoxDisks.push(pd)
     for (const pt of snap.proxmoxTasks ?? []) outProxmoxTasks.push(pt)
+    // Pack C governance — `?? []` for Snapshot objects pre-dating this phase.
+    for (const is of snap.proxmoxIssues ?? []) outProxmoxIssues.push(is)
+    for (const au of snap.proxmoxAccessUsers ?? []) outProxmoxAccessUsers.push(au)
+    for (const at of snap.proxmoxAccessTokens ?? []) outProxmoxAccessTokens.push(at)
+    for (const ar of snap.proxmoxAccessRoles ?? []) outProxmoxAccessRoles.push(ar)
+    for (const aa of snap.proxmoxAccessAcls ?? []) outProxmoxAccessAcls.push(aa)
+    for (const pm of snap.proxmoxPoolMembers ?? []) outProxmoxPoolMembers.push(pm)
   }
 
   return {
@@ -221,6 +258,12 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
     proxmoxPartitions: outProxmoxPartitions,
     proxmoxDisks: outProxmoxDisks,
     proxmoxTasks: outProxmoxTasks,
+    proxmoxIssues: outProxmoxIssues,
+    proxmoxAccessUsers: outProxmoxAccessUsers,
+    proxmoxAccessTokens: outProxmoxAccessTokens,
+    proxmoxAccessRoles: outProxmoxAccessRoles,
+    proxmoxAccessAcls: outProxmoxAccessAcls,
+    proxmoxPoolMembers: outProxmoxPoolMembers,
     vcenters: [...vcenterIndex.values()],
   }
 }

@@ -14,7 +14,8 @@
     "snapshots": "Snapshot Sprawl",
     "storagecontent": "Storage Content",
     "clusterhealth": "Cluster Health",
-    "protection": "Protection"
+    "protection": "Protection",
+    "governance": "Governance"
   },
   "tab": {
     "label": "Object type",

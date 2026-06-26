@@ -148,6 +148,71 @@ export const NETWORK_NODES_COLS = {
   comments: ['comments'],
 } as const
 
+/** Column map for the flat `Issues` sheet (Pack C). */
+export const ISSUE_COLS = {
+  severity: ['severity'],
+  section: ['section'],
+  message: ['message'],
+  timestamp: ['timestamp'],
+  linkKey: ['link key'],
+} as const
+
+/** Column map for the "Users" sub-table in the stacked `Cluster Access` sheet. */
+export const ACCESS_USER_COLS = {
+  id: ['id'],
+  enable: ['enable'],
+  firstname: ['firstname'],
+  lastname: ['lastname'],
+  email: ['email'],
+  groups: ['groups'],
+  keys: ['keys'],
+  totpLocked: ['totp locked'],
+  expire: ['expire'],
+  comment: ['comment'],
+} as const
+
+/** Column map for the "API Tokens" sub-table in the stacked `Cluster Access` sheet. */
+export const ACCESS_TOKEN_COLS = {
+  user: ['user'],
+  tokenId: ['token id'],
+  expire: ['expire'],
+  privSeparated: ['priv separated'],
+  comment: ['comment'],
+} as const
+
+/** Column map for the "Roles" sub-table in the stacked `Cluster Access` sheet. */
+export const ACCESS_ROLE_COLS = {
+  id: ['id'],
+  privileges: ['privileges'],
+  special: ['special'],
+} as const
+
+/** Column map for the "ACL" sub-table in the stacked `Cluster Access` sheet. */
+export const ACCESS_ACL_COLS = {
+  path: ['path'],
+  usersOrGroup: ['users or group'],
+  type: ['type'],
+  roleId: ['id'],
+  propagate: ['propagate'],
+} as const
+
+/**
+ * Column map for the "Pools" data rows in the `Cluster Pools` sheet.
+ * This sheet cannot be parsed with `extractStackedSection` due to a TOC
+ * row that appears before the actual section header — a custom scanner is
+ * used instead (see `adaptProxmoxPoolMembers` in proxmox.ts).
+ */
+export const POOL_MEMBER_COLS = {
+  pool: ['pool'],
+  type: ['type'],
+  node: ['node'],
+  vmId: ['vm id'],
+  storage: ['storage'],
+  status: ['status'],
+  description: ['description'],
+  comment: ['comment'],
+} as const
+
 /**
  * Column map for the "VM Networks" stacked sub-table inside the "Network"
  * sheet. One row per guest NIC. (P5.)

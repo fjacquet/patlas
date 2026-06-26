@@ -6,6 +6,7 @@ import type { BackupCoverage } from '@/engines/aggregation/backupCoverage'
 import type { ClusterHealth } from '@/engines/aggregation/clusterHealth'
 import type { DiskHygiene } from '@/engines/aggregation/diskHygiene'
 import type { FsFillRisk } from '@/engines/aggregation/fsFillRisk'
+import type { GovernancePosture } from '@/engines/aggregation/governance'
 import type { MonsterEstate } from '@/engines/aggregation/monsterVm'
 import type { NetworkRollup } from '@/engines/aggregation/network'
 import type { EstateSizing } from '@/engines/aggregation/sizing'
@@ -518,6 +519,11 @@ export interface EstateView {
    * measurement; same single-pass origin; `EMPTY_CLUSTER_HEALTH` in
    * `EMPTY_VIEW`. */
   clusterHealth: ClusterHealth
+  /**
+   * Pack C governance & ops — issues, access posture (users/tokens/roles/
+   * ACLs), and resource pools. Neutral measurement; same single-pass origin;
+   * `EMPTY_GOVERNANCE` in `EMPTY_VIEW`. */
+  governance: GovernancePosture
   /**
    * P9 LC-4 per-datastore drill projection, keyed by the `naa ?? name`
    * datastore key. Produced in the single `buildEstateView` pass — no

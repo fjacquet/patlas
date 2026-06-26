@@ -6,11 +6,17 @@ import type {
   NodeInterfaceRow,
   NodeRow,
   ParseError,
+  ProxmoxAccessAclRow,
+  ProxmoxAccessRoleRow,
+  ProxmoxAccessTokenRow,
+  ProxmoxAccessUserRow,
   ProxmoxBackupJobRow,
   ProxmoxDiskRow,
   ProxmoxHaResourceRow,
   ProxmoxHaStatusRow,
+  ProxmoxIssueRow,
   ProxmoxPartitionRow,
+  ProxmoxPoolMemberRow,
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
   ProxmoxTaskRow,
@@ -21,16 +27,22 @@ import type {
 import type { ParsedSheet, ParsedWorkbook } from '../parseXlsx'
 import { findSheet, mapColumns, readCol, readNumber, readString } from './columnMap'
 import {
+  ACCESS_ACL_COLS,
+  ACCESS_ROLE_COLS,
+  ACCESS_TOKEN_COLS,
+  ACCESS_USER_COLS,
   BACKUP_JOB_COLS,
   CLUSTER_COLS,
   DISK_COLS,
   GUEST_COLS,
   HA_RESOURCE_COLS,
   HA_STATUS_COLS,
+  ISSUE_COLS,
   NETWORK_NODES_COLS,
   NETWORK_VMS_COLS,
   NODE_COLS,
   PARTITION_COLS,
+  POOL_MEMBER_COLS,
   RRD_NODE_COLS,
   SNAPSHOT_COLS,
   STORAGE_COLS,
@@ -470,6 +482,8 @@ export const adaptProxmoxVmNics = (sheet: ParsedSheet | undefined): VmNicRow[] =
     .filter((r) => r.node !== '' && r.vmId !== '')
 }
 
+const readX = (v: unknown): boolean => readString(v).trim() === 'X'
+
 export const adaptProxmoxPartitions = (sheet: ParsedSheet | undefined): ProxmoxPartitionRow[] => {
   if (!sheet) return []
   const cols = mapColumns(sheet.headers, PARTITION_COLS)
@@ -502,7 +516,6 @@ export const adaptProxmoxPartitions = (sheet: ParsedSheet | undefined): ProxmoxP
 export const adaptProxmoxDisks = (sheet: ParsedSheet | undefined): ProxmoxDiskRow[] => {
   if (!sheet) return []
   const cols = mapColumns(sheet.headers, DISK_COLS)
-  const readX = (v: unknown): boolean => readString(v).trim() === 'X'
   return sheet.rows
     .map((row): ProxmoxDiskRow => {
       const usageRaw = readCol(row, cols.storageUsagePct)
@@ -560,6 +573,153 @@ export const adaptProxmoxTasks = (sheet: ParsedSheet | undefined): ProxmoxTaskRo
     .filter((r) => r.node !== '' && r.type !== '')
 }
 
+/** Parse the flat `Issues` sheet (Pack C). */
+export const adaptProxmoxIssues = (sheet: ParsedSheet | undefined): ProxmoxIssueRow[] => {
+  if (!sheet) return []
+  const cols = mapColumns(sheet.headers, ISSUE_COLS)
+  return sheet.rows
+    .map((row): ProxmoxIssueRow => {
+      const tsRaw = readCol(row, cols.timestamp)
+      const timestampSerial = typeof tsRaw === 'number' && Number.isFinite(tsRaw) ? tsRaw : null
+      return {
+        severity: readString(readCol(row, cols.severity)),
+        section: readString(readCol(row, cols.section)),
+        message: readString(readCol(row, cols.message)),
+        timestampSerial,
+        linkKey: readString(readCol(row, cols.linkKey)),
+      }
+    })
+    .filter((r) => r.message !== '')
+}
+
+/** Parse the "Users" stacked sub-table from `Cluster Access` (Pack C). */
+export const adaptProxmoxAccessUsers = (sheet: ParsedSheet | undefined): ProxmoxAccessUserRow[] => {
+  if (!sheet) return []
+  const sec = extractStackedSection(sheet.cells, 'Users')
+  if (sec.headers.length === 0) return []
+  const cols = mapColumns(sec.headers, ACCESS_USER_COLS)
+  return sec.rows
+    .map(
+      (row): ProxmoxAccessUserRow => ({
+        id: readString(readCol(row, cols.id)),
+        enabled: readX(readCol(row, cols.enable)),
+        firstname: readString(readCol(row, cols.firstname)),
+        lastname: readString(readCol(row, cols.lastname)),
+        email: readString(readCol(row, cols.email)),
+        groups: readString(readCol(row, cols.groups)),
+        keys: readString(readCol(row, cols.keys)),
+        totpLocked: readX(readCol(row, cols.totpLocked)),
+        expire: readString(readCol(row, cols.expire)),
+        comment: readString(readCol(row, cols.comment)),
+      }),
+    )
+    .filter((r) => r.id !== '')
+}
+
+/** Parse the "API Tokens" stacked sub-table from `Cluster Access` (Pack C). */
+export const adaptProxmoxAccessTokens = (
+  sheet: ParsedSheet | undefined,
+): ProxmoxAccessTokenRow[] => {
+  if (!sheet) return []
+  const sec = extractStackedSection(sheet.cells, 'API Tokens')
+  if (sec.headers.length === 0) return []
+  const cols = mapColumns(sec.headers, ACCESS_TOKEN_COLS)
+  return sec.rows
+    .map(
+      (row): ProxmoxAccessTokenRow => ({
+        user: readString(readCol(row, cols.user)),
+        tokenId: readString(readCol(row, cols.tokenId)),
+        expire: readString(readCol(row, cols.expire)),
+        privSeparated: readX(readCol(row, cols.privSeparated)),
+        comment: readString(readCol(row, cols.comment)),
+      }),
+    )
+    .filter((r) => r.user !== '')
+}
+
+/** Parse the "Roles" stacked sub-table from `Cluster Access` (Pack C). */
+export const adaptProxmoxAccessRoles = (sheet: ParsedSheet | undefined): ProxmoxAccessRoleRow[] => {
+  if (!sheet) return []
+  const sec = extractStackedSection(sheet.cells, 'Roles')
+  if (sec.headers.length === 0) return []
+  const cols = mapColumns(sec.headers, ACCESS_ROLE_COLS)
+  return sec.rows
+    .map(
+      (row): ProxmoxAccessRoleRow => ({
+        id: readString(readCol(row, cols.id)),
+        privileges: readString(readCol(row, cols.privileges)),
+        special: readX(readCol(row, cols.special)),
+      }),
+    )
+    .filter((r) => r.id !== '')
+}
+
+/** Parse the "ACL" stacked sub-table from `Cluster Access` (Pack C). */
+export const adaptProxmoxAccessAcls = (sheet: ParsedSheet | undefined): ProxmoxAccessAclRow[] => {
+  if (!sheet) return []
+  const sec = extractStackedSection(sheet.cells, 'ACL')
+  if (sec.headers.length === 0) return []
+  const cols = mapColumns(sec.headers, ACCESS_ACL_COLS)
+  return sec.rows
+    .map(
+      (row): ProxmoxAccessAclRow => ({
+        path: readString(readCol(row, cols.path)),
+        usersOrGroup: readString(readCol(row, cols.usersOrGroup)),
+        type: readString(readCol(row, cols.type)).toLowerCase(),
+        roleId: readString(readCol(row, cols.roleId)),
+        propagate: readX(readCol(row, cols.propagate)),
+      }),
+    )
+    .filter((r) => r.path !== '')
+}
+
+/**
+ * Parse the "Pools" data section from the `Cluster Pools` sheet (Pack C).
+ */
+export const adaptProxmoxPoolMembers = (sheet: ParsedSheet | undefined): ProxmoxPoolMemberRow[] => {
+  if (!sheet) return []
+  const cells = sheet.cells
+  const normCell = (v: unknown): string => (v == null ? '' : String(v).trim())
+  const nonEmpty = (row: unknown[]): number =>
+    row.reduce<number>((n, c) => (normCell(c) !== '' ? n + 1 : n), 0)
+
+  let headerIdx = -1
+  for (let r = 0; r < cells.length; r++) {
+    const row = cells[r] ?? []
+    if (normCell(row[0]).toLowerCase() === 'pool' && nonEmpty(row) >= 4) {
+      headerIdx = r
+      break
+    }
+  }
+  if (headerIdx === -1) return []
+
+  const headers = (cells[headerIdx] ?? []).map(normCell)
+  const cols = mapColumns(headers, POOL_MEMBER_COLS)
+  const out: ProxmoxPoolMemberRow[] = []
+  for (let r = headerIdx + 1; r < cells.length; r++) {
+    const row = cells[r] ?? []
+    if (nonEmpty(row) < 2) continue
+    const obj: Record<string, unknown> = {}
+    headers.forEach((h, i) => {
+      if (h !== '') obj[h] = row[i] ?? null
+    })
+    const pool = readString(readCol(obj, cols.pool))
+    if (!pool) continue
+    const vmIdRaw = readCol(obj, cols.vmId)
+    out.push({
+      pool,
+      type: readString(readCol(obj, cols.type)).toLowerCase(),
+      node: readString(readCol(obj, cols.node)),
+      vmId: vmIdRaw === null || vmIdRaw === undefined ? '' : String(vmIdRaw).trim(),
+      storage: readString(readCol(obj, cols.storage)),
+      status: readString(readCol(obj, cols.status)),
+      description: readString(readCol(obj, cols.description)),
+      comment: readString(readCol(obj, cols.comment)),
+    })
+  }
+  return out
+}
+
 /**
  * Throw a structured fatal `ParseError`. `name === 'ParseError'` is the
  * discriminator the worker boundary serializes; `sheet`/`kind` ride along
@@ -598,6 +758,12 @@ export const adaptProxmox = (
   proxmoxTasks: ProxmoxTaskRow[]
   nodeInterfaces: NodeInterfaceRow[]
   vmNics: VmNicRow[]
+  proxmoxIssues: ProxmoxIssueRow[]
+  proxmoxAccessUsers: ProxmoxAccessUserRow[]
+  proxmoxAccessTokens: ProxmoxAccessTokenRow[]
+  proxmoxAccessRoles: ProxmoxAccessRoleRow[]
+  proxmoxAccessAcls: ProxmoxAccessAclRow[]
+  proxmoxPoolMembers: ProxmoxPoolMemberRow[]
   clusterName: string
   warnings: ParseError[]
 } => {
@@ -669,6 +835,9 @@ export const adaptProxmox = (
   const partitionsSheet = findSheet(workbook, ['partitions'])
   const disksSheet = findSheet(workbook, ['disks'])
   const clusterTasksSheet = findSheet(workbook, ['cluster tasks'])
+  const issuesSheet = findSheet(workbook, ['issues'])
+  const clusterAccessSheet = findSheet(workbook, ['cluster access'])
+  const clusterPoolsSheet = findSheet(workbook, ['cluster pools'])
 
   // --- RRD Nodes: derive per-node CPU ratio from time-series data ------------
   // Primary source: "RRD Nodes" sheet (optional). Contains one row per
@@ -709,6 +878,12 @@ export const adaptProxmox = (
     proxmoxTasks: adaptProxmoxTasks(clusterTasksSheet),
     nodeInterfaces: adaptProxmoxNodeInterfaces(networkSheet),
     vmNics: adaptProxmoxVmNics(networkSheet),
+    proxmoxIssues: adaptProxmoxIssues(issuesSheet),
+    proxmoxAccessUsers: adaptProxmoxAccessUsers(clusterAccessSheet),
+    proxmoxAccessTokens: adaptProxmoxAccessTokens(clusterAccessSheet),
+    proxmoxAccessRoles: adaptProxmoxAccessRoles(clusterAccessSheet),
+    proxmoxAccessAcls: adaptProxmoxAccessAcls(clusterAccessSheet),
+    proxmoxPoolMembers: adaptProxmoxPoolMembers(clusterPoolsSheet),
     clusterName,
     warnings,
   }

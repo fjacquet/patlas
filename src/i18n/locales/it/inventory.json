@@ -14,7 +14,8 @@
     "snapshots": "Proliferazione degli snapshot",
     "storagecontent": "Contenuto storage",
     "clusterhealth": "Salute cluster",
-    "protection": "Protezione"
+    "protection": "Protezione",
+    "governance": "Governance"
   },
   "tab": {
     "label": "Tipo di oggetto",

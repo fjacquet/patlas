@@ -14,7 +14,8 @@
     "snapshots": "Prolifération des instantanés",
     "storagecontent": "Contenu stockage",
     "clusterhealth": "Santé cluster",
-    "protection": "Protection"
+    "protection": "Protection",
+    "governance": "Gouvernance"
   },
   "tab": {
     "label": "Type d'objet",

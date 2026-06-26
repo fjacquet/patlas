@@ -1,0 +1,82 @@
+{
+  "heading": "Governance & Operations",
+  "subtitle": "Issues, access posture, and resource pools",
+  "empty": {
+    "heading": "No report loaded",
+    "body": "Load a report to see governance data."
+  },
+  "issues": {
+    "heading": "Issues",
+    "none": "No issues found.",
+    "kpi": {
+      "total": "Total",
+      "errors": "Errors",
+      "warnings": "Warnings"
+    },
+    "col": {
+      "severity": "Severity",
+      "section": "Section",
+      "message": "Message",
+      "linkKey": "Reference"
+    },
+    "bySection": "By section"
+  },
+  "access": {
+    "heading": "Access posture",
+    "kpi": {
+      "users": "Users",
+      "enabled": "Enabled",
+      "tokens": "API tokens",
+      "roles": "Roles",
+      "acls": "ACL entries",
+      "rootAccounts": "Root accounts"
+    },
+    "users": {
+      "heading": "Users",
+      "none": "No users found.",
+      "col": {
+        "id": "ID",
+        "enabled": "Enabled",
+        "email": "Email",
+        "groups": "Groups",
+        "expire": "Expiry"
+      }
+    },
+    "tokens": {
+      "heading": "API tokens",
+      "none": "No API tokens found.",
+      "col": {
+        "user": "User",
+        "tokenId": "Token ID",
+        "privSeparated": "Priv. separated",
+        "expire": "Expiry"
+      }
+    },
+    "acls": {
+      "heading": "ACL entries",
+      "none": "No ACL entries found.",
+      "col": {
+        "path": "Path",
+        "usersOrGroup": "User / Group",
+        "type": "Type",
+        "role": "Role",
+        "propagate": "Propagate"
+      }
+    }
+  },
+  "pools": {
+    "heading": "Resource pools",
+    "none": "No resource pools found.",
+    "kpi": {
+      "pools": "Pools",
+      "members": "Members"
+    },
+    "col": {
+      "pool": "Pool",
+      "members": "Members",
+      "vms": "Guests",
+      "storages": "Storages"
+    }
+  },
+  "na": "—"
+}

@@ -6,6 +6,7 @@ import { GlobalDashboard } from './components/dashboard/GlobalDashboard'
 import { ExportButtons } from './components/ExportButtons'
 import { EosView } from './components/eos/EosView'
 import { FallbackError } from './components/FallbackError'
+import { GovernanceView } from './components/governance/GovernanceView'
 import { HostsView } from './components/hosts/HostsView'
 import { InventoryView } from './components/inventory/InventoryView'
 import { LanguageToggle } from './components/LanguageToggle'
@@ -79,6 +80,8 @@ function App() {
               <ClusterHealthView />
             ) : activeView === 'protection' ? (
               <ProtectionView />
+            ) : activeView === 'governance' ? (
+              <GovernanceView />
             ) : (
               <GlobalDashboard />
             )}

@@ -1,0 +1,82 @@
+{
+  "heading": "Gouvernance & Opérations",
+  "subtitle": "Problèmes, posture d'accès et pools de ressources",
+  "empty": {
+    "heading": "Aucun rapport chargé",
+    "body": "Chargez un rapport pour voir les données de gouvernance."
+  },
+  "issues": {
+    "heading": "Problèmes",
+    "none": "Aucun problème détecté.",
+    "kpi": {
+      "total": "Total",
+      "errors": "Erreurs",
+      "warnings": "Avertissements"
+    },
+    "col": {
+      "severity": "Sévérité",
+      "section": "Section",
+      "message": "Message",
+      "linkKey": "Référence"
+    },
+    "bySection": "Par section"
+  },
+  "access": {
+    "heading": "Posture d'accès",
+    "kpi": {
+      "users": "Utilisateurs",
+      "enabled": "Actifs",
+      "tokens": "Jetons API",
+      "roles": "Rôles",
+      "acls": "Entrées ACL",
+      "rootAccounts": "Comptes root"
+    },
+    "users": {
+      "heading": "Utilisateurs",
+      "none": "Aucun utilisateur trouvé.",
+      "col": {
+        "id": "ID",
+        "enabled": "Actif",
+        "email": "E-mail",
+        "groups": "Groupes",
+        "expire": "Expiration"
+      }
+    },
+    "tokens": {
+      "heading": "Jetons API",
+      "none": "Aucun jeton API trouvé.",
+      "col": {
+        "user": "Utilisateur",
+        "tokenId": "ID jeton",
+        "privSeparated": "Priv. séparés",
+        "expire": "Expiration"
+      }
+    },
+    "acls": {
+      "heading": "Entrées ACL",
+      "none": "Aucune entrée ACL trouvée.",
+      "col": {
+        "path": "Chemin",
+        "usersOrGroup": "Utilisateur / Groupe",
+        "type": "Type",
+        "role": "Rôle",
+        "propagate": "Propagation"
+      }
+    }
+  },
+  "pools": {
+    "heading": "Pools de ressources",
+    "none": "Aucun pool de ressources trouvé.",
+    "kpi": {
+      "pools": "Pools",
+      "members": "Membres"
+    },
+    "col": {
+      "pool": "Pool",
+      "members": "Membres",
+      "vms": "Invités",
+      "storages": "Stockages"
+    }
+  },
+  "na": "—"
+}

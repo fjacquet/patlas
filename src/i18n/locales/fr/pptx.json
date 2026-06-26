@@ -197,5 +197,60 @@
       "count": "Quantité",
       "sizeGib": "Taille (Gio)"
     }
+  },
+  "governance": {
+    "issues": {
+      "title": "Problèmes",
+      "kpi": {
+        "total": "Total",
+        "errors": "Erreurs",
+        "warnings": "Avertissements"
+      },
+      "col": {
+        "severity": "Sévérité",
+        "section": "Section",
+        "message": "Message"
+      }
+    },
+    "access": {
+      "title": "Posture d'accès",
+      "kpi": {
+        "users": "Utilisateurs",
+        "enabled": "Actifs",
+        "tokens": "Jetons API",
+        "roles": "Rôles",
+        "acls": "Entrées ACL",
+        "rootAccounts": "Comptes root"
+      },
+      "users": {
+        "heading": "Utilisateurs",
+        "col": {
+          "id": "ID",
+          "enabled": "Actif",
+          "email": "E-mail"
+        }
+      },
+      "tokens": {
+        "heading": "Jetons API",
+        "col": {
+          "user": "Utilisateur",
+          "tokenId": "ID jeton",
+          "privSeparated": "Priv. séparés"
+        }
+      }
+    },
+    "pools": {
+      "title": "Pools de ressources",
+      "kpi": {
+        "pools": "Pools",
+        "members": "Membres"
+      },
+      "col": {
+        "pool": "Pool",
+        "members": "Membres",
+        "vms": "Invités",
+        "storages": "Stockages"
+      }
+    }
   }
 }
