@@ -4,10 +4,12 @@ export type AppView =
   | 'dashboard'
   | 'inventory'
   | 'hosts'
+  | 'rrdheadroom'
   | 'planning'
   | 'eos'
   | 'trends'
   | 'storage'
+  | 'storagegrowth'
   | 'network'
   | 'rightsizing'
   | 'monstervm'
@@ -21,10 +23,12 @@ const VIEWS = [
   'dashboard',
   'inventory',
   'hosts',
+  'rrdheadroom',
   'planning',
   'eos',
   'trends',
   'storage',
+  'storagegrowth',
   'network',
   'rightsizing',
   'monstervm',

@@ -15,7 +15,9 @@
     "storagecontent": "Storage Content",
     "clusterhealth": "Cluster Health",
     "protection": "Protection",
-    "governance": "Governance"
+    "governance": "Governance",
+    "rrdheadroom": "Node Headroom",
+    "storagegrowth": "Storage Growth"
   },
   "tab": {
     "label": "Object type",

@@ -15,6 +15,8 @@ import { NetworkView } from './components/network/NetworkView'
 import { PlanningView } from './components/planning/PlanningView'
 import { ProtectionView } from './components/protection/ProtectionView'
 import { RightSizingView } from './components/rightsizing/RightSizingView'
+import { RrdHeadroomView } from './components/rrd/RrdHeadroomView'
+import { StorageGrowthView } from './components/rrd/StorageGrowthView'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
 import { SnapshotSprawlView } from './components/snapshots/SnapshotSprawlView'
 import { StorageView } from './components/storage/StorageView'
@@ -58,6 +60,10 @@ function App() {
               <InventoryView />
             ) : activeView === 'hosts' ? (
               <HostsView />
+            ) : activeView === 'rrdheadroom' ? (
+              <RrdHeadroomView />
+            ) : activeView === 'storagegrowth' ? (
+              <StorageGrowthView />
             ) : activeView === 'planning' ? (
               <PlanningView />
             ) : activeView === 'eos' ? (

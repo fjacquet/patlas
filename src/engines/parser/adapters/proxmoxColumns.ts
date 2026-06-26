@@ -111,8 +111,8 @@ export const BACKUP_JOB_COLS = {
 
 /** Column map for the "RRD Nodes" time-series sheet. Each row is one sample
  *  for one node. P3 uses node/timeDate/cpuUsagePct to derive cpuRatio;
- *  the remaining columns are mapped now so P8 can reuse without touching
- *  this file again. */
+ *  P8 (Pack A) consumes the full series for node-headroom analytics.
+ *  "%" columns are 0-1 fractions in the Proxmox report. */
 export const RRD_NODE_COLS = {
   node: ['node'],
   timeDate: ['time date'],
@@ -120,6 +120,33 @@ export const RRD_NODE_COLS = {
   memUsagePct: ['memory usage %'],
   ioWaitPct: ['io wait %'],
   loadavg: ['loadavg'],
+  netInMb: ['net in mb'],
+  netOutMb: ['net out mb'],
+  psiMemSomePct: ['psi mem some %'],
+} as const
+
+/** Column map for the "RRD Storage" time-series sheet (P8 Pack A). One row
+ *  per node+storage+timestamp. `Usage %` is a 0-1 fraction; `Size GB`/`Used
+ *  GB` are reinterpreted as GiB (ADR-0010). The capacity-growth engine reads
+ *  only these six columns in a single pass (the sheet has ~36k rows). */
+export const RRD_STORAGE_COLS = {
+  node: ['node'],
+  storage: ['storage'],
+  timeDate: ['time date'],
+  sizeGib: ['size gb'],
+  usedGib: ['used gb'],
+  usagePct: ['usage %'],
+} as const
+
+/** Column map for the OPTIONAL "RRD Guests" time-series sheet (P8 Pack A,
+ *  defensive). Empty in current exports but supported; parsed when present,
+ *  degrades to `[]` otherwise. Aliases cover the likely guest-RRD headers. */
+export const RRD_GUEST_COLS = {
+  vmId: ['vm id'],
+  node: ['node'],
+  timeDate: ['time date'],
+  cpuUsagePct: ['cpu usage %'],
+  memUsagePct: ['memory usage %'],
 } as const
 
 /**

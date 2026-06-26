@@ -5,7 +5,10 @@ import {
   adaptProxmox,
   adaptProxmoxGuests,
   adaptProxmoxNodes,
+  adaptProxmoxRrdGuests,
+  adaptProxmoxRrdNodeSeries,
   adaptProxmoxRrdNodes,
+  adaptProxmoxRrdStorage,
   adaptProxmoxStorages,
   adaptProxmoxUsage,
   extractClusterName,
@@ -311,6 +314,87 @@ it('adaptProxmoxRrdNodes: skips rows with missing Cpu Usage %', () => {
     rrdNodesSheet([{ Node: 'pve1', 'Time Date': '2024-01-01 00:00:00', 'Cpu Usage %': '' }]),
   )
   expect(map.size).toBe(0)
+})
+
+// ── P8 Pack A — full RRD time-series parsing ─────────────────────────────────
+
+const rrdNodeSeriesSheet = (rows: Record<string, unknown>[]): ParsedSheet => ({
+  name: 'RRD Nodes',
+  headers: [
+    'Node',
+    'Time Date',
+    'Cpu Usage %',
+    'Memory Usage %',
+    'Io Wait %',
+    'Loadavg',
+    'Net In MB',
+    'Net Out MB',
+    'Psi Mem Some %',
+  ],
+  rows,
+  cells: [],
+})
+
+it('adaptProxmoxRrdNodeSeries: returns [] for an absent sheet', () => {
+  expect(adaptProxmoxRrdNodeSeries(undefined)).toEqual([])
+})
+
+it('adaptProxmoxRrdNodeSeries: parses the full series with a numeric serial', () => {
+  const series = adaptProxmoxRrdNodeSeries(
+    rrdNodeSeriesSheet([
+      {
+        Node: 'pve1',
+        'Time Date': 46198.25,
+        'Cpu Usage %': 0.27,
+        'Memory Usage %': 0.32,
+        'Io Wait %': 0.001,
+        Loadavg: 1.6,
+        'Net In MB': 2.5,
+        'Net Out MB': 2.1,
+        'Psi Mem Some %': 0,
+      },
+    ]),
+  )
+  expect(series).toHaveLength(1)
+  expect(series[0]).toMatchObject({
+    node: 'pve1',
+    timeSerial: 46198.25,
+    cpuRatio: 0.27,
+    memRatio: 0.32,
+    loadavg: 1.6,
+    netInMb: 2.5,
+  })
+})
+
+it('adaptProxmoxRrdStorage: parses node/storage capacity samples', () => {
+  const sheet2: ParsedSheet = {
+    name: 'RRD Storage',
+    headers: ['Node', 'Storage', 'Time Date', 'Size GB', 'Used GB', 'Usage %'],
+    rows: [
+      {
+        Node: 'pve1',
+        Storage: 'local',
+        'Time Date': 46198.25,
+        'Size GB': 95.6,
+        'Used GB': 29.5,
+        'Usage %': 0.308,
+      },
+      { Node: '', Storage: '', 'Time Date': 46198.25, 'Size GB': 1, 'Used GB': 1, 'Usage %': 0 }, // skipped
+    ],
+    cells: [],
+  }
+  const rows = adaptProxmoxRrdStorage(sheet2)
+  expect(rows).toHaveLength(1)
+  expect(rows[0]).toMatchObject({
+    node: 'pve1',
+    storage: 'local',
+    usedGib: 29.5,
+    usageRatio: 0.308,
+  })
+})
+
+it('adaptProxmoxRrdGuests: degrades to [] when the sheet is absent', () => {
+  expect(adaptProxmoxRrdGuests(undefined)).toEqual([])
 })
 
 it('adaptProxmoxNodes: cpuRatio comes from RRD map (non-zero)', () => {

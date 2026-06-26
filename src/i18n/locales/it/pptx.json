@@ -71,7 +71,12 @@
     "title": "Andamenti nella sessione",
     "points": "Punti della cronologia",
     "deltas": "Delta",
-    "series": "Numero di ospiti tra gli snapshot"
+    "series": "Numero di ospiti tra gli snapshot",
+    "singleTitle": "Andamenti file singolo — serie RRD",
+    "singleNote": "Derivato dalla serie temporale RRD di questo export.",
+    "singleCpu": "CPU media %",
+    "singleMem": "Memoria media %",
+    "singleSamples": "Punti serie"
   },
   "inventory": {
     "title": "Riepilogo dell'inventario",
@@ -251,6 +256,44 @@
         "vms": "Ospiti",
         "storages": "Storage"
       }
+    }
+  },
+  "rrdHeadroom": {
+    "title": "Margine nodo — utilizzo RRD",
+    "kpi": {
+      "cpuPeak": "CPU picco",
+      "cpuAvg": "CPU media",
+      "memPeak": "Memoria picco",
+      "memAvg": "Memoria media",
+      "ioWaitPeak": "Attesa I/O picco",
+      "psiMemPeak": "Pressione memoria picco"
+    },
+    "col": {
+      "node": "Nodo",
+      "cpuPeak": "CPU picco",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU media",
+      "memPeak": "Mem picco",
+      "memP95": "Mem p95",
+      "memAvg": "Mem media"
+    }
+  },
+  "storageGrowth": {
+    "title": "Tempo al riempimento — crescita RRD",
+    "kpi": {
+      "storages": "Storage",
+      "soonest": "Riempimento più vicino (giorni)",
+      "window": "Finestra (giorni)",
+      "growing": "Storage in crescita"
+    },
+    "col": {
+      "storage": "Storage",
+      "node": "Nodo",
+      "used": "Usato (GiB)",
+      "size": "Dimensione (GiB)",
+      "usage": "Utilizzo",
+      "growth": "Crescita (GiB/giorno)",
+      "daysToFull": "Giorni al riempimento"
     }
   }
 }

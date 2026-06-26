@@ -1,0 +1,78 @@
+{
+  "headroom": {
+    "heading": "Marge nœud",
+    "subtitle": "Utilisation par nœud d'après la série temporelle RRD",
+    "empty": "Aucune série temporelle nœud RRD dans cet export.",
+    "kpi": {
+      "cpuPeak": "CPU crête",
+      "cpuAvg": "CPU moyen",
+      "memPeak": "Mémoire crête",
+      "memAvg": "Mémoire moyenne",
+      "ioWaitPeak": "Attente E/S crête",
+      "psiMemPeak": "Pression mémoire crête"
+    },
+    "chartTitle": "CPU & mémoire par nœud",
+    "series": {
+      "cpuPeak": "CPU crête",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU moyen",
+      "memPeak": "Mémoire crête",
+      "memP95": "Mémoire p95",
+      "memAvg": "Mémoire moyenne"
+    },
+    "col": {
+      "node": "Nœud",
+      "cpuPeak": "CPU crête",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU moyen",
+      "memPeak": "Mém crête",
+      "memP95": "Mém p95",
+      "memAvg": "Mém moyen",
+      "ioWait": "Attente E/S crête",
+      "loadavg": "Charge crête",
+      "psiMem": "Pression mém crête",
+      "netIn": "Réseau entrant crête",
+      "netOut": "Réseau sortant crête",
+      "samples": "Échantillons"
+    }
+  },
+  "storageGrowth": {
+    "heading": "Temps avant saturation",
+    "subtitle": "Croissance de capacité d'après la série temporelle RRD",
+    "empty": "Aucune série temporelle stockage RRD dans cet export.",
+    "kpi": {
+      "storages": "Stockages",
+      "soonest": "Saturation la plus proche",
+      "window": "Fenêtre",
+      "growing": "En croissance"
+    },
+    "chartTitle": "Croissance de capacité utilisée par stockage",
+    "series": {
+      "growth": "Croissance"
+    },
+    "col": {
+      "storage": "Stockage",
+      "node": "Nœud",
+      "used": "Utilisé",
+      "size": "Taille",
+      "usage": "Utilisation",
+      "growth": "Croissance",
+      "daysToFull": "Jours avant saturation",
+      "samples": "Échantillons"
+    },
+    "unit": {
+      "gibPerDay": "Gio/jour",
+      "days": "jours"
+    }
+  },
+  "single": {
+    "heading": "Tendances mono-fichier",
+    "note": "Dérivé de la série temporelle RRD de cet export — aucun second instantané requis.",
+    "empty": "Aucune série temporelle RRD disponible pour les tendances mono-fichier.",
+    "chartTitle": "Utilisation du parc sur la fenêtre RRD",
+    "series": {
+      "cpu": "CPU moyen",
+      "mem": "Mémoire moyenne"
+    }
+  }
+}

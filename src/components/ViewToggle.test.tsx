@@ -4,23 +4,25 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
 import { type AppView, ViewToggle } from './ViewToggle'
 
-describe('ViewToggle (15 segments incl Right-sizing + Monster Guests + Snapshot Sprawl + Storage Content + Cluster Health + Protection + Governance)', () => {
+describe('ViewToggle (17 segments incl Node Headroom + Storage Growth + Right-sizing + Monster Guests + Snapshot Sprawl + Storage Content + Cluster Health + Protection + Governance)', () => {
   beforeEach(async () => {
     await i18n.changeLanguage('en')
   })
 
-  it('renders all 15 segments', () => {
+  it('renders all 17 segments', () => {
     render(<ViewToggle value="dashboard" onChange={() => {}} />)
     const buttons = screen.getAllByRole('button')
-    expect(buttons).toHaveLength(15)
+    expect(buttons).toHaveLength(17)
     for (const label of [
       'Dashboard',
       'Inventory',
       'Nodes',
+      'Node Headroom',
       'Planning',
       'OS end-of-support',
       'Trends',
       'Storage',
+      'Storage Growth',
       'Network',
       'Right-sizing',
       'Monster Guests',
@@ -61,7 +63,7 @@ describe('ViewToggle (15 segments incl Right-sizing + Monster Guests + Snapshot 
     const onChange = vi.fn<(v: AppView) => void>()
     render(<ViewToggle value="dashboard" onChange={onChange} orientation="vertical" />)
     expect(screen.getByRole('group')).not.toBeNull()
-    expect(screen.getAllByRole('button')).toHaveLength(15)
+    expect(screen.getAllByRole('button')).toHaveLength(17)
     fireEvent.keyDown(screen.getByRole('group'), { key: 'ArrowDown' })
     expect(onChange).toHaveBeenCalledWith('inventory')
   })

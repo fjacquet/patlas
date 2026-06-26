@@ -17,6 +17,7 @@ import deProtection from './locales/de/protection.json'
 import deRci from './locales/de/rci.json'
 import deReport from './locales/de/report.json'
 import deRightsizing from './locales/de/rightsizing.json'
+import deRrd from './locales/de/rrd.json'
 import deSnapshots from './locales/de/snapshots.json'
 import deStorage from './locales/de/storage.json'
 import deStorageContent from './locales/de/storagecontent.json'
@@ -38,6 +39,7 @@ import enProtection from './locales/en/protection.json'
 import enRci from './locales/en/rci.json'
 import enReport from './locales/en/report.json'
 import enRightsizing from './locales/en/rightsizing.json'
+import enRrd from './locales/en/rrd.json'
 import enSnapshots from './locales/en/snapshots.json'
 import enStorage from './locales/en/storage.json'
 import enStorageContent from './locales/en/storagecontent.json'
@@ -59,6 +61,7 @@ import frProtection from './locales/fr/protection.json'
 import frRci from './locales/fr/rci.json'
 import frReport from './locales/fr/report.json'
 import frRightsizing from './locales/fr/rightsizing.json'
+import frRrd from './locales/fr/rrd.json'
 import frSnapshots from './locales/fr/snapshots.json'
 import frStorage from './locales/fr/storage.json'
 import frStorageContent from './locales/fr/storagecontent.json'
@@ -80,6 +83,7 @@ import itProtection from './locales/it/protection.json'
 import itRci from './locales/it/rci.json'
 import itReport from './locales/it/report.json'
 import itRightsizing from './locales/it/rightsizing.json'
+import itRrd from './locales/it/rrd.json'
 import itSnapshots from './locales/it/snapshots.json'
 import itStorage from './locales/it/storage.json'
 import itStorageContent from './locales/it/storagecontent.json'
@@ -120,6 +124,7 @@ export const NAMESPACES = [
   'clusterhealth',
   'protection',
   'governance',
+  'rrd',
 ] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
@@ -146,6 +151,7 @@ export const resources = {
     clusterhealth: enClusterHealth,
     protection: enProtection,
     governance: enGovernance,
+    rrd: enRrd,
   },
   fr: {
     common: frCommon,
@@ -169,6 +175,7 @@ export const resources = {
     clusterhealth: frClusterHealth,
     protection: frProtection,
     governance: frGovernance,
+    rrd: frRrd,
   },
   de: {
     common: deCommon,
@@ -192,6 +199,7 @@ export const resources = {
     clusterhealth: deClusterHealth,
     protection: deProtection,
     governance: deGovernance,
+    rrd: deRrd,
   },
   it: {
     common: itCommon,
@@ -215,6 +223,7 @@ export const resources = {
     clusterhealth: itClusterHealth,
     protection: itProtection,
     governance: itGovernance,
+    rrd: itRrd,
   },
 } as const
 

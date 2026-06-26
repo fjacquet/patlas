@@ -15,7 +15,9 @@
     "storagecontent": "Contenuto storage",
     "clusterhealth": "Salute cluster",
     "protection": "Protezione",
-    "governance": "Governance"
+    "governance": "Governance",
+    "rrdheadroom": "Margine nodi",
+    "storagegrowth": "Crescita storage"
   },
   "tab": {
     "label": "Tipo di oggetto",

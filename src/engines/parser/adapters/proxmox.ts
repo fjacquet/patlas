@@ -20,6 +20,9 @@ import type {
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
   ProxmoxTaskRow,
+  RrdGuestRow,
+  RrdNodeRow,
+  RrdStorageRow,
   StorageRow,
   VmNicRow,
   VmUsageRow,
@@ -43,7 +46,9 @@ import {
   NODE_COLS,
   PARTITION_COLS,
   POOL_MEMBER_COLS,
+  RRD_GUEST_COLS,
   RRD_NODE_COLS,
+  RRD_STORAGE_COLS,
   SNAPSHOT_COLS,
   STORAGE_COLS,
   STORAGE_CONTENT_COLS,
@@ -81,6 +86,99 @@ export const adaptProxmoxRrdNodes = (sheet: ParsedSheet | undefined): Map<string
   }
   const out = new Map<string, number>()
   for (const [node, { cpuUsagePct }] of latestByNode) out.set(node, cpuUsagePct)
+  return out
+}
+
+// Dense time-series numeric read: blank/non-numeric → 0 (a missing sample
+// value is a real 0, unlike capacity columns where blank means "unknown").
+const num = (row: Record<string, unknown>, col: string | undefined): number =>
+  Math.max(0, readNumber(readCol(row, col)))
+
+/**
+ * Parse the FULL "RRD Nodes" time-series into per-node samples (P8 Pack A).
+ * One pass over the ~8.6k-row sheet, reading only the headroom columns.
+ * `timeSerial` is the raw Excel serial day (numeric in the cv4pve export).
+ * "%" columns are 0-1 fractions. Returns `[]` when the sheet is absent.
+ *
+ * Separate from `adaptProxmoxRrdNodes` (which keeps the latest-sample cpuRatio
+ * map on a lexicographic string compare) — that one feeds NodeRow.cpuRatio and
+ * its contract/tests are unchanged; this one feeds the headroom analytics.
+ */
+export const adaptProxmoxRrdNodeSeries = (sheet: ParsedSheet | undefined): RrdNodeRow[] => {
+  if (!sheet) return []
+  const cols = mapColumns(sheet.headers, RRD_NODE_COLS)
+  const out: RrdNodeRow[] = []
+  for (const row of sheet.rows) {
+    const node = readString(readCol(row, cols.node))
+    if (!node) continue
+    const timeSerial = readNumber(readCol(row, cols.timeDate))
+    if (!Number.isFinite(timeSerial)) continue
+    out.push({
+      node,
+      timeSerial,
+      cpuRatio: num(row, cols.cpuUsagePct),
+      memRatio: num(row, cols.memUsagePct),
+      ioWaitRatio: num(row, cols.ioWaitPct),
+      loadavg: num(row, cols.loadavg),
+      netInMb: num(row, cols.netInMb),
+      netOutMb: num(row, cols.netOutMb),
+      psiMemSomeRatio: num(row, cols.psiMemSomePct),
+    })
+  }
+  return out
+}
+
+/**
+ * Parse the "RRD Storage" time-series into per-storage samples (P8 Pack A).
+ * One pass over the LARGE (~36k-row) sheet, reading only the six needed
+ * columns to keep worker memory bounded. `Size GB`/`Used GB` are reinterpreted
+ * as GiB (ADR-0010); `Usage %` is a 0-1 fraction. Returns `[]` when absent.
+ */
+export const adaptProxmoxRrdStorage = (sheet: ParsedSheet | undefined): RrdStorageRow[] => {
+  if (!sheet) return []
+  const cols = mapColumns(sheet.headers, RRD_STORAGE_COLS)
+  const out: RrdStorageRow[] = []
+  for (const row of sheet.rows) {
+    const node = readString(readCol(row, cols.node))
+    const storage = readString(readCol(row, cols.storage))
+    if (!node || !storage) continue
+    const timeSerial = readNumber(readCol(row, cols.timeDate))
+    if (!Number.isFinite(timeSerial)) continue
+    out.push({
+      node,
+      storage,
+      timeSerial,
+      sizeGib: num(row, cols.sizeGib),
+      usedGib: num(row, cols.usedGib),
+      usageRatio: num(row, cols.usagePct),
+    })
+  }
+  return out
+}
+
+/**
+ * Parse the OPTIONAL "RRD Guests" time-series (P8 Pack A, defensive). Empty in
+ * current exports but supported; returns `[]` when the sheet is absent or
+ * carries no identifiable rows. `*Ratio` columns are 0-1 fractions.
+ */
+export const adaptProxmoxRrdGuests = (sheet: ParsedSheet | undefined): RrdGuestRow[] => {
+  if (!sheet) return []
+  const cols = mapColumns(sheet.headers, RRD_GUEST_COLS)
+  const out: RrdGuestRow[] = []
+  for (const row of sheet.rows) {
+    const vmId = readString(readCol(row, cols.vmId))
+    const node = readString(readCol(row, cols.node))
+    if (!vmId && !node) continue
+    const timeSerial = readNumber(readCol(row, cols.timeDate))
+    if (!Number.isFinite(timeSerial)) continue
+    out.push({
+      vmId,
+      node,
+      timeSerial,
+      cpuRatio: num(row, cols.cpuUsagePct),
+      memRatio: num(row, cols.memUsagePct),
+    })
+  }
   return out
 }
 
@@ -764,6 +862,9 @@ export const adaptProxmox = (
   proxmoxAccessRoles: ProxmoxAccessRoleRow[]
   proxmoxAccessAcls: ProxmoxAccessAclRow[]
   proxmoxPoolMembers: ProxmoxPoolMemberRow[]
+  rrdNodes: RrdNodeRow[]
+  rrdStorage: RrdStorageRow[]
+  rrdGuests: RrdGuestRow[]
   clusterName: string
   warnings: ParseError[]
 } => {
@@ -845,6 +946,13 @@ export const adaptProxmox = (
   const rrdNodesSheet = findSheet(workbook, ['rrd nodes'])
   let rrdCpuByNode = adaptProxmoxRrdNodes(rrdNodesSheet)
 
+  // P8 Pack A: the FULL RRD time-series (node headroom + storage growth +
+  // single-file trends). Parsed once here; the analytics engines downstream
+  // consume the typed rows off the Snapshot (engines stay pure).
+  const rrdNodeSeries = adaptProxmoxRrdNodeSeries(rrdNodesSheet)
+  const rrdStorage = adaptProxmoxRrdStorage(findSheet(workbook, ['rrd storage']))
+  const rrdGuests = adaptProxmoxRrdGuests(findSheet(workbook, ['rrd guests']))
+
   // Build nodes early so we have speedMhz for VM usage derivation.
   let nodes = adaptProxmoxNodes(nodesSheet, clusterName, rrdCpuByNode)
 
@@ -884,6 +992,9 @@ export const adaptProxmox = (
     proxmoxAccessRoles: adaptProxmoxAccessRoles(clusterAccessSheet),
     proxmoxAccessAcls: adaptProxmoxAccessAcls(clusterAccessSheet),
     proxmoxPoolMembers: adaptProxmoxPoolMembers(clusterPoolsSheet),
+    rrdNodes: rrdNodeSeries,
+    rrdStorage,
+    rrdGuests,
     clusterName,
     warnings,
   }

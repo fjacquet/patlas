@@ -30,6 +30,8 @@ import { networkRollup } from './network'
 import { classifyOsFamily } from './osFamily'
 import { datastoreCountByCluster, perDatastore } from './perDatastore'
 import { perEsx } from './perEsx'
+import { computeRrdNodeStats, EMPTY_RRD_HEADROOM } from './rrdNodeStats'
+import { computeRrdStorageGrowth } from './rrdStorageGrowth'
 import {
   computeSizing,
   DEFAULT_SIZING_THRESHOLDS,
@@ -347,6 +349,16 @@ export function buildEstateView(
     merged.proxmoxAccessAcls,
     merged.proxmoxPoolMembers,
   )
+  // P8 Pack A — RRD analytics. Computed from the PRE-merge `selected` snapshots'
+  // RRD time-series (like trends/sizing — RRD is per-snapshot, not part of the
+  // spatial merge). Concatenated across selected files (peak/avg over the
+  // loaded window); for the primary single-file case this is just the one
+  // export. Pure — reuses the parsed rows. `?? []` tolerates Snapshot objects
+  // built before this phase (and released raw rows).
+  const rrdNodeRows = selected.flatMap((s) => s.rrdNodes ?? [])
+  const rrdStorageRows = selected.flatMap((s) => s.rrdStorage ?? [])
+  const rrdHeadroom = computeRrdNodeStats(rrdNodeRows)
+  const rrdStorageGrowth = computeRrdStorageGrowth(rrdStorageRows)
 
   return {
     globals,
@@ -378,6 +390,8 @@ export function buildEstateView(
     fsFillRisk,
     diskHygiene,
     backupCoverage,
+    rrdHeadroom,
+    rrdStorageGrowth,
   }
 }
 
@@ -628,4 +642,11 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   fsFillRisk: EMPTY_FS_FILL,
   diskHygiene: EMPTY_DISK_HYGIENE,
   backupCoverage: EMPTY_BACKUP_COVERAGE,
+  rrdHeadroom: EMPTY_RRD_HEADROOM,
+  rrdStorageGrowth: Object.freeze({
+    hasData: false,
+    rows: Object.freeze([]) as never[],
+    soonestDaysToFull: null,
+    windowDays: 0,
+  }),
 })

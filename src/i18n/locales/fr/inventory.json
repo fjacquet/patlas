@@ -15,7 +15,9 @@
     "storagecontent": "Contenu stockage",
     "clusterhealth": "Santé cluster",
     "protection": "Protection",
-    "governance": "Gouvernance"
+    "governance": "Gouvernance",
+    "rrdheadroom": "Marge nœuds",
+    "storagegrowth": "Croissance stockage"
   },
   "tab": {
     "label": "Type d'objet",

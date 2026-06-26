@@ -15,7 +15,9 @@
     "storagecontent": "Speicherinhalt",
     "clusterhealth": "Cluster-Zustand",
     "protection": "Schutz",
-    "governance": "Governance"
+    "governance": "Governance",
+    "rrdheadroom": "Knoten-Reserve",
+    "storagegrowth": "Speicherwachstum"
   },
   "tab": {
     "label": "Objekttyp",

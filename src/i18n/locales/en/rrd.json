@@ -1,0 +1,78 @@
+{
+  "headroom": {
+    "heading": "Node headroom",
+    "subtitle": "Per-node utilization from the RRD time-series",
+    "empty": "No RRD node time-series in this export.",
+    "kpi": {
+      "cpuPeak": "Peak CPU",
+      "cpuAvg": "Mean CPU",
+      "memPeak": "Peak memory",
+      "memAvg": "Mean memory",
+      "ioWaitPeak": "Peak IO-wait",
+      "psiMemPeak": "Peak memory pressure"
+    },
+    "chartTitle": "Per-node CPU & memory",
+    "series": {
+      "cpuPeak": "CPU peak",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU mean",
+      "memPeak": "Memory peak",
+      "memP95": "Memory p95",
+      "memAvg": "Memory mean"
+    },
+    "col": {
+      "node": "Node",
+      "cpuPeak": "CPU peak",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU mean",
+      "memPeak": "Mem peak",
+      "memP95": "Mem p95",
+      "memAvg": "Mem mean",
+      "ioWait": "IO-wait peak",
+      "loadavg": "Loadavg peak",
+      "psiMem": "Mem pressure peak",
+      "netIn": "Net in peak",
+      "netOut": "Net out peak",
+      "samples": "Samples"
+    }
+  },
+  "storageGrowth": {
+    "heading": "Storage time-to-full",
+    "subtitle": "Capacity growth from the RRD time-series",
+    "empty": "No RRD storage time-series in this export.",
+    "kpi": {
+      "storages": "Storages",
+      "soonest": "Soonest full",
+      "window": "Window",
+      "growing": "Growing"
+    },
+    "chartTitle": "Used-capacity growth per storage",
+    "series": {
+      "growth": "Growth"
+    },
+    "col": {
+      "storage": "Storage",
+      "node": "Node",
+      "used": "Used",
+      "size": "Size",
+      "usage": "Usage",
+      "growth": "Growth",
+      "daysToFull": "Days to full",
+      "samples": "Samples"
+    },
+    "unit": {
+      "gibPerDay": "GiB/day",
+      "days": "days"
+    }
+  },
+  "single": {
+    "heading": "Single-file trends",
+    "note": "Derived from the RRD time-series in this export — no second snapshot required.",
+    "empty": "No RRD time-series available for single-file trends.",
+    "chartTitle": "Estate utilization over the RRD window",
+    "series": {
+      "cpu": "Mean CPU",
+      "mem": "Mean memory"
+    }
+  }
+}
