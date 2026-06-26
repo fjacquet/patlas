@@ -28,8 +28,10 @@ import { addOverviewSlide } from './slides/overviewSlide'
 import { addPhysicalInventorySlide } from './slides/physicalInventorySlide'
 import { addPlannedSlide } from './slides/plannedSlide'
 import { addRightSizingSlide } from './slides/rightSizingSlide'
+import { addRrdHeadroomSlide } from './slides/rrdHeadroomSlide'
 import { addSnapshotSprawlSlide } from './slides/snapshotSprawlSlide'
 import { addStorageContentSlide } from './slides/storageContentSlide'
+import { addStorageGrowthSlide } from './slides/storageGrowthSlide'
 import { addStorageSlide } from './slides/storageSlide'
 import { addTitleSlide } from './slides/titleSlide'
 import { addTrendsSlide } from './slides/trendsSlide'
@@ -133,6 +135,16 @@ export async function buildPptx(
     addMonsterSlide(pptx, view.monsters, strings, locale)
   }
 
+  // P8 Pack A — node headroom (RRD): only when RRD-Nodes samples were present.
+  if (view.rrdHeadroom.hasData) {
+    addRrdHeadroomSlide(pptx, view.rrdHeadroom, strings, locale)
+  }
+  // P8 Pack A — storage time-to-full (RRD): only when RRD-Storage samples were
+  // present.
+  if (view.rrdStorageGrowth.hasData) {
+    addStorageGrowthSlide(pptx, view.rrdStorageGrowth, strings, locale)
+  }
+
   if (view.snapshotSprawl.count > 0) {
     addSnapshotSprawlSlide(pptx, view.snapshotSprawl, strings, locale)
   }
@@ -151,8 +163,12 @@ export async function buildPptx(
   // F-1 (deck side): planned-vs-measured with the other re-aggregation.
   addPlannedSlide(pptx, view, strings, locale)
 
-  // D-09: trends slide only when trends is non-null (<2 snapshots ⇒ omit).
-  if (trends !== null) addTrendsSlide(pptx, trends, png('trendLine'), strings, locale)
+  // D-09 + P8 Pack A: the trends slide emits when there is a cross-snapshot
+  // series (≥2 snapshots) OR a single-file RRD timeline (intra-export trend) —
+  // so a single dropped file still produces a trends slide.
+  if (trends !== null || view.rrdHeadroom.timeline.length > 0) {
+    addTrendsSlide(pptx, trends, view.rrdHeadroom, png('trendLine'), strings, locale)
+  }
 
   addInventorySlide(pptx, view, png('osDonut'), strings, locale)
 

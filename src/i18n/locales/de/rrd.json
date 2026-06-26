@@ -1,0 +1,78 @@
+{
+  "headroom": {
+    "heading": "Knoten-Reserve",
+    "subtitle": "Auslastung pro Knoten aus der RRD-Zeitreihe",
+    "empty": "Keine RRD-Knotenzeitreihe in diesem Export.",
+    "kpi": {
+      "cpuPeak": "CPU-Spitze",
+      "cpuAvg": "CPU-Mittel",
+      "memPeak": "Speicher-Spitze",
+      "memAvg": "Speicher-Mittel",
+      "ioWaitPeak": "IO-Wait-Spitze",
+      "psiMemPeak": "Speicherdruck-Spitze"
+    },
+    "chartTitle": "CPU & Speicher pro Knoten",
+    "series": {
+      "cpuPeak": "CPU-Spitze",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU-Mittel",
+      "memPeak": "Speicher-Spitze",
+      "memP95": "Speicher p95",
+      "memAvg": "Speicher-Mittel"
+    },
+    "col": {
+      "node": "Knoten",
+      "cpuPeak": "CPU-Spitze",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU-Mittel",
+      "memPeak": "Sp.-Spitze",
+      "memP95": "Sp. p95",
+      "memAvg": "Sp.-Mittel",
+      "ioWait": "IO-Wait-Spitze",
+      "loadavg": "Last-Spitze",
+      "psiMem": "Speicherdruck-Spitze",
+      "netIn": "Netz ein Spitze",
+      "netOut": "Netz aus Spitze",
+      "samples": "Stichproben"
+    }
+  },
+  "storageGrowth": {
+    "heading": "Zeit bis voll",
+    "subtitle": "Kapazitätswachstum aus der RRD-Zeitreihe",
+    "empty": "Keine RRD-Speicherzeitreihe in diesem Export.",
+    "kpi": {
+      "storages": "Speicher",
+      "soonest": "Am ehesten voll",
+      "window": "Fenster",
+      "growing": "Wachsend"
+    },
+    "chartTitle": "Wachstum belegter Kapazität pro Speicher",
+    "series": {
+      "growth": "Wachstum"
+    },
+    "col": {
+      "storage": "Speicher",
+      "node": "Knoten",
+      "used": "Belegt",
+      "size": "Größe",
+      "usage": "Auslastung",
+      "growth": "Wachstum",
+      "daysToFull": "Tage bis voll",
+      "samples": "Stichproben"
+    },
+    "unit": {
+      "gibPerDay": "GiB/Tag",
+      "days": "Tage"
+    }
+  },
+  "single": {
+    "heading": "Einzeldatei-Trends",
+    "note": "Abgeleitet aus der RRD-Zeitreihe dieses Exports — kein zweiter Snapshot nötig.",
+    "empty": "Keine RRD-Zeitreihe für Einzeldatei-Trends verfügbar.",
+    "chartTitle": "Auslastung des Bestands über das RRD-Fenster",
+    "series": {
+      "cpu": "CPU-Mittel",
+      "mem": "Speicher-Mittel"
+    }
+  }
+}

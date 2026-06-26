@@ -15,6 +15,7 @@ import dePptx from './locales/de/pptx.json'
 import deRci from './locales/de/rci.json'
 import deReport from './locales/de/report.json'
 import deRightsizing from './locales/de/rightsizing.json'
+import deRrd from './locales/de/rrd.json'
 import deSnapshots from './locales/de/snapshots.json'
 import deStorage from './locales/de/storage.json'
 import deStorageContent from './locales/de/storagecontent.json'
@@ -34,6 +35,7 @@ import enPptx from './locales/en/pptx.json'
 import enRci from './locales/en/rci.json'
 import enReport from './locales/en/report.json'
 import enRightsizing from './locales/en/rightsizing.json'
+import enRrd from './locales/en/rrd.json'
 import enSnapshots from './locales/en/snapshots.json'
 import enStorage from './locales/en/storage.json'
 import enStorageContent from './locales/en/storagecontent.json'
@@ -53,6 +55,7 @@ import frPptx from './locales/fr/pptx.json'
 import frRci from './locales/fr/rci.json'
 import frReport from './locales/fr/report.json'
 import frRightsizing from './locales/fr/rightsizing.json'
+import frRrd from './locales/fr/rrd.json'
 import frSnapshots from './locales/fr/snapshots.json'
 import frStorage from './locales/fr/storage.json'
 import frStorageContent from './locales/fr/storagecontent.json'
@@ -72,6 +75,7 @@ import itPptx from './locales/it/pptx.json'
 import itRci from './locales/it/rci.json'
 import itReport from './locales/it/report.json'
 import itRightsizing from './locales/it/rightsizing.json'
+import itRrd from './locales/it/rrd.json'
 import itSnapshots from './locales/it/snapshots.json'
 import itStorage from './locales/it/storage.json'
 import itStorageContent from './locales/it/storagecontent.json'
@@ -110,6 +114,7 @@ export const NAMESPACES = [
   'snapshots',
   'storagecontent',
   'clusterhealth',
+  'rrd',
 ] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
@@ -134,6 +139,7 @@ export const resources = {
     snapshots: enSnapshots,
     storagecontent: enStorageContent,
     clusterhealth: enClusterHealth,
+    rrd: enRrd,
   },
   fr: {
     common: frCommon,
@@ -155,6 +161,7 @@ export const resources = {
     snapshots: frSnapshots,
     storagecontent: frStorageContent,
     clusterhealth: frClusterHealth,
+    rrd: frRrd,
   },
   de: {
     common: deCommon,
@@ -176,6 +183,7 @@ export const resources = {
     snapshots: deSnapshots,
     storagecontent: deStorageContent,
     clusterhealth: deClusterHealth,
+    rrd: deRrd,
   },
   it: {
     common: itCommon,
@@ -197,6 +205,7 @@ export const resources = {
     snapshots: itSnapshots,
     storagecontent: itStorageContent,
     clusterhealth: itClusterHealth,
+    rrd: itRrd,
   },
 } as const
 

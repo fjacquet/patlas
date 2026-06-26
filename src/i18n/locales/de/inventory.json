@@ -13,7 +13,9 @@
     "monstervm": "Monster-Gäste",
     "snapshots": "Snapshot-Wildwuchs",
     "storagecontent": "Speicherinhalt",
-    "clusterhealth": "Cluster-Zustand"
+    "clusterhealth": "Cluster-Zustand",
+    "rrdheadroom": "Knoten-Reserve",
+    "storagegrowth": "Speicherwachstum"
   },
   "tab": {
     "label": "Objekttyp",

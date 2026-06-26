@@ -71,7 +71,12 @@
     "title": "Tendances de session",
     "points": "Points de la chronologie",
     "deltas": "Deltas",
-    "series": "Nombre d'invités sur les instantanés"
+    "series": "Nombre d'invités sur les instantanés",
+    "singleTitle": "Tendances mono-fichier — série RRD",
+    "singleNote": "Dérivé de la série temporelle RRD de cet export.",
+    "singleCpu": "CPU moyen %",
+    "singleMem": "Mémoire moyenne %",
+    "singleSamples": "Points de la série"
   },
   "inventory": {
     "title": "Synthèse d'inventaire",
@@ -196,6 +201,44 @@
       "storage": "Stockage",
       "count": "Quantité",
       "sizeGib": "Taille (Gio)"
+    }
+  },
+  "rrdHeadroom": {
+    "title": "Marge nœud — utilisation RRD",
+    "kpi": {
+      "cpuPeak": "CPU crête",
+      "cpuAvg": "CPU moyen",
+      "memPeak": "Mémoire crête",
+      "memAvg": "Mémoire moyenne",
+      "ioWaitPeak": "Attente E/S crête",
+      "psiMemPeak": "Pression mémoire crête"
+    },
+    "col": {
+      "node": "Nœud",
+      "cpuPeak": "CPU crête",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU moyen",
+      "memPeak": "Mém crête",
+      "memP95": "Mém p95",
+      "memAvg": "Mém moyen"
+    }
+  },
+  "storageGrowth": {
+    "title": "Temps avant saturation — croissance RRD",
+    "kpi": {
+      "storages": "Stockages",
+      "soonest": "Saturation la plus proche (jours)",
+      "window": "Fenêtre (jours)",
+      "growing": "Stockages en croissance"
+    },
+    "col": {
+      "storage": "Stockage",
+      "node": "Nœud",
+      "used": "Utilisé (Gio)",
+      "size": "Taille (Gio)",
+      "usage": "Utilisation",
+      "growth": "Croissance (Gio/jour)",
+      "daysToFull": "Jours avant saturation"
     }
   }
 }

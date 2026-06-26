@@ -345,6 +345,125 @@ function Report({
             value={fmtInt(trends.deltas.length, loc)}
           />
         </Section>
+      ) : view.rrdHeadroom.timeline.length > 0 ? (
+        // P8 Pack A — single-file trends: one export's RRD time-series still
+        // yields an intra-file estate-utilization trend (no second snapshot).
+        <Section
+          id="trends-single"
+          title={strings['trends.singleTitle'] ?? 'Single-file trends — RRD time-series'}
+        >
+          <p className="factual-note">
+            {strings['trends.singleNote'] ?? 'Derived from the RRD time-series in this export.'}
+          </p>
+          <Metric
+            label={strings['trends.singleSamples'] ?? 'Timeline samples'}
+            value={fmtInt(view.rrdHeadroom.timeline.length, loc)}
+          />
+          <Metric
+            label={strings['trends.singleCpu'] ?? 'Mean CPU %'}
+            value={fmtPercentWhole(view.rrdHeadroom.estate.cpuAvg, loc)}
+          />
+          <Metric
+            label={strings['trends.singleMem'] ?? 'Mean memory %'}
+            value={fmtPercentWhole(view.rrdHeadroom.estate.memAvg, loc)}
+          />
+        </Section>
+      ) : null}
+
+      {view.rrdHeadroom.hasData ? (
+        <Section
+          id="rrd-headroom"
+          title={strings['rrdHeadroom.title'] ?? 'Node headroom — RRD utilization'}
+        >
+          <Metric
+            label={strings['rrdHeadroom.kpi.cpuPeak'] ?? 'Peak CPU'}
+            value={fmtPercentWhole(view.rrdHeadroom.estate.cpuPeak, loc)}
+          />
+          <Metric
+            label={strings['rrdHeadroom.kpi.cpuAvg'] ?? 'Mean CPU'}
+            value={fmtPercentWhole(view.rrdHeadroom.estate.cpuAvg, loc)}
+          />
+          <Metric
+            label={strings['rrdHeadroom.kpi.memPeak'] ?? 'Peak memory'}
+            value={fmtPercentWhole(view.rrdHeadroom.estate.memPeak, loc)}
+          />
+          <Metric
+            label={strings['rrdHeadroom.kpi.memAvg'] ?? 'Mean memory'}
+            value={fmtPercentWhole(view.rrdHeadroom.estate.memAvg, loc)}
+          />
+          <table className="annex-table">
+            <thead>
+              <tr>
+                <th>{strings['rrdHeadroom.col.node'] ?? 'Node'}</th>
+                <th>{strings['rrdHeadroom.col.cpuPeak'] ?? 'CPU peak'}</th>
+                <th>{strings['rrdHeadroom.col.cpuAvg'] ?? 'CPU mean'}</th>
+                <th>{strings['rrdHeadroom.col.memPeak'] ?? 'Mem peak'}</th>
+                <th>{strings['rrdHeadroom.col.memAvg'] ?? 'Mem mean'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {view.rrdHeadroom.perNode.slice(0, TOP_N_CLUSTERS).map((n) => (
+                <tr key={`rrdn-${slug(n.node)}`}>
+                  <td>{n.node}</td>
+                  <td className="num">{fmtPercentWhole(n.cpuPeak, loc)}</td>
+                  <td className="num">{fmtPercentWhole(n.cpuAvg, loc)}</td>
+                  <td className="num">{fmtPercentWhole(n.memPeak, loc)}</td>
+                  <td className="num">{fmtPercentWhole(n.memAvg, loc)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Section>
+      ) : null}
+
+      {view.rrdStorageGrowth.hasData ? (
+        <Section
+          id="rrd-storage-growth"
+          title={strings['storageGrowth.title'] ?? 'Storage time-to-full — RRD growth'}
+        >
+          <Metric
+            label={strings['storageGrowth.kpi.storages'] ?? 'Storages'}
+            value={fmtInt(view.rrdStorageGrowth.rows.length, loc)}
+          />
+          <Metric
+            label={strings['storageGrowth.kpi.soonest'] ?? 'Soonest full (days)'}
+            value={
+              view.rrdStorageGrowth.soonestDaysToFull === null
+                ? NA
+                : fmtInt(Math.round(view.rrdStorageGrowth.soonestDaysToFull), loc)
+            }
+          />
+          <Metric
+            label={strings['storageGrowth.kpi.window'] ?? 'Window (days)'}
+            value={fmtInt(Math.round(view.rrdStorageGrowth.windowDays), loc)}
+          />
+          <table className="annex-table">
+            <thead>
+              <tr>
+                <th>{strings['storageGrowth.col.storage'] ?? 'Storage'}</th>
+                <th>{strings['storageGrowth.col.node'] ?? 'Node'}</th>
+                <th>{strings['storageGrowth.col.used'] ?? 'Used (GiB)'}</th>
+                <th>{strings['storageGrowth.col.size'] ?? 'Size (GiB)'}</th>
+                <th>{strings['storageGrowth.col.growth'] ?? 'Growth (GiB/day)'}</th>
+                <th>{strings['storageGrowth.col.daysToFull'] ?? 'Days to full'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {view.rrdStorageGrowth.rows.slice(0, TOP_N_CLUSTERS).map((r) => (
+                <tr key={`rrds-${slug(r.key)}`}>
+                  <td>{r.storage}</td>
+                  <td>{r.node}</td>
+                  <td className="num">{fmtInt(Math.round(r.usedGib), loc)}</td>
+                  <td className="num">{fmtInt(Math.round(r.sizeGib), loc)}</td>
+                  <td className="num">{fmtInt(Math.round(r.growthGibPerDay * 10) / 10, loc)}</td>
+                  <td className="num">
+                    {r.daysToFull === null ? NA : fmtInt(Math.round(r.daysToFull), loc)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Section>
       ) : null}
 
       <Section id="annex" title={strings['annex.title'] ?? 'Annex'}>

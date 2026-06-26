@@ -121,6 +121,61 @@ export interface ProxmoxStorageContentRow {
 }
 
 /**
+ * One parsed "RRD Nodes" time-series sample (P8 Pack A). The cv4pve report
+ * emits ~1 day of per-node samples (minute resolution). Only the columns the
+ * headroom engine consumes are carried — read in a single pass to keep the
+ * 8.6k-row sheet cheap. `timeSerial` is the raw Excel serial day (parseXlsx
+ * does not convert dates). All `*Ratio` fields are 0-1 fractions (the report's
+ * "%" columns); `loadavg` is the absolute system load; net throughput is MB.
+ */
+export interface RrdNodeRow {
+  node: string
+  timeSerial: number
+  /** CPU usage, 0-1 fraction. */
+  cpuRatio: number
+  /** Memory usage, 0-1 fraction. */
+  memRatio: number
+  /** IO-wait, 0-1 fraction. */
+  ioWaitRatio: number
+  /** System load average (absolute). */
+  loadavg: number
+  /** Inbound network, MB (per sample). */
+  netInMb: number
+  /** Outbound network, MB (per sample). */
+  netOutMb: number
+  /** PSI memory pressure "some", 0-1 fraction. */
+  psiMemSomeRatio: number
+}
+
+/**
+ * One parsed "RRD Storage" time-series sample (P8 Pack A). One row per
+ * node+storage+timestamp; the source sheet is large (~36k rows) so only the
+ * six needed columns are read in a single pass. `Size GB`/`Used GB` are
+ * reinterpreted as GiB (ADR-0010); `usageRatio` is a 0-1 fraction.
+ */
+export interface RrdStorageRow {
+  node: string
+  storage: string
+  timeSerial: number
+  sizeGib: number
+  usedGib: number
+  usageRatio: number
+}
+
+/**
+ * One parsed "RRD Guests" time-series sample (P8 Pack A, defensive). The
+ * sheet is empty in current exports but supported; parsed when present and
+ * degrades to `[]` otherwise. `*Ratio` fields are 0-1 fractions.
+ */
+export interface RrdGuestRow {
+  vmId: string
+  node: string
+  timeSerial: number
+  cpuRatio: number
+  memRatio: number
+}
+
+/**
  * A single parsed RVTools workbook, normalized to vatlas' canonical shape.
  *
  * The parser worker produces everything except `id` and `parsedAt` — those
@@ -180,6 +235,16 @@ export interface Snapshot {
   /** Proxmox guest NIC attachment rows from the "Network" sheet "VM Networks"
    *  sub-table. `[]` when absent — never undefined (P5 factual-degrade). */
   vmNics: VmNicRow[]
+  /** P8 Pack A — "RRD Nodes" per-node utilization time-series. Optional (the
+   *  sheet is OPTIONAL, and older Snapshot objects predate this field): read
+   *  via `?? []`. Large; dropped by `releaseRawRows` beyond 4 snapshots. */
+  rrdNodes?: RrdNodeRow[]
+  /** P8 Pack A — "RRD Storage" per-storage capacity time-series. Optional;
+   *  read via `?? []`. Large (~36k rows); dropped by `releaseRawRows`. */
+  rrdStorage?: RrdStorageRow[]
+  /** P8 Pack A — "RRD Guests" per-guest time-series. Optional; empty in
+   *  current exports (defensive). Read via `?? []`. */
+  rrdGuests?: RrdGuestRow[]
   parseErrors: ParseError[]
   /**
    * The `network-diagram.svg` from a Proxmox `.zip` bundle, as a raw SVG

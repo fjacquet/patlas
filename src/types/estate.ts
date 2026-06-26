@@ -376,6 +376,101 @@ export interface TrendSeries {
 }
 
 /**
+ * P8 Pack A — per-node RRD utilization/headroom statistics. Every ratio is a
+ * 0-1 fraction; peaks/avgs/p95 are computed across the node's samples in the
+ * loaded window. Neutral measurement (no verdict/colour), `rrdNodeStats.ts`.
+ */
+export interface RrdNodeStat {
+  node: string
+  cpuPeak: number
+  cpuAvg: number
+  cpuP95: number
+  memPeak: number
+  memAvg: number
+  memP95: number
+  ioWaitPeak: number
+  ioWaitAvg: number
+  loadavgPeak: number
+  loadavgAvg: number
+  netInPeakMb: number
+  netInAvgMb: number
+  netOutPeakMb: number
+  netOutAvgMb: number
+  psiMemPeak: number
+  psiMemAvg: number
+  sampleCount: number
+}
+
+/**
+ * One estate-wide RRD timeline point (P8 Pack A) — the mean CPU/memory across
+ * all nodes at a single timestamp, plus summed network throughput. Drives the
+ * single-file trends chart (intra-export time-series). `timeSerial` is the raw
+ * Excel serial day.
+ */
+export interface RrdEstateTimePoint {
+  timeSerial: number
+  cpuAvg: number
+  memAvg: number
+  netInMb: number
+  netOutMb: number
+}
+
+/**
+ * P8 Pack A — node-headroom rollup over the RRD window. `hasData` is false
+ * when no RRD-Nodes samples were present (factual-degrade). `timeline` is the
+ * estate-wide utilization series feeding single-file trends.
+ */
+export interface RrdHeadroom {
+  hasData: boolean
+  perNode: RrdNodeStat[]
+  estate: {
+    cpuPeak: number
+    cpuAvg: number
+    memPeak: number
+    memAvg: number
+    ioWaitPeak: number
+    loadavgPeak: number
+    psiMemPeak: number
+  }
+  timeline: RrdEstateTimePoint[]
+  /** Raw Excel-serial window bounds; `null` when no data. */
+  windowStartSerial: number | null
+  windowEndSerial: number | null
+}
+
+/**
+ * P8 Pack A — per-storage capacity projection. `growthGibPerDay` is the
+ * least-squares slope of used capacity over the RRD window; `daysToFull` is
+ * the projected days until `usedGib` reaches `sizeGib`, `null` when not
+ * growing / already full / insufficient data (never fabricated).
+ */
+export interface RrdStorageProjection {
+  node: string
+  storage: string
+  key: string
+  sizeGib: number
+  usedGib: number
+  usageRatio: number
+  growthGibPerDay: number
+  daysToFull: number | null
+  sampleCount: number
+}
+
+/**
+ * P8 Pack A — storage time-to-full rollup over the RRD-Storage window.
+ * `hasData` is false when no RRD-Storage samples were present. `soonestDaysToFull`
+ * is the minimum projected days-to-full across all storages (`null` when none
+ * is projectable).
+ */
+export interface RrdStorageGrowth {
+  hasData: boolean
+  rows: RrdStorageProjection[]
+  soonestDaysToFull: number | null
+  /** Observation window span in days (max-min serial across all samples). */
+  windowDays: number
+}
+
+/**
  * P7 OS End-of-Support projection. Defined here (not in the engine) so the
  * types→engines import direction is preserved — `bucketEos.ts` imports these
  * as types (no cycle). The `partition` is a DISJOINT cover whose counts
@@ -524,6 +619,18 @@ export interface EstateView {
    * P9 LC-4 per-VM drill projection, keyed by VM name. Same single-pass
    * origin; empty `Map` in `EMPTY_VIEW`. */
   vmDetail: Map<string, VmDetailEntry>
+  /**
+   * P8 Pack A — node headroom from the RRD-Nodes time-series (peak/avg/p95
+   * CPU + memory, PSI memory-pressure, IO-wait, loadavg, net throughput),
+   * plus the estate-wide `timeline` that drives single-file trends. Computed
+   * from the pre-merge `selected` snapshots' RRD rows in the single
+   * `buildEstateView` pass; `EMPTY_RRD_HEADROOM` in `EMPTY_VIEW`. */
+  rrdHeadroom: RrdHeadroom
+  /**
+   * P8 Pack A — per-storage capacity growth + projected days-to-full from the
+   * RRD-Storage time-series. Same single-pass origin;
+   * `EMPTY_RRD_STORAGE_GROWTH` in `EMPTY_VIEW`. */
+  rrdStorageGrowth: RrdStorageGrowth
 }
 
 /**

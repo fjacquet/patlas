@@ -75,6 +75,9 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
       vpartition: [],
       nodeInterfaces: bundle.nodeInterfaces,
       vmNics: bundle.vmNics,
+      rrdNodes: bundle.rrdNodes,
+      rrdStorage: bundle.rrdStorage,
+      rrdGuests: bundle.rrdGuests,
       parseErrors: bundle.warnings,
       networkSvg,
     }

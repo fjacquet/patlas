@@ -71,7 +71,12 @@
     "title": "In-session trends",
     "points": "Timeline points",
     "deltas": "Deltas",
-    "series": "Guest count over snapshots"
+    "series": "Guest count over snapshots",
+    "singleTitle": "Single-file trends — RRD time-series",
+    "singleNote": "Derived from the RRD time-series in this export.",
+    "singleCpu": "Mean CPU %",
+    "singleMem": "Mean memory %",
+    "singleSamples": "Timeline samples"
   },
   "inventory": {
     "title": "Inventory summary",
@@ -196,6 +201,44 @@
       "storage": "Storage",
       "count": "Count",
       "sizeGib": "Size (GiB)"
+    }
+  },
+  "rrdHeadroom": {
+    "title": "Node headroom — RRD utilization",
+    "kpi": {
+      "cpuPeak": "Peak CPU",
+      "cpuAvg": "Mean CPU",
+      "memPeak": "Peak memory",
+      "memAvg": "Mean memory",
+      "ioWaitPeak": "Peak IO-wait",
+      "psiMemPeak": "Peak memory pressure"
+    },
+    "col": {
+      "node": "Node",
+      "cpuPeak": "CPU peak",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU mean",
+      "memPeak": "Mem peak",
+      "memP95": "Mem p95",
+      "memAvg": "Mem mean"
+    }
+  },
+  "storageGrowth": {
+    "title": "Storage time-to-full — RRD growth",
+    "kpi": {
+      "storages": "Storages",
+      "soonest": "Soonest full (days)",
+      "window": "Window (days)",
+      "growing": "Growing storages"
+    },
+    "col": {
+      "storage": "Storage",
+      "node": "Node",
+      "used": "Used (GiB)",
+      "size": "Size (GiB)",
+      "usage": "Usage",
+      "growth": "Growth (GiB/day)",
+      "daysToFull": "Days to full"
     }
   }
 }

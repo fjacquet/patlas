@@ -25,6 +25,8 @@ export { classifyOsFamily, type OsFamily } from './osFamily'
 export { aggregateHostsPerCluster } from './perCluster'
 export { perDatastore } from './perDatastore'
 export { perEsx } from './perEsx'
+export { computeRrdNodeStats, EMPTY_RRD_HEADROOM } from './rrdNodeStats'
+export { computeRrdStorageGrowth } from './rrdStorageGrowth'
 export {
   computeSizing,
   DEFAULT_SIZING_THRESHOLDS,

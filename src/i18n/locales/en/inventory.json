@@ -13,7 +13,9 @@
     "monstervm": "Monster Guests",
     "snapshots": "Snapshot Sprawl",
     "storagecontent": "Storage Content",
-    "clusterhealth": "Cluster Health"
+    "clusterhealth": "Cluster Health",
+    "rrdheadroom": "Node Headroom",
+    "storagegrowth": "Storage Growth"
   },
   "tab": {
     "label": "Object type",

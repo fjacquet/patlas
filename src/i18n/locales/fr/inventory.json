@@ -13,7 +13,9 @@
     "monstervm": "Invités monstres",
     "snapshots": "Prolifération des instantanés",
     "storagecontent": "Contenu stockage",
-    "clusterhealth": "Santé cluster"
+    "clusterhealth": "Santé cluster",
+    "rrdheadroom": "Marge nœuds",
+    "storagegrowth": "Croissance stockage"
   },
   "tab": {
     "label": "Type d'objet",

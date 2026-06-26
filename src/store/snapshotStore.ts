@@ -181,6 +181,11 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
         nodeInterfaces: [],
 
         vmNics: [],
+        // P8 Pack A — the RRD time-series are the largest row sets (8.6k/36k
+        // rows); drop them too when releasing raw rows for GC.
+        rrdNodes: [],
+        rrdStorage: [],
+        rrdGuests: [],
         rawReleased: true,
         releasedAggregate,
       })
