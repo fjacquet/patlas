@@ -17,16 +17,19 @@ import type { EstateView, TrendSeries } from '@/types/estate'
 import type { PngBundle } from '../chartBundle'
 import type { ExportStrings } from '../types'
 import type { ExportLocale } from './format'
+import { addAccessPostureSlide } from './slides/accessPostureSlide'
 import { addClusterHealthSlide } from './slides/clusterHealthSlide'
 import { addClusterSlide } from './slides/clusterSlide'
 import { addContentionAnnex, type ContentionRow } from './slides/contentionAnnex'
 import { addEosSlide } from './slides/eosSlide'
 import { addInventorySlide } from './slides/inventorySlide'
+import { addIssuesSlide } from './slides/issuesSlide'
 import { addMonsterSlide } from './slides/monsterSlide'
 import { addNetworkSlide } from './slides/networkSlide'
 import { addOverviewSlide } from './slides/overviewSlide'
 import { addPhysicalInventorySlide } from './slides/physicalInventorySlide'
 import { addPlannedSlide } from './slides/plannedSlide'
+import { addPoolsSlide } from './slides/poolsSlide'
 import { addRightSizingSlide } from './slides/rightSizingSlide'
 import { addSnapshotSprawlSlide } from './slides/snapshotSprawlSlide'
 import { addStorageContentSlide } from './slides/storageContentSlide'
@@ -145,6 +148,17 @@ export async function buildPptx(
     view.clusterHealth.backups.jobCount > 0
   ) {
     addClusterHealthSlide(pptx, view.clusterHealth, strings, locale)
+  }
+
+  // Pack C governance — conditional: only emit when each data source is present.
+  if (view.governance.issues.totalCount > 0) {
+    addIssuesSlide(pptx, view.governance.issues, strings, locale)
+  }
+  if (view.governance.access.userCount > 0 || view.governance.access.tokenCount > 0) {
+    addAccessPostureSlide(pptx, view.governance.access, strings, locale)
+  }
+  if (view.governance.pools.poolCount > 0) {
+    addPoolsSlide(pptx, view.governance.pools, strings, locale)
   }
 
   addEosSlide(pptx, view.eos, png('eosBar'), strings, locale)

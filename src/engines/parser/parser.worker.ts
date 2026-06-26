@@ -75,6 +75,12 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
       vpartition: [],
       nodeInterfaces: bundle.nodeInterfaces,
       vmNics: bundle.vmNics,
+      proxmoxIssues: bundle.proxmoxIssues,
+      proxmoxAccessUsers: bundle.proxmoxAccessUsers,
+      proxmoxAccessTokens: bundle.proxmoxAccessTokens,
+      proxmoxAccessRoles: bundle.proxmoxAccessRoles,
+      proxmoxAccessAcls: bundle.proxmoxAccessAcls,
+      proxmoxPoolMembers: bundle.proxmoxPoolMembers,
       parseErrors: bundle.warnings,
       networkSvg,
     }

@@ -13,7 +13,8 @@
     "monstervm": "Invités monstres",
     "snapshots": "Prolifération des instantanés",
     "storagecontent": "Contenu stockage",
-    "clusterhealth": "Santé cluster"
+    "clusterhealth": "Santé cluster",
+    "governance": "Gouvernance"
   },
   "tab": {
     "label": "Type d'objet",

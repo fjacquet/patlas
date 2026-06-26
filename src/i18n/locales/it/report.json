@@ -89,5 +89,14 @@
     "hosts": "Nodi",
     "vms": "Ospiti",
     "datastores": "Archiviazioni"
-  }
+  },
+  "governance.title": "Governance & Operazioni",
+  "governance.issues.total": "Problemi totali",
+  "governance.issues.errors": "Errori",
+  "governance.issues.warnings": "Avvisi",
+  "governance.access.users": "Utenti",
+  "governance.access.tokens": "Token API",
+  "governance.access.acls": "Voci ACL",
+  "governance.pools.count": "Pool di risorse",
+  "governance.pools.members": "Membri dei pool"
 }

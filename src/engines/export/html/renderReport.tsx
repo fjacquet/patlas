@@ -347,6 +347,57 @@ function Report({
         </Section>
       ) : null}
 
+      {(view.governance.issues.totalCount > 0 ||
+        view.governance.access.userCount > 0 ||
+        view.governance.pools.poolCount > 0) && (
+        <Section id="governance" title={strings['governance.title'] ?? 'Governance & Operations'}>
+          {view.governance.issues.totalCount > 0 && (
+            <>
+              <Metric
+                label={strings['governance.issues.total'] ?? 'Issues total'}
+                value={fmtInt(view.governance.issues.totalCount, loc)}
+              />
+              <Metric
+                label={strings['governance.issues.errors'] ?? 'Errors'}
+                value={fmtInt(view.governance.issues.errorCount, loc)}
+              />
+              <Metric
+                label={strings['governance.issues.warnings'] ?? 'Warnings'}
+                value={fmtInt(view.governance.issues.warningCount, loc)}
+              />
+            </>
+          )}
+          {view.governance.access.userCount > 0 && (
+            <>
+              <Metric
+                label={strings['governance.access.users'] ?? 'Users'}
+                value={fmtInt(view.governance.access.userCount, loc)}
+              />
+              <Metric
+                label={strings['governance.access.tokens'] ?? 'API tokens'}
+                value={fmtInt(view.governance.access.tokenCount, loc)}
+              />
+              <Metric
+                label={strings['governance.access.acls'] ?? 'ACL entries'}
+                value={fmtInt(view.governance.access.aclCount, loc)}
+              />
+            </>
+          )}
+          {view.governance.pools.poolCount > 0 && (
+            <>
+              <Metric
+                label={strings['governance.pools.count'] ?? 'Resource pools'}
+                value={fmtInt(view.governance.pools.poolCount, loc)}
+              />
+              <Metric
+                label={strings['governance.pools.members'] ?? 'Pool members'}
+                value={fmtInt(view.governance.pools.totalMembers, loc)}
+              />
+            </>
+          )}
+        </Section>
+      )}
+
       <Section id="annex" title={strings['annex.title'] ?? 'Annex'}>
         <table className="annex-table">
           <thead>

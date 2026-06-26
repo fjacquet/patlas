@@ -89,5 +89,14 @@
     "hosts": "Knoten",
     "vms": "Gäste",
     "datastores": "Speicher"
-  }
+  },
+  "governance.title": "Governance & Betrieb",
+  "governance.issues.total": "Probleme gesamt",
+  "governance.issues.errors": "Fehler",
+  "governance.issues.warnings": "Warnungen",
+  "governance.access.users": "Benutzer",
+  "governance.access.tokens": "API-Token",
+  "governance.access.acls": "ACL-Einträge",
+  "governance.pools.count": "Ressourcenpools",
+  "governance.pools.members": "Pool-Mitglieder"
 }

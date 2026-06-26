@@ -17,6 +17,7 @@ import { aggregateClusters } from './aggregateClusters'
 import { computeClusterHealth } from './clusterHealth'
 import { buildDatastoreDetail, buildVmDetail } from './detailIndex'
 import { aggregateGlobals, emptySummary } from './globals'
+import { computeGovernance } from './governance'
 import { aggregateGuestData, type GuestData } from './guestData'
 import { computeMonsters, DEFAULT_MONSTER_THRESHOLDS, type MonsterThresholds } from './monsterVm'
 import { networkRollup } from './network'
@@ -326,6 +327,16 @@ export function buildEstateView(
     merged.proxmoxBackupJobs,
   )
 
+  // Pack C governance & ops — same single pass.
+  const governance = computeGovernance(
+    merged.proxmoxIssues,
+    merged.proxmoxAccessUsers,
+    merged.proxmoxAccessTokens,
+    merged.proxmoxAccessRoles,
+    merged.proxmoxAccessAcls,
+    merged.proxmoxPoolMembers,
+  )
+
   return {
     globals,
     clusters,
@@ -350,6 +361,7 @@ export function buildEstateView(
     snapshotSprawl,
     storageContent,
     clusterHealth,
+    governance,
     datastoreDetail,
     vmDetail,
   }
@@ -484,6 +496,34 @@ const EMPTY_STORAGE_CONTENT = Object.freeze({
   fileCount: 0,
 })
 
+const EMPTY_GOVERNANCE = Object.freeze({
+  issues: Object.freeze({
+    rows: Object.freeze([]) as never[],
+    totalCount: 0,
+    errorCount: 0,
+    warningCount: 0,
+    bySection: Object.freeze([]) as never[],
+  }),
+  access: Object.freeze({
+    users: Object.freeze([]) as never[],
+    tokens: Object.freeze([]) as never[],
+    roles: Object.freeze([]) as never[],
+    acls: Object.freeze([]) as never[],
+    userCount: 0,
+    enabledUserCount: 0,
+    tokenCount: 0,
+    roleCount: 0,
+    aclCount: 0,
+    rootCount: 0,
+  }),
+  pools: Object.freeze({
+    members: Object.freeze([]) as never[],
+    poolCount: 0,
+    totalMembers: 0,
+    pools: Object.freeze([]) as never[],
+  }),
+})
+
 const EMPTY_CLUSTER_HEALTH = Object.freeze({
   ha: Object.freeze({
     resources: Object.freeze([]) as never[],
@@ -529,6 +569,7 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   snapshotSprawl: EMPTY_SPRAWL,
   storageContent: EMPTY_STORAGE_CONTENT,
   clusterHealth: EMPTY_CLUSTER_HEALTH,
+  governance: EMPTY_GOVERNANCE,
   datastoreDetail: new Map(),
   vmDetail: new Map(),
 })

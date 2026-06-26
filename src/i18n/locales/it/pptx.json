@@ -197,5 +197,60 @@
       "count": "Quantità",
       "sizeGib": "Dimensione (GiB)"
     }
+  },
+  "governance": {
+    "issues": {
+      "title": "Problemi",
+      "kpi": {
+        "total": "Totale",
+        "errors": "Errori",
+        "warnings": "Avvisi"
+      },
+      "col": {
+        "severity": "Gravità",
+        "section": "Sezione",
+        "message": "Messaggio"
+      }
+    },
+    "access": {
+      "title": "Postura di accesso",
+      "kpi": {
+        "users": "Utenti",
+        "enabled": "Attivi",
+        "tokens": "Token API",
+        "roles": "Ruoli",
+        "acls": "Voci ACL",
+        "rootAccounts": "Account root"
+      },
+      "users": {
+        "heading": "Utenti",
+        "col": {
+          "id": "ID",
+          "enabled": "Attivo",
+          "email": "E-mail"
+        }
+      },
+      "tokens": {
+        "heading": "Token API",
+        "col": {
+          "user": "Utente",
+          "tokenId": "ID token",
+          "privSeparated": "Priv. sep."
+        }
+      }
+    },
+    "pools": {
+      "title": "Pool di risorse",
+      "kpi": {
+        "pools": "Pool",
+        "members": "Membri"
+      },
+      "col": {
+        "pool": "Pool",
+        "members": "Membri",
+        "vms": "Ospiti",
+        "storages": "Storage"
+      }
+    }
   }
 }

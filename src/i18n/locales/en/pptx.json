@@ -177,6 +177,61 @@
       "enabled": "Enabled"
     }
   },
+  "governance": {
+    "issues": {
+      "title": "Issues",
+      "kpi": {
+        "total": "Total",
+        "errors": "Errors",
+        "warnings": "Warnings"
+      },
+      "col": {
+        "severity": "Severity",
+        "section": "Section",
+        "message": "Message"
+      }
+    },
+    "access": {
+      "title": "Access posture",
+      "kpi": {
+        "users": "Users",
+        "enabled": "Enabled",
+        "tokens": "API tokens",
+        "roles": "Roles",
+        "acls": "ACL entries",
+        "rootAccounts": "Root accounts"
+      },
+      "users": {
+        "heading": "Users",
+        "col": {
+          "id": "ID",
+          "enabled": "Enabled",
+          "email": "Email"
+        }
+      },
+      "tokens": {
+        "heading": "API tokens",
+        "col": {
+          "user": "User",
+          "tokenId": "Token ID",
+          "privSeparated": "Priv. sep."
+        }
+      }
+    },
+    "pools": {
+      "title": "Resource pools",
+      "kpi": {
+        "pools": "Pools",
+        "members": "Members"
+      },
+      "col": {
+        "pool": "Pool",
+        "members": "Members",
+        "vms": "Guests",
+        "storages": "Storages"
+      }
+    }
+  },
   "storageContent": {
     "title": "Storage content — file inventory by type and pool",
     "kpi": {

@@ -89,5 +89,14 @@
     "hosts": "Nœuds",
     "vms": "Invités",
     "datastores": "Stockages"
-  }
+  },
+  "governance.title": "Gouvernance & Opérations",
+  "governance.issues.total": "Total problèmes",
+  "governance.issues.errors": "Erreurs",
+  "governance.issues.warnings": "Avertissements",
+  "governance.access.users": "Utilisateurs",
+  "governance.access.tokens": "Jetons API",
+  "governance.access.acls": "Entrées ACL",
+  "governance.pools.count": "Pools de ressources",
+  "governance.pools.members": "Membres des pools"
 }

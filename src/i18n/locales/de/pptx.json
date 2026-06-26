@@ -197,5 +197,60 @@
       "count": "Anzahl",
       "sizeGib": "Größe (GiB)"
     }
+  },
+  "governance": {
+    "issues": {
+      "title": "Probleme",
+      "kpi": {
+        "total": "Gesamt",
+        "errors": "Fehler",
+        "warnings": "Warnungen"
+      },
+      "col": {
+        "severity": "Schweregrad",
+        "section": "Abschnitt",
+        "message": "Meldung"
+      }
+    },
+    "access": {
+      "title": "Zugriffsposition",
+      "kpi": {
+        "users": "Benutzer",
+        "enabled": "Aktiv",
+        "tokens": "API-Token",
+        "roles": "Rollen",
+        "acls": "ACL-Einträge",
+        "rootAccounts": "Root-Konten"
+      },
+      "users": {
+        "heading": "Benutzer",
+        "col": {
+          "id": "ID",
+          "enabled": "Aktiv",
+          "email": "E-Mail"
+        }
+      },
+      "tokens": {
+        "heading": "API-Token",
+        "col": {
+          "user": "Benutzer",
+          "tokenId": "Token-ID",
+          "privSeparated": "Priv. get."
+        }
+      }
+    },
+    "pools": {
+      "title": "Ressourcenpools",
+      "kpi": {
+        "pools": "Pools",
+        "members": "Mitglieder"
+      },
+      "col": {
+        "pool": "Pool",
+        "members": "Mitglieder",
+        "vms": "Gäste",
+        "storages": "Speicher"
+      }
+    }
   }
 }

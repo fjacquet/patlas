@@ -7,6 +7,7 @@ import deClusterHealth from './locales/de/clusterhealth.json'
 import deCommon from './locales/de/common.json'
 import deDashboard from './locales/de/dashboard.json'
 import deEos from './locales/de/eos.json'
+import deGovernance from './locales/de/governance.json'
 import deInventory from './locales/de/inventory.json'
 import deMonstervm from './locales/de/monstervm.json'
 import deMvc from './locales/de/mvc.json'
@@ -26,6 +27,7 @@ import enClusterHealth from './locales/en/clusterhealth.json'
 import enCommon from './locales/en/common.json'
 import enDashboard from './locales/en/dashboard.json'
 import enEos from './locales/en/eos.json'
+import enGovernance from './locales/en/governance.json'
 import enInventory from './locales/en/inventory.json'
 import enMonstervm from './locales/en/monstervm.json'
 import enMvc from './locales/en/mvc.json'
@@ -45,6 +47,7 @@ import frClusterHealth from './locales/fr/clusterhealth.json'
 import frCommon from './locales/fr/common.json'
 import frDashboard from './locales/fr/dashboard.json'
 import frEos from './locales/fr/eos.json'
+import frGovernance from './locales/fr/governance.json'
 import frInventory from './locales/fr/inventory.json'
 import frMonstervm from './locales/fr/monstervm.json'
 import frMvc from './locales/fr/mvc.json'
@@ -64,6 +67,7 @@ import itClusterHealth from './locales/it/clusterhealth.json'
 import itCommon from './locales/it/common.json'
 import itDashboard from './locales/it/dashboard.json'
 import itEos from './locales/it/eos.json'
+import itGovernance from './locales/it/governance.json'
 import itInventory from './locales/it/inventory.json'
 import itMonstervm from './locales/it/monstervm.json'
 import itMvc from './locales/it/mvc.json'
@@ -110,6 +114,7 @@ export const NAMESPACES = [
   'snapshots',
   'storagecontent',
   'clusterhealth',
+  'governance',
 ] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
@@ -134,6 +139,7 @@ export const resources = {
     snapshots: enSnapshots,
     storagecontent: enStorageContent,
     clusterhealth: enClusterHealth,
+    governance: enGovernance,
   },
   fr: {
     common: frCommon,
@@ -155,6 +161,7 @@ export const resources = {
     snapshots: frSnapshots,
     storagecontent: frStorageContent,
     clusterhealth: frClusterHealth,
+    governance: frGovernance,
   },
   de: {
     common: deCommon,
@@ -176,6 +183,7 @@ export const resources = {
     snapshots: deSnapshots,
     storagecontent: deStorageContent,
     clusterhealth: deClusterHealth,
+    governance: deGovernance,
   },
   it: {
     common: itCommon,
@@ -197,6 +205,7 @@ export const resources = {
     snapshots: itSnapshots,
     storagecontent: itStorageContent,
     clusterhealth: itClusterHealth,
+    governance: itGovernance,
   },
 } as const
 

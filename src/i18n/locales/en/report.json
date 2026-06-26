@@ -89,5 +89,14 @@
     "hosts": "Nodes",
     "vms": "Guests",
     "datastores": "Storages"
-  }
+  },
+  "governance.title": "Governance & Operations",
+  "governance.issues.total": "Issues total",
+  "governance.issues.errors": "Errors",
+  "governance.issues.warnings": "Warnings",
+  "governance.access.users": "Users",
+  "governance.access.tokens": "API tokens",
+  "governance.access.acls": "ACL entries",
+  "governance.pools.count": "Resource pools",
+  "governance.pools.members": "Pool members"
 }

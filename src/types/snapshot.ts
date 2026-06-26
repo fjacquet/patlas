@@ -181,6 +181,18 @@ export interface Snapshot {
    *  sub-table. `[]` when absent — never undefined (P5 factual-degrade). */
   vmNics: VmNicRow[]
   parseErrors: ParseError[]
+  /** Proxmox issue rows from the `Issues` sheet. `undefined` when sheet is absent. */
+  proxmoxIssues?: ProxmoxIssueRow[]
+  /** Proxmox access user rows from the `Cluster Access` sheet "Users" sub-table. */
+  proxmoxAccessUsers?: ProxmoxAccessUserRow[]
+  /** Proxmox API token rows from the `Cluster Access` sheet "API Tokens" sub-table. */
+  proxmoxAccessTokens?: ProxmoxAccessTokenRow[]
+  /** Proxmox role definition rows from the `Cluster Access` sheet "Roles" sub-table. */
+  proxmoxAccessRoles?: ProxmoxAccessRoleRow[]
+  /** Proxmox ACL entries from the `Cluster Access` sheet "ACL" sub-table. */
+  proxmoxAccessAcls?: ProxmoxAccessAclRow[]
+  /** Proxmox pool member rows from the `Cluster Pools` sheet. `undefined` when absent. */
+  proxmoxPoolMembers?: ProxmoxPoolMemberRow[]
   /**
    * The `network-diagram.svg` from a Proxmox `.zip` bundle, as a raw SVG
    * string. `null` for a bare `.xlsx` (no bundle). Per-active-snapshot asset;
@@ -328,6 +340,71 @@ export interface VMetaDataEntry {
  */
 export interface VMetaDataRow {
   entries: VMetaDataEntry[]
+}
+
+/** A row from the Proxmox report `Issues` sheet. */
+export interface ProxmoxIssueRow {
+  severity: string
+  section: string
+  message: string
+  /** Excel serial date; `null` when the cell is blank. */
+  timestampSerial: number | null
+  linkKey: string
+}
+
+/** A user row from the `Cluster Access` sheet "Users" sub-table. */
+export interface ProxmoxAccessUserRow {
+  id: string
+  enabled: boolean
+  firstname: string
+  lastname: string
+  email: string
+  groups: string
+  keys: string
+  totpLocked: boolean
+  expire: string
+  comment: string
+}
+
+/** An API token row from the `Cluster Access` sheet "API Tokens" sub-table. */
+export interface ProxmoxAccessTokenRow {
+  user: string
+  tokenId: string
+  expire: string
+  privSeparated: boolean
+  comment: string
+}
+
+/** A role definition row from the `Cluster Access` sheet "Roles" sub-table. */
+export interface ProxmoxAccessRoleRow {
+  id: string
+  privileges: string
+  /** True when this is a built-in Proxmox role. */
+  special: boolean
+}
+
+/** An ACL entry row from the `Cluster Access` sheet "ACL" sub-table. */
+export interface ProxmoxAccessAclRow {
+  path: string
+  usersOrGroup: string
+  /** 'user' | 'group' | 'token' */
+  type: string
+  /** Role id (e.g. 'Administrator', 'PVEAuditor'). */
+  roleId: string
+  propagate: boolean
+}
+
+/** A pool member row from the `Cluster Pools` sheet "Pools" sub-table. */
+export interface ProxmoxPoolMemberRow {
+  pool: string
+  /** 'qemu' | 'lxc' | 'storage' */
+  type: string
+  node: string
+  vmId: string
+  storage: string
+  status: string
+  description: string
+  comment: string
 }
 
 /**
