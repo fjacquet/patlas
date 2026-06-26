@@ -47,7 +47,7 @@
     "consumedGhz": "GHz consumati",
     "availableGhz": "GHz disponibili",
     "ramAvailable": "RAM disponibile",
-    "footer": "Fonte: Proxmox — nodo (utilizzo CPU/RAM %, Speed × Cores, Memory) + info ospite (vCPUs, Memory)"
+    "footer": "Fonte: Proxmox — serie temporali RRD (utilizzo CPU % nodo) + nodo (utilizzo RAM %, Speed × Cores, Memory) + info ospite (vCPUs, Memory)"
   },
   "eos": {
     "title": "Previsione di fine supporto degli OS",

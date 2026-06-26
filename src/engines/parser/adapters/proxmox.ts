@@ -22,6 +22,7 @@ import {
   HA_RESOURCE_COLS,
   HA_STATUS_COLS,
   NODE_COLS,
+  RRD_NODE_COLS,
   SNAPSHOT_COLS,
   STORAGE_COLS,
   STORAGE_CONTENT_COLS,
@@ -35,26 +36,97 @@ export const extractClusterName = (sheet: ParsedSheet | undefined): string => {
   return readString(readCol(row ?? {}, cols.name))
 }
 
-export const adaptProxmoxNodes = (sheet: ParsedSheet, clusterName: string): NodeRow[] => {
+/**
+ * Parse "RRD Nodes" time-series sheet into a per-node cpuRatio map.
+ * For each node, the LATEST sample (by lexicographic sort on timeDate, which
+ * is ISO-like "YYYY-MM-DD HH:MM:SS") is used. Returns an empty Map when the
+ * sheet is absent or contains no valid rows.
+ */
+export const adaptProxmoxRrdNodes = (sheet: ParsedSheet | undefined): Map<string, number> => {
+  if (!sheet) return new Map()
+  const cols = mapColumns(sheet.headers, RRD_NODE_COLS)
+  const latestByNode = new Map<string, { timeDate: string; cpuUsagePct: number }>()
+  for (const row of sheet.rows) {
+    const node = readString(readCol(row, cols.node))
+    if (!node) continue
+    const timeDate = readString(readCol(row, cols.timeDate))
+    const cpuRaw = cellOrNull(row, cols.cpuUsagePct)
+    if (cpuRaw === null) continue
+    const prev = latestByNode.get(node)
+    if (!prev || timeDate > prev.timeDate) {
+      latestByNode.set(node, { timeDate, cpuUsagePct: cpuRaw })
+    }
+  }
+  const out = new Map<string, number>()
+  for (const [node, { cpuUsagePct }] of latestByNode) out.set(node, cpuUsagePct)
+  return out
+}
+
+/**
+ * Fallback: derive per-node cpuRatio from VM-level cpuUsagePct when "RRD
+ * Nodes" is absent. Formula: sum(VM cpuUsagePct × vcpu) / nodePhysicalCores.
+ * Nodes without any powered-on VM measurements are omitted from the Map so
+ * the caller can fall through to 0 naturally.
+ */
+const deriveCpuRatioFromGuests = (
+  vmsSheet: ParsedSheet | undefined,
+  ctSheet: ParsedSheet | undefined,
+  nodes: NodeRow[],
+): Map<string, number> => {
+  const nodeCores = new Map<string, number>()
+  for (const n of nodes) {
+    if (n.hostName) nodeCores.set(n.hostName, (n.cores as number) * (n.sockets as number))
+  }
+  const weightedSum = new Map<string, number>()
+  for (const sheet of [vmsSheet, ctSheet]) {
+    if (!sheet) continue
+    const cols = mapColumns(sheet.headers, GUEST_COLS)
+    for (const row of sheet.rows) {
+      const node = readString(readCol(row, cols.node))
+      if (!node) continue
+      const sock = Math.max(1, Math.trunc(readNumber(readCol(row, cols.sockets))))
+      const core = Math.max(0, Math.trunc(readNumber(readCol(row, cols.cores))))
+      const vcpu = core * sock
+      const cpuPct = cellOrNull(row, cols.cpuUsagePct)
+      if (cpuPct === null || vcpu === 0) continue
+      weightedSum.set(node, (weightedSum.get(node) ?? 0) + cpuPct * vcpu)
+    }
+  }
+  const out = new Map<string, number>()
+  for (const [node, wsum] of weightedSum) {
+    const totalCores = nodeCores.get(node)
+    if (totalCores && totalCores > 0) out.set(node, Math.min(1.5, wsum / totalCores))
+  }
+  return out
+}
+
+export const adaptProxmoxNodes = (
+  sheet: ParsedSheet,
+  clusterName: string,
+  rrdCpuByNode: Map<string, number> = new Map(),
+): NodeRow[] => {
   const cols = mapColumns(sheet.headers, NODE_COLS)
   return sheet.rows
-    .map(
-      (row): NodeRow => ({
-        hostName: readString(readCol(row, cols.node)),
+    .map((row): NodeRow => {
+      const hostName = readString(readCol(row, cols.node))
+      return {
+        hostName,
         cluster: clusterName,
         sockets: sockets(Math.max(0, Math.trunc(readNumber(readCol(row, cols.sockets))))),
         cores: cores(Math.max(0, Math.trunc(readNumber(readCol(row, cols.cores))))),
         speedMhz: mhz(Math.max(0, readNumber(readCol(row, cols.speedMhz)))),
         memoryMib: gibToMib(gib(Math.max(0, readNumber(readCol(row, cols.memoryGib))))),
-        cpuRatio: 0, // Proxmox Nodes sheet has no host-level CPU usage %
+        // cpuRatio: sourced from "RRD Nodes" latest sample (0-1 fraction);
+        // falls back to 0 when the sheet is absent (factual-degrade).
+        cpuRatio: rrdCpuByNode.get(hostName) ?? 0,
         ramRatio: Math.max(0, readNumber(readCol(row, cols.memUsagePct))) / 100,
         faultDomain: '',
         model: readString(readCol(row, cols.model)),
         vendor: '',
         serialNumber: '',
         esxVersion: readString(readCol(row, cols.pveVersion)),
-      }),
-    )
+      }
+    })
     .filter((h) => h.hostName !== '')
 }
 
@@ -266,8 +338,21 @@ const mapUsageRow = (
   row: Record<string, unknown>,
   cols: ReturnType<typeof mapColumns>,
   clusterName: string,
+  nodeSpeedByName: Map<string, number>,
 ): VmUsageRow => {
   const memGib = cellOrNull(row, cols.memUsageGib)
+  const nodeName = readString(readCol(row, cols.node))
+  const coreMhz = nodeSpeedByName.get(nodeName)
+  // cpuUsagePct is a 0-1 fraction in the Proxmox report ("Cpu Usage %" column).
+  // "Host Cpu Usage %" is a non-numeric string ("0 % of 64 CPUs") — never used.
+  const cpuPct = cellOrNull(row, cols.cpuUsagePct)
+  const sock = Math.max(1, Math.trunc(readNumber(readCol(row, cols.sockets))))
+  const core = Math.max(0, Math.trunc(readNumber(readCol(row, cols.cores))))
+  const vcpu = core * sock
+  // Derive MHz from fraction × allocated vCPUs × per-core MHz. Null when any
+  // input is missing (not derivable; ADR-0012 — never coerced to 0).
+  const cpuUsageMhz =
+    cpuPct !== null && coreMhz !== undefined && vcpu > 0 ? mhz(cpuPct * vcpu * coreMhz) : null
   return {
     vmName: readString(readCol(row, cols.vmName)),
     cluster: clusterName,
@@ -277,7 +362,7 @@ const mapUsageRow = (
     consumedMib: memGib === null ? null : gibToMib(gib(memGib)),
     balloonedMib: null,
     swappedMib: null,
-    cpuUsageMhz: null, // Proxmox reports CPU as %, not MHz; derived later if needed
+    cpuUsageMhz,
   }
 }
 
@@ -285,12 +370,13 @@ export const adaptProxmoxUsage = (
   vmsSheet: ParsedSheet | undefined,
   ctSheet: ParsedSheet | undefined,
   clusterName: string,
+  nodeSpeedByName: Map<string, number> = new Map(),
 ): VmUsageRow[] => {
   const out: VmUsageRow[] = []
   for (const sheet of [vmsSheet, ctSheet]) {
     if (!sheet) continue
     const cols = mapColumns(sheet.headers, GUEST_COLS)
-    for (const row of sheet.rows) out.push(mapUsageRow(row, cols, clusterName))
+    for (const row of sheet.rows) out.push(mapUsageRow(row, cols, clusterName, nodeSpeedByName))
   }
   return out.filter((u) => u.vmName !== '')
 }
@@ -385,11 +471,35 @@ export const adaptProxmox = (
 
   const clusterHaSheet = findSheet(workbook, ['cluster ha'])
 
+  // --- RRD Nodes: derive per-node CPU ratio from time-series data ------------
+  // Primary source: "RRD Nodes" sheet (optional). Contains one row per
+  // node+timestamp; we keep the latest sample for each node.
+  const rrdNodesSheet = findSheet(workbook, ['rrd nodes'])
+  let rrdCpuByNode = adaptProxmoxRrdNodes(rrdNodesSheet)
+
+  // Build nodes early so we have speedMhz for VM usage derivation.
+  let nodes = adaptProxmoxNodes(nodesSheet, clusterName, rrdCpuByNode)
+
+  // Fallback: if "RRD Nodes" is absent/empty, approximate node cpuRatio from
+  // the VM-sheet "Cpu Usage %" column (weighted by vcpu count). This keeps the
+  // dashboard non-zero even when RRD export is disabled.
+  if (rrdCpuByNode.size === 0) {
+    const fallback = deriveCpuRatioFromGuests(vmsSheet, ctSheet, nodes)
+    if (fallback.size > 0) {
+      nodes = nodes.map((n) => ({ ...n, cpuRatio: fallback.get(n.hostName) ?? n.cpuRatio }))
+      rrdCpuByNode = fallback // reuse same Map shape for nodeSpeedByName derivation below
+    }
+  }
+
+  // Build nodeSpeedByName for VM cpuUsageMhz derivation.
+  const nodeSpeedByName = new Map<string, number>()
+  for (const n of nodes) if (n.hostName) nodeSpeedByName.set(n.hostName, n.speedMhz as number)
+
   return {
-    nodes: adaptProxmoxNodes(nodesSheet, clusterName),
+    nodes,
     guests: adaptProxmoxGuests(vmsSheet, ctSheet, clusterName),
     storages: adaptProxmoxStorages(storageSheet),
-    vmUsage: adaptProxmoxUsage(vmsSheet, ctSheet, clusterName),
+    vmUsage: adaptProxmoxUsage(vmsSheet, ctSheet, clusterName, nodeSpeedByName),
     proxmoxSnapshots: adaptProxmoxSnapshots(snapshotsSheet),
     proxmoxStorageContent: adaptProxmoxStorageContent(storageContentSheet),
     proxmoxHaResources: adaptProxmoxHaResources(clusterHaSheet),

@@ -47,7 +47,7 @@
     "consumedGhz": "GHz consumed",
     "availableGhz": "GHz available",
     "ramAvailable": "RAM available",
-    "footer": "Source: Proxmox — node (CPU/RAM usage %, Speed × Cores, Memory) + guest info (vCPUs, Memory)"
+    "footer": "Source: Proxmox — RRD time-series (node CPU usage %) + node (RAM usage %, Speed × Cores, Memory) + guest info (vCPUs, Memory)"
   },
   "eos": {
     "title": "OS end-of-support forecast",
