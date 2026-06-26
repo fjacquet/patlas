@@ -24,7 +24,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { svgToDataUri } from '@/engines/export/svgDataUri'
 import type { EstateView, TrendSeries } from '@/types/estate'
-import { fmtInt, fmtPercentWhole } from '@/utils/format'
+import { fmtInt, fmtMemMb, fmtPercentWhole } from '@/utils/format'
 import type { ExportStrings } from '../types'
 
 /** Per-cluster inline depth (RESEARCH Open Q3 / Pitfall 5 size lever):
@@ -96,16 +96,15 @@ function Report({
   const top = clustersByVm.slice(0, TOP_N_CLUSTERS)
   const rest = clustersByVm.slice(TOP_N_CLUSTERS)
   // P9 size levers: top-N by provisioned, remainder folded into a count.
-  const gib = (m: number): string => fmtInt(Math.round(Number(m) / 1024), loc)
-  const stoByCluster = [...view.storage.byCluster].sort(
-    (a, b) => Number(b.provisionedMib) - Number(a.provisionedMib),
-  )
-  const stoByDs = [...view.storage.byDatastore].sort(
-    (a, b) => Number(b.provisionedMib) - Number(a.provisionedMib),
-  )
-  const stoClusterTop = stoByCluster.slice(0, TOP_N_CLUSTERS)
-  const stoDsTop = stoByDs.slice(0, TOP_N_CLUSTERS)
-  const vsanShared = [...view.vsan.shared.entries()]
+  // TiB/GiB-tiered storage figures (cv4pve backup repos reach hundreds of
+  // TiB — raw GiB integers are unreadable; ADR-0010 base-2 suffixes).
+  const mem = (m: number): string => fmtMemMb(Number(m), loc)
+  // Storage grouped by cv4pve role — VM data leads; backup + node-local
+  // boot shown as separate groups so a few PBS repos don't drown VM storage.
+  // Real datastore `used` (never the always-zero per-VM `Disk Usage GB`).
+  const roleGroups = view.storage.byRole
+  const vmRole = roleGroups.find((g) => g.role === 'vmdata')
+  const roleLabel = (role: string): string => strings[`storage.role.${role}`] ?? role
   const flaggedDs = view.flags.counts.ds + view.flags.counts.lu
   const planned = view.plannedView
   const plannedRows =
@@ -181,73 +180,46 @@ function Report({
       </Section>
 
       <Section id="storage" title={strings['storage.title'] ?? 'Storage'}>
+        {/* VM data leads — real used / capacity (cv4pve leaves per-VM
+            "Disk Usage GB" empty, so usage comes from the Storages sheet). */}
         <Metric
-          label={strings['storage.provisioned'] ?? 'Provisioned (GiB)'}
-          value={gib(Number(view.storage.estate.provisionedMib))}
+          label={strings['storage.vmUsedCapacity'] ?? 'VM storage (used / capacity)'}
+          value={`${mem(Number(vmRole?.usedMib ?? 0))} / ${mem(Number(vmRole?.capacityMib ?? 0))}`}
         />
         <Metric
-          label={strings['storage.usedStorage'] ?? 'Used storage (GiB)'}
-          value={gib(Number(view.operationalInsights.usedStorageMib))}
+          label={strings['storage.vmAllocated'] ?? 'VM allocated'}
+          value={mem(Number(view.storage.estate.provisionedMib))}
         />
         <Metric
-          label={strings['storage.inUse'] ?? 'Committed (GiB)'}
-          value={gib(Number(view.storage.estate.inUseMib))}
-        />
-        <Metric
-          label={strings['storage.capacity'] ?? 'Capacity (GiB)'}
-          value={gib(Number(view.storage.estate.capacityMib))}
-        />
-        <Metric
-          label={strings['storage.flagged'] ?? 'Flagged datastores'}
+          label={strings['storage.flagged'] ?? 'Flagged storages'}
           value={fmtInt(flaggedDs, loc)}
           flag={flaggedDs > 0}
         />
         <div data-chart-slot="storage-treemap" className="chart-slot" />
+        {/* Per-role breakdown — used before capacity. Backup + local
+            shown separately so PBS repos don't distort the VM-storage view. */}
         <table className="annex-table">
           <thead>
             <tr>
-              <th>{strings['storage.colCluster'] ?? 'Cluster'}</th>
-              <th>{strings['storage.colProvisioned'] ?? 'Provisioned'}</th>
-              <th>{strings['storage.colInUse'] ?? 'In use'}</th>
+              <th>{strings['storage.colRole'] ?? 'Role'}</th>
+              <th>{strings['storage.colUsed'] ?? 'Used'}</th>
+              <th>{strings['storage.colCapacity'] ?? 'Capacity'}</th>
+              <th>{strings['storage.colFree'] ?? 'Free'}</th>
+              <th>{strings['storage.colDatastores'] ?? 'Datastores'}</th>
             </tr>
           </thead>
           <tbody>
-            {stoClusterTop.map((s) => (
-              <tr key={`sto-c-${slug(s.key)}`}>
-                <td>{s.key}</td>
-                <td className="num">{gib(Number(s.provisionedMib))}</td>
-                <td className="num">{gib(Number(s.inUseMib))}</td>
+            {roleGroups.map((g) => (
+              <tr key={`sto-role-${g.role}`}>
+                <td>{roleLabel(g.role)}</td>
+                <td className="num">{mem(Number(g.usedMib))}</td>
+                <td className="num">{mem(Number(g.capacityMib))}</td>
+                <td className="num">{mem(Number(g.freeMib))}</td>
+                <td className="num">{fmtInt(g.count, loc)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        <table className="annex-table">
-          <thead>
-            <tr>
-              <th>{strings['storage.colCluster'] ?? 'Cluster'}</th>
-              <th>{strings['storage.colProvisioned'] ?? 'Provisioned'}</th>
-              <th>{strings['storage.colInUse'] ?? 'In use'}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stoDsTop.map((s) => (
-              <tr key={`sto-d-${slug(s.key)}`}>
-                <td>{s.key}</td>
-                <td className="num">{gib(Number(s.provisionedMib))}</td>
-                <td className="num">{gib(Number(s.inUseMib))}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {vsanShared.map(([k, n]) => (
-          <p key={`vsan-${slug(k)}`} className="factual-note">
-            {k} —{' '}
-            {(strings['storage.vsanShared'] ?? 'Shared across {{n}} clusters').replace(
-              '{{n}}',
-              fmtInt(n, loc),
-            )}
-          </p>
-        ))}
       </Section>
 
       <Section id="network" title={strings['network.title'] ?? 'Network'}>

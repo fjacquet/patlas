@@ -11,6 +11,7 @@ const ds = (over: Partial<StorageRow>): StorageRow => ({
   provisionedMib: mib(786_432),
   naa: 'naa.6000',
   type: 'VMFS',
+  role: 'other',
   hosts: '',
   clusterName: 'C1',
   ...over,

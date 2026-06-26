@@ -116,6 +116,7 @@ export const StorageRowSchema: z.ZodType<StorageRow> = z.object({
   provisionedMib: MibSchema,
   naa: z.string().trim().min(1).nullable(),
   type: z.string().trim(),
+  role: z.enum(['vmdata', 'backup', 'local', 'other']),
   // Empty string allowed — not every datastore lists its host set.
   hosts: z.string().trim(),
   // Empty string allowed — a host-local datastore has no cluster. Do NOT

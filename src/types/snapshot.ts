@@ -289,7 +289,21 @@ export interface Snapshot {
   releasedAggregate?: ReleasedTrendAggregate | null
 }
 
-/** A datastore row from the RVTools `vDatastore` sheet. */
+/**
+ * cv4pve storage role, classified at the parser boundary from the Storages
+ * sheet's `Plugin Type` + `Content` + `Shared` columns. Proxmox datastores
+ * serve very different purposes — VM disk images, backup repositories, and
+ * node-local boot/OS storage — and summing them into one capacity figure is
+ * misleading (in real estates a few PBS backup repos can dwarf VM storage by
+ * 5×). The Storage view groups by this role instead.
+ *  - `vmdata` — shared storage holding VM disks / CT rootfs (`images`/`rootdir`)
+ *  - `backup` — Proxmox Backup Server, or a target dedicated to `backup`
+ *  - `local`  — node-local (non-shared) `local`/`local-lvm` boot/OS storage
+ *  - `other`  — shared ISO/template/snippet libraries, unconfigured targets
+ */
+export type StorageRole = 'vmdata' | 'backup' | 'local' | 'other'
+
+/** A datastore row from the cv4pve `Storages` sheet. */
 export interface StorageRow {
   name: string
   capacityMib: MiB
@@ -299,6 +313,8 @@ export interface StorageRow {
   naa: string | null
   /** VMFS, NFS, vSAN, … */
   type: string
+  /** cv4pve storage role (see {@link StorageRole}); `'other'` when unknown. */
+  role: StorageRole
   /**
    * RVTools `Hosts` — the host-name list this datastore is mounted on.
    * Empty string when the column is absent. Consumed by Plan 04-02 to

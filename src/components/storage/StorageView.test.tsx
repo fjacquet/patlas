@@ -57,6 +57,7 @@ const snapshot = (): Snapshot =>
         provisionedMib: mib(800),
         naa: null,
         type: 'vSAN',
+        role: 'vmdata',
         hosts: '2',
         clusterName: 'CL_1',
       },

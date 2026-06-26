@@ -1,8 +1,10 @@
 /**
- * Phase 18-03 — Storage: estate KPI cards (readable TiB, not raw GiB) + a
- * factual per-cluster storage table (Cluster · Provisioned · In use). The
- * old rasterized treemap rendered as a meaningless solid block on the slide;
- * a text table is denser, reliable, and brand-free (navy/gold/grey).
+ * Storage slide — VM-storage KPI cards (real used / capacity in readable TiB)
+ * plus a per-role breakdown table (Role · Used · Capacity · Free). cv4pve
+ * datastores split into VM data / backup / node-local roles; a few PBS backup
+ * repos routinely dwarf VM storage, so a single "capacity" figure misleads.
+ * Used comes from the Storages sheet — never the always-zero per-VM "Disk
+ * Usage GB". Brand-free (navy/gold/grey).
  */
 import type PptxGenJS from 'pptxgenjs'
 import type { EstateView } from '@/types/estate'
@@ -20,40 +22,44 @@ export function addStorageSlide(
 ): void {
   const s = pptx.addSlide()
   const e = view.storage.estate
+  const vm = view.storage.byRole.find((g) => g.role === 'vmdata')
   const t = (k: string, fallback: string) => strings[`storage.${k}`] ?? fallback
   const y = addHeader(s, t('title', 'Storage'))
 
   const gap = 0.15
   const cw = (CONTENT_W - gap * 3) / 4
+  // VM data leads, used before capacity (per the "used / capacity" framing).
   const cards = [
-    { big: pptxMemMib(Number(e.provisionedMib), locale), small: t('provisioned', 'Provisioned') },
-    { big: pptxMemMib(Number(e.inUseMib), locale), small: t('inUse', 'In use') },
-    { big: pptxMemMib(Number(e.capacityMib), locale), small: t('capacity', 'Capacity') },
+    { big: pptxMemMib(Number(vm?.usedMib ?? 0), locale), small: t('vmUsed', 'VM used') },
+    {
+      big: pptxMemMib(Number(vm?.capacityMib ?? 0), locale),
+      small: t('vmCapacity', 'VM capacity'),
+    },
+    { big: pptxMemMib(Number(e.provisionedMib), locale), small: t('vmAllocated', 'VM allocated') },
     {
       big: pptxNumber(view.flags.counts.ds + view.flags.counts.lu, locale),
-      small: t('flagged', 'Flagged datastores'),
+      small: t('flagged', 'Flagged storages'),
     },
   ]
   cards.forEach((c, i) => {
     drawKpiCard(s, { x: M + i * (cw + gap), y, w: cw, h: 1.05, big: c.big, small: c.small })
   })
 
-  // Per-cluster storage table (top by provisioned).
-  const rows = [...view.storage.byCluster]
-    .map((g) => ({
-      cluster: g.key,
-      prov: Number(g.provisionedMib),
-      inUse: Number(g.inUseMib),
-    }))
-    .sort((a, b) => b.prov - a.prov)
-    .slice(0, 12)
+  // Per-role breakdown (VM data / backup / local / other) — used before
+  // capacity. Real datastore usage from the Storages sheet.
+  const rows = view.storage.byRole.map((g) => ({
+    role: t(`role.${g.role}`, g.role),
+    used: Number(g.usedMib),
+    cap: Number(g.capacityMib),
+    free: Number(g.freeMib),
+  }))
 
   const tableY = y + 1.4
-  const colCluster = M
   const colW = CONTENT_W
-  const c1 = colCluster
-  const c2 = colCluster + colW * 0.5
-  const c3 = colCluster + colW * 0.75
+  const c1 = M
+  const c2 = M + colW * 0.4
+  const c3 = M + colW * 0.6
+  const c4 = M + colW * 0.8
   const head = (x: number, w: number, txt: string, align: 'left' | 'right') =>
     s.addText(pptxSafeFormat(txt), {
       x,
@@ -67,9 +73,10 @@ export function addStorageSlide(
       align,
       margin: 0,
     })
-  head(c1, colW * 0.5, t('colCluster', 'Cluster'), 'left')
-  head(c2, colW * 0.25 - 0.1, t('colProvisioned', 'Provisioned'), 'right')
-  head(c3, colW * 0.25, t('colInUse', 'In use'), 'right')
+  head(c1, colW * 0.4, t('colRole', 'Role'), 'left')
+  head(c2, colW * 0.2 - 0.1, t('colUsed', 'Used'), 'right')
+  head(c3, colW * 0.2 - 0.1, t('colCapacity', 'Capacity'), 'right')
+  head(c4, colW * 0.2, t('colFree', 'Free'), 'right')
   s.addShape('rect', {
     x: M,
     y: tableY + 0.32,
@@ -82,37 +89,30 @@ export function addStorageSlide(
   const rowH = 0.34
   rows.forEach((r, i) => {
     const ry = tableY + 0.42 + i * rowH
-    s.addText(pptxSafeFormat(r.cluster), {
+    s.addText(pptxSafeFormat(r.role), {
       x: c1,
       y: ry,
-      w: colW * 0.5,
+      w: colW * 0.4,
       h: rowH,
       fontFace: 'Arial',
       fontSize: 11,
       color: PPTX_COLORS.ink,
       margin: 0,
     })
-    s.addText(pptxMemMib(r.prov, locale), {
-      x: c2,
-      y: ry,
-      w: colW * 0.25 - 0.1,
-      h: rowH,
-      fontFace: 'Consolas',
-      fontSize: 11,
-      color: PPTX_COLORS.ink,
-      align: 'right',
-      margin: 0,
-    })
-    s.addText(pptxMemMib(r.inUse, locale), {
-      x: c3,
-      y: ry,
-      w: colW * 0.25,
-      h: rowH,
-      fontFace: 'Consolas',
-      fontSize: 11,
-      color: PPTX_COLORS.ink,
-      align: 'right',
-      margin: 0,
-    })
+    const numCell = (x: number, w: number, value: number) =>
+      s.addText(pptxMemMib(value, locale), {
+        x,
+        y: ry,
+        w,
+        h: rowH,
+        fontFace: 'Consolas',
+        fontSize: 11,
+        color: PPTX_COLORS.ink,
+        align: 'right',
+        margin: 0,
+      })
+    numCell(c2, colW * 0.2 - 0.1, r.used)
+    numCell(c3, colW * 0.2 - 0.1, r.cap)
+    numCell(c4, colW * 0.2, r.free)
   })
 }

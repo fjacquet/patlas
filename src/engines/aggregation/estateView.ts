@@ -445,6 +445,7 @@ const EMPTY_STORAGE = Object.freeze({
   byDatastore: Object.freeze([]) as never[],
   capacityByDatastore: Object.freeze([]) as never[],
   capacityByCluster: Object.freeze([]) as never[],
+  byRole: Object.freeze([]) as never[],
   estate: Object.freeze({
     provisionedMib: mib(0),
     inUseMib: mib(0),

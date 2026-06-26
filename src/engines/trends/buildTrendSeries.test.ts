@@ -77,6 +77,7 @@ const snap = (over: Partial<Snapshot> & { id: string }): Snapshot => ({
       provisionedMib: mib(800),
       naa: 'naa.s',
       type: 'VMFS',
+      role: 'other',
       hosts: '',
       clusterName: 'C1',
     },

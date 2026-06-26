@@ -4,6 +4,7 @@ import type { AccountingMode, DatastoreAggregate } from '@/types/estate'
 import type { GuestRow } from '@/types/guest'
 import type { StorageRow } from '@/types/snapshot'
 import { perDatastore } from './perDatastore'
+import { type StorageRoleGroup, storageByRole } from './storageByRole'
 import type { VsanRelinkResult } from './vsanRelink'
 
 /**
@@ -54,6 +55,10 @@ export interface StorageByX {
   /** Datastore capacity attributed to a single cluster via vSAN relink +
    *  RVTools `Cluster name`; shared-LUN / unrelinkable excluded. */
   capacityByCluster: StorageCapacityGroup[]
+  /** Capacity / used / free grouped by cv4pve storage role (VM data /
+   *  backup / local / other), in canonical display order. Real datastore
+   *  usage — never the always-zero per-VM `Disk Usage GB`. */
+  byRole: StorageRoleGroup[]
   estate: {
     provisionedMib: MiB
     inUseMib: MiB
@@ -158,6 +163,7 @@ export const storageByX = (
     byDatastore,
     capacityByDatastore,
     capacityByCluster: [...capByCluster.values()],
+    byRole: storageByRole(merged.storages),
     estate,
   }
 }

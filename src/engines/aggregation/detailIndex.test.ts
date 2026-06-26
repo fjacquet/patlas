@@ -27,6 +27,7 @@ const dsRow = (over: Partial<StorageRow>): StorageRow => ({
   provisionedMib: mib(800),
   naa: null,
   type: 'vSAN',
+  role: 'other',
   hosts: '3',
   clusterName: '',
   ...over,

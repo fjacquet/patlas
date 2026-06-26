@@ -110,7 +110,20 @@
     "colCluster": "Cluster",
     "colProvisioned": "Bereitgestellt",
     "colInUse": "Belegt",
-    "vsanShared": "Über {{n}} Cluster geteilt"
+    "vsanShared": "Über {{n}} Cluster geteilt",
+    "vmUsed": "VM belegt",
+    "vmCapacity": "VM Kapazität",
+    "vmAllocated": "VM zugewiesen",
+    "colRole": "Rolle",
+    "colUsed": "Belegt",
+    "colCapacity": "Kapazität",
+    "colFree": "Frei",
+    "role": {
+      "vmdata": "VM-Speicher",
+      "backup": "Sicherung",
+      "local": "Lokal / Boot",
+      "other": "Andere"
+    }
   },
   "network": {
     "title": "Netzwerk",

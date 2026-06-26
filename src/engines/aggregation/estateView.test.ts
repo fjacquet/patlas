@@ -84,6 +84,7 @@ const snapshot = (): Snapshot => ({
   storages: [
     {
       name: 'ds-A',
+      role: 'other',
       capacityMib: mib(1000),
       freeMib: mib(400),
       provisionedMib: mib(800),
@@ -94,6 +95,7 @@ const snapshot = (): Snapshot => ({
     },
     {
       name: 'ds-A-clusterview',
+      role: 'other',
       capacityMib: mib(1000),
       freeMib: mib(400),
       provisionedMib: mib(800),
@@ -104,6 +106,7 @@ const snapshot = (): Snapshot => ({
     },
     {
       name: 'ds-B',
+      role: 'other',
       capacityMib: mib(500),
       freeMib: mib(100),
       provisionedMib: mib(450),

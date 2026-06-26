@@ -23,6 +23,7 @@ import type {
   RrdGuestRow,
   RrdNodeRow,
   RrdStorageRow,
+  StorageRole,
   StorageRow,
   VmNicRow,
   VmUsageRow,
@@ -304,6 +305,33 @@ export const adaptProxmoxGuests = (
   return out.filter((g) => g.vmName !== '')
 }
 
+/**
+ * Classify a cv4pve storage into its {@link StorageRole} from the Storages
+ * sheet's `Plugin Type` + `Content` + `Shared` columns. Order matters:
+ *  1. PBS (`pbs`) or a target whose Content is *only* `backup` → `backup`.
+ *  2. Non-shared (`Shared` blank) `local`/`local-lvm` → `local` (boot/OS).
+ *  3. Shared with `images`/`rootdir` content → `vmdata` (VM disks / CT rootfs).
+ *  4. Everything else (ISO/template libraries, unconfigured) → `other`.
+ * Pure string logic — no estate context, safe at the parser boundary.
+ */
+export const classifyStorageRole = (
+  pluginType: string,
+  content: string,
+  shared: boolean,
+): StorageRole => {
+  const plugin = pluginType.toLowerCase().trim()
+  const tokens = content
+    .toLowerCase()
+    .split(/[\s,;]+/)
+    .map((t) => t.trim())
+    .filter((t) => t.length > 0)
+  if (plugin === 'pbs') return 'backup'
+  if (tokens.length > 0 && tokens.every((t) => t === 'backup')) return 'backup'
+  if (!shared) return 'local'
+  if (tokens.includes('images') || tokens.includes('rootdir')) return 'vmdata'
+  return 'other'
+}
+
 export const adaptProxmoxStorages = (sheet: ParsedSheet | undefined): StorageRow[] => {
   if (!sheet) return []
   const cols = mapColumns(sheet.headers, STORAGE_COLS)
@@ -311,13 +339,19 @@ export const adaptProxmoxStorages = (sheet: ParsedSheet | undefined): StorageRow
     .map((row): StorageRow => {
       const cap = Math.max(0, readNumber(readCol(row, cols.capacityGib)))
       const used = Math.max(0, readNumber(readCol(row, cols.usageGib)))
+      const pluginType = readString(readCol(row, cols.pluginType))
       return {
         name: readString(readCol(row, cols.name)),
         capacityMib: gibToMib(gib(cap)),
         freeMib: gibToMib(gib(Math.max(0, cap - used))),
         provisionedMib: gibToMib(gib(used)),
         naa: null,
-        type: readString(readCol(row, cols.pluginType)),
+        type: pluginType,
+        role: classifyStorageRole(
+          pluginType,
+          readString(readCol(row, cols.content)),
+          readString(readCol(row, cols.shared)).trim() !== '',
+        ),
         hosts: readString(readCol(row, cols.node)),
         clusterName: '',
       }

@@ -45,6 +45,7 @@ export type {
   RrdNodeRow,
   RrdStorageRow,
   Snapshot,
+  StorageRole,
   StorageRow,
   VMetaDataEntry,
   VMetaDataRow,

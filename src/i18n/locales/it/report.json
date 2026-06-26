@@ -44,7 +44,20 @@
     "colCluster": "Cluster",
     "colProvisioned": "Provisionato",
     "colInUse": "In uso",
-    "vsanShared": "Condiviso su {{n}} cluster"
+    "vsanShared": "Condiviso su {{n}} cluster",
+    "vmUsedCapacity": "Storage VM (usato / capacità)",
+    "vmAllocated": "Allocato VM",
+    "colRole": "Ruolo",
+    "colUsed": "Usato",
+    "colCapacity": "Capacità",
+    "colFree": "Libero",
+    "colDatastores": "Archiviazioni",
+    "role": {
+      "vmdata": "Storage VM",
+      "backup": "Backup",
+      "local": "Locale / avvio",
+      "other": "Altro"
+    }
   },
   "network": {
     "title": "Rete",

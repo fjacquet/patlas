@@ -72,5 +72,23 @@ describe('proxmox estate-totals acceptance (real report)', () => {
       globals.vramAllocatedMib as number,
       'total allocated vRAM (MiB) must be positive',
     ).toBeGreaterThan(0)
+
+    // Storage role breakdown (the cv4pve "VM data / backup / local" model).
+    // Real datastore usage must be NON-ZERO — the regression was the report
+    // reading the always-empty per-VM "Disk Usage GB" and showing 0 in use.
+    const { byRole } = view.storage
+    console.log(
+      '[proxmox-estate] storage by role:',
+      byRole.map((g) => `${g.role}=${Number(g.usedMib)}/${Number(g.capacityMib)} MiB`).join('  '),
+    )
+    expect(byRole.length, 'at least one storage role group').toBeGreaterThan(0)
+    const totalCapacity = byRole.reduce((a, g) => a + Number(g.capacityMib), 0)
+    const totalUsed = byRole.reduce((a, g) => a + Number(g.usedMib), 0)
+    expect(totalCapacity, 'datastore capacity must be positive').toBeGreaterThan(0)
+    expect(totalUsed, 'real datastore usage must be > 0 (not the 0-GiB bug)').toBeGreaterThan(0)
+    // used ≤ capacity for every role group (free = capacity − used ≥ 0).
+    for (const g of byRole) {
+      expect(Number(g.usedMib)).toBeLessThanOrEqual(Number(g.capacityMib))
+    }
   })
 })

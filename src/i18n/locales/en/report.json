@@ -44,7 +44,20 @@
     "colCluster": "Cluster",
     "colProvisioned": "Provisioned",
     "colInUse": "In use",
-    "vsanShared": "Shared across {{n}} clusters"
+    "vsanShared": "Shared across {{n}} clusters",
+    "vmUsedCapacity": "VM storage (used / capacity)",
+    "vmAllocated": "VM allocated",
+    "colRole": "Role",
+    "colUsed": "Used",
+    "colCapacity": "Capacity",
+    "colFree": "Free",
+    "colDatastores": "Datastores",
+    "role": {
+      "vmdata": "VM storage",
+      "backup": "Backup",
+      "local": "Local / boot",
+      "other": "Other"
+    }
   },
   "network": {
     "title": "Network",

@@ -194,6 +194,7 @@ const sharedLunSnapshot = (): Snapshot => ({
   storages: [
     {
       name: 'ds-shared',
+      role: 'other',
       capacityMib: mib(1000),
       freeMib: mib(400),
       provisionedMib: mib(800),
@@ -204,6 +205,7 @@ const sharedLunSnapshot = (): Snapshot => ({
     },
     {
       name: 'ds-shared-clusterview',
+      role: 'other',
       capacityMib: mib(1000),
       freeMib: mib(400),
       provisionedMib: mib(800),
@@ -214,6 +216,7 @@ const sharedLunSnapshot = (): Snapshot => ({
     },
     {
       name: 'ds-local',
+      role: 'local',
       capacityMib: mib(500),
       freeMib: mib(100),
       provisionedMib: mib(450),
