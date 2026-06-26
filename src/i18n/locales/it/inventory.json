@@ -13,7 +13,8 @@
     "monstervm": "Ospiti mostruosi",
     "snapshots": "Proliferazione degli snapshot",
     "storagecontent": "Contenuto storage",
-    "clusterhealth": "Salute cluster"
+    "clusterhealth": "Salute cluster",
+    "protection": "Protezione"
   },
   "tab": {
     "label": "Tipo di oggetto",

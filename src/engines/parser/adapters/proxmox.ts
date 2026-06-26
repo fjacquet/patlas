@@ -7,10 +7,13 @@ import type {
   NodeRow,
   ParseError,
   ProxmoxBackupJobRow,
+  ProxmoxDiskRow,
   ProxmoxHaResourceRow,
   ProxmoxHaStatusRow,
+  ProxmoxPartitionRow,
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
+  ProxmoxTaskRow,
   StorageRow,
   VmNicRow,
   VmUsageRow,
@@ -20,16 +23,19 @@ import { findSheet, mapColumns, readCol, readNumber, readString } from './column
 import {
   BACKUP_JOB_COLS,
   CLUSTER_COLS,
+  DISK_COLS,
   GUEST_COLS,
   HA_RESOURCE_COLS,
   HA_STATUS_COLS,
   NETWORK_NODES_COLS,
   NETWORK_VMS_COLS,
   NODE_COLS,
+  PARTITION_COLS,
   RRD_NODE_COLS,
   SNAPSHOT_COLS,
   STORAGE_COLS,
   STORAGE_CONTENT_COLS,
+  TASK_COLS,
 } from './proxmoxColumns'
 import { extractStackedSection } from './stackedSection'
 
@@ -464,6 +470,96 @@ export const adaptProxmoxVmNics = (sheet: ParsedSheet | undefined): VmNicRow[] =
     .filter((r) => r.node !== '' && r.vmId !== '')
 }
 
+export const adaptProxmoxPartitions = (sheet: ParsedSheet | undefined): ProxmoxPartitionRow[] => {
+  if (!sheet) return []
+  const cols = mapColumns(sheet.headers, PARTITION_COLS)
+  return sheet.rows
+    .map((row): ProxmoxPartitionRow => {
+      const pctRaw = readCol(row, cols.usedPct)
+      const usedFraction =
+        pctRaw === undefined || pctRaw === null || readString(pctRaw) === ''
+          ? null
+          : Math.max(0, readNumber(pctRaw))
+      return {
+        node: readString(readCol(row, cols.node)),
+        vmId: readString(readCol(row, cols.vmId)),
+        vmName: readString(readCol(row, cols.vmName)),
+        vmType: readString(readCol(row, cols.vmType)),
+        vmStatus: readString(readCol(row, cols.vmStatus)),
+        mountPoint: readString(readCol(row, cols.mountPoint)),
+        fsType: readString(readCol(row, cols.fsType)),
+        totalGb: Math.max(0, readNumber(readCol(row, cols.totalGb))),
+        usedGb: Math.max(0, readNumber(readCol(row, cols.usedGb))),
+        usedFraction,
+        error: readString(readCol(row, cols.error)),
+        name: readString(readCol(row, cols.name)),
+        disks: readString(readCol(row, cols.disks)),
+      }
+    })
+    .filter((r) => r.node !== '' && r.mountPoint !== '')
+}
+
+export const adaptProxmoxDisks = (sheet: ParsedSheet | undefined): ProxmoxDiskRow[] => {
+  if (!sheet) return []
+  const cols = mapColumns(sheet.headers, DISK_COLS)
+  const readX = (v: unknown): boolean => readString(v).trim() === 'X'
+  return sheet.rows
+    .map((row): ProxmoxDiskRow => {
+      const usageRaw = readCol(row, cols.storageUsagePct)
+      const storageUsageFraction =
+        usageRaw === undefined || usageRaw === null || readString(usageRaw) === ''
+          ? null
+          : Math.max(0, readNumber(usageRaw))
+      return {
+        node: readString(readCol(row, cols.node)),
+        vmId: readString(readCol(row, cols.vmId)),
+        vmName: readString(readCol(row, cols.vmName)),
+        vmType: readString(readCol(row, cols.vmType)),
+        vmStatus: readString(readCol(row, cols.vmStatus)),
+        kind: readString(readCol(row, cols.kind)),
+        id: readString(readCol(row, cols.id)),
+        storage: readString(readCol(row, cols.storage)),
+        storageType: readString(readCol(row, cols.storageType)),
+        storageShared: readX(readCol(row, cols.storageShared)),
+        fileName: readString(readCol(row, cols.fileName)),
+        sizeGb: Math.max(0, readNumber(readCol(row, cols.sizeGb))),
+        storageUsageFraction,
+        cache: readString(readCol(row, cols.cache)),
+        backup: readString(readCol(row, cols.backup)),
+        isUnused: readX(readCol(row, cols.isUnused)),
+        device: readString(readCol(row, cols.device)),
+        mountPoint: readString(readCol(row, cols.mountPoint)),
+      }
+    })
+    .filter((r) => r.node !== '')
+}
+
+export const adaptProxmoxTasks = (sheet: ParsedSheet | undefined): ProxmoxTaskRow[] => {
+  if (!sheet) return []
+  const cols = mapColumns(sheet.headers, TASK_COLS)
+  const readSerial = (v: unknown): number | null => {
+    if (v === undefined || v === null || readString(v) === '') return null
+    const n = readNumber(v)
+    return Number.isFinite(n) ? n : null
+  }
+  return sheet.rows
+    .map((row): ProxmoxTaskRow => {
+      const statusOkRaw = readCol(row, cols.statusOk)
+      return {
+        node: readString(readCol(row, cols.node)),
+        taskId: readString(readCol(row, cols.taskId)),
+        type: readString(readCol(row, cols.type)),
+        user: readString(readCol(row, cols.user)),
+        status: readString(readCol(row, cols.status)),
+        statusOk: readString(statusOkRaw).trim() === 'X',
+        startSerial: readSerial(readCol(row, cols.startTime)),
+        endSerial: readSerial(readCol(row, cols.endTime)),
+        durationDays: readSerial(readCol(row, cols.duration)),
+      }
+    })
+    .filter((r) => r.node !== '' && r.type !== '')
+}
+
 /**
  * Throw a structured fatal `ParseError`. `name === 'ParseError'` is the
  * discriminator the worker boundary serializes; `sheet`/`kind` ride along
@@ -497,6 +593,9 @@ export const adaptProxmox = (
   proxmoxHaResources: ProxmoxHaResourceRow[]
   proxmoxHaStatus: ProxmoxHaStatusRow[]
   proxmoxBackupJobs: ProxmoxBackupJobRow[]
+  proxmoxPartitions: ProxmoxPartitionRow[]
+  proxmoxDisks: ProxmoxDiskRow[]
+  proxmoxTasks: ProxmoxTaskRow[]
   nodeInterfaces: NodeInterfaceRow[]
   vmNics: VmNicRow[]
   clusterName: string
@@ -567,6 +666,9 @@ export const adaptProxmox = (
 
   const clusterHaSheet = findSheet(workbook, ['cluster ha'])
   const networkSheet = findSheet(workbook, ['network'])
+  const partitionsSheet = findSheet(workbook, ['partitions'])
+  const disksSheet = findSheet(workbook, ['disks'])
+  const clusterTasksSheet = findSheet(workbook, ['cluster tasks'])
 
   // --- RRD Nodes: derive per-node CPU ratio from time-series data ------------
   // Primary source: "RRD Nodes" sheet (optional). Contains one row per
@@ -602,6 +704,9 @@ export const adaptProxmox = (
     proxmoxHaResources: adaptProxmoxHaResources(clusterHaSheet),
     proxmoxHaStatus: adaptProxmoxHaStatus(clusterHaSheet),
     proxmoxBackupJobs: adaptProxmoxBackupJobs(clusterSheet),
+    proxmoxPartitions: adaptProxmoxPartitions(partitionsSheet),
+    proxmoxDisks: adaptProxmoxDisks(disksSheet),
+    proxmoxTasks: adaptProxmoxTasks(clusterTasksSheet),
     nodeInterfaces: adaptProxmoxNodeInterfaces(networkSheet),
     vmNics: adaptProxmoxVmNics(networkSheet),
     clusterName,

@@ -13,7 +13,8 @@
     "monstervm": "Monster-Gäste",
     "snapshots": "Snapshot-Wildwuchs",
     "storagecontent": "Speicherinhalt",
-    "clusterhealth": "Cluster-Zustand"
+    "clusterhealth": "Cluster-Zustand",
+    "protection": "Schutz"
   },
   "tab": {
     "label": "Objekttyp",

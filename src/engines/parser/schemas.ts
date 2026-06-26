@@ -4,6 +4,9 @@ import type {
   GuestRow,
   NodeInterfaceRow,
   NodeRow,
+  ProxmoxDiskRow,
+  ProxmoxPartitionRow,
+  ProxmoxTaskRow,
   StorageRow,
   VMetaDataRow,
   VmNicRow,
@@ -183,6 +186,55 @@ export const RrdNodeSampleSchema = z.object({
   cpuUsagePct: z.number().min(0).max(1.5),
 })
 export type RrdNodeSample = z.infer<typeof RrdNodeSampleSchema>
+
+export const ProxmoxPartitionRowSchema: z.ZodType<ProxmoxPartitionRow> = z.object({
+  node: z.string().trim().min(1),
+  vmId: z.string().trim(),
+  vmName: z.string().trim(),
+  vmType: z.string().trim(),
+  vmStatus: z.string().trim(),
+  mountPoint: z.string().trim().min(1),
+  fsType: z.string().trim(),
+  totalGb: z.number().nonnegative(),
+  usedGb: z.number().nonnegative(),
+  usedFraction: z.number().min(0).max(2).nullable(),
+  error: z.string().trim(),
+  name: z.string().trim(),
+  disks: z.string().trim(),
+})
+
+export const ProxmoxDiskRowSchema: z.ZodType<ProxmoxDiskRow> = z.object({
+  node: z.string().trim().min(1),
+  vmId: z.string().trim(),
+  vmName: z.string().trim(),
+  vmType: z.string().trim(),
+  vmStatus: z.string().trim(),
+  kind: z.string().trim(),
+  id: z.string().trim(),
+  storage: z.string().trim(),
+  storageType: z.string().trim(),
+  storageShared: z.boolean(),
+  fileName: z.string().trim(),
+  sizeGb: z.number().nonnegative(),
+  storageUsageFraction: z.number().min(0).max(2).nullable(),
+  cache: z.string().trim(),
+  backup: z.string().trim(),
+  isUnused: z.boolean(),
+  device: z.string().trim(),
+  mountPoint: z.string().trim(),
+})
+
+export const ProxmoxTaskRowSchema: z.ZodType<ProxmoxTaskRow> = z.object({
+  node: z.string().trim().min(1),
+  taskId: z.string().trim(),
+  type: z.string().trim().min(1),
+  user: z.string().trim(),
+  status: z.string().trim(),
+  statusOk: z.boolean(),
+  startSerial: z.number().nullable(),
+  endSerial: z.number().nullable(),
+  durationDays: z.number().nonnegative().nullable(),
+})
 
 /**
  * Per-VM runtime metrics from `vMemory`+`vCPU`. Branded MiB/MHz; every metric

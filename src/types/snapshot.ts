@@ -170,6 +170,15 @@ export interface Snapshot {
   proxmoxHaStatus: ProxmoxHaStatusRow[]
   /** Proxmox scheduled backup jobs (`Cluster` → Backup Jobs). `[]` when absent. */
   proxmoxBackupJobs: ProxmoxBackupJobRow[]
+  /** Proxmox in-guest filesystem partition rows from the `Partitions` sheet.
+   *  `[]` when the sheet is absent. Optional for backwards compat with test fixtures. */
+  proxmoxPartitions?: ProxmoxPartitionRow[]
+  /** Proxmox guest disk rows from the `Disks` sheet.
+   *  `[]` when the sheet is absent. Optional for backwards compat with test fixtures. */
+  proxmoxDisks?: ProxmoxDiskRow[]
+  /** Proxmox cluster task rows from the `Cluster Tasks` sheet.
+   *  `[]` when the sheet is absent. Optional for backwards compat with test fixtures. */
+  proxmoxTasks?: ProxmoxTaskRow[]
   /** Proxmox storage rows from the report `Storages` sheet. */
   storages: StorageRow[]
   vpartition: VPartitionRow[]
@@ -328,6 +337,85 @@ export interface VMetaDataEntry {
  */
 export interface VMetaDataRow {
   entries: VMetaDataEntry[]
+}
+
+/**
+ * An in-guest filesystem partition row from the Proxmox report `Partitions`
+ * sheet. `usedFraction` is a 0–1 fraction (cv4pve stores "%" as fraction).
+ * `null` means the cell was blank ("not derivable"; ADR-0012, never coerced
+ * to 0).
+ */
+export interface ProxmoxPartitionRow {
+  node: string
+  /** Proxmox VMID (numeric string). */
+  vmId: string
+  vmName: string
+  vmType: string
+  vmStatus: string
+  mountPoint: string
+  fsType: string
+  /** Total filesystem size in GiB. */
+  totalGb: number
+  /** Used filesystem size in GiB. */
+  usedGb: number
+  /** Used fraction, 0–1 (cv4pve "Used %" column is a 0–1 fraction). */
+  usedFraction: number | null
+  error: string
+  name: string
+  disks: string
+}
+
+/**
+ * A guest disk row from the Proxmox report `Disks` sheet.
+ * `storageUsageFraction` is a 0–1 fraction. Empty string `backup` means the
+ * disk is excluded from backup (non-"X" cell). `isUnused === true` means the
+ * disk is detached/orphaned. `kind` distinguishes 'Cdrom' from 'Disk'.
+ */
+export interface ProxmoxDiskRow {
+  node: string
+  vmId: string
+  vmName: string
+  vmType: string
+  vmStatus: string
+  /** 'Disk' | 'Cdrom' | other */
+  kind: string
+  id: string
+  storage: string
+  storageType: string
+  storageShared: boolean
+  fileName: string
+  /** Size in GiB (as reported; may be 0 for empty cdroms). */
+  sizeGb: number
+  /** Storage usage fraction 0–1; null when blank. */
+  storageUsageFraction: number | null
+  cache: string
+  /** 'X' → included in backup; '' → excluded. */
+  backup: string
+  /** True when the disk is not attached to any guest (orphaned). */
+  isUnused: boolean
+  device: string
+  mountPoint: string
+}
+
+/**
+ * A Proxmox task row from the `Cluster Tasks` sheet.
+ * `statusOk === true` when the "Status Ok" column is "X". `startSerial` /
+ * `endSerial` are raw Excel serials (fractional day values); `null` when blank.
+ */
+export interface ProxmoxTaskRow {
+  node: string
+  taskId: string
+  /** Task type, e.g. 'vzdump', 'aptupdate', 'qmdelsnapshot'. */
+  type: string
+  user: string
+  status: string
+  statusOk: boolean
+  /** Excel serial for the start time; `null` when blank. */
+  startSerial: number | null
+  /** Excel serial for the end time; `null` when blank. */
+  endSerial: number | null
+  /** Duration in fractional days; `null` when blank. */
+  durationDays: number | null
 }
 
 /**

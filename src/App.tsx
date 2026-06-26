@@ -12,6 +12,7 @@ import { LanguageToggle } from './components/LanguageToggle'
 import { MonsterVmView } from './components/monstervm/MonsterVmView'
 import { NetworkView } from './components/network/NetworkView'
 import { PlanningView } from './components/planning/PlanningView'
+import { ProtectionView } from './components/protection/ProtectionView'
 import { RightSizingView } from './components/rightsizing/RightSizingView'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
 import { SnapshotSprawlView } from './components/snapshots/SnapshotSprawlView'
@@ -76,6 +77,8 @@ function App() {
               <StorageContentView />
             ) : activeView === 'clusterhealth' ? (
               <ClusterHealthView />
+            ) : activeView === 'protection' ? (
+              <ProtectionView />
             ) : (
               <GlobalDashboard />
             )}

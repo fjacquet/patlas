@@ -1,0 +1,104 @@
+{
+  "heading": "Protection & risques",
+  "subtitle": "Remplissage des systèmes de fichiers, hygiène des disques et couverture de sauvegarde",
+  "empty": {
+    "heading": "Aucun rapport chargé",
+    "body": "Chargez un rapport pour voir les données de protection et de risque."
+  },
+  "na": "—",
+  "fsFill": {
+    "heading": "Remplissage des systèmes de fichiers",
+    "subtitle": "Points de montage internes au-dessus du seuil",
+    "kpi": {
+      "overThreshold": "Points de montage au-dessus du seuil",
+      "totalMounts": "Total des points de montage",
+      "totalVms": "VMs avec partitions",
+      "threshold": "Seuil"
+    },
+    "col": {
+      "node": "Nœud",
+      "vmName": "VM",
+      "vmId": "ID VM",
+      "mountPoint": "Point de montage",
+      "fsType": "Type FS",
+      "totalGb": "Total (Go)",
+      "usedGb": "Utilisé (Go)",
+      "usedPct": "Utilisé %"
+    },
+    "none": "Aucun point de montage au-dessus du seuil."
+  },
+  "diskHygiene": {
+    "heading": "Hygiène des disques",
+    "subtitle": "Disques non utilisés, ISOs non désengagées, exclusions de sauvegarde, modes de cache",
+    "kpi": {
+      "unusedCount": "Disques orphelins",
+      "reclaimableGb": "Récupérable (Go)",
+      "strayIsoCount": "ISOs non désengagées",
+      "noBackupCount": "Disques sans sauvegarde",
+      "riskyCacheCount": "Modes de cache non standard"
+    },
+    "unused": {
+      "heading": "Disques orphelins",
+      "none": "Aucun disque orphelin."
+    },
+    "strayIso": {
+      "heading": "ISOs montées non désengagées",
+      "none": "Aucune ISO non désengagée montée."
+    },
+    "noBackup": {
+      "heading": "Disques sans sauvegarde",
+      "none": "Tous les disques sont couverts par la sauvegarde."
+    },
+    "riskyCache": {
+      "heading": "Disques avec cache non standard",
+      "none": "Aucun mode de cache non standard."
+    },
+    "col": {
+      "node": "Nœud",
+      "vmName": "VM",
+      "vmId": "ID VM",
+      "id": "ID disque",
+      "storage": "Stockage",
+      "fileName": "Fichier",
+      "sizeGb": "Taille (Go)",
+      "cache": "Cache"
+    }
+  },
+  "backupCoverage": {
+    "heading": "Couverture de sauvegarde",
+    "subtitle": "Tâches vzdump et santé opérationnelle",
+    "kpi": {
+      "total": "Tâches vzdump",
+      "success": "Réussies",
+      "failed": "Échouées",
+      "coveredVmids": "VMs avec sauvegarde",
+      "uncoveredCount": "VMs sans sauvegarde"
+    },
+    "uncovered": {
+      "heading": "VMs sans sauvegarde réussie",
+      "none": "Toutes les VMs ont au moins une sauvegarde réussie."
+    },
+    "tasks": {
+      "heading": "Liste des tâches vzdump"
+    },
+    "operationalHealth": {
+      "heading": "Santé opérationnelle",
+      "kpi": {
+        "totalTasks": "Total des tâches",
+        "totalOk": "Réussies",
+        "totalFailed": "Échouées"
+      }
+    },
+    "col": {
+      "vmName": "VM",
+      "vmId": "ID VM",
+      "lastBackupAge": "Dernière sauvegarde (jours)",
+      "node": "Nœud",
+      "type": "Type",
+      "total": "Total",
+      "ok": "OK",
+      "failed": "Échouées",
+      "status": "Statut"
+    }
+  }
+}

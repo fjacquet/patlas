@@ -1,0 +1,104 @@
+{
+  "heading": "Protezione & rischi",
+  "subtitle": "Riempimento del filesystem, igiene dei dischi e copertura di backup",
+  "empty": {
+    "heading": "Nessun report caricato",
+    "body": "Carica un report per vedere i dati di protezione e rischio."
+  },
+  "na": "—",
+  "fsFill": {
+    "heading": "Riempimento del filesystem",
+    "subtitle": "Punti di montaggio interni al o sopra la soglia",
+    "kpi": {
+      "overThreshold": "Montaggi sopra la soglia",
+      "totalMounts": "Montaggi totali",
+      "totalVms": "VM con partizioni",
+      "threshold": "Soglia"
+    },
+    "col": {
+      "node": "Nodo",
+      "vmName": "VM",
+      "vmId": "ID VM",
+      "mountPoint": "Punto di montaggio",
+      "fsType": "Tipo FS",
+      "totalGb": "Totale (GB)",
+      "usedGb": "Usato (GB)",
+      "usedPct": "Usato %"
+    },
+    "none": "Nessun punto di montaggio al o sopra la soglia."
+  },
+  "diskHygiene": {
+    "heading": "Igiene dei dischi",
+    "subtitle": "Dischi orfani, ISO non espulse, esclusioni di backup, modalità cache",
+    "kpi": {
+      "unusedCount": "Dischi orfani",
+      "reclaimableGb": "Recuperabile (GB)",
+      "strayIsoCount": "ISO non espulse",
+      "noBackupCount": "Dischi senza backup",
+      "riskyCacheCount": "Modalità cache non standard"
+    },
+    "unused": {
+      "heading": "Dischi orfani",
+      "none": "Nessun disco orfano."
+    },
+    "strayIso": {
+      "heading": "ISO non espulse montate",
+      "none": "Nessuna ISO non espulsa montata."
+    },
+    "noBackup": {
+      "heading": "Dischi senza backup",
+      "none": "Tutti i dischi sono coperti dal backup."
+    },
+    "riskyCache": {
+      "heading": "Dischi con cache non standard",
+      "none": "Nessuna modalità cache non standard."
+    },
+    "col": {
+      "node": "Nodo",
+      "vmName": "VM",
+      "vmId": "ID VM",
+      "id": "ID disco",
+      "storage": "Storage",
+      "fileName": "File",
+      "sizeGb": "Dimensione (GB)",
+      "cache": "Cache"
+    }
+  },
+  "backupCoverage": {
+    "heading": "Copertura backup",
+    "subtitle": "Attività vzdump e stato operativo",
+    "kpi": {
+      "total": "Attività vzdump",
+      "success": "Riuscite",
+      "failed": "Non riuscite",
+      "coveredVmids": "VM con backup",
+      "uncoveredCount": "VM senza backup"
+    },
+    "uncovered": {
+      "heading": "VM senza backup riuscito",
+      "none": "Tutte le VM hanno almeno un backup riuscito."
+    },
+    "tasks": {
+      "heading": "Elenco attività vzdump"
+    },
+    "operationalHealth": {
+      "heading": "Stato operativo",
+      "kpi": {
+        "totalTasks": "Attività totali",
+        "totalOk": "Riuscite",
+        "totalFailed": "Non riuscite"
+      }
+    },
+    "col": {
+      "vmName": "VM",
+      "vmId": "ID VM",
+      "lastBackupAge": "Ultimo backup (giorni fa)",
+      "node": "Nodo",
+      "type": "Tipo",
+      "total": "Totale",
+      "ok": "OK",
+      "failed": "Non riuscite",
+      "status": "Stato"
+    }
+  }
+}

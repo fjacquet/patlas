@@ -14,8 +14,14 @@ import type {
 } from '@/types/estate'
 import type { Snapshot } from '@/types/snapshot'
 import { aggregateClusters } from './aggregateClusters'
+import type { BackupCoverage } from './backupCoverage'
+import { computeBackupCoverage } from './backupCoverage'
 import { computeClusterHealth } from './clusterHealth'
 import { buildDatastoreDetail, buildVmDetail } from './detailIndex'
+import type { DiskHygiene } from './diskHygiene'
+import { computeDiskHygiene } from './diskHygiene'
+import type { FsFillRisk } from './fsFillRisk'
+import { computeFsFillRisk, FS_FILL_DEFAULT_THRESHOLD } from './fsFillRisk'
 import { aggregateGlobals, emptySummary } from './globals'
 import { aggregateGuestData, type GuestData } from './guestData'
 import { computeMonsters, DEFAULT_MONSTER_THRESHOLDS, type MonsterThresholds } from './monsterVm'
@@ -326,6 +332,11 @@ export function buildEstateView(
     merged.proxmoxBackupJobs,
   )
 
+  // Pack B — protection & risk (P6). Three new sheets, same single pass.
+  const fsFillRisk = computeFsFillRisk(merged.proxmoxPartitions ?? [])
+  const diskHygiene = computeDiskHygiene(merged.proxmoxDisks ?? [])
+  const backupCoverage = computeBackupCoverage(merged.proxmoxTasks ?? [], merged.guests, today)
+
   return {
     globals,
     clusters,
@@ -352,6 +363,9 @@ export function buildEstateView(
     clusterHealth,
     datastoreDetail,
     vmDetail,
+    fsFillRisk,
+    diskHygiene,
+    backupCoverage,
   }
 }
 
@@ -500,6 +514,45 @@ const EMPTY_CLUSTER_HEALTH = Object.freeze({
   }),
 })
 
+const EMPTY_FS_FILL: FsFillRisk = Object.freeze({
+  overThreshold: Object.freeze([]) as never[],
+  overThresholdCount: 0,
+  totalMounts: 0,
+  totalVms: 0,
+  threshold: FS_FILL_DEFAULT_THRESHOLD,
+})
+
+const EMPTY_DISK_HYGIENE: DiskHygiene = Object.freeze({
+  unusedDisks: Object.freeze([]) as never[],
+  unusedCount: 0,
+  reclaimableGb: 0,
+  strayIsos: Object.freeze([]) as never[],
+  strayIsoCount: 0,
+  noBackupDisks: Object.freeze([]) as never[],
+  noBackupCount: 0,
+  riskyCacheDisks: Object.freeze([]) as never[],
+  riskyCacheCount: 0,
+})
+
+const EMPTY_BACKUP_COVERAGE: BackupCoverage = Object.freeze({
+  vzdump: Object.freeze({
+    tasks: Object.freeze([]) as never[],
+    totalCount: 0,
+    successCount: 0,
+    failedCount: 0,
+    coveredVmids: 0,
+    uncoveredGuests: Object.freeze([]) as never[],
+    uncoveredCount: 0,
+    guestStatuses: Object.freeze([]) as never[],
+  }),
+  operationalHealth: Object.freeze({
+    taskTypes: Object.freeze([]) as never[],
+    totalTasks: 0,
+    totalOk: 0,
+    totalFailed: 0,
+  }),
+})
+
 /**
  * The valid empty-but-typed view `useEstateView` returns when no snapshot
  * is active. Frozen (modeled on `globals.ts:emptySummary`) so consumers
@@ -531,4 +584,7 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   clusterHealth: EMPTY_CLUSTER_HEALTH,
   datastoreDetail: new Map(),
   vmDetail: new Map(),
+  fsFillRisk: EMPTY_FS_FILL,
+  diskHygiene: EMPTY_DISK_HYGIENE,
+  backupCoverage: EMPTY_BACKUP_COVERAGE,
 })
