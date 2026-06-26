@@ -6,9 +6,9 @@ import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import i18n from '@/i18n'
 import { useSnapshotStore } from '@/store/snapshotStore'
+import type { GuestRow, VmUsageRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import type { Snapshot } from '@/types/snapshot'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow, VmUsageRow } from '@/types/vinfo'
 
 /**
  * P-RS end-to-end: build a 10k Proxmox estate in memory (no xlsx, no
@@ -34,8 +34,8 @@ const TODAY = new Date('2026-01-01T00:00:00Z')
 const CLUSTERS: [string, ...string[]] = ['cluster-a', 'cluster-b']
 const HOSTS_PER_CLUSTER = 4
 
-function makeProxmoxHosts(): VHostRow[] {
-  const hosts: VHostRow[] = []
+function makeProxmoxHosts(): NodeRow[] {
+  const hosts: NodeRow[] = []
   for (const cluster of CLUSTERS) {
     for (let h = 0; h < HOSTS_PER_CLUSTER; h++) {
       hosts.push({
@@ -61,7 +61,7 @@ function makeProxmoxHosts(): VHostRow[] {
 function makeProxmoxEstate(vmCount: number): Snapshot {
   const hostList = makeProxmoxHosts()
   const hostNames: [string, ...string[]] = hostList.map((h) => h.hostName) as [string, ...string[]]
-  const vinfo: VInfoRow[] = []
+  const guests: GuestRow[] = []
   const vmUsage: VmUsageRow[] = []
 
   // pick(arr, i) is safe: modulo always yields a valid index for non-empty arrays.
@@ -92,7 +92,7 @@ function makeProxmoxEstate(vmCount: number): Snapshot {
       // else stressed default: 4 vcpu, 2048 MiB
     }
 
-    vinfo.push({
+    guests.push({
       vmName: name,
       cluster,
       host,
@@ -170,15 +170,15 @@ function makeProxmoxEstate(vmCount: number): Snapshot {
     source: 'proxmox',
     viSdkUuid: null,
     vMetaData: [],
-    vinfo,
-    vhost: hostList,
+    guests,
+    nodes: hostList,
     vmUsage,
     proxmoxSnapshots: [],
     proxmoxStorageContent: [],
     proxmoxHaResources: [],
     proxmoxHaStatus: [],
     proxmoxBackupJobs: [],
-    vdatastore: [],
+    storages: [],
     vpartition: [],
     vnetwork: [],
     vswitch: [],

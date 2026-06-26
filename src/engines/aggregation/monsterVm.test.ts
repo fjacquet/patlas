@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mib } from '@/engines/units'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
 import { computeMonsters, DEFAULT_MONSTER_THRESHOLDS } from './monsterVm'
 
-const vm = (over: Partial<VInfoRow> = {}): VInfoRow => ({
+const vm = (over: Partial<GuestRow> = {}): GuestRow => ({
   vmName: 'vm',
   cluster: 'C1',
   host: 'h1',

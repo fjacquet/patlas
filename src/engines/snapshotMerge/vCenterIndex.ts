@@ -40,14 +40,14 @@ export const buildVCenterIndex = (selected: Snapshot[]): Map<string, VCenterEntr
     // string match is available (the allvCenters single-workbook shape).
     const order: string[] = []
     const seen = new Set<string>()
-    for (const row of snap.vinfo) {
+    for (const row of snap.guests) {
       if (!seen.has(row.viSdkUuid)) {
         seen.add(row.viSdkUuid)
         order.push(row.viSdkUuid)
       }
     }
 
-    for (const row of snap.vinfo) {
+    for (const row of snap.guests) {
       const uuid = row.viSdkUuid
       let entry = index.get(uuid)
       if (!entry) {

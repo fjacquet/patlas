@@ -104,37 +104,37 @@ export function buildEstateView(
   // vSAN/host-local datastores attribute to their hosts' cluster(s)
   // instead of being dropped (Pitfall 6 / Plan 04-02).
   const hostClusterMap = new Map<string, string>()
-  for (const hrow of merged.vhost) {
+  for (const hrow of merged.nodes) {
     if (hrow.hostName !== '' && hrow.cluster !== '') hostClusterMap.set(hrow.hostName, hrow.cluster)
   }
   const dsByCluster =
-    merged.vdatastore.length === 0
+    merged.storages.length === 0
       ? undefined
-      : datastoreCountByCluster(merged.vdatastore, hostClusterMap)
+      : datastoreCountByCluster(merged.storages, hostClusterMap)
   const clusters = aggregateClusters({
-    vinfo: merged.vinfo,
-    vhost: merged.vhost,
+    guests: merged.guests,
+    nodes: merged.nodes,
     mode,
     datastoreCountByCluster: dsByCluster,
     allocRatios,
   })
 
-  const datastores = perDatastore(merged.vdatastore)
+  const datastores = perDatastore(merged.storages)
   const datastoreCount = datastores.length
   const totalStorageMib = mib(datastores.reduce((acc, d) => acc + (d.capacityMib as number), 0))
 
   const globals = aggregateGlobals(clusters, datastoreCount, totalStorageMib)
-  const hosts = perEsx(merged.vhost, merged.vinfo, mode)
+  const hosts = perEsx(merged.nodes, merged.guests, mode)
 
   // ── P9 (D-07..D-11) — four pure projections composed in THIS single
   // pass (no second memo). vsan feeds storage's per-cluster attribution;
   // flags reads the deduped `datastores` + the in-memory thresholds line.
-  const vsan = relinkBlankClusterDatastores(merged.vinfo, merged.vdatastore)
+  const vsan = relinkBlankClusterDatastores(merged.guests, merged.storages)
   const storage = storageByX(merged, mode, vsan)
   const network = networkRollup(merged)
   const thresholds = opts?.thresholds ?? DEFAULT_THRESHOLDS
   const flags = computeThresholdFlags(merged.vpartition, datastores, thresholds)
-  const datastoreDetail = buildDatastoreDetail(datastores, merged.vdatastore, vsan, thresholds)
+  const datastoreDetail = buildDatastoreDetail(datastores, merged.storages, vsan, thresholds)
   const vmDetail = buildVmDetail(merged, thresholds)
 
   // OS breakdown — global + per-cluster. `other` is always present even
@@ -143,7 +143,7 @@ export function buildEstateView(
   const osBreakdown = emptyBreakdown()
   const vmsByCluster = new Map<string, OsBreakdown>()
   const vmRows: VmDisplayRow[] = []
-  for (const vm of merged.vinfo) {
+  for (const vm of merged.guests) {
     const family = classifyOsFamily(vm.osConfig, vm.osTools)
     osBreakdown[family] += 1
     const perCluster = vmsByCluster.get(vm.cluster) ?? emptyBreakdown()
@@ -166,7 +166,7 @@ export function buildEstateView(
 
   // ── P5 operational insights (RCI) — estate + per-cluster, all
   // calculated from parsed columns; runs in THIS single pass (no memo).
-  const gd = aggregateGuestData(merged.vpartition, merged.vinfo)
+  const gd = aggregateGuestData(merged.vpartition, merged.guests)
   interface Acc {
     on: number
     off: number
@@ -178,7 +178,7 @@ export function buildEstateView(
   const zero = (): Acc => ({ on: 0, off: 0, susp: 0, tmpl: 0, prov: 0, inuse: 0 })
   const estAcc = zero()
   const accBy = new Map<string, Acc>()
-  for (const v of merged.vinfo) {
+  for (const v of merged.guests) {
     const a = accBy.get(v.cluster) ?? zero()
     const bump = (t: Acc) => {
       if (v.template) t.tmpl += 1
@@ -259,8 +259,8 @@ export function buildEstateView(
       ? null
       : (() => {
           const plannedClusters = aggregateClusters({
-            vinfo: merged.vinfo,
-            vhost: merged.vhost,
+            guests: merged.guests,
+            nodes: merged.nodes,
             mode,
             datastoreCountByCluster: dsByCluster,
             allocRatios: plannedRatios,
@@ -277,8 +277,8 @@ export function buildEstateView(
   // `classifyOsFamily` vinfo pass above. `today` is the injected reference
   // clock (D-07) — never constructed here, so this engine stays pure.
   const eos = buildEosProjection({
-    vinfo: merged.vinfo,
-    vhost: merged.vhost,
+    guests: merged.guests,
+    nodes: merged.nodes,
     catalogue: loadEosCatalogue(),
     today,
   })
@@ -296,8 +296,8 @@ export function buildEstateView(
   // speed for the utilization denominator. Pure — reuses the shipped rows.
   const sizingThresholds = opts?.sizingThresholds ?? DEFAULT_SIZING_THRESHOLDS
   const sizing = computeSizing(
-    merged.vinfo,
-    merged.vhost,
+    merged.guests,
+    merged.nodes,
     maxVmUsageAcrossSnapshots(selected),
     sizingThresholds,
     selected.length,
@@ -306,7 +306,7 @@ export function buildEstateView(
   // P-RS monster-VM extract — same single pass; configured allocation only,
   // so no multi-snapshot max is needed (vCPU/vRAM are stable per VM).
   const monsters = computeMonsters(
-    merged.vinfo,
+    merged.guests,
     opts?.monsterThresholds ?? DEFAULT_MONSTER_THRESHOLDS,
   )
 

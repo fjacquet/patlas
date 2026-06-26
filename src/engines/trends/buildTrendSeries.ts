@@ -22,8 +22,8 @@ import { captureDateOrdinal } from './captureDateOrdinal'
 
 const dayKey = (d: Date): string => `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`
 
-const poweredOnOf = (vinfo: { template: boolean; powerState: string }[]): number =>
-  vinfo.reduce((n, v) => (!v.template && v.powerState === 'poweredOn' ? n + 1 : n), 0)
+const poweredOnOf = (guests: { template: boolean; powerState: string }[]): number =>
+  guests.reduce((n, v) => (!v.template && v.powerState === 'poweredOn' ? n + 1 : n), 0)
 
 /**
  * Aggregate one snapshot group through the SHIPPED engines (DRY — the
@@ -41,18 +41,18 @@ export const aggregateTrendGroup = (
   const allocRatios = opts.allocRatios ?? { cpuRatio: 4, ramRatio: 1 }
   const merged = mergeSnapshotsToEstate(group)
   const clusters = aggregateClusters({
-    vinfo: merged.vinfo,
-    vhost: merged.vhost,
+    guests: merged.guests,
+    nodes: merged.nodes,
     mode,
     allocRatios,
   })
-  const datastores = perDatastore(merged.vdatastore)
+  const datastores = perDatastore(merged.storages)
   const totalStorageMib = mib(datastores.reduce((acc, d) => acc + (d.capacityMib as number), 0))
   const globals = aggregateGlobals(clusters, datastores.length, totalStorageMib)
 
   const headline: TrendHeadline = {
     vmCount: globals.vmCount,
-    poweredOnVms: poweredOnOf(merged.vinfo),
+    poweredOnVms: poweredOnOf(merged.guests),
     hostCount: globals.hostCount,
     clusterCount: globals.clusterCount,
     vcpuAllocated: globals.vcpuAllocated,
@@ -63,13 +63,13 @@ export const aggregateTrendGroup = (
   const byCluster = new Map<string, TrendHeadline>()
   for (const c of clusters) {
     const clusterCap = mib(
-      merged.vdatastore
+      merged.storages
         .filter((d) => d.clusterName === c.cluster)
         .reduce((acc, d) => acc + (d.capacityMib as number), 0),
     )
     byCluster.set(c.cluster, {
       vmCount: c.vmCount,
-      poweredOnVms: poweredOnOf(merged.vinfo.filter((v) => v.cluster === c.cluster)),
+      poweredOnVms: poweredOnOf(merged.guests.filter((v) => v.cluster === c.cluster)),
       hostCount: c.hostCount,
       clusterCount: 1,
       vcpuAllocated: c.vcpuAllocated,

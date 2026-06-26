@@ -1,9 +1,9 @@
 export type {
+  GuestRow,
+  NodeRow,
   ParseError,
   Snapshot,
-  VDatastoreRow,
-  VHostRow,
-  VInfoRow,
+  StorageRow,
   VPartitionRow,
 } from '@/types'
 export { parseInWorker } from './parseInWorker'

@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import type { Cores, MHz, MiB, Sockets } from '@/engines/units'
 import type {
-  VDatastoreRow,
+  GuestRow,
+  NodeRow,
+  StorageRow,
   VDvPortRow,
   VDvSwitchRow,
-  VHostRow,
-  VInfoRow,
   VMetaDataRow,
   VmUsageRow,
   VNetworkRow,
@@ -65,7 +65,7 @@ const SocketsSchema = z
   .positive()
   .transform((n) => n as Sockets)
 
-export const VInfoRowSchema: z.ZodType<VInfoRow> = z.object({
+export const GuestRowSchema: z.ZodType<GuestRow> = z.object({
   vmName: z.string().trim().min(1),
   cluster: z.string().trim().min(1),
   host: z.string().trim(),
@@ -91,7 +91,7 @@ export const VInfoRowSchema: z.ZodType<VInfoRow> = z.object({
   guestType: z.enum(['qemu', 'lxc']),
 })
 
-export const VHostRowSchema: z.ZodType<VHostRow> = z.object({
+export const NodeRowSchema: z.ZodType<NodeRow> = z.object({
   hostName: z.string().trim().min(1),
   cluster: z.string().trim(),
   sockets: SocketsSchema,
@@ -108,7 +108,7 @@ export const VHostRowSchema: z.ZodType<VHostRow> = z.object({
   esxVersion: z.string().trim(),
 })
 
-export const VDatastoreRowSchema: z.ZodType<VDatastoreRow> = z.object({
+export const StorageRowSchema: z.ZodType<StorageRow> = z.object({
   name: z.string().trim().min(1),
   capacityMib: MibSchema,
   freeMib: MibSchema,

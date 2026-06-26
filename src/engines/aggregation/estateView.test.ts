@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import type { Snapshot } from '@/types/snapshot'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
 import { buildEstateView as buildEstateViewMerged, EMPTY_VIEW } from './estateView'
 
 // Phase-4 contract: `buildEstateView` consumes the MERGED bundle. These
@@ -16,7 +16,7 @@ const TEST_TODAY = new Date('2026-01-01T00:00:00Z')
 const buildEstateView = (snap: Snapshot, mode: AccountingMode) =>
   buildEstateViewMerged(mergeSnapshotsToEstate([snap]), [snap], mode, TEST_TODAY)
 
-const host = (over: Partial<VHostRow>): VHostRow => ({
+const host = (over: Partial<NodeRow>): NodeRow => ({
   hostName: 'esx-1',
   cluster: 'C1',
   sockets: sockets(2),
@@ -33,7 +33,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   ...over,
 })
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm',
   cluster: 'C1',
   host: 'esx-1',
@@ -68,20 +68,20 @@ const snapshot = (): Snapshot => ({
   source: 'proxmox',
   viSdkUuid: null,
   vMetaData: [],
-  vhost: [host({})],
+  nodes: [host({})],
   vmUsage: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
   proxmoxHaResources: [],
   proxmoxHaStatus: [],
   proxmoxBackupJobs: [],
-  vinfo: [
+  guests: [
     vm({ vmName: 'on-1', poweredOn: true, osConfig: 'Microsoft Windows Server 2019' }),
     vm({ vmName: 'on-2', poweredOn: true, osConfig: 'Ubuntu Linux (64-bit)' }),
     vm({ vmName: 'off-1', poweredOn: false, osConfig: 'FreeBSD 13' }),
     vm({ vmName: 'off-2', poweredOn: false, osConfig: 'Red Hat Enterprise Linux' }),
   ],
-  vdatastore: [
+  storages: [
     {
       name: 'ds-A',
       capacityMib: mib(1000),
@@ -155,7 +155,7 @@ describe('buildEstateView', () => {
 
   it('renders the em-dash sentinel (datastoreCount null) only when vDatastore is absent', () => {
     const snap = snapshot()
-    snap.vdatastore = []
+    snap.storages = []
     const view = buildEstateView(snap, 'active')
     for (const c of view.clusters) expect(c.datastoreCount).toBeNull()
     expect(view.globals.datastoreCount).toBe(0)
@@ -230,9 +230,9 @@ describe('buildEstateView', () => {
     expect(EMPTY_VIEW.flags.counts).toEqual({ fs: 0, ds: 0, lu: 0 })
   })
 
-  it('vmRows projection carries guestType from source VInfoRow', () => {
+  it('vmRows projection carries guestType from source GuestRow', () => {
     const snap = snapshot()
-    snap.vinfo = [
+    snap.guests = [
       vm({ vmName: 'qemu-vm', guestType: 'qemu' }),
       vm({ vmName: 'lxc-vm', guestType: 'lxc' }),
     ]

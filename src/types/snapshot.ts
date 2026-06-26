@@ -1,7 +1,7 @@
 import type { Bytes, MiB } from '@/engines/units'
 import type { TrendHeadline } from './estate'
-import type { VHostRow } from './vhost'
-import type { VInfoRow, VmUsageRow } from './vinfo'
+import type { GuestRow, VmUsageRow } from './guest'
+import type { NodeRow } from './node'
 
 /**
  * The aggregated trend facts that SURVIVE when a snapshot's raw rows are
@@ -150,8 +150,10 @@ export interface Snapshot {
    * Empty when the `vMetaData` sheet is absent. (Phase 4 MVC-04.)
    */
   vMetaData: VMetaDataEntry[]
-  vinfo: VInfoRow[]
-  vhost: VHostRow[]
+  /** Proxmox guest rows (VMs + LXC containers) from the report `VMs` + `Containers` sheets. */
+  guests: GuestRow[]
+  /** Proxmox node rows from the report `Nodes` sheet. */
+  nodes: NodeRow[]
   /** Per-VM runtime/perf metrics from `vMemory`+`vCPU` (right-sizing/stress).
    *  `[]` when both OPTIONAL sheets are absent (factual-degrade). Never
    *  undefined. */
@@ -168,7 +170,8 @@ export interface Snapshot {
   proxmoxHaStatus: ProxmoxHaStatusRow[]
   /** Proxmox scheduled backup jobs (`Cluster` → Backup Jobs). `[]` when absent. */
   proxmoxBackupJobs: ProxmoxBackupJobRow[]
-  vdatastore: VDatastoreRow[]
+  /** Proxmox storage rows from the report `Storages` sheet. */
+  storages: StorageRow[]
   vpartition: VPartitionRow[]
   /** RVTools `vNetwork` rows (VM→portgroup). `[]` when the OPTIONAL sheet
    *  is absent — never undefined (P9 D-11 factual-degrade). */
@@ -203,7 +206,7 @@ export interface Snapshot {
 }
 
 /** A datastore row from the RVTools `vDatastore` sheet. */
-export interface VDatastoreRow {
+export interface StorageRow {
   name: string
   capacityMib: MiB
   freeMib: MiB

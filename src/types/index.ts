@@ -17,6 +17,8 @@ export type {
   TrendPoint,
   TrendSeries,
 } from './estate'
+export type { GuestRow, VmUsageRow, VPowerState } from './guest'
+export type { NodeRow } from './node'
 export type {
   ParseError,
   ProxmoxBackupJobRow,
@@ -25,7 +27,7 @@ export type {
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
   Snapshot,
-  VDatastoreRow,
+  StorageRow,
   VDvPortRow,
   VDvSwitchRow,
   VMetaDataEntry,
@@ -34,5 +36,3 @@ export type {
   VPartitionRow,
   VSwitchRow,
 } from './snapshot'
-export type { VHostRow } from './vhost'
-export type { VInfoRow, VmUsageRow, VPowerState } from './vinfo'

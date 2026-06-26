@@ -173,10 +173,10 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
       const next = new Map(state.snapshots)
       next.set(id, {
         ...snap,
-        vinfo: [],
-        vhost: [],
+        guests: [],
+        nodes: [],
         vmUsage: [],
-        vdatastore: [],
+        storages: [],
         vpartition: [],
         vnetwork: [],
         vswitch: [],

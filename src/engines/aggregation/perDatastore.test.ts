@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { mib } from '@/engines/units'
 import { first } from '@/test/arrays'
-import type { VDatastoreRow } from '@/types/snapshot'
+import type { StorageRow } from '@/types/snapshot'
 import { datastoreCountByCluster, perDatastore } from './perDatastore'
 
-const ds = (over: Partial<VDatastoreRow>): VDatastoreRow => ({
+const ds = (over: Partial<StorageRow>): StorageRow => ({
   name: 'datastore-1',
   capacityMib: mib(1_048_576),
   freeMib: mib(524_288),

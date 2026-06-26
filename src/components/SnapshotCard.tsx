@@ -39,14 +39,14 @@ export function SnapshotCard({ snapshot, active, onClick, onRemove }: SnapshotCa
   const { t: tTrends } = useTranslation('trends')
   const setCapturedAt = useSnapshotStore((s) => s.setCapturedAt)
   const released = snapshot.rawReleased === true
-  const clusterCount = new Set(snapshot.vinfo.map((v) => v.cluster)).size
+  const clusterCount = new Set(snapshot.guests.map((v) => v.cluster)).size
 
   // MVC-04: a single RVTools 4.x workbook can embed N vCenters — the count
   // is the number of DISTINCT vCenter identities in this snapshot's rows
   // (NEVER 1-file-=-1-vCenter). `viSdkUuid` is the per-row identity; fall
   // back to the per-vCenter `vMetaData` Server list when uuids are absent.
   const vcenterCount =
-    new Set(snapshot.vinfo.map((v) => v.viSdkUuid).filter((u) => u !== '')).size ||
+    new Set(snapshot.guests.map((v) => v.viSdkUuid).filter((u) => u !== '')).size ||
     snapshot.vMetaData.filter((m) => m.server !== '').length ||
     1
   const serverLabels = snapshot.vMetaData.map((m) => m.server).filter((s) => s !== '')
@@ -104,10 +104,10 @@ export function SnapshotCard({ snapshot, active, onClick, onRemove }: SnapshotCa
         </p>
         <p className="mt-1 text-slate-500 dark:text-slate-400">
           {t('snapshots.card.rows', {
-            vms: snapshot.vinfo.length,
-            hosts: snapshot.vhost.length,
+            vms: snapshot.guests.length,
+            hosts: snapshot.nodes.length,
             clusters: clusterCount,
-            datastores: snapshot.vdatastore.length,
+            datastores: snapshot.storages.length,
           })}
         </p>
       </button>

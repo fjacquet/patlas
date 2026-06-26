@@ -1,6 +1,6 @@
 import type { EosBucketKey, EosProjection, EosRow, NodeHostRow } from '@/types/estate'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import type { EosCatalogue } from './catalogueSchema'
 import { classifyPve } from './classifyPve'
 import { normalizeOs } from './normalizeOs'
@@ -79,12 +79,12 @@ function emptyPartition(): Record<EosBucketKey, EosRow[]> {
 }
 
 export function buildEosProjection(args: {
-  vinfo: VInfoRow[]
-  vhost: VHostRow[]
+  guests: GuestRow[]
+  nodes: NodeRow[]
   catalogue: EosCatalogue
   today: Date
 }): EosProjection {
-  const { vinfo, vhost, catalogue, today } = args
+  const { guests: vinfo, nodes: vhost, catalogue, today } = args
   // Date-only: drop time-of-day so a same-day EOL (catalogue dates are UTC
   // midnight via Date.parse) is not flipped to `overdue` later in the day.
   const todayMs = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())

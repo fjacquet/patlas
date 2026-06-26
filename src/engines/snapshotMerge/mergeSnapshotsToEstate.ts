@@ -1,15 +1,15 @@
 import type {
+  GuestRow,
+  NodeRow,
   ProxmoxBackupJobRow,
   ProxmoxHaResourceRow,
   ProxmoxHaStatusRow,
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
   Snapshot,
-  VDatastoreRow,
+  StorageRow,
   VDvPortRow,
   VDvSwitchRow,
-  VHostRow,
-  VInfoRow,
   VNetworkRow,
   VPartitionRow,
   VSwitchRow,
@@ -22,9 +22,12 @@ import { buildVCenterIndex, type VCenterEntry } from './vCenterIndex'
  * THIS, not raw snapshots.
  */
 export interface MergedEstate {
-  vinfo: VInfoRow[]
-  vhost: VHostRow[]
-  vdatastore: VDatastoreRow[]
+  /** Proxmox guest rows (VMs + LXC containers) flattened across selected snapshots. */
+  guests: GuestRow[]
+  /** Proxmox node rows flattened across selected snapshots. */
+  nodes: NodeRow[]
+  /** Proxmox storage rows flattened across selected snapshots. */
+  storages: StorageRow[]
   /** Concatenated guest-disk partitions of the selected snapshots (P5
    *  guest-data). Empty when no vPartition sheet was present. */
   vpartition: VPartitionRow[]
@@ -53,9 +56,9 @@ export interface MergedEstate {
 }
 
 const EMPTY_MERGED: MergedEstate = {
-  vinfo: [],
-  vhost: [],
-  vdatastore: [],
+  guests: [],
+  nodes: [],
+  storages: [],
   vpartition: [],
   vnetwork: [],
   vswitch: [],
@@ -76,7 +79,7 @@ const EMPTY_MERGED: MergedEstate = {
  *   - else `(viSdkUuid, vmName, cluster)` so distinct VMs are not merged
  * `vmInstanceUuid` is ABSENT in RVTools 4.7 — deliberately not a key path.
  */
-const vmDedupeKey = (row: VInfoRow): string =>
+const vmDedupeKey = (row: GuestRow): string =>
   row.vmBiosUuid.trim() !== ''
     ? `uuid:${row.vmBiosUuid}`
     : `fallback:${row.viSdkUuid} ${row.vmName} ${row.cluster}`
@@ -105,16 +108,16 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
   const vcenterIndex = buildVCenterIndex(selected)
   const labelFor = (viSdkUuid: string): string => vcenterIndex.get(viSdkUuid)?.label ?? viSdkUuid
 
-  // VHostRow has no `viSdkUuid` column. A host's vCenter is resolved
+  // NodeRow has no `viSdkUuid` column. A host's vCenter is resolved
   // SNAPSHOT-SCOPED (never globally — a global cluster→vCenter map collapses
   // exactly the colliding-name case we must disambiguate):
-  //   1. vinfo rows in the SAME snapshot whose `host` === h.hostName
-  //   2. vinfo rows in the SAME snapshot whose `cluster` === h.cluster
+  //   1. guest rows in the SAME snapshot whose `host` === h.hostName
+  //   2. guest rows in the SAME snapshot whose `cluster` === h.cluster
   //   3. the snapshot's own `viSdkUuid`
-  const hostVcenter = (snap: Snapshot, h: VHostRow): string => {
-    const byHost = snap.vinfo.find((v) => v.host !== '' && v.host === h.hostName)
+  const hostVcenter = (snap: Snapshot, h: NodeRow): string => {
+    const byHost = snap.guests.find((v) => v.host !== '' && v.host === h.hostName)
     if (byHost) return byHost.viSdkUuid
-    const byCluster = snap.vinfo.find((v) => v.cluster === h.cluster)
+    const byCluster = snap.guests.find((v) => v.cluster === h.cluster)
     if (byCluster) return byCluster.viSdkUuid
     return snap.viSdkUuid ?? ''
   }
@@ -124,12 +127,12 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
   // vCenter. `size > 1` ⇒ the name spans distinct vCenters ⇒ colliding.
   const vcByCluster = new Map<string, Set<string>>()
   for (const snap of selected) {
-    for (const v of snap.vinfo) {
+    for (const v of snap.guests) {
       const set = vcByCluster.get(v.cluster) ?? new Set<string>()
       set.add(v.viSdkUuid)
       vcByCluster.set(v.cluster, set)
     }
-    for (const h of snap.vhost) {
+    for (const h of snap.nodes) {
       const set = vcByCluster.get(h.cluster) ?? new Set<string>()
       set.add(hostVcenter(snap, h))
       vcByCluster.set(h.cluster, set)
@@ -137,11 +140,11 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
   }
   const isColliding = (cluster: string): boolean => (vcByCluster.get(cluster)?.size ?? 0) > 1
 
-  // Step 2: rewrite-or-passthrough vinfo (deduped) + vhost.
-  const outVinfo: VInfoRow[] = []
+  // Step 2: rewrite-or-passthrough guests (deduped) + nodes.
+  const outVinfo: GuestRow[] = []
   const seenVm = new Set<string>()
   for (const snap of selected) {
-    for (const v of snap.vinfo) {
+    for (const v of snap.guests) {
       const key = vmDedupeKey(v)
       if (seenVm.has(key)) continue
       seenVm.add(key)
@@ -151,9 +154,9 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
     }
   }
 
-  const outVhost: VHostRow[] = []
+  const outVhost: NodeRow[] = []
   for (const snap of selected) {
-    for (const h of snap.vhost) {
+    for (const h of snap.nodes) {
       outVhost.push(
         isColliding(h.cluster)
           ? { ...h, cluster: `${h.cluster} (${labelFor(hostVcenter(snap, h))})` }
@@ -162,7 +165,7 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
     }
   }
 
-  const outVdatastore: VDatastoreRow[] = []
+  const outVdatastore: StorageRow[] = []
   const outVpartition: VPartitionRow[] = []
   const outVnetwork: VNetworkRow[] = []
   const outVswitch: VSwitchRow[] = []
@@ -174,7 +177,7 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
   const outProxmoxHaStatus: ProxmoxHaStatusRow[] = []
   const outProxmoxBackupJobs: ProxmoxBackupJobRow[] = []
   for (const snap of selected) {
-    for (const d of snap.vdatastore) outVdatastore.push(d)
+    for (const d of snap.storages) outVdatastore.push(d)
     for (const p of snap.vpartition) outVpartition.push(p)
     // P9 D-11: the four network arrays are new required Snapshot fields.
     // `?? []` keeps the merge resilient to Snapshot objects constructed
@@ -192,9 +195,9 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
   }
 
   return {
-    vinfo: outVinfo,
-    vhost: outVhost,
-    vdatastore: outVdatastore,
+    guests: outVinfo,
+    nodes: outVhost,
+    storages: outVdatastore,
     vpartition: outVpartition,
     vnetwork: outVnetwork,
     vswitch: outVswitch,

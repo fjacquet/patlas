@@ -8,9 +8,9 @@ import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import i18n from '@/i18n'
 import type { AccountingMode } from '@/types/estate'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import type { Snapshot } from '@/types/snapshot'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
 
 /**
  * 10k-VM Proxmox stress proof (ROADMAP Phase-3 success #1/#2/#4). Builds the
@@ -33,8 +33,8 @@ const HOSTS_PER_CLUSTER = 4
 // pick(arr, i) is safe: modulo always yields a valid index for non-empty arrays.
 const pick = <T,>(arr: [T, ...T[]], i: number): T => arr[i % arr.length] as T
 
-function makeHosts(): VHostRow[] {
-  const hosts: VHostRow[] = []
+function makeHosts(): NodeRow[] {
+  const hosts: NodeRow[] = []
   for (const cluster of CLUSTER_NAMES) {
     for (let h = 0; h < HOSTS_PER_CLUSTER; h++) {
       hosts.push({
@@ -60,7 +60,7 @@ function makeHosts(): VHostRow[] {
 function makeProxmoxEstate(vmCount: number): Snapshot {
   const hostList = makeHosts()
   const hostNames: [string, ...string[]] = hostList.map((h) => h.hostName) as [string, ...string[]]
-  const vinfo: VInfoRow[] = []
+  const guests: GuestRow[] = []
 
   for (let i = 0; i < vmCount; i++) {
     const name = `vm-${String(i + 1).padStart(5, '0')}`
@@ -75,7 +75,7 @@ function makeProxmoxEstate(vmCount: number): Snapshot {
         ? 'Debian GNU/Linux 12\nmaintenance window: 2026-06'
         : `Debian GNU/Linux ${(i % 5) + 8}`
 
-    vinfo.push({
+    guests.push({
       vmName: name,
       cluster,
       host,
@@ -109,15 +109,15 @@ function makeProxmoxEstate(vmCount: number): Snapshot {
     source: 'proxmox',
     viSdkUuid: null,
     vMetaData: [],
-    vinfo,
-    vhost: hostList,
+    guests,
+    nodes: hostList,
     vmUsage: [],
     proxmoxSnapshots: [],
     proxmoxStorageContent: [],
     proxmoxHaResources: [],
     proxmoxHaStatus: [],
     proxmoxBackupJobs: [],
-    vdatastore: [],
+    storages: [],
     vpartition: [],
     vnetwork: [],
     vswitch: [],
@@ -143,9 +143,9 @@ describe('Inventory 10k stress — Proxmox in-memory estate (Phase-3 #1/#2/#4)',
   })
 
   it('builds ~10k VMs and projects vmRows in the single estate pass', () => {
-    expect(snapshot.vinfo.length).toBeGreaterThanOrEqual(9_000)
+    expect(snapshot.guests.length).toBeGreaterThanOrEqual(9_000)
     const view = buildEstateView(snapshot, 'active')
-    expect(view.vmRows.length).toBe(snapshot.vinfo.length)
+    expect(view.vmRows.length).toBe(snapshot.guests.length)
   })
 
   it('sorts the VM rows by provisionedMib desc in < 200 ms at 10k (#2)', () => {

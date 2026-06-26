@@ -11,7 +11,7 @@ import { fmtInt, fmtMemMb, fmtPercent, fmtRatio } from '@/utils/format'
  * `useMemo`, zero `@/engines` import.
  *
  * There is intentionally NO scoping column here (03-RESEARCH Open Q3 /
- * Anti-Pattern; UI-SPEC §Three object tables): `VDatastoreRow` carries no
+ * Anti-Pattern; UI-SPEC §Three object tables): `StorageRow` carries no
  * such attribution, so the table is scope-agnostic. `key` (the
  * `naa ?? name` dedupe key) is the identity column → `enableHiding:
  * false`. Capacity/free/used/provisioned cells format for DISPLAY via the

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mib } from '@/engines/units'
-import type { VInfoRow, VPartitionRow } from '@/types'
+import type { GuestRow, VPartitionRow } from '@/types'
 import { aggregateGuestData } from './guestData'
 
 const part = (over: Partial<VPartitionRow>): VPartitionRow => ({
@@ -12,8 +12,8 @@ const part = (over: Partial<VPartitionRow>): VPartitionRow => ({
   ...over,
 })
 
-const vm = (vmName: string, cluster: string): VInfoRow =>
-  ({ vmName, cluster }) as unknown as VInfoRow
+const vm = (vmName: string, cluster: string): GuestRow =>
+  ({ vmName, cluster }) as unknown as GuestRow
 
 describe('aggregateGuestData (P5)', () => {
   it('no vPartition → estate null (factual, never invented 0)', () => {

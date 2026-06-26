@@ -19,7 +19,7 @@ const snapshot = (): Snapshot =>
     source: 'proxmox',
     viSdkUuid: null,
     vMetaData: [],
-    vinfo: [
+    guests: [
       {
         vmName: 'vm-1',
         cluster: 'CL_1',
@@ -42,14 +42,14 @@ const snapshot = (): Snapshot =>
         guestType: 'qemu',
       },
     ],
-    vhost: [],
+    nodes: [],
     vmUsage: [],
     proxmoxSnapshots: [],
     proxmoxStorageContent: [],
     proxmoxHaResources: [],
     proxmoxHaStatus: [],
     proxmoxBackupJobs: [],
-    vdatastore: [
+    storages: [
       {
         name: 'DS_A',
         capacityMib: mib(1000),

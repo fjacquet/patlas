@@ -23,7 +23,7 @@ const snapshot = (id: string): Snapshot => ({
   proxmoxHaResources: [],
   proxmoxHaStatus: [],
   proxmoxBackupJobs: [],
-  vhost: [
+  nodes: [
     {
       hostName: 'esx-1',
       cluster: 'C1',
@@ -40,7 +40,7 @@ const snapshot = (id: string): Snapshot => ({
       esxVersion: '',
     },
   ],
-  vinfo: [
+  guests: [
     {
       vmName: 'vm-1',
       cluster: 'C1',
@@ -63,7 +63,7 @@ const snapshot = (id: string): Snapshot => ({
       path: '',
     },
   ],
-  vdatastore: [],
+  storages: [],
   vpartition: [],
   vnetwork: [],
   vswitch: [],

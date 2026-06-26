@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mib } from '@/engines/units'
 import { first } from '@/test/arrays'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
 import { aggregateVmsPerCluster, readinessStats, topReadinessVmsByCluster } from './vinfoMerge'
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm-1',
   cluster: 'C1',
   host: 'esx-1',

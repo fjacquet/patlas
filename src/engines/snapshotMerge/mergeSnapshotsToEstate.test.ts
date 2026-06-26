@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mhz, mib, sockets } from '@/engines/units'
 import type {
+  GuestRow,
+  NodeRow,
   ProxmoxBackupJobRow,
   ProxmoxHaResourceRow,
   ProxmoxHaStatusRow,
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
   Snapshot,
-  VHostRow,
-  VInfoRow,
 } from '@/types'
 import { mergeSnapshotsToEstate } from './mergeSnapshotsToEstate'
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm',
   cluster: 'C1',
   host: 'esx-1',
@@ -35,7 +35,7 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   ...over,
 })
 
-const host = (over: Partial<VHostRow>): VHostRow => ({
+const host = (over: Partial<NodeRow>): NodeRow => ({
   hostName: 'esx-1',
   cluster: 'C1',
   sockets: sockets(2),
@@ -63,15 +63,15 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   source: 'proxmox',
   viSdkUuid: 'vc-a',
   vMetaData: [],
-  vinfo: [],
-  vhost: [],
+  guests: [],
+  nodes: [],
   vmUsage: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
   proxmoxHaResources: [],
   proxmoxHaStatus: [],
   proxmoxBackupJobs: [],
-  vdatastore: [],
+  storages: [],
   vpartition: [],
   vnetwork: [],
   vswitch: [],
@@ -87,30 +87,30 @@ describe('mergeSnapshotsToEstate — PRIMARY: N separately-dropped files', () =>
       id: 'a',
       viSdkUuid: 'vc-a',
       vMetaData: [{ server: 'vc-a.local', rvtoolsVersion: '4.7.1.4', exportedTimestamp: null }],
-      vinfo: [
+      guests: [
         vm({ vmName: 'a1', viSdkUuid: 'vc-a', cluster: 'CL_WRK_PFLEX', vmBiosUuid: 'a1' }),
         vm({ vmName: 'a2', viSdkUuid: 'vc-a', cluster: 'CL_WRK_PFLEX', vmBiosUuid: 'a2' }),
       ],
-      vhost: [host({ hostName: 'esx-a', cluster: 'CL_WRK_PFLEX', faultDomain: '' })],
+      nodes: [host({ hostName: 'esx-a', cluster: 'CL_WRK_PFLEX', faultDomain: '' })],
     })
     const b = snap({
       id: 'b',
       viSdkUuid: 'vc-b',
       vMetaData: [{ server: 'vc-b.local', rvtoolsVersion: '4.7.1.4', exportedTimestamp: null }],
-      vinfo: [vm({ vmName: 'b1', viSdkUuid: 'vc-b', cluster: 'CL_WRK_PFLEX', vmBiosUuid: 'b1' })],
-      vhost: [host({ hostName: 'esx-b', cluster: 'CL_WRK_PFLEX' })],
+      guests: [vm({ vmName: 'b1', viSdkUuid: 'vc-b', cluster: 'CL_WRK_PFLEX', vmBiosUuid: 'b1' })],
+      nodes: [host({ hostName: 'esx-b', cluster: 'CL_WRK_PFLEX' })],
     })
 
     const merged = mergeSnapshotsToEstate([a, b])
 
-    expect(merged.vinfo).toHaveLength(3) // 2 + 1, no double-count
+    expect(merged.guests).toHaveLength(3) // 2 + 1, no double-count
     expect(merged.vcenters).toHaveLength(2)
     // Colliding cluster suffixed with the vCenter label on BOTH row sets.
-    const clusters = new Set(merged.vinfo.map((r) => r.cluster))
+    const clusters = new Set(merged.guests.map((r) => r.cluster))
     expect(clusters.has('CL_WRK_PFLEX (vc-a.local)')).toBe(true)
     expect(clusters.has('CL_WRK_PFLEX (vc-b.local)')).toBe(true)
     expect(clusters.has('CL_WRK_PFLEX')).toBe(false)
-    const hostClusters = new Set(merged.vhost.map((r) => r.cluster))
+    const hostClusters = new Set(merged.nodes.map((r) => r.cluster))
     expect(hostClusters.has('CL_WRK_PFLEX (vc-a.local)')).toBe(true)
     expect(hostClusters.has('CL_WRK_PFLEX (vc-b.local)')).toBe(true)
   })
@@ -119,30 +119,30 @@ describe('mergeSnapshotsToEstate — PRIMARY: N separately-dropped files', () =>
     const a = snap({
       id: 'a',
       viSdkUuid: 'vc-a',
-      vinfo: [vm({ vmName: 'a1', viSdkUuid: 'vc-a', cluster: 'SHARED', vmBiosUuid: 'a1' })],
-      vhost: [host({ cluster: 'SHARED' })],
+      guests: [vm({ vmName: 'a1', viSdkUuid: 'vc-a', cluster: 'SHARED', vmBiosUuid: 'a1' })],
+      nodes: [host({ cluster: 'SHARED' })],
     })
     const b = snap({
       id: 'b',
       viSdkUuid: 'vc-b',
-      vinfo: [vm({ vmName: 'b1', viSdkUuid: 'vc-b', cluster: 'SHARED', vmBiosUuid: 'b1' })],
-      vhost: [host({ cluster: 'SHARED' })],
+      guests: [vm({ vmName: 'b1', viSdkUuid: 'vc-b', cluster: 'SHARED', vmBiosUuid: 'b1' })],
+      nodes: [host({ cluster: 'SHARED' })],
     })
     mergeSnapshotsToEstate([a, b])
-    expect(a.vinfo[0]?.cluster).toBe('SHARED')
-    expect(b.vhost[0]?.cluster).toBe('SHARED')
+    expect(a.guests[0]?.cluster).toBe('SHARED')
+    expect(b.nodes[0]?.cluster).toBe('SHARED')
   })
 
   it('non-colliding clusters pass through as the SAME object reference', () => {
     const a = snap({
       id: 'a',
       viSdkUuid: 'vc-a',
-      vinfo: [vm({ vmName: 'a1', viSdkUuid: 'vc-a', cluster: 'ONLY_A', vmBiosUuid: 'a1' })],
-      vhost: [host({ cluster: 'ONLY_A' })],
+      guests: [vm({ vmName: 'a1', viSdkUuid: 'vc-a', cluster: 'ONLY_A', vmBiosUuid: 'a1' })],
+      nodes: [host({ cluster: 'ONLY_A' })],
     })
     const merged = mergeSnapshotsToEstate([a])
-    expect(merged.vinfo[0]).toBe(a.vinfo[0])
-    expect(merged.vhost[0]).toBe(a.vhost[0])
+    expect(merged.guests[0]).toBe(a.guests[0])
+    expect(merged.nodes[0]).toBe(a.nodes[0])
   })
 })
 
@@ -156,12 +156,12 @@ describe('mergeSnapshotsToEstate — ADDITIONAL: ONE workbook with 3 vCenters', 
         { server: 'vc13.local', rvtoolsVersion: '4.7.1.4', exportedTimestamp: null },
         { server: 'vc14.local', rvtoolsVersion: '4.7.1.4', exportedTimestamp: null },
       ],
-      vinfo: [
+      guests: [
         vm({ vmName: 'a', viSdkUuid: 'vc11', cluster: 'CL_11', vmBiosUuid: 'a' }),
         vm({ vmName: 'b', viSdkUuid: 'vc13', cluster: 'CL_13', vmBiosUuid: 'b' }),
         vm({ vmName: 'c', viSdkUuid: 'vc14', cluster: 'CL_14', vmBiosUuid: 'c' }),
       ],
-      vhost: [
+      nodes: [
         host({ hostName: 'h11', cluster: 'CL_11' }),
         host({ hostName: 'h13', cluster: 'CL_13' }),
         host({ hostName: 'h14', cluster: 'CL_14' }),
@@ -169,7 +169,7 @@ describe('mergeSnapshotsToEstate — ADDITIONAL: ONE workbook with 3 vCenters', 
     })
     const merged = mergeSnapshotsToEstate([oneWorkbook])
     expect(merged.vcenters).toHaveLength(3)
-    expect(merged.vinfo).toHaveLength(3)
+    expect(merged.guests).toHaveLength(3)
   })
 
   it('suffixes a name colliding ACROSS viSdkUuid inside one workbook', () => {
@@ -180,14 +180,14 @@ describe('mergeSnapshotsToEstate — ADDITIONAL: ONE workbook with 3 vCenters', 
         { server: 'vc11.local', rvtoolsVersion: '4.7.1.4', exportedTimestamp: null },
         { server: 'vc14.local', rvtoolsVersion: '4.7.1.4', exportedTimestamp: null },
       ],
-      vinfo: [
+      guests: [
         vm({ vmName: 'a', viSdkUuid: 'vc11', cluster: 'CL', vmBiosUuid: 'a' }),
         vm({ vmName: 'b', viSdkUuid: 'vc14', cluster: 'CL', vmBiosUuid: 'b' }),
       ],
-      vhost: [host({ hostName: 'h11', cluster: 'CL' }), host({ hostName: 'h14', cluster: 'CL' })],
+      nodes: [host({ hostName: 'h11', cluster: 'CL' }), host({ hostName: 'h14', cluster: 'CL' })],
     })
     const merged = mergeSnapshotsToEstate([w])
-    const clusters = new Set(merged.vinfo.map((r) => r.cluster))
+    const clusters = new Set(merged.guests.map((r) => r.cluster))
     expect(clusters.has('CL (vc11.local)')).toBe(true)
     expect(clusters.has('CL (vc14.local)')).toBe(true)
   })
@@ -198,56 +198,60 @@ describe('mergeSnapshotsToEstate — VM dedupe (MVC-03 / vMotion)', () => {
     const a = snap({
       id: 'a',
       viSdkUuid: 'vc-a',
-      vinfo: [vm({ vmName: 'mover', viSdkUuid: 'vc-a', cluster: 'CA', vmBiosUuid: 'shared-uuid' })],
-      vhost: [host({ cluster: 'CA' })],
+      guests: [
+        vm({ vmName: 'mover', viSdkUuid: 'vc-a', cluster: 'CA', vmBiosUuid: 'shared-uuid' }),
+      ],
+      nodes: [host({ cluster: 'CA' })],
     })
     const b = snap({
       id: 'b',
       viSdkUuid: 'vc-b',
-      vinfo: [vm({ vmName: 'mover', viSdkUuid: 'vc-b', cluster: 'CB', vmBiosUuid: 'shared-uuid' })],
-      vhost: [host({ cluster: 'CB' })],
+      guests: [
+        vm({ vmName: 'mover', viSdkUuid: 'vc-b', cluster: 'CB', vmBiosUuid: 'shared-uuid' }),
+      ],
+      nodes: [host({ cluster: 'CB' })],
     })
     const merged = mergeSnapshotsToEstate([a, b])
-    expect(merged.vinfo).toHaveLength(1) // deduped, first occurrence wins
-    expect(merged.vinfo[0]?.cluster).toBe('CA')
+    expect(merged.guests).toHaveLength(1) // deduped, first occurrence wins
+    expect(merged.guests[0]?.cluster).toBe('CA')
   })
 
   it('blank vmBiosUuid falls back to (viSdkUuid, vmName, cluster) — distinct VMs kept', () => {
     const a = snap({
       id: 'a',
       viSdkUuid: 'vc-a',
-      vinfo: [
+      guests: [
         vm({ vmName: 'no-uuid', viSdkUuid: 'vc-a', cluster: 'CA', vmBiosUuid: '' }),
         vm({ vmName: 'no-uuid', viSdkUuid: 'vc-b', cluster: 'CB', vmBiosUuid: '' }),
       ],
-      vhost: [host({ cluster: 'CA' }), host({ cluster: 'CB' })],
+      nodes: [host({ cluster: 'CA' }), host({ cluster: 'CB' })],
     })
     const merged = mergeSnapshotsToEstate([a])
     // Different (viSdkUuid, vmName, cluster) ⇒ two distinct VMs, NOT collapsed.
-    expect(merged.vinfo).toHaveLength(2)
+    expect(merged.guests).toHaveLength(2)
   })
 
   it('blank vmBiosUuid with identical fallback key collapses to one', () => {
     const a = snap({
       id: 'a',
       viSdkUuid: 'vc-a',
-      vinfo: [
+      guests: [
         vm({ vmName: 'dup', viSdkUuid: 'vc-a', cluster: 'CA', vmBiosUuid: '' }),
         vm({ vmName: 'dup', viSdkUuid: 'vc-a', cluster: 'CA', vmBiosUuid: '' }),
       ],
-      vhost: [host({ cluster: 'CA' })],
+      nodes: [host({ cluster: 'CA' })],
     })
     const merged = mergeSnapshotsToEstate([a])
-    expect(merged.vinfo).toHaveLength(1)
+    expect(merged.guests).toHaveLength(1)
   })
 })
 
 describe('mergeSnapshotsToEstate — empty / degenerate', () => {
   it('empty selection ⇒ empty bundle', () => {
     const merged = mergeSnapshotsToEstate([])
-    expect(merged.vinfo).toHaveLength(0)
-    expect(merged.vhost).toHaveLength(0)
-    expect(merged.vdatastore).toHaveLength(0)
+    expect(merged.guests).toHaveLength(0)
+    expect(merged.nodes).toHaveLength(0)
+    expect(merged.storages).toHaveLength(0)
     expect(merged.vcenters).toHaveLength(0)
   })
 
@@ -255,14 +259,14 @@ describe('mergeSnapshotsToEstate — empty / degenerate', () => {
     const a = snap({
       id: 'a',
       viSdkUuid: 'vc-a',
-      vinfo: [vm({ vmName: 'a1', viSdkUuid: 'vc-a', cluster: 'CA', vmBiosUuid: 'a1' })],
-      vhost: [host({ cluster: 'CA' })],
-      vdatastore: [],
+      guests: [vm({ vmName: 'a1', viSdkUuid: 'vc-a', cluster: 'CA', vmBiosUuid: 'a1' })],
+      nodes: [host({ cluster: 'CA' })],
+      storages: [],
     })
     const merged = mergeSnapshotsToEstate([a])
-    expect(merged.vinfo).toHaveLength(1)
+    expect(merged.guests).toHaveLength(1)
     expect(merged.vcenters).toHaveLength(1)
-    expect(merged.vinfo[0]).toBe(a.vinfo[0]) // no collision ⇒ same ref
+    expect(merged.guests[0]).toBe(a.guests[0]) // no collision ⇒ same ref
   })
 })
 

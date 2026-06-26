@@ -19,7 +19,7 @@ const snapshot = (): Snapshot =>
     source: 'proxmox',
     viSdkUuid: null,
     vMetaData: [],
-    vinfo: [
+    guests: [
       {
         vmName: 'vm-1',
         cluster: 'CL_1',
@@ -41,7 +41,7 @@ const snapshot = (): Snapshot =>
         path: '[DS_A] vm-1/vm-1.vmx',
       },
     ],
-    vhost: [
+    nodes: [
       {
         hostName: 'esx-1',
         cluster: 'CL_1',
@@ -57,7 +57,7 @@ const snapshot = (): Snapshot =>
         esxVersion: '8.0.0',
       },
     ],
-    vdatastore: [],
+    storages: [],
     vpartition: [],
     vnetwork: [],
     vswitch: [

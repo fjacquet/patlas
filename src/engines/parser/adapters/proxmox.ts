@@ -2,15 +2,15 @@ import { cores, mhz, sockets } from '@/engines/units'
 import { gibToMib } from '@/engines/units/converters'
 import { gib } from '@/engines/units/types'
 import type {
+  GuestRow,
+  NodeRow,
   ParseError,
   ProxmoxBackupJobRow,
   ProxmoxHaResourceRow,
   ProxmoxHaStatusRow,
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
-  VDatastoreRow,
-  VHostRow,
-  VInfoRow,
+  StorageRow,
   VmUsageRow,
 } from '@/types'
 import type { ParsedSheet, ParsedWorkbook } from '../parseXlsx'
@@ -35,11 +35,11 @@ export const extractClusterName = (sheet: ParsedSheet | undefined): string => {
   return readString(readCol(row ?? {}, cols.name))
 }
 
-export const adaptProxmoxNodes = (sheet: ParsedSheet, clusterName: string): VHostRow[] => {
+export const adaptProxmoxNodes = (sheet: ParsedSheet, clusterName: string): NodeRow[] => {
   const cols = mapColumns(sheet.headers, NODE_COLS)
   return sheet.rows
     .map(
-      (row): VHostRow => ({
+      (row): NodeRow => ({
         hostName: readString(readCol(row, cols.node)),
         cluster: clusterName,
         sockets: sockets(Math.max(0, Math.trunc(readNumber(readCol(row, cols.sockets))))),
@@ -63,7 +63,7 @@ const mapGuestRow = (
   cols: ReturnType<typeof mapColumns>,
   clusterName: string,
   guestType: 'qemu' | 'lxc',
-): VInfoRow => {
+): GuestRow => {
   const sock = Math.max(1, Math.trunc(readNumber(readCol(row, cols.sockets))))
   const core = Math.max(0, Math.trunc(readNumber(readCol(row, cols.cores))))
   const status = readString(readCol(row, cols.status)).toLowerCase()
@@ -99,8 +99,8 @@ export const adaptProxmoxGuests = (
   vmsSheet: ParsedSheet | undefined,
   ctSheet: ParsedSheet | undefined,
   clusterName: string,
-): VInfoRow[] => {
-  const out: VInfoRow[] = []
+): GuestRow[] => {
+  const out: GuestRow[] = []
   if (vmsSheet) {
     const cols = mapColumns(vmsSheet.headers, GUEST_COLS)
     for (const row of vmsSheet.rows) out.push(mapGuestRow(row, cols, clusterName, 'qemu'))
@@ -112,11 +112,11 @@ export const adaptProxmoxGuests = (
   return out.filter((g) => g.vmName !== '')
 }
 
-export const adaptProxmoxStorages = (sheet: ParsedSheet | undefined): VDatastoreRow[] => {
+export const adaptProxmoxStorages = (sheet: ParsedSheet | undefined): StorageRow[] => {
   if (!sheet) return []
   const cols = mapColumns(sheet.headers, STORAGE_COLS)
   return sheet.rows
-    .map((row): VDatastoreRow => {
+    .map((row): StorageRow => {
       const cap = Math.max(0, readNumber(readCol(row, cols.capacityGib)))
       const used = Math.max(0, readNumber(readCol(row, cols.usageGib)))
       return {
@@ -319,9 +319,9 @@ const parseError = (message: string, meta: { sheet?: string; kind: ParseError['k
 export const adaptProxmox = (
   workbook: ParsedWorkbook,
 ): {
-  vinfo: VInfoRow[]
-  vhost: VHostRow[]
-  vdatastore: VDatastoreRow[]
+  guests: GuestRow[]
+  nodes: NodeRow[]
+  storages: StorageRow[]
   vmUsage: VmUsageRow[]
   proxmoxSnapshots: ProxmoxSnapshotRow[]
   proxmoxStorageContent: ProxmoxStorageContentRow[]
@@ -386,9 +386,9 @@ export const adaptProxmox = (
   const clusterHaSheet = findSheet(workbook, ['cluster ha'])
 
   return {
-    vhost: adaptProxmoxNodes(nodesSheet, clusterName),
-    vinfo: adaptProxmoxGuests(vmsSheet, ctSheet, clusterName),
-    vdatastore: adaptProxmoxStorages(storageSheet),
+    nodes: adaptProxmoxNodes(nodesSheet, clusterName),
+    guests: adaptProxmoxGuests(vmsSheet, ctSheet, clusterName),
+    storages: adaptProxmoxStorages(storageSheet),
     vmUsage: adaptProxmoxUsage(vmsSheet, ctSheet, clusterName),
     proxmoxSnapshots: adaptProxmoxSnapshots(snapshotsSheet),
     proxmoxStorageContent: adaptProxmoxStorageContent(storageContentSheet),

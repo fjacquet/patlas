@@ -1,7 +1,7 @@
 import { cores as coresOf, ghz as ghzOf, mib } from '@/engines/units'
 import type { AccountingMode, ClusterAggregate } from '@/types/estate'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import { aggregateHostsPerCluster } from './perCluster'
 import { aggregateVmsPerCluster } from './vinfoMerge'
 
@@ -12,7 +12,7 @@ import { aggregateVmsPerCluster } from './vinfoMerge'
  * with VMs but no hosts cannot be sized).
  *
  * `vcpuPerPcpu` is computed against `usablePhysicalCores` — PHYSICAL cores
- * never threads (Moderate-4; structurally guaranteed — `VHostRow` has no
+ * never threads (Moderate-4; structurally guaranteed — `NodeRow` has no
  * threads field).
  *
  * Output is sorted by `cluster.localeCompare` for stable render order.
@@ -22,14 +22,14 @@ const computeMhzPerVcpu = (consumedGhz: number, vcpuAllocated: number): number =
   vcpuAllocated === 0 ? 0 : (consumedGhz * 1000) / vcpuAllocated
 
 export const aggregateClusters = ({
-  vinfo,
-  vhost,
+  guests: vinfo,
+  nodes: vhost,
   mode,
   datastoreCountByCluster,
   allocRatios,
 }: {
-  vinfo: VInfoRow[]
-  vhost: VHostRow[]
+  guests: GuestRow[]
+  nodes: NodeRow[]
   mode: AccountingMode
   /** vCPU:pCPU and vRAM overcommit ratios from the URL-hash sliders.
    *  Defaults to 4:1 / 1:1 (ALC-02). Changes the headroom verdict ONLY —

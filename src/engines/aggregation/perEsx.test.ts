@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mhz, mib, sockets } from '@/engines/units'
 import { first } from '@/test/arrays'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import { perEsx } from './perEsx'
 
-const host = (over: Partial<VHostRow>): VHostRow => ({
+const host = (over: Partial<NodeRow>): NodeRow => ({
   hostName: 'esx-1',
   cluster: 'C1',
   sockets: sockets(2),
@@ -22,7 +22,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   ...over,
 })
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm-1',
   cluster: 'C1',
   host: 'esx-1',
@@ -46,7 +46,7 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
 })
 
 describe('perEsx', () => {
-  it('attaches VMs via VInfoRow.host === hostName; cores is physical (Moderate-4)', () => {
+  it('attaches VMs via GuestRow.host === hostName; cores is physical (Moderate-4)', () => {
     const d = first(
       perEsx(
         [host({ hostName: 'esx-1', cores: cores(12) })],

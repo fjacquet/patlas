@@ -19,15 +19,15 @@ vi.mock('./parseXlsx', () => ({
 vi.mock('./adapters/proxmox', () => ({
   adaptProxmox: vi.fn(() => ({
     clusterName: 'test-cluster',
-    vinfo: [],
-    vhost: [],
+    guests: [],
+    nodes: [],
     vmUsage: [],
     proxmoxSnapshots: [],
     proxmoxStorageContent: [],
     proxmoxHaResources: [],
     proxmoxHaStatus: [],
     proxmoxBackupJobs: [],
-    vdatastore: [],
+    storages: [],
     warnings: [],
   })),
 }))

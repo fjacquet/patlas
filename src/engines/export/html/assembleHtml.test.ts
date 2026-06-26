@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import type { Snapshot } from '@/types/snapshot'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
 import { buildExportView } from '../buildExportView'
 import { assembleHtml } from './assembleHtml'
 import { assertSizeBudget } from './inlineAssets'
@@ -14,7 +14,7 @@ const TODAY = new Date('2026-01-01T00:00:00Z')
 const MODE: AccountingMode = 'configured'
 const CLUSTERS = 40
 
-const vmRow = (i: number): VInfoRow => ({
+const vmRow = (i: number): GuestRow => ({
   vmName: `vm-${i}`,
   cluster: `C${i % CLUSTERS}`,
   host: `esx-${i % CLUSTERS}`,
@@ -36,7 +36,7 @@ const vmRow = (i: number): VInfoRow => ({
   path: '',
 })
 
-const hostRow = (c: number): VHostRow => ({
+const hostRow = (c: number): NodeRow => ({
   hostName: `esx-${c}`,
   cluster: `C${c}`,
   sockets: sockets(2),
@@ -63,15 +63,15 @@ const estate = (vmCount: number): Snapshot => ({
   source: 'proxmox',
   viSdkUuid: null,
   vMetaData: [],
-  vinfo: Array.from({ length: vmCount }, (_, i) => vmRow(i)),
-  vhost: Array.from({ length: CLUSTERS }, (_, c) => hostRow(c)),
+  guests: Array.from({ length: vmCount }, (_, i) => vmRow(i)),
+  nodes: Array.from({ length: CLUSTERS }, (_, c) => hostRow(c)),
   vmUsage: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
   proxmoxHaResources: [],
   proxmoxHaStatus: [],
   proxmoxBackupJobs: [],
-  vdatastore: [],
+  storages: [],
   vpartition: [],
   vnetwork: [],
   vswitch: [],

@@ -13,8 +13,8 @@ const TEST_TODAY = new Date('2026-01-01T00:00:00Z')
 const buildEstateView = (snap: Snapshot, mode: AccountingMode) =>
   buildEstateViewMerged(mergeSnapshotsToEstate([snap]), [snap], mode, TEST_TODAY)
 
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import { datastoreColumns, datastoreDefaultVisible } from './datastoreColumns'
 import { esxColumns, esxDefaultVisible } from './esxColumns'
 import { vmColumns } from './vmColumns'
@@ -128,7 +128,7 @@ describe('datastoreColumns (INV-04 — EstateView.datastores verbatim, scope-agn
 // sharedDuplicateCount > 1 — proving no re-derivation widened the dedupe
 // (Moderate-11 / 03-RESEARCH Anti-Pattern line 232 / ROADMAP Phase-3 #5).
 
-const host = (over: Partial<VHostRow>): VHostRow => ({
+const host = (over: Partial<NodeRow>): NodeRow => ({
   hostName: 'esx-1',
   cluster: 'C1',
   sockets: sockets(2),
@@ -145,7 +145,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   ...over,
 })
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm',
   cluster: 'C1',
   host: 'esx-1',
@@ -180,18 +180,18 @@ const sharedLunSnapshot = (): Snapshot => ({
   source: 'proxmox',
   viSdkUuid: null,
   vMetaData: [],
-  vhost: [host({}), host({ hostName: 'esx-2', cluster: 'C2' })],
+  nodes: [host({}), host({ hostName: 'esx-2', cluster: 'C2' })],
   vmUsage: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
   proxmoxHaResources: [],
   proxmoxHaStatus: [],
   proxmoxBackupJobs: [],
-  vinfo: [
+  guests: [
     vm({ vmName: 'on-1', cluster: 'C1', host: 'esx-1' }),
     vm({ vmName: 'on-2', cluster: 'C2', host: 'esx-2' }),
   ],
-  vdatastore: [
+  storages: [
     {
       name: 'ds-shared',
       capacityMib: mib(1000),

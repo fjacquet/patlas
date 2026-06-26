@@ -1,12 +1,12 @@
 import { cores as coresOf, ghz as ghzOf, mib } from '@/engines/units'
 import type { ClusterHostStats } from '@/types/estate'
-import type { VHostRow } from '@/types/vhost'
+import type { NodeRow } from '@/types/node'
 import { consumedGhz as consumedGhzOf, physicalGhz as physicalGhzOf } from './ghz'
 
 /**
  * Host-side rollup for one cluster — ported from vsizer `perCluster.ts`
  * with the mechanical brand retrofit. Deviations vs the port:
- * - `h.memoryMb` → `h.memoryMib` (Phase-1 `VHostRow` rename).
+ * - `h.memoryMb` → `h.memoryMib` (Phase-1 `NodeRow` rename).
  * - `physicalGhzOf`/`consumedGhzOf` return `GHz` — unwrapped with
  *   `as number` inside `sum(...)` and re-branded on the way out.
  * - `Math.max/min` on the small per-cluster `cpuRatio`/`ramRatio` arrays
@@ -18,8 +18,8 @@ import { consumedGhz as consumedGhzOf, physicalGhz as physicalGhzOf } from './gh
  * (`aggregateClusters` does the final stable sort).
  */
 
-const groupByCluster = (rows: VHostRow[]): Map<string, VHostRow[]> => {
-  const out = new Map<string, VHostRow[]>()
+const groupByCluster = (rows: NodeRow[]): Map<string, NodeRow[]> => {
+  const out = new Map<string, NodeRow[]>()
   for (const row of rows) {
     if (row.cluster.length === 0) continue
     const list = out.get(row.cluster) ?? []
@@ -37,7 +37,7 @@ const mean = (xs: readonly number[]): number => (xs.length === 0 ? 0 : sum(xs) /
  * physical/consumed GHz and the host-side physical RAM sum. No DR logic
  * here — stretched-cluster reservations are applied one layer up.
  */
-export const aggregateHostsPerCluster = (vhost: VHostRow[]): ClusterHostStats[] => {
+export const aggregateHostsPerCluster = (vhost: NodeRow[]): ClusterHostStats[] => {
   const grouped = groupByCluster(vhost)
   const out: ClusterHostStats[] = []
   for (const [cluster, hosts] of grouped) {

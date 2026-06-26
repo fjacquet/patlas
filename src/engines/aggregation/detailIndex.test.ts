@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mib } from '@/engines/units'
 import type { DatastoreAggregate } from '@/types/estate'
-import type { VDatastoreRow, VNetworkRow, VPartitionRow } from '@/types/snapshot'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
+import type { StorageRow, VNetworkRow, VPartitionRow } from '@/types/snapshot'
 import { buildDatastoreDetail, buildVmDetail } from './detailIndex'
 import type { VsanRelinkResult } from './vsanRelink'
 
@@ -20,7 +20,7 @@ const dsAgg = (over: Partial<DatastoreAggregate>): DatastoreAggregate => ({
   ...over,
 })
 
-const dsRow = (over: Partial<VDatastoreRow>): VDatastoreRow => ({
+const dsRow = (over: Partial<StorageRow>): StorageRow => ({
   name: 'DS_A',
   capacityMib: mib(1000),
   freeMib: mib(100),
@@ -39,7 +39,7 @@ const NO_VSAN: VsanRelinkResult = {
   datastoreVms: new Map(),
 }
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm-1',
   cluster: 'CL_1',
   host: 'esx-1',
@@ -117,7 +117,7 @@ describe('buildVmDetail (LC-4)', () => {
   it('projects partitions with the factual fs flag, portgroups, and the path datastore', () => {
     const out = buildVmDetail(
       {
-        vinfo: [vm({})],
+        guests: [vm({})],
         vpartition: [
           part({ consumedMib: mib(950) }),
           part({ disk: '/var', consumedMib: mib(100) }),
@@ -137,7 +137,7 @@ describe('buildVmDetail (LC-4)', () => {
 
   it('empty partition/portgroup lists when none reference the VM (em-dash upstream)', () => {
     const out = buildVmDetail(
-      { vinfo: [vm({ vmName: 'lonely', path: 'no-bracket' })], vpartition: [], vnetwork: [] },
+      { guests: [vm({ vmName: 'lonely', path: 'no-bracket' })], vpartition: [], vnetwork: [] },
       { fsUsedPct: 90, dsUsedPct: 85, luUsedPct: 85 },
     )
     const d = out.get('lonely')

@@ -4,15 +4,15 @@ import { buildEstateView } from '@/engines/aggregation'
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import type { Snapshot } from '@/types/snapshot'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
 import { buildChartBundle } from './chartBundle'
 
 const TODAY = new Date('2026-01-01T00:00:00Z')
 const MODE: AccountingMode = 'configured'
 
-const host = (over: Partial<VHostRow>): VHostRow => ({
+const host = (over: Partial<NodeRow>): NodeRow => ({
   hostName: 'esx-1',
   cluster: 'C1',
   sockets: sockets(2),
@@ -29,7 +29,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   ...over,
 })
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm-1',
   cluster: 'C1',
   host: 'esx-1',
@@ -63,18 +63,18 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   source: 'proxmox',
   viSdkUuid: null,
   vMetaData: [],
-  vinfo: [
+  guests: [
     vm({ vmName: 'a1', cluster: 'C1', host: 'esx-1', provisionedMib: mib(40_960) }),
     vm({ vmName: 'b1', cluster: 'C2', host: 'esx-2', provisionedMib: mib(81_920) }),
   ],
-  vhost: [host({ hostName: 'esx-1', cluster: 'C1' }), host({ hostName: 'esx-2', cluster: 'C2' })],
+  nodes: [host({ hostName: 'esx-1', cluster: 'C1' }), host({ hostName: 'esx-2', cluster: 'C2' })],
   vmUsage: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
   proxmoxHaResources: [],
   proxmoxHaStatus: [],
   proxmoxBackupJobs: [],
-  vdatastore: [],
+  storages: [],
   vpartition: [],
   vnetwork: [],
   vswitch: [],

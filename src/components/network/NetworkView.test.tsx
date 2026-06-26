@@ -40,9 +40,9 @@ const snapshot = (withNetwork: boolean, networkSvg?: string | null): Snapshot =>
     viSdkUuid: null,
     networkSvg: networkSvg ?? null,
     vMetaData: [],
-    vinfo: [baseVm],
-    vhost: [],
-    vdatastore: [],
+    guests: [baseVm],
+    nodes: [],
+    storages: [],
     vpartition: [],
     vnetwork: withNetwork
       ? [

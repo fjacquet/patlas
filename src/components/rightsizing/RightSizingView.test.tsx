@@ -22,7 +22,7 @@ const snap = (): Snapshot =>
     source: 'proxmox',
     viSdkUuid: null,
     vMetaData: [],
-    vinfo: [
+    guests: [
       {
         vmName: 'web01',
         cluster: 'C1',
@@ -45,7 +45,7 @@ const snap = (): Snapshot =>
         path: '',
       },
     ],
-    vhost: [
+    nodes: [
       {
         hostName: 'h1',
         cluster: 'C1',
@@ -80,7 +80,7 @@ const snap = (): Snapshot =>
     proxmoxHaResources: [],
     proxmoxHaStatus: [],
     proxmoxBackupJobs: [],
-    vdatastore: [],
+    storages: [],
     vpartition: [],
     vnetwork: [],
     vswitch: [],

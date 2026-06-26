@@ -25,7 +25,7 @@ it('returns empty string when absent', () => {
   expect(extractClusterName(sheet(['Id'], [{}]))).toBe('')
 })
 
-it('maps a Node row to VHostRow with GiB→MiB memory', () => {
+it('maps a Node row to NodeRow with GiB→MiB memory', () => {
   const s: ParsedSheet = {
     name: 'Nodes',
     headers: [
@@ -226,9 +226,9 @@ it('assembles a bundle from a workbook (Nodes + VMs required)', () => {
   })
   const b = adaptProxmox(wb)
   expect(b.clusterName).toBe('pve-prod')
-  expect(b.vhost).toHaveLength(1)
-  expect(b.vinfo).toHaveLength(1)
-  expect(b.vinfo[0]?.cluster).toBe('pve-prod')
+  expect(b.nodes).toHaveLength(1)
+  expect(b.guests).toHaveLength(1)
+  expect(b.guests[0]?.cluster).toBe('pve-prod')
 })
 
 it('throws a ParseError when the Nodes sheet is missing', () => {
@@ -274,6 +274,6 @@ it('falls back to "proxmox" cluster name when no Cluster sheet is present', () =
   })
   const b = adaptProxmox(wb)
   expect(b.clusterName).toBe('proxmox')
-  expect(b.vhost[0]?.cluster).toBe('proxmox')
-  expect(b.vinfo[0]?.cluster).toBe('proxmox')
+  expect(b.nodes[0]?.cluster).toBe('proxmox')
+  expect(b.guests[0]?.cluster).toBe('proxmox')
 })

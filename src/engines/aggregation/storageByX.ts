@@ -1,8 +1,8 @@
 import type { MiB } from '@/engines/units'
 import { mib } from '@/engines/units'
 import type { AccountingMode, DatastoreAggregate } from '@/types/estate'
-import type { VDatastoreRow } from '@/types/snapshot'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
+import type { StorageRow } from '@/types/snapshot'
 import { perDatastore } from './perDatastore'
 import type { VsanRelinkResult } from './vsanRelink'
 
@@ -63,7 +63,7 @@ export interface StorageByX {
   }
 }
 
-const sumGroup = (rows: VInfoRow[], keyOf: (vm: VInfoRow) => string): StorageConsumptionGroup[] => {
+const sumGroup = (rows: GuestRow[], keyOf: (vm: GuestRow) => string): StorageConsumptionGroup[] => {
   const prov = new Map<string, number>()
   const used = new Map<string, number>()
   for (const vm of rows) {
@@ -79,12 +79,12 @@ const sumGroup = (rows: VInfoRow[], keyOf: (vm: VInfoRow) => string): StorageCon
 }
 
 export const storageByX = (
-  merged: { vinfo: VInfoRow[]; vdatastore: VDatastoreRow[] },
+  merged: { guests: GuestRow[]; storages: StorageRow[] },
   mode: AccountingMode,
   vsan: VsanRelinkResult,
 ): StorageByX => {
   // Mode-aware VM cohort (mirrors perEsx / vinfoMerge).
-  const cohort = mode === 'configured' ? merged.vinfo : merged.vinfo.filter((vm) => vm.poweredOn)
+  const cohort = mode === 'configured' ? merged.guests : merged.guests.filter((vm) => vm.poweredOn)
 
   const byCluster = sumGroup(cohort, (vm) => vm.cluster)
   const byEsx = sumGroup(cohort, (vm) => vm.host)
@@ -92,7 +92,7 @@ export const storageByX = (
 
   // Datastore lenses — NAA-deduped (perDatastore collapses shared LUNs to
   // one key with first-row capacity, so no double-count by construction).
-  const dsAgg: DatastoreAggregate[] = perDatastore(merged.vdatastore)
+  const dsAgg: DatastoreAggregate[] = perDatastore(merged.storages)
 
   const byDatastore: StorageConsumptionGroup[] = dsAgg.map((d) => ({
     key: d.key,
@@ -114,7 +114,7 @@ export const storageByX = (
   // per dedupe key is enough — the aggregate already deduped.
   const clusterByKey = new Map<string, string>()
   const excluded = new Set<string>()
-  for (const row of merged.vdatastore) {
+  for (const row of merged.storages) {
     const key = row.naa ?? row.name
     if (clusterByKey.has(key) || excluded.has(key)) continue
     if (row.clusterName.trim() !== '') {

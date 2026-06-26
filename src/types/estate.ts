@@ -24,7 +24,7 @@ import type { Cores, GHz, GiB, MHz, MiB, Sockets } from '@/engines/units'
  *   `physicalRamMib: MiB` / `vramAllocatedMib: MiB` (RVTools "MB" IS MiB —
  *   reinterpreted, never converted).
  * - vsizer's active-memory sum chain is DROPPED entirely: vatlas'
- *   Phase-1 `VInfoRow` does not parse active memory, so the field would
+ *   Phase-1 `GuestRow` does not parse active memory, so the field would
  *   be permanently `null` — dead code, removed at the type level.
  * - New for vatlas: `AccountingMode`, `OsFamily`, `DatastoreAggregate`
  *   (Moderate-11 NAA dedupe), `EsxAggregate` (per-host rollup), and the
@@ -247,7 +247,7 @@ export interface DatastoreAggregate {
 
 /**
  * Per-ESX-host rollup (DSH-01 + Phase-3 inventory tree consumer). `cores`
- * is PHYSICAL cores — `VHostRow` structurally has no threads field so the
+ * is PHYSICAL cores — `NodeRow` structurally has no threads field so the
  * Moderate-4 bug is type-prevented. `vmCount`/`vcpuAllocated` honor the
  * accounting `mode`; CPU Ready reuses the SHARED `readinessStats`.
  */
@@ -283,7 +283,7 @@ export interface EsxAggregate {
 
 /**
  * Flat per-VM row for the Phase-3 inventory table (INV-05). This is a PURE
- * PROJECTION of `Snapshot.vinfo`, NOT an aggregation — a 1:1 filter/map of
+ * PROJECTION of `Snapshot.guests`, NOT an aggregation — a 1:1 filter/map of
  * the source rows (same operation-class as the `classifyOsFamily` call in
  * the existing `buildEstateView` vinfo loop), never a group/sum. It rides
  * inside that one existing pass so the project keeps exactly one `useMemo`
@@ -434,7 +434,7 @@ export interface EstateView {
   hosts: EsxAggregate[]
   datastores: DatastoreAggregate[]
   /** Flat per-VM rows for the inventory table (INV-05). Pure projection
-   *  of `Snapshot.vinfo`, produced in the single `buildEstateView` pass. */
+   *  of `Snapshot.guests`, produced in the single `buildEstateView` pass. */
   vmRows: VmDisplayRow[]
   /** Per-cluster OS breakdown, keyed by cluster name. */
   vmsByCluster: Map<string, OsBreakdown>

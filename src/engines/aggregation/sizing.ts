@@ -1,6 +1,6 @@
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import type { Snapshot } from '@/types/snapshot'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
 import { CONTENTION_THRESHOLDS } from './contention'
 
 /**
@@ -116,7 +116,7 @@ export const maxVmUsageAcrossSnapshots = (snapshots: Snapshot[]): Map<string, Ma
   const out = new Map<string, MaxUsage>()
   for (const snap of snapshots) {
     const poweredOn = new Set<string>()
-    for (const v of snap.vinfo ?? []) if (v.poweredOn) poweredOn.add(identity(v))
+    for (const v of snap.guests ?? []) if (v.poweredOn) poweredOn.add(identity(v))
     for (const u of snap.vmUsage ?? []) {
       const id = identity(u)
       if (!poweredOn.has(id)) continue
@@ -150,8 +150,8 @@ export const memPct = (mibUsed: number | null, vramMib: number): number | null =
   mibUsed === null || vramMib <= 0 ? null : (mibUsed / vramMib) * 100
 
 export const computeSizing = (
-  vinfo: VInfoRow[],
-  vhost: VHostRow[],
+  vinfo: GuestRow[],
+  vhost: NodeRow[],
   maxUsage: Map<string, MaxUsage>,
   thresholds: SizingThresholds,
   snapshotCount: number,

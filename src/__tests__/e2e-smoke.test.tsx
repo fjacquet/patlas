@@ -24,7 +24,7 @@ vi.mock('@/engines/parser', () => ({
       viSdkUuid: null,
       vMetaData: [],
       source: 'proxmox' as const,
-      vinfo: [
+      guests: [
         {
           vmName: 'test-vm-1',
           cluster: 'proxmox',
@@ -68,7 +68,7 @@ vi.mock('@/engines/parser', () => ({
           guestType: 'lxc',
         },
       ],
-      vhost: [
+      nodes: [
         {
           hostName: 'pve-node-1',
           cluster: 'proxmox',
@@ -91,7 +91,7 @@ vi.mock('@/engines/parser', () => ({
       proxmoxHaResources: [],
       proxmoxHaStatus: [],
       proxmoxBackupJobs: [],
-      vdatastore: [],
+      storages: [],
       vpartition: [],
       vnetwork: [],
       vswitch: [],
@@ -164,15 +164,15 @@ describe('Proxmox end-to-end smoke: drop → parse → render', () => {
       source: 'proxmox',
       viSdkUuid: null,
       vMetaData: [],
-      vinfo: [],
-      vhost: [],
+      guests: [],
+      nodes: [],
       vmUsage: [],
       proxmoxSnapshots: [],
       proxmoxStorageContent: [],
       proxmoxHaResources: [],
       proxmoxHaStatus: [],
       proxmoxBackupJobs: [],
-      vdatastore: [],
+      storages: [],
       vpartition: [],
       vnetwork: [],
       vswitch: [],

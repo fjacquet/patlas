@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mib } from '@/engines/units'
-import type { Snapshot, VInfoRow } from '@/types'
+import type { GuestRow, Snapshot } from '@/types'
 import { buildVCenterIndex } from './vCenterIndex'
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm',
   cluster: 'C1',
   host: 'esx-1',
@@ -37,15 +37,15 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   source: 'proxmox',
   viSdkUuid: 'vc-a',
   vMetaData: [],
-  vinfo: [],
-  vhost: [],
+  guests: [],
+  nodes: [],
   vmUsage: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
   proxmoxHaResources: [],
   proxmoxHaStatus: [],
   proxmoxBackupJobs: [],
-  vdatastore: [],
+  storages: [],
   vpartition: [],
   vnetwork: [],
   vswitch: [],
@@ -64,7 +64,7 @@ describe('buildVCenterIndex', () => {
         { server: 'vc13.local', rvtoolsVersion: '4.7.1.4', exportedTimestamp: null },
         { server: 'vc14.local', rvtoolsVersion: '4.7.1.4', exportedTimestamp: null },
       ],
-      vinfo: [
+      guests: [
         vm({ vmName: 'a', viSdkUuid: 'vc11', viSdkServer: 'vc11.local', cluster: 'CL_11' }),
         vm({ vmName: 'b', viSdkUuid: 'vc13', viSdkServer: 'vc13.local', cluster: 'CL_13' }),
         vm({ vmName: 'c', viSdkUuid: 'vc14', viSdkServer: 'vc14.local', cluster: 'CL_14' }),
@@ -84,7 +84,7 @@ describe('buildVCenterIndex', () => {
       vMetaData: [
         { server: 'meta-vc.example', rvtoolsVersion: '4.7.1.4', exportedTimestamp: null },
       ],
-      vinfo: [vm({ viSdkUuid: 'vc-x', viSdkServer: 'row-server.local' })],
+      guests: [vm({ viSdkUuid: 'vc-x', viSdkServer: 'row-server.local' })],
     })
     const idx = buildVCenterIndex([s])
     expect(idx.get('vc-x')?.label).toBe('meta-vc.example')
@@ -95,7 +95,7 @@ describe('buildVCenterIndex', () => {
       viSdkUuid: 'vc-y',
       vMetaData: [],
       vCenterLabel: 'snap-fallback',
-      vinfo: [
+      guests: [
         vm({ vmName: 'a', viSdkUuid: 'vc-y', viSdkServer: 'row.server' }),
         vm({ vmName: 'b', viSdkUuid: 'vc-z', viSdkServer: '' }),
       ],
@@ -106,8 +106,8 @@ describe('buildVCenterIndex', () => {
   })
 
   it('vCenter count across N separately-dropped snapshots = distinct viSdkUuid', () => {
-    const s1 = snap({ id: 's1', viSdkUuid: 'vc-1', vinfo: [vm({ viSdkUuid: 'vc-1' })] })
-    const s2 = snap({ id: 's2', viSdkUuid: 'vc-2', vinfo: [vm({ viSdkUuid: 'vc-2' })] })
+    const s1 = snap({ id: 's1', viSdkUuid: 'vc-1', guests: [vm({ viSdkUuid: 'vc-1' })] })
+    const s2 = snap({ id: 's2', viSdkUuid: 'vc-2', guests: [vm({ viSdkUuid: 'vc-2' })] })
     const idx = buildVCenterIndex([s1, s2])
     expect(idx.size).toBe(2)
   })
