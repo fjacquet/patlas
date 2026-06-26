@@ -3,7 +3,7 @@
   "private": true,
   "version": "2.2.2",
   "type": "module",
-  "description": "Drop your RVTools export, get a navigable visual atlas of your VMware estate. 100% client-side.",
+  "description": "Drop a Proxmox cv4pve-report export, get a navigable visual atlas of your Proxmox estate. 100% client-side.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

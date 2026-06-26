@@ -11,7 +11,7 @@
     "error": "L'export ne s'est pas terminé. Les données sont inchangées — ouvrez la console du navigateur pour le détail, puis réessayez."
   },
   "footer": {
-    "methodology": "Généré par vatlas — synthèse factuelle du parc. Source : export Proxmox, capturé le {{captureDate}}. Les chiffres reflètent l'instantané actif uniquement."
+    "methodology": "Généré par patlas — synthèse factuelle du parc. Source : export Proxmox, capturé le {{captureDate}}. Les chiffres reflètent l'instantané actif uniquement."
   },
   "storage": {
     "title": "Stockage",

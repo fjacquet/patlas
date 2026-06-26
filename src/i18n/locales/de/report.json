@@ -11,7 +11,7 @@
     "error": "Der Export wurde nicht abgeschlossen. Die Daten sind unverändert — öffnen Sie die Browser-Konsole für Details und versuchen Sie es erneut."
   },
   "footer": {
-    "methodology": "Erstellt von vatlas — faktische Bestandssynthese. Quelle: Proxmox-Export, erfasst am {{captureDate}}. Die Zahlen beziehen sich nur auf den aktiven Snapshot."
+    "methodology": "Erstellt von patlas — faktische Bestandssynthese. Quelle: Proxmox-Export, erfasst am {{captureDate}}. Die Zahlen beziehen sich nur auf den aktiven Snapshot."
   },
   "storage": {
     "title": "Speicher",

@@ -11,7 +11,7 @@
     "error": "L'esportazione non è stata completata. I dati sono invariati — apri la console del browser per i dettagli, poi riprova."
   },
   "footer": {
-    "methodology": "Generato da vatlas — sintesi fattuale del parco. Fonte: export Proxmox, acquisito il {{captureDate}}. I numeri riflettono solo lo snapshot attivo."
+    "methodology": "Generato da patlas — sintesi fattuale del parco. Fonte: export Proxmox, acquisito il {{captureDate}}. I numeri riflettono solo lo snapshot attivo."
   },
   "storage": {
     "title": "Archiviazione",

@@ -3,9 +3,9 @@
 
 **patlas**
 
-vatlas is a 100 % client-side web app that turns one or more RVTools `.xlsx` exports into a navigable, visual atlas of a VMware estate — global dashboard, inventory tree views, allocation/DR analysis, OS End-of-Support forecasting, in-session trends across multiple snapshots — and exports the whole thing as a shareable HTML report and a PPTX deck. It is the broader sibling of vsizer: same architectural mold (drop file in browser → see numbers → export → leave), much larger feature surface.
+patlas is a 100 % client-side web app that turns one or more Proxmox VE cluster reports (from `cv4pve-report`) into a navigable, visual atlas of a Proxmox estate — global dashboard, inventory tree views, allocation analysis, OS End-of-Support forecasting, in-session trends across multiple snapshots — and exports the whole thing as a shareable HTML report and a PPTX deck. It is a Proxmox-focused fork of the vatlas/vsizer line: same architectural mold (drop file in browser → see numbers → export → leave).
 
-**Core Value:** A user drops a RVTools workbook and walks away with a polished, shareable HTML report and PPTX deck describing their VMware estate — without uploading a single byte. **The report is the product.**
+**Core Value:** A user drops a Proxmox `cv4pve-report` export (`.zip` bundle = `report.xlsx` + optional `network-diagram.svg`, or a bare `.xlsx`) and walks away with a polished, shareable HTML report and PPTX deck describing their Proxmox estate — without uploading a single byte. **The report is the product.**
 
 ### Constraints
 
@@ -13,7 +13,7 @@ vatlas is a 100 % client-side web app that turns one or more RVTools `.xlsx` exp
 - **Engineering principles (binding):** **KISS**, **DRY**, **functional programming**. No premature abstractions, no class hierarchies for domain logic, no copy-paste between phases. Engines are pure functions; the Zustand store holds inputs only; `useEstateView` is the one place `useMemo` lives. If two phases would compute the same thing, the second imports from the first.
 - **Privacy invariant:** no fetch ships workbook bytes; no telemetry of parsed contents; no `localStorage` of dataset rows. Refresh = data gone.
 - **Deploy target:** GitHub Pages static site at `fjacquet.github.io/patlas/` (same CI shape as vsizer: typecheck → lint → test → build → deploy).
-- **Input format:** RVTools `.xlsx` only (no Live Optics, no `.zip` bundles in v1).
+- **Input format:** Proxmox `cv4pve-report` export — a `.zip` bundle (`report.xlsx` + optional `network-diagram.svg`) or a bare `.xlsx`.
 - **Charting:** Apache ECharts with `{ renderer: 'svg' }` mandated project-wide (locked in during research — SVG everywhere for crisp pictures and trivial HTML-report inlining). Canvas permitted only as a per-chart escape hatch for in-app >10k-point overviews that don't appear in the HTML report.
 <!-- GSD:project-end -->
 

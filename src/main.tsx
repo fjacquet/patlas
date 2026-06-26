@@ -19,7 +19,7 @@ import './index.css'
 import { registerPwa } from './pwa/registerSW'
 
 const rootEl = document.getElementById('root')
-if (!rootEl) throw new Error('vatlas: missing #root element in index.html')
+if (!rootEl) throw new Error('patlas: missing #root element in index.html')
 
 createRoot(rootEl).render(
   <StrictMode>
