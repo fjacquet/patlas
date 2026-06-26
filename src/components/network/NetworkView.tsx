@@ -71,7 +71,12 @@ export function NetworkView() {
               <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-200">
                 {t('section.diagram')}
               </h2>
-              <img src={svgToDataUri(svg)} alt={t('img.alt')} className="max-w-full" />
+              <div
+                className="overflow-auto rounded border border-slate-200 dark:border-slate-700"
+                style={{ maxHeight: '70vh' }}
+              >
+                <img src={svgToDataUri(svg)} alt={t('img.alt')} className="max-w-full" />
+              </div>
             </section>
           )}
           <section className="flex flex-col gap-2">
