@@ -3,10 +3,13 @@ import type {
   NodeInterfaceRow,
   NodeRow,
   ProxmoxBackupJobRow,
+  ProxmoxDiskRow,
   ProxmoxHaResourceRow,
   ProxmoxHaStatusRow,
+  ProxmoxPartitionRow,
   ProxmoxSnapshotRow,
   ProxmoxStorageContentRow,
+  ProxmoxTaskRow,
   Snapshot,
   StorageRow,
   VmNicRow,
@@ -51,6 +54,15 @@ export interface MergedEstate {
   /** Concatenated Proxmox backup job rows across selected snapshots.
    *  Empty when the Cluster Backup Jobs sub-table was absent — factual-degrade, never undefined. */
   proxmoxBackupJobs: ProxmoxBackupJobRow[]
+  /** Concatenated Proxmox partition rows across selected snapshots.
+   *  Empty when the Partitions sheet was absent — factual-degrade, never undefined. */
+  proxmoxPartitions: ProxmoxPartitionRow[]
+  /** Concatenated Proxmox disk rows across selected snapshots.
+   *  Empty when the Disks sheet was absent — factual-degrade, never undefined. */
+  proxmoxDisks: ProxmoxDiskRow[]
+  /** Concatenated Proxmox task rows across selected snapshots.
+   *  Empty when the Cluster Tasks sheet was absent — factual-degrade, never undefined. */
+  proxmoxTasks: ProxmoxTaskRow[]
   vcenters: VCenterEntry[]
 }
 
@@ -66,6 +78,9 @@ const EMPTY_MERGED: MergedEstate = {
   proxmoxHaResources: [],
   proxmoxHaStatus: [],
   proxmoxBackupJobs: [],
+  proxmoxPartitions: [],
+  proxmoxDisks: [],
+  proxmoxTasks: [],
   vcenters: [],
 }
 
@@ -171,6 +186,9 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
   const outProxmoxHaResources: ProxmoxHaResourceRow[] = []
   const outProxmoxHaStatus: ProxmoxHaStatusRow[] = []
   const outProxmoxBackupJobs: ProxmoxBackupJobRow[] = []
+  const outProxmoxPartitions: ProxmoxPartitionRow[] = []
+  const outProxmoxDisks: ProxmoxDiskRow[] = []
+  const outProxmoxTasks: ProxmoxTaskRow[] = []
   for (const snap of selected) {
     for (const d of snap.storages) outVdatastore.push(d)
     for (const p of snap.vpartition) outVpartition.push(p)
@@ -183,6 +201,9 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
     for (const hr of snap.proxmoxHaResources ?? []) outProxmoxHaResources.push(hr)
     for (const hs of snap.proxmoxHaStatus ?? []) outProxmoxHaStatus.push(hs)
     for (const bj of snap.proxmoxBackupJobs ?? []) outProxmoxBackupJobs.push(bj)
+    for (const pp of snap.proxmoxPartitions ?? []) outProxmoxPartitions.push(pp)
+    for (const pd of snap.proxmoxDisks ?? []) outProxmoxDisks.push(pd)
+    for (const pt of snap.proxmoxTasks ?? []) outProxmoxTasks.push(pt)
   }
 
   return {
@@ -197,6 +218,9 @@ export const mergeSnapshotsToEstate = (selected: Snapshot[]): MergedEstate => {
     proxmoxHaResources: outProxmoxHaResources,
     proxmoxHaStatus: outProxmoxHaStatus,
     proxmoxBackupJobs: outProxmoxBackupJobs,
+    proxmoxPartitions: outProxmoxPartitions,
+    proxmoxDisks: outProxmoxDisks,
+    proxmoxTasks: outProxmoxTasks,
     vcenters: [...vcenterIndex.values()],
   }
 }

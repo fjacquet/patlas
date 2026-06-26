@@ -2,7 +2,10 @@
 // aggregation engines — no runtime coupling, no cycle (the engines import
 // their input types from here; these are produced in the single
 // `buildEstateView` pass and surfaced on `EstateView`).
+import type { BackupCoverage } from '@/engines/aggregation/backupCoverage'
 import type { ClusterHealth } from '@/engines/aggregation/clusterHealth'
+import type { DiskHygiene } from '@/engines/aggregation/diskHygiene'
+import type { FsFillRisk } from '@/engines/aggregation/fsFillRisk'
 import type { MonsterEstate } from '@/engines/aggregation/monsterVm'
 import type { NetworkRollup } from '@/engines/aggregation/network'
 import type { EstateSizing } from '@/engines/aggregation/sizing'
@@ -524,6 +527,19 @@ export interface EstateView {
    * P9 LC-4 per-VM drill projection, keyed by VM name. Same single-pass
    * origin; empty `Map` in `EMPTY_VIEW`. */
   vmDetail: Map<string, VmDetailEntry>
+  /**
+   * Pack B — in-guest filesystem fill risk (Partitions sheet). Neutral
+   * measurement; same single-pass origin; `EMPTY_FS_FILL` in `EMPTY_VIEW`. */
+  fsFillRisk: FsFillRisk
+  /**
+   * Pack B — disk hygiene (Disks sheet). Neutral measurement; same
+   * single-pass origin; `EMPTY_DISK_HYGIENE` in `EMPTY_VIEW`. */
+  diskHygiene: DiskHygiene
+  /**
+   * Pack B — backup coverage + operational health (Cluster Tasks sheet).
+   * Neutral measurement; same single-pass origin; `EMPTY_BACKUP_COVERAGE`
+   * in `EMPTY_VIEW`. */
+  backupCoverage: BackupCoverage
 }
 
 /**

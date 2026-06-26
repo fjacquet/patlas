@@ -347,6 +347,65 @@ function Report({
         </Section>
       ) : null}
 
+      {view.fsFillRisk.overThresholdCount > 0 ||
+      view.diskHygiene.unusedCount > 0 ||
+      view.backupCoverage.vzdump.totalCount > 0 ? (
+        <Section id="protection" title={strings['protection.heading'] ?? 'Protection & Risk'}>
+          <Metric
+            label={strings['protection.fsFill.kpi.overThreshold'] ?? 'Mounts over threshold'}
+            value={fmtInt(view.fsFillRisk.overThresholdCount, loc)}
+            flag={view.fsFillRisk.overThresholdCount > 0}
+          />
+          <Metric
+            label={strings['protection.diskHygiene.kpi.unusedCount'] ?? 'Orphaned disks'}
+            value={fmtInt(view.diskHygiene.unusedCount, loc)}
+            flag={view.diskHygiene.unusedCount > 0}
+          />
+          <Metric
+            label={strings['protection.diskHygiene.kpi.reclaimableGb'] ?? 'Reclaimable (GB)'}
+            value={fmtInt(Math.round(view.diskHygiene.reclaimableGb), loc)}
+          />
+          <Metric
+            label={strings['protection.diskHygiene.kpi.strayIsoCount'] ?? 'Stray ISOs'}
+            value={fmtInt(view.diskHygiene.strayIsoCount, loc)}
+            flag={view.diskHygiene.strayIsoCount > 0}
+          />
+          <Metric
+            label={strings['protection.backupCoverage.kpi.uncoveredCount'] ?? 'VMs without backup'}
+            value={fmtInt(view.backupCoverage.vzdump.uncoveredCount, loc)}
+            flag={view.backupCoverage.vzdump.uncoveredCount > 0}
+          />
+          <Metric
+            label={strings['protection.backupCoverage.kpi.total'] ?? 'vzdump tasks'}
+            value={fmtInt(view.backupCoverage.vzdump.totalCount, loc)}
+          />
+          {view.fsFillRisk.overThreshold.length > 0 ? (
+            <table className="annex-table">
+              <thead>
+                <tr>
+                  <th>{strings['protection.fsFill.col.node'] ?? 'Node'}</th>
+                  <th>{strings['protection.fsFill.col.vmName'] ?? 'VM'}</th>
+                  <th>{strings['protection.fsFill.col.mountPoint'] ?? 'Mount point'}</th>
+                  <th>{strings['protection.fsFill.col.usedPct'] ?? 'Used %'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {view.fsFillRisk.overThreshold.slice(0, 20).map((r) => (
+                  <tr key={`fs-${slug(r.node)}-${slug(r.vmId)}-${slug(r.mountPoint)}`}>
+                    <td>{r.node}</td>
+                    <td>{r.vmName || r.vmId}</td>
+                    <td>{r.mountPoint}</td>
+                    <td className="num">
+                      {r.usedPct !== null ? `${fmtInt(Math.round(r.usedPct), loc)} %` : NA}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : null}
+        </Section>
+      ) : null}
+
       <Section id="annex" title={strings['annex.title'] ?? 'Annex'}>
         <table className="annex-table">
           <thead>

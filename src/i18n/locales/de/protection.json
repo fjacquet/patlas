@@ -1,0 +1,104 @@
+{
+  "heading": "Schutz & Risiken",
+  "subtitle": "Dateisystemfüllung, Datenträgerhygiene und Sicherungsabdeckung",
+  "empty": {
+    "heading": "Kein Bericht geladen",
+    "body": "Laden Sie einen Bericht, um Schutz- und Risikodaten zu sehen."
+  },
+  "na": "—",
+  "fsFill": {
+    "heading": "Dateisystemfüllung",
+    "subtitle": "Einhängepunkte am oder über dem Schwellenwert",
+    "kpi": {
+      "overThreshold": "Einhängepunkte über Schwellenwert",
+      "totalMounts": "Einhängepunkte gesamt",
+      "totalVms": "VMs mit Partitionen",
+      "threshold": "Schwellenwert"
+    },
+    "col": {
+      "node": "Knoten",
+      "vmName": "VM",
+      "vmId": "VM-ID",
+      "mountPoint": "Einhängepunkt",
+      "fsType": "FS-Typ",
+      "totalGb": "Gesamt (GB)",
+      "usedGb": "Belegt (GB)",
+      "usedPct": "Belegt %"
+    },
+    "none": "Keine Einhängepunkte am oder über dem Schwellenwert."
+  },
+  "diskHygiene": {
+    "heading": "Datenträgerhygiene",
+    "subtitle": "Verwaiste Datenträger, nicht ausgeworfene ISOs, Sicherungsausschlüsse, Cache-Modi",
+    "kpi": {
+      "unusedCount": "Verwaiste Datenträger",
+      "reclaimableGb": "Rückgewinnbar (GB)",
+      "strayIsoCount": "Nicht ausgeworfene ISOs",
+      "noBackupCount": "Datenträger ohne Sicherung",
+      "riskyCacheCount": "Nicht standardmäßige Cache-Modi"
+    },
+    "unused": {
+      "heading": "Verwaiste Datenträger",
+      "none": "Keine verwaisten Datenträger."
+    },
+    "strayIso": {
+      "heading": "Nicht ausgeworfene ISOs",
+      "none": "Keine nicht ausgeworfenen ISOs eingehängt."
+    },
+    "noBackup": {
+      "heading": "Datenträger ohne Sicherung",
+      "none": "Alle Datenträger sind durch Sicherung abgedeckt."
+    },
+    "riskyCache": {
+      "heading": "Datenträger mit nicht standardmäßigem Cache",
+      "none": "Keine nicht standardmäßigen Cache-Modi."
+    },
+    "col": {
+      "node": "Knoten",
+      "vmName": "VM",
+      "vmId": "VM-ID",
+      "id": "Datenträger-ID",
+      "storage": "Speicher",
+      "fileName": "Datei",
+      "sizeGb": "Größe (GB)",
+      "cache": "Cache"
+    }
+  },
+  "backupCoverage": {
+    "heading": "Sicherungsabdeckung",
+    "subtitle": "vzdump-Aufgaben und Betriebszustand",
+    "kpi": {
+      "total": "vzdump-Aufgaben",
+      "success": "Erfolgreich",
+      "failed": "Fehlgeschlagen",
+      "coveredVmids": "VMs mit Sicherung",
+      "uncoveredCount": "VMs ohne Sicherung"
+    },
+    "uncovered": {
+      "heading": "VMs ohne erfolgreiche Sicherung",
+      "none": "Alle VMs haben mindestens eine erfolgreiche Sicherung."
+    },
+    "tasks": {
+      "heading": "vzdump-Aufgabenliste"
+    },
+    "operationalHealth": {
+      "heading": "Betriebszustand",
+      "kpi": {
+        "totalTasks": "Aufgaben gesamt",
+        "totalOk": "Erfolgreich",
+        "totalFailed": "Fehlgeschlagen"
+      }
+    },
+    "col": {
+      "vmName": "VM",
+      "vmId": "VM-ID",
+      "lastBackupAge": "Letzte Sicherung (Tage)",
+      "node": "Knoten",
+      "type": "Typ",
+      "total": "Gesamt",
+      "ok": "OK",
+      "failed": "Fehlgeschlagen",
+      "status": "Status"
+    }
+  }
+}

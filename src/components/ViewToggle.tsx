@@ -14,6 +14,7 @@ export type AppView =
   | 'snapshots'
   | 'storagecontent'
   | 'clusterhealth'
+  | 'protection'
 
 const VIEWS = [
   'dashboard',
@@ -29,6 +30,7 @@ const VIEWS = [
   'snapshots',
   'storagecontent',
   'clusterhealth',
+  'protection',
 ] as const
 
 export interface ViewToggleProps {

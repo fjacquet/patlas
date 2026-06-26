@@ -162,3 +162,55 @@ export const NETWORK_VMS_COLS = {
   tag: ['tag'],
   model: ['model'],
 } as const
+
+/** Column map for the "Partitions" sheet. "Used %" is a 0–1 fraction. */
+export const PARTITION_COLS = {
+  node: ['node'],
+  vmId: ['vm id'],
+  vmName: ['vm name'],
+  vmType: ['vm type'],
+  vmStatus: ['vm status'],
+  mountPoint: ['mount point'],
+  fsType: ['type'],
+  totalGb: ['total gb'],
+  usedGb: ['used gb'],
+  usedPct: ['used %'],
+  error: ['error'],
+  name: ['name'],
+  disks: ['disks'],
+} as const
+
+/** Column map for the "Disks" sheet. "Storage Usage %" is a 0–1 fraction. */
+export const DISK_COLS = {
+  node: ['node'],
+  vmId: ['vm id'],
+  vmName: ['vm name'],
+  vmType: ['vm type'],
+  vmStatus: ['vm status'],
+  kind: ['kind'],
+  id: ['id'],
+  storage: ['storage'],
+  storageType: ['storage type'],
+  storageShared: ['storage shared'],
+  fileName: ['file name'],
+  sizeGb: ['size gb'],
+  storageUsagePct: ['storage usage %'],
+  cache: ['cache'],
+  backup: ['backup'],
+  isUnused: ['is unused'],
+  device: ['device'],
+  mountPoint: ['mount point'],
+} as const
+
+/** Column map for the "Cluster Tasks" sheet. */
+export const TASK_COLS = {
+  node: ['node'],
+  taskId: ['unique task id'],
+  type: ['type'],
+  user: ['user'],
+  status: ['status'],
+  statusOk: ['status ok'],
+  startTime: ['start time'],
+  endTime: ['end time'],
+  duration: ['duration'],
+} as const

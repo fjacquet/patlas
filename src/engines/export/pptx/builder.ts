@@ -17,10 +17,13 @@ import type { EstateView, TrendSeries } from '@/types/estate'
 import type { PngBundle } from '../chartBundle'
 import type { ExportStrings } from '../types'
 import type { ExportLocale } from './format'
+import { addBackupCoverageSlide } from './slides/backupCoverageSlide'
 import { addClusterHealthSlide } from './slides/clusterHealthSlide'
 import { addClusterSlide } from './slides/clusterSlide'
 import { addContentionAnnex, type ContentionRow } from './slides/contentionAnnex'
+import { addDiskHygieneSlide } from './slides/diskHygieneSlide'
 import { addEosSlide } from './slides/eosSlide'
+import { addFsFillSlide } from './slides/fsFillSlide'
 import { addInventorySlide } from './slides/inventorySlide'
 import { addMonsterSlide } from './slides/monsterSlide'
 import { addNetworkSlide } from './slides/networkSlide'
@@ -145,6 +148,22 @@ export async function buildPptx(
     view.clusterHealth.backups.jobCount > 0
   ) {
     addClusterHealthSlide(pptx, view.clusterHealth, strings, locale)
+  }
+
+  // Pack B — protection & risk (conditional: only when data is present)
+  if (view.fsFillRisk.overThresholdCount > 0 || view.fsFillRisk.totalMounts > 0) {
+    addFsFillSlide(pptx, view.fsFillRisk, strings, locale)
+  }
+  if (
+    view.diskHygiene.unusedCount > 0 ||
+    view.diskHygiene.strayIsoCount > 0 ||
+    view.diskHygiene.noBackupCount > 0 ||
+    view.diskHygiene.riskyCacheCount > 0
+  ) {
+    addDiskHygieneSlide(pptx, view.diskHygiene, strings, locale)
+  }
+  if (view.backupCoverage.vzdump.totalCount > 0) {
+    addBackupCoverageSlide(pptx, view.backupCoverage, strings, locale)
   }
 
   addEosSlide(pptx, view.eos, png('eosBar'), strings, locale)

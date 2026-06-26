@@ -1,0 +1,104 @@
+{
+  "heading": "Protection & Risk",
+  "subtitle": "Filesystem fill, disk hygiene, and backup coverage",
+  "empty": {
+    "heading": "No report loaded",
+    "body": "Load a report to see protection and risk data."
+  },
+  "na": "—",
+  "fsFill": {
+    "heading": "Filesystem fill",
+    "subtitle": "In-guest mounts at or above threshold",
+    "kpi": {
+      "overThreshold": "Mounts over threshold",
+      "totalMounts": "Total mounts",
+      "totalVms": "VMs with partitions",
+      "threshold": "Threshold"
+    },
+    "col": {
+      "node": "Node",
+      "vmName": "VM",
+      "vmId": "VM ID",
+      "mountPoint": "Mount point",
+      "fsType": "FS type",
+      "totalGb": "Total (GB)",
+      "usedGb": "Used (GB)",
+      "usedPct": "Used %"
+    },
+    "none": "No mounts at or above threshold."
+  },
+  "diskHygiene": {
+    "heading": "Disk hygiene",
+    "subtitle": "Unused disks, stray ISOs, backup exclusions, cache modes",
+    "kpi": {
+      "unusedCount": "Orphaned disks",
+      "reclaimableGb": "Reclaimable (GB)",
+      "strayIsoCount": "Stray ISOs",
+      "noBackupCount": "Disks without backup",
+      "riskyCacheCount": "Risky cache modes"
+    },
+    "unused": {
+      "heading": "Orphaned disks",
+      "none": "No orphaned disks."
+    },
+    "strayIso": {
+      "heading": "Stray mounted ISOs",
+      "none": "No stray ISOs mounted."
+    },
+    "noBackup": {
+      "heading": "Disks without backup",
+      "none": "All disks are covered by backup."
+    },
+    "riskyCache": {
+      "heading": "Disks with non-standard cache",
+      "none": "No non-standard cache modes."
+    },
+    "col": {
+      "node": "Node",
+      "vmName": "VM",
+      "vmId": "VM ID",
+      "id": "Disk ID",
+      "storage": "Storage",
+      "fileName": "File",
+      "sizeGb": "Size (GB)",
+      "cache": "Cache"
+    }
+  },
+  "backupCoverage": {
+    "heading": "Backup coverage",
+    "subtitle": "vzdump tasks and operational health",
+    "kpi": {
+      "total": "vzdump tasks",
+      "success": "Successful",
+      "failed": "Failed",
+      "coveredVmids": "VMs with backup",
+      "uncoveredCount": "VMs without backup"
+    },
+    "uncovered": {
+      "heading": "VMs without successful backup",
+      "none": "All VMs have at least one successful backup."
+    },
+    "tasks": {
+      "heading": "vzdump task list"
+    },
+    "operationalHealth": {
+      "heading": "Operational health",
+      "kpi": {
+        "totalTasks": "Total tasks",
+        "totalOk": "Successful",
+        "totalFailed": "Failed"
+      }
+    },
+    "col": {
+      "vmName": "VM",
+      "vmId": "VM ID",
+      "lastBackupAge": "Last backup (days ago)",
+      "node": "Node",
+      "type": "Type",
+      "total": "Total",
+      "ok": "OK",
+      "failed": "Failed",
+      "status": "Status"
+    }
+  }
+}

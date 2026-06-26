@@ -12,6 +12,7 @@ import deMonstervm from './locales/de/monstervm.json'
 import deMvc from './locales/de/mvc.json'
 import deNetwork from './locales/de/network.json'
 import dePptx from './locales/de/pptx.json'
+import deProtection from './locales/de/protection.json'
 import deRci from './locales/de/rci.json'
 import deReport from './locales/de/report.json'
 import deRightsizing from './locales/de/rightsizing.json'
@@ -31,6 +32,7 @@ import enMonstervm from './locales/en/monstervm.json'
 import enMvc from './locales/en/mvc.json'
 import enNetwork from './locales/en/network.json'
 import enPptx from './locales/en/pptx.json'
+import enProtection from './locales/en/protection.json'
 import enRci from './locales/en/rci.json'
 import enReport from './locales/en/report.json'
 import enRightsizing from './locales/en/rightsizing.json'
@@ -50,6 +52,7 @@ import frMonstervm from './locales/fr/monstervm.json'
 import frMvc from './locales/fr/mvc.json'
 import frNetwork from './locales/fr/network.json'
 import frPptx from './locales/fr/pptx.json'
+import frProtection from './locales/fr/protection.json'
 import frRci from './locales/fr/rci.json'
 import frReport from './locales/fr/report.json'
 import frRightsizing from './locales/fr/rightsizing.json'
@@ -69,6 +72,7 @@ import itMonstervm from './locales/it/monstervm.json'
 import itMvc from './locales/it/mvc.json'
 import itNetwork from './locales/it/network.json'
 import itPptx from './locales/it/pptx.json'
+import itProtection from './locales/it/protection.json'
 import itRci from './locales/it/rci.json'
 import itReport from './locales/it/report.json'
 import itRightsizing from './locales/it/rightsizing.json'
@@ -110,6 +114,7 @@ export const NAMESPACES = [
   'snapshots',
   'storagecontent',
   'clusterhealth',
+  'protection',
 ] as const
 export const DEFAULT_NS = 'common' satisfies (typeof NAMESPACES)[number]
 
@@ -134,6 +139,7 @@ export const resources = {
     snapshots: enSnapshots,
     storagecontent: enStorageContent,
     clusterhealth: enClusterHealth,
+    protection: enProtection,
   },
   fr: {
     common: frCommon,
@@ -155,6 +161,7 @@ export const resources = {
     snapshots: frSnapshots,
     storagecontent: frStorageContent,
     clusterhealth: frClusterHealth,
+    protection: frProtection,
   },
   de: {
     common: deCommon,
@@ -176,6 +183,7 @@ export const resources = {
     snapshots: deSnapshots,
     storagecontent: deStorageContent,
     clusterhealth: deClusterHealth,
+    protection: deProtection,
   },
   it: {
     common: itCommon,
@@ -197,6 +205,7 @@ export const resources = {
     snapshots: itSnapshots,
     storagecontent: itStorageContent,
     clusterhealth: itClusterHealth,
+    protection: itProtection,
   },
 } as const
 
