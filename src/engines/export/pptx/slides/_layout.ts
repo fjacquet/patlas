@@ -10,7 +10,7 @@
  * default-white text dump.
  */
 import type PptxGenJS from 'pptxgenjs'
-import { pptxSafeFormat } from '../format'
+import { type ExportLocale, pptxNumber, pptxSafeFormat } from '../format'
 import { addChartImage } from '../primitives/chartSvg'
 import { PPTX_COLORS } from '../primitives/colors'
 import { SLIDE } from '../theme'
@@ -184,6 +184,30 @@ export function addNote(s: PptxGenJS.Slide, text: string, y: number): void {
     color: PPTX_COLORS.inkMuted,
     fontFace: 'Arial',
     fontSize: 12,
+  })
+}
+
+/** A truncation footer ("+ N more …") below a capped table. `label` carries a
+ *  literal `{{count}}` token, replaced here with the locale-formatted
+ *  `remainder` (the export worker resolves only a fixed token set, so the
+ *  substitution happens in the slide). Muted + italic so it reads as metadata,
+ *  not data. */
+export function addMoreFooter(
+  s: PptxGenJS.Slide,
+  label: string,
+  remainder: number,
+  locale: ExportLocale,
+  box: Box,
+): void {
+  s.addText(pptxSafeFormat(label.replace('{{count}}', pptxNumber(remainder, locale))), {
+    x: box.x,
+    y: box.y,
+    w: box.w,
+    h: box.h,
+    color: PPTX_COLORS.inkMuted,
+    fontFace: 'Arial',
+    fontSize: 10,
+    italic: true,
   })
 }
 

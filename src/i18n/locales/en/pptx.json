@@ -21,6 +21,9 @@
     "provisioned": "Provisioned",
     "usedStorage": "Used storage"
   },
+  "protection": {
+    "fsFill": { "more": "+ {{count}} more mounts over threshold" }
+  },
   "cluster": {
     "stretched": "Stretched",
     "drReserved": "DR reserved",

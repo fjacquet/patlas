@@ -21,6 +21,9 @@
     "provisioned": "Bereitgestellt",
     "usedStorage": "Belegter Speicher"
   },
+  "protection": {
+    "fsFill": { "more": "+ {{count}} weitere Mounts über dem Schwellenwert" }
+  },
   "cluster": {
     "stretched": "Stretched",
     "drReserved": "DR-reserviert",

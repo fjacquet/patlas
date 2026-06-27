@@ -21,6 +21,9 @@
     "provisioned": "Provisionato",
     "usedStorage": "Spazio utilizzato"
   },
+  "protection": {
+    "fsFill": { "more": "+ {{count}} altri montaggi oltre la soglia" }
+  },
   "cluster": {
     "stretched": "Stretched",
     "drReserved": "Riservato DR",

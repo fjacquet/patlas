@@ -21,6 +21,9 @@
     "provisioned": "Provisionné",
     "usedStorage": "Stockage utilisé"
   },
+  "protection": {
+    "fsFill": { "more": "+ {{count}} montages supplémentaires au-dessus du seuil" }
+  },
   "cluster": {
     "stretched": "Étendu",
     "drReserved": "Réservé PRA",

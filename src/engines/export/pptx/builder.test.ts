@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import PptxGenJS from 'pptxgenjs'
 import { describe, expect, it } from 'vitest'
+import type { FsFillRisk, FsRiskRow } from '@/engines/aggregation/fsFillRisk'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
 import type { GuestRow } from '@/types/guest'
@@ -17,6 +19,7 @@ import { buildExportView } from '../buildExportView'
 import { buildPptx } from './builder'
 import { chartSvgToPng } from './primitives/chartSvg'
 import type { ContentionRow } from './slides/contentionAnnex'
+import { addFsFillSlide } from './slides/fsFillSlide'
 
 // node-fs wasm bytes for producing a real network PNG (mirrors chartSvg.test).
 const require = createRequire(import.meta.url)
@@ -104,6 +107,49 @@ const isZip = (ab: ArrayBuffer): boolean => {
   const u = new Uint8Array(ab)
   return u[0] === 0x50 && u[1] === 0x4b && u[2] === 0x03 && u[3] === 0x04
 }
+
+async function renderSlideText(fn: (p: PptxGenJS) => void): Promise<string> {
+  const pptx = new PptxGenJS()
+  pptx.defineLayout({ name: 'WIDE', width: 13.333, height: 7.5 })
+  pptx.layout = 'WIDE'
+  fn(pptx)
+  const ab = (await pptx.write({ outputType: 'arraybuffer' })) as ArrayBuffer
+  return new TextDecoder('latin1').decode(new Uint8Array(ab))
+}
+
+const fsRow = (i: number): FsRiskRow => ({
+  node: `pve${i % 3}`,
+  vmId: String(100 + i),
+  vmName: `vm-${i}`,
+  vmType: 'qemu',
+  mountPoint: `/data${i}`,
+  fsType: 'ext4',
+  totalGb: 100,
+  usedGb: 95,
+  usedPct: 95,
+  overThreshold: true,
+})
+
+const fsRisk = (n: number): FsFillRisk => ({
+  overThreshold: Array.from({ length: n }, (_, i) => fsRow(i)),
+  overThresholdCount: n,
+  totalMounts: n,
+  totalVms: n,
+  threshold: 0.8,
+})
+
+describe('Fix 2 — FS-fill slide remainder footer', () => {
+  it('shows the footer when over-threshold rows exceed the cap', async () => {
+    const txt = await renderSlideText((p) => addFsFillSlide(p, fsRisk(15), {}, 'en'))
+    expect(txt).toContain('more mounts over threshold')
+    expect(txt).toContain('+ 3 more') // 15 − 12
+  })
+
+  it('omits the footer when rows fit', async () => {
+    const txt = await renderSlideText((p) => addFsFillSlide(p, fsRisk(10), {}, 'en'))
+    expect(txt).not.toContain('more mounts over threshold')
+  })
+})
 
 describe('buildPptx — Proxmox label on title slide', () => {
   it('title slide uses the Proxmox cluster label, not a VMware fallback', async () => {
