@@ -51,8 +51,15 @@ export function buildHtmlCharts(
   // Fix for C1: this slot was missing from the HTML branch of the worker,
   // leaving an empty container in every real HTML export.
   if (view.topology.hasData) {
-    const { option, height: topoHeight } = topologyTreeOption(view.topology, topoLabels)
-    charts.set('topology-tree', chartToSvg(option, width, topoHeight))
+    // Best-effort: a bad topology shape (or an SVG-render throw) omits this one
+    // chart rather than aborting the whole HTML report — the report is the
+    // product (CodeRabbit, PR #25).
+    try {
+      const { option, height: topoHeight } = topologyTreeOption(view.topology, topoLabels)
+      charts.set('topology-tree', chartToSvg(option, width, topoHeight))
+    } catch {
+      // leave the slot empty; the rest of the report still renders
+    }
   }
 
   return charts

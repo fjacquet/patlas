@@ -137,6 +137,7 @@ export const buildTopology = (merged: {
   let gi = 0
   for (const [signature, { nodes, model, totalUnconfigured }] of groups) {
     const sortedNodes = [...nodes].sort()
+    const nodeSet = new Set(sortedNodes)
     const gid = `g${gi++}`
     const sumSpread = (bridge: string, tag: number | null) => {
       let vmCount = 0
@@ -156,13 +157,41 @@ export const buildTopology = (merged: {
         ? `${b.port} · ${bond.mode || 'bond'} · ${bond.slaves.join('+')}`
         : b.port || '(no uplink)'
       const bridgeId = `${rootId}/${b.name}`
-      const vlanLeaves: TopologyNode[] = model.vlans
-        .filter((v) => v.raw === b.name || v.raw === b.port)
+      // VLAN leaves come from BOTH declared vlan interface rows (host-side) AND
+      // the distinct non-null VM tags attached to this bridge. VLAN-aware
+      // bridges carry no per-VLAN interface row — the VM's VLAN lives only in
+      // VmNicRow.tag — so without the tag-derived set those tagged VMs would be
+      // counted in no leaf at all (CodeRabbit, PR #25).
+      const declaredVlans = model.vlans.filter((v) => v.raw === b.name || v.raw === b.port)
+      const vmTagIds = new Set<number>()
+      for (const n of vmNics) {
+        if (n.tag != null && n.bridge === b.name && nodeSet.has(n.node)) vmTagIds.add(n.tag)
+      }
+      const numericTagIds = [
+        ...new Set<number>([
+          ...declaredVlans.map((v) => v.id).filter((id): id is number => id != null),
+          ...vmTagIds,
+        ]),
+      ].sort((x, y) => x - y)
+      const vlanLeaves: TopologyNode[] = numericTagIds.map((id) => {
+        const s = sumSpread(b.name, id)
+        return {
+          id: `${bridgeId}/vlan${id}`,
+          name: `VLAN ${id}`,
+          kind: 'vlan' as const,
+          vmCount: s.vmCount,
+          vmNodeSpread: s.vmNodeSpread,
+        }
+      })
+      // Declared vlan interfaces with no parseable id (rare) keep a name-keyed
+      // leaf with the untagged spread, matching the prior behavior.
+      const namedVlanLeaves: TopologyNode[] = declaredVlans
+        .filter((v) => v.id == null)
         .map((v) => {
-          const s = sumSpread(b.name, v.id)
+          const s = sumSpread(b.name, null)
           return {
-            id: `${bridgeId}/vlan${v.id ?? v.name}`,
-            name: `VLAN ${v.id ?? '?'}`,
+            id: `${bridgeId}/vlan${v.name}`,
+            name: 'VLAN ?',
             kind: 'vlan' as const,
             vmCount: s.vmCount,
             vmNodeSpread: s.vmNodeSpread,
@@ -180,7 +209,7 @@ export const buildTopology = (merged: {
         id: bridgeId,
         name: b.vlanAware ? `${b.name} (VLAN-aware)` : b.name,
         kind: 'bridge',
-        children: [...vlanLeaves, untagged],
+        children: [...vlanLeaves, ...namedVlanLeaves, untagged],
       }
       return {
         id: rootId,

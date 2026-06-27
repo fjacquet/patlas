@@ -140,7 +140,10 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
             wasmSource(),
           )
         } catch {
+          // Warn (generic message, no payload — never leak parsed rows) so a
+          // permanently blank network slide is diagnosable (CodeRabbit, PR #25).
           topologyPng = null
+          console.warn('[patlas] topology tree render failed; network slide omitted')
         }
       }
 

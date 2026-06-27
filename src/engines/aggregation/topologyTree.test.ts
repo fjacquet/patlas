@@ -120,6 +120,27 @@ describe('buildTopology', () => {
     expect(untagged?.vmNodeSpread).toEqual({ withVms: 2, total: 2 })
   })
 
+  it('VLAN-aware bridge counts tagged VMs with no declared vlan interface row', () => {
+    // Real VLAN-aware exports carry the VM's VLAN only in VmNicRow.tag — there
+    // is no vmbr0.<id> interface row. The tagged VMs must still get a VLAN leaf
+    // (regression for the CodeRabbit PR #25 finding).
+    const nodeInterfaces = standardNode('pve1') // vmbr0 vlan-aware, NO vmbr0.100 row
+    const vmNics: VmNicRow[] = [
+      vmNic({ node: 'pve1', vmId: '1', bridge: 'vmbr0', tag: 100 }),
+      vmNic({ node: 'pve1', vmId: '2', bridge: 'vmbr0', tag: 100 }),
+      vmNic({ node: 'pve1', vmId: '3', bridge: 'vmbr0', tag: 200 }),
+      vmNic({ node: 'pve1', vmId: '4', bridge: 'vmbr0', tag: null }),
+    ]
+    const v = buildTopology({ nodeInterfaces, vmNics })
+    const bridge = v.groups[0]?.roots[0]?.children?.[0]
+    const vlan100 = bridge?.children?.find((c) => c.name === 'VLAN 100')
+    const vlan200 = bridge?.children?.find((c) => c.name === 'VLAN 200')
+    const untagged = bridge?.children?.find((c) => c.name === 'untagged')
+    expect(vlan100?.vmCount).toBe(2)
+    expect(vlan200?.vmCount).toBe(1)
+    expect(untagged?.vmCount).toBe(1)
+  })
+
   it('inactive non-eth (bond/vlan) does NOT raise unconfiguredNicCount; inactive eth does', () => {
     // Inactive bond — must NOT count as unconfigured NIC.
     const downBond = iface({ node: 'pve1', name: 'bond9', type: 'bond', active: false })
