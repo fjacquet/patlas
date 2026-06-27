@@ -36,6 +36,10 @@ const wasmSource = (): Promise<Response> =>
   fetch(new URL('@resvg/resvg-wasm/index_bg.wasm', import.meta.url))
 
 self.onmessage = async (e: MessageEvent<ExportRequest>) => {
+  // Dedicated worker — only the same-origin parent document can post here, so
+  // `e.origin` is always '' in practice. Reject any unexpected cross-origin
+  // sender defensively before touching `e.data`.
+  if (e.origin !== '' && e.origin !== self.location.origin) return
   const req = e.data
   try {
     const { view, trends, sizing } = buildExportView(
@@ -64,7 +68,14 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
     }
     const strings: typeof req.strings = {}
     for (const [k, v] of Object.entries(req.strings)) {
-      strings[k] = v.replace(/\{\{(\w+)\}\}/g, (m, key) => vars[key] ?? m)
+      // `req.strings` is the app's own i18n bundle, but it crosses a postMessage
+      // boundary — guard the dynamic property write against prototype-polluting
+      // keys, and resolve placeholders only against own keys of `vars`.
+      if (k === '__proto__' || k === 'prototype' || k === 'constructor') continue
+      strings[k] = v.replace(/\{\{(\w+)\}\}/g, (m, key) => {
+        const val = Object.hasOwn(vars, key) ? vars[key] : undefined
+        return val ?? m
+      })
     }
 
     let bytes: ArrayBuffer

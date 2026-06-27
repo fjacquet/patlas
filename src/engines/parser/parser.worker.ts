@@ -28,6 +28,10 @@ const parseCaptureDate = (filename: string, mtime: number): Date => {
 }
 
 self.onmessage = (e: MessageEvent<ParseRequest>) => {
+  // Dedicated worker — only the same-origin parent document can post here, so
+  // `e.origin` is always '' in practice. Reject any unexpected cross-origin
+  // sender defensively before touching `e.data`.
+  if (e.origin !== '' && e.origin !== self.location.origin) return
   if (e.data.kind !== 'parse') return
   try {
     const u8 = new Uint8Array(e.data.buf)
