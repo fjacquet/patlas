@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "patlas.fullname" . }}-test-connection"
+  labels:
+    {{- include "patlas.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  restartPolicy: Never
+  containers:
+    - name: wget
+      image: busybox:1.36
+      command: ["wget"]
+      args:
+        - "--spider"
+        - "{{ include "patlas.fullname" . }}:{{ .Values.service.port }}/index.html"
