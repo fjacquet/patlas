@@ -23,6 +23,7 @@ import {
   HeatmapChart,
   LineChart,
   PieChart,
+  TreeChart,
   TreemapChart,
 } from 'echarts/charts'
 import {
@@ -45,6 +46,7 @@ echarts.use([
   HeatmapChart,
   LineChart,
   TreemapChart,
+  TreeChart,
   GridComponent,
   TooltipComponent,
   LegendComponent,

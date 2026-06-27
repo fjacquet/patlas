@@ -314,5 +314,13 @@
       "growth": "Wachstum (GiB/Tag)",
       "daysToFull": "Tage bis voll"
     }
+  },
+  "topology": {
+    "heading": "Topologie",
+    "estate": "Bestand",
+    "nodesWord": "Knoten",
+    "unconfigured": "+ {{count}} unkonfigurierte NICs",
+    "vms": "VMs",
+    "ofNodes": "{{withVms}}/{{total}} Knoten"
   }
 }

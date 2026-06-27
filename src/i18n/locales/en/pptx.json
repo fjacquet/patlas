@@ -314,5 +314,13 @@
       "growth": "Growth (GiB/day)",
       "daysToFull": "Days to full"
     }
+  },
+  "topology": {
+    "heading": "Topology",
+    "estate": "Estate",
+    "nodesWord": "nodes",
+    "unconfigured": "+ {{count}} unconfigured NICs",
+    "vms": "VMs",
+    "ofNodes": "{{withVms}}/{{total}} nodes"
   }
 }

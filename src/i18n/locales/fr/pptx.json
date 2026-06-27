@@ -314,5 +314,13 @@
       "growth": "Croissance (Gio/jour)",
       "daysToFull": "Jours avant saturation"
     }
+  },
+  "topology": {
+    "heading": "Topologie",
+    "estate": "Parc",
+    "nodesWord": "nœuds",
+    "unconfigured": "+ {{count}} NIC non configurées",
+    "vms": "VM",
+    "ofNodes": "{{withVms}}/{{total}} nœuds"
   }
 }

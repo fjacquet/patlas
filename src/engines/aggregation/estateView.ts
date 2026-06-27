@@ -42,6 +42,7 @@ import { computeSnapshotSprawl } from './snapshotSprawl'
 import { storageByX } from './storageByX'
 import { computeStorageContentHealth } from './storageContentHealth'
 import { computeThresholdFlags, DEFAULT_THRESHOLDS, type ThresholdInput } from './thresholdFlags'
+import { buildTopology } from './topologyTree'
 import { relinkBlankClusterDatastores } from './vsanRelink'
 
 /**
@@ -141,6 +142,7 @@ export function buildEstateView(
   const vsan = relinkBlankClusterDatastores(merged.guests, merged.storages)
   const storage = storageByX(merged, mode, vsan)
   const network = networkRollup(merged)
+  const topology = buildTopology(merged)
   const thresholds = opts?.thresholds ?? DEFAULT_THRESHOLDS
   const flags = computeThresholdFlags(merged.vpartition, datastores, thresholds)
   const datastoreDetail = buildDatastoreDetail(datastores, merged.storages, vsan, thresholds)
@@ -378,6 +380,7 @@ export function buildEstateView(
     storage,
     vsan,
     network,
+    topology,
     flags,
     sizing,
     monsters,
@@ -631,6 +634,7 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   storage: EMPTY_STORAGE,
   vsan: EMPTY_VSAN,
   network: EMPTY_NETWORK,
+  topology: { groups: [], hasData: false },
   flags: EMPTY_FLAGS,
   sizing: EMPTY_SIZING,
   monsters: EMPTY_MONSTERS,
