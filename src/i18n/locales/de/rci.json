@@ -32,7 +32,7 @@
     "powerState": "Energiestatus",
     "provisioned": "Bereitgestellt (MiB)",
     "usedStorage": "VM-Speicher belegt",
-    "vmCapacity": "VM-Speicher Kapazität",
+    "vmCapacity": "VM-Speicherkapazität",
     "inUse": "Zugesichert (MiB)",
     "guestData": "Gastdaten (MiB)",
     "totalCores": "Physische Kerne gesamt",
