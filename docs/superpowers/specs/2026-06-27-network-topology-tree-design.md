@@ -34,21 +34,36 @@ This spec builds a Proxmox-native **topology tree** from that data, rendered via
 export type TopologyKind = 'bridge' | 'bond' | 'nic' | 'vlan'
 
 export interface TopologyNode {
-  /** Display label — the literal device name (vmbr0, bond0, eno1) plus a
-   *  factual qualifier (bond mode, VLAN id). NOT translated (device names). */
+  /** Path-based unique id (`g0/bond0/vmbr0/vlan100`) — guarantees a device
+   *  that legitimately recurs across branches does NOT collapse in ECharts'
+   *  tree model (Critique 1 / Fix 3). */
+  id: string
+  /** Display label — the literal device name plus a factual qualifier. Bonds
+   *  carry their slaves INLINE (`bond0 · 802.3ad · eno1+eno2`); a "(shared)"
+   *  qualifier marks an uplink that ports more than one bridge. NOT translated
+   *  (device names). */
   name: string
   kind: TopologyKind
-  /** Summed VM-NIC attachments at this bridge/VLAN across the grouped nodes;
-   *  undefined for bond/nic. */
+  /** VLAN/untagged leaves only: total VM-NIC attachments summed across the
+   *  grouped nodes. Undefined for bond/nic/bridge. */
   vmCount?: number
+  /** VLAN/untagged leaves only: how many of the group's nodes actually carry
+   *  VMs here — backs the "· 64 VMs · 1/6 nodes" distribution descriptor so a
+   *  sum never hides imbalance (Critique 3). */
+  vmNodeSpread?: { withVms: number; total: number }
   children?: TopologyNode[]
 }
 
 export interface TopologyGroup {
   /** Node names sharing this exact topology structure, sorted. */
   nodes: string[]
-  /** Top-level bridges for this config (the tree roots within the group). */
+  /** Top-level uplinks (bonds / standalone bridge-ported NICs) — the tree
+   *  roots within the group; the logical bridge/VLAN nodes hang off them. */
   roots: TopologyNode[]
+  /** Standalone interfaces excluded from the signature (inactive / unconfigured
+   *  / not reachable from any bridge) — reported as a factual count, never as
+   *  tree nodes (Critique 2). */
+  unconfiguredNicCount: number
   /** Canonical structural key (internal; drives the grouping). */
   signature: string
 }
@@ -64,19 +79,32 @@ export const buildTopology = (merged: {
 }): TopologyView => { /* … */ }
 ```
 
-**Dedup signature.** For each node, build a canonical string from the *structure* only: each bridge's name + sorted `bridgePorts`, each bond's `bondMode` + sorted `slaves`, each VLAN's `vlanId` + `vlanRawDevice`, and `bridgeVlanAware`. **Exclude** per-node specifics: IP `address`/`cidr`/`gateway`, `mtu`, `comments`, and the node name itself. Two nodes with equal signatures group together.
+**Dedup signature (Critique 2 — must not split on noise).** Build the canonical string from the *active, configured, topology-connected* interfaces ONLY: bridges, the bonds/NICs they port to, and VLAN sub-interfaces. **Exclude from the signature**: inactive interfaces (`active === false`), standalone/unconfigured interfaces not reachable from any bridge (an unused `eno5`, a USB dongle, a standby NIC), per-node specifics (IP `address`/`cidr`/`gateway`, `mtu`, `comments`), and the node name. The string captures only structure: each bridge name + sorted `bridgePorts`, each bond's `bondMode` + sorted `slaves`, each VLAN's `vlanId` + `vlanRawDevice`, and `bridgeVlanAware`. So an unused dongle on one node does **not** split it into its own group. The excluded interfaces are surfaced as `unconfiguredNicCount` per group ("+ 3 unconfigured NICs"), never as tree nodes.
 
-**Hierarchy** (matches the approved preview). Per group, the roots are the **bridges** (VMs attach to bridges). Each bridge's children: its uplink (the bond or direct NIC named by `bridgePorts`) and its VLAN sub-interfaces (`vlanRawDevice` === this bridge or its bond). Each bond's children: its slave NICs (`slaves[]`). VM counts annotate bridges (untagged attachments) and VLAN nodes (tagged attachments), **summed across the grouped nodes** (e.g. "VLAN 100 · 64 VMs" = the sum over pve1…pve6). Interfaces that are neither a bridge port nor a slave (standalone NICs) attach under a synthetic "unbridged" parent or the group root — factual, no crash.
+**Hierarchy (Critiques 1 & 4 — root at the physical uplink).** Signal flows left→right exactly as Proxmox wires it: **bond / standalone-NIC → bridge → VLAN / untagged (VM count)**. Rooting at the uplink means every node has exactly one parent (a bridge's port is one uplink; a VLAN's raw-device is one parent) — which dissolves the graph-vs-tree multi-parent problem — and it places the VM-count-bearing VLAN/untagged nodes as the spacious right-hand **leaves**, with the boring physical NICs at the congested root. A bond's slave NICs are rendered **inline in the bond's label** (`bond0 · 802.3ad · eno1+eno2`), NOT as child leaves — so physical NICs are never leaves, a shared NIC is never duplicated, and the leaf count shrinks. A single uplink that ports several bridges is one root with several bridge children (still one parent per node); a genuinely shared device across branches keeps a distinct path-based `id` and gets a "(shared)" label. VM counts annotate the VLAN/untagged leaves, summed across the grouped nodes **with the `vmNodeSpread` descriptor** so summing never hides imbalance — `VLAN 100 · 64 VMs · 1/6 nodes` means 64 VMs total, present on 1 of the 6 grouped nodes (factual, no verdict — ADR-0012).
+
+Example (one group, all 6 nodes identical, VLAN-aware single bridge):
+
+```
+estate
+└─ pve1…pve6  (× 6 nodes · + 3 unconfigured NICs)
+   └─ bond0 · 802.3ad · eno1+eno2          ← root (uplink; slaves inline)
+      └─ vmbr0  (VLAN-aware)               ← bridge
+         ├─ VLAN 100 · 64 VMs · 1/6 nodes  ← leaf (spacious right; carries the data)
+         └─ untagged · 48 VMs · 6/6 nodes  ← leaf
+```
 
 ### Component 2 — ECharts option builder (pure)
 
-`src/engines/export/charts/topologyOption.ts` (pure, testable, no DOM) — `topologyTreeOption(view: TopologyView): EChartsOption`. Produces ONE `tree` series: a synthetic `estate` root → one node per group (labelled with the grouped node list + "× N nodes") → that group's bridge/bond/nic/vlan subtree. Horizontal orientation (`layout: 'orthogonal'`, `orient: 'LR'`) reads well on a wide PPTX slide and in the report. SVG renderer only (project mandate). This single option object is the shared artifact for all three targets.
+`src/engines/export/charts/topologyOption.ts` (pure, testable, no DOM) — `topologyTreeOption(view: TopologyView): { option: EChartsOption; height: number }`. Produces ONE `tree` series: a synthetic `estate` root → one node per group (labelled with the grouped node list + "× N nodes" + `unconfiguredNicCount`) → that group's uplink → bridge → VLAN/untagged subtree. Horizontal orientation (`layout: 'orthogonal'`, `orient: 'LR'`) puts the leaves on the right. Every data node carries the path-based `id` from Component 1, so ECharts' tree model never collapses a recurring device. SVG renderer only (project mandate).
+
+**Dynamic height (Critique 5 — ECharts fits the tree to its box, it does NOT grow the box).** A fixed `CHART_H` would crush N leaves into an illegible blob, so the builder returns a computed `height = clamp(MIN_H, totalLeaves × PX_PER_LEAF, MAX_H)` where `totalLeaves` is the VLAN/untagged-leaf count across all groups (plus a per-group header row). Width scales with max depth (`estate→group→uplink→bridge→vlan` = 5 levels). The three callers consume this height: the web container sizes its `<div>` to it, the HTML report inlines an SVG of that height, and the PPTX export passes it as `CHART_H` to `chartSvgToPng`. This `{ option, height }` pair is the shared artifact for all three targets.
 
 ### Component 3 — Rendering per target
 
 - **Web** (`src/components/network/NetworkView.tsx`): a new topology section, **primary**, above the existing count/VM-NIC tables. Renders the option through the `<Chart>` primitive (interactive: ECharts tree collapse + tooltip). The upstream `network-diagram.svg`, when present, is **kept as a secondary collapsible "raw upstream diagram"** section (preserves IP-level detail the tree omits) — *recommendation, flag for review.*
 - **HTML report** (`src/engines/export/html/renderCharts.ts` + `renderReport.tsx`): SSR-render the option to an SVG string (existing `echarts.init(null, …, { ssr: true }).renderToSVGString()` path) and inline it in the network section, **replacing** the upstream-SVG embed.
-- **PPTX** (`src/engines/export/export.worker.ts` + `slides/networkSlide.ts`): render the option → SVG (`chartToSvg`) → PNG (`chartSvgToPng`/resvg) → embed below the four KPI cards, **replacing Spec 1's interim oversized-note branch**. The slide keeps the KPI cards; the tree PNG is the body. The `networkOversized` flag and the upstream-SVG raster path are removed from the network slide.
+- **PPTX** (`src/engines/export/export.worker.ts` + `slides/networkSlide.ts`): render the option at the builder's computed `height` → SVG (`chartToSvg`) → PNG (`chartSvgToPng`/resvg) → embed below the four KPI cards, **replacing Spec 1's interim oversized-note branch**. The slide keeps the KPI cards; the tree PNG is the body. The PNG is then fit into the slide body box preserving aspect ratio; `MAX_H` in the builder is tuned so the infra-only/deduplicated leaf count stays within the slide without crushing — if a pathological estate still overflows, the image scales down to the box and a factual "tree continues in the HTML report" note appears (rare). The `networkOversized` flag and the upstream-SVG raster path are removed from the network slide.
 
 ### Error handling / factual-degrade
 
@@ -92,8 +120,8 @@ export const buildTopology = (merged: {
 
 ## Testing
 
-- `topologyTree.test.ts`: dedup grouping (identical nodes → 1 group), signature normalization (differing IPs/MTU → still 1 group; differing bond slaves → 2 groups), VM-count summing across a group, bridge→bond→NIC + VLAN hierarchy, standalone NIC handling, empty input → `hasData: false`, SDN/unknown rows don't crash.
-- `topologyOption.test.ts`: option shape (one `tree` series, SVG-safe, group/bridge/bond/nic/vlan nodes present), `orient: 'LR'`.
+- `topologyTree.test.ts`: dedup grouping (identical nodes → 1 group); signature normalization (differing IPs/MTU → still 1 group; **an unused/inactive/standalone NIC on one node → still 1 group, `unconfiguredNicCount` incremented**, Critique 2); differing bond slaves → 2 groups; uplink→bridge→VLAN hierarchy with bond slaves inline (no NIC leaves, Critique 1/4); a single uplink porting two bridges → one root + two children, no collapse; VM-count summing **plus `vmNodeSpread`** (64 VMs concentrated on 1 node → `{ withVms: 1, total: 6 }`, Critique 3); empty input → `hasData: false`; SDN/unknown rows don't crash.
+- `topologyOption.test.ts`: option shape (one `tree` series, SVG-safe, path-based `id`s unique, `orient: 'LR'`); **dynamic `height` grows with leaf count** (`clamp(MIN_H, leaves × PX_PER_LEAF, MAX_H)`, Critique 5) and is clamped at the bounds.
 - A realfile test (new `topologyTree.realfile.test.ts`, or extend `proxmox-estate.realfile.test.ts`): the real workbook → expected group count and a known bridge/bond/slave path.
 - HTML render test: SSR SVG string contains a known bridge name. PPTX: the network slide emits a PNG (extend `builder.test.ts`); the oversized-note branch is gone.
 - Bundle: `check:bundle-size` stays green (web `index` ≤ 300 KiB).
@@ -101,12 +129,17 @@ export const buildTopology = (merged: {
 ## Acceptance criteria
 
 1. Dropping the real cv4pve export shows a legible topology tree on the web `NetworkView`, in the HTML report, and on the PPTX network slide — with no dependency on `network-diagram.svg`.
-2. The six cluster nodes collapse into the correct number of config groups (one if all identical), each labelled with its node list; VM counts per bridge/VLAN are the summed totals.
-3. The PPTX network slide shows KPI cards + the topology-tree PNG (no "see HTML report" note, no blurry upstream raster).
+2. The six cluster nodes collapse into the correct number of config groups (one if all identical — **even when a node carries an extra unused/inactive NIC**, which appears only in the per-group `unconfiguredNicCount`, never as its own group); each VLAN/untagged leaf shows the summed VM total **and** the node-spread descriptor (`64 VMs · 1/6 nodes`), so concentration is visible.
+3. The PPTX network slide shows KPI cards + the topology-tree PNG (no "see HTML report" note, no blurry upstream raster); the PNG height scales with leaf count so labels never overlap into a blob.
 4. A bare `.xlsx` (no upstream SVG) still renders the tree from `nodeInterfaces`.
-5. Gates green: `npm run typecheck`, `biome check`, full Vitest (incl. new topology + render tests), `npm run build`, `check:bundle-size` (web index ≤ 300 KiB), `keyParity`. Privacy invariant intact.
+5. The tree is legible at every size: physical NICs are inline on their bond (not leaves), the VM-bearing VLAN/untagged nodes occupy the spacious right-hand leaf column, and every node has exactly one parent (no multi-parent collapse).
+6. Gates green: `npm run typecheck`, `biome check`, full Vitest (incl. new topology + render tests), `npm run build`, `check:bundle-size` (web index ≤ 300 KiB), `keyParity`. Privacy invariant intact.
+
+## Review notes — devil's-advocate critiques folded in
+
+All five raised critiques are addressed in the design above: (1) graph-vs-tree multi-parent → root at the physical uplink so every node has one parent + path-based ids + bond slaves inline; (2) brittle signature → signature ignores inactive/unconfigured/standalone interfaces, surfaced as a count; (3) summed VM counts hiding imbalance → `vmNodeSpread` distribution descriptor; (4) leaf real-estate → uplink-rooted so VM-bearing VLANs are the spacious leaves; (5) static SSR size → dynamic `height = clamp(MIN_H, leaves × PX_PER_LEAF, MAX_H)`.
 
 ## Open points for review
 
 - **(A) Fate of the upstream SVG on the web view** — recommendation: keep it as a *secondary collapsible* "raw upstream diagram" (preserves IP-level detail; zero export cost). Alternative: drop it entirely now that the tree exists. *Which do you prefer?*
-- **(B) Bundle mitigation** — the plan tries the simple in-`Chart.tsx` registration first and only lazy-splits if the gate fails. Acceptable, or prefer lazy-split unconditionally (guarantees gate headroom, slightly more code)?
+- **(B) Bundle mitigation** — resolved as: try the simple in-`Chart.tsx` registration, measure `check:bundle-size`, lazy-split the web topology chart only if the web `index` chunk exceeds 300 KiB. (Flag if you'd rather lazy-split unconditionally.)
