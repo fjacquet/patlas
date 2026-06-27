@@ -79,4 +79,19 @@ describe('computeFsFillRisk', () => {
     expect(computeFsFillRisk(rows, 0.5).overThresholdCount).toBe(1)
     expect(computeFsFillRisk(rows, 0.9).overThresholdCount).toBe(0)
   })
+
+  it('excludes squashfs/iso9660/erofs from every figure', () => {
+    const rows = [
+      row({ vmId: '100', mountPoint: '/', fsType: 'ext4', usedFraction: 0.9 }),
+      row({ vmId: '100', mountPoint: '/snap/core', fsType: 'squashfs', usedFraction: 1 }),
+      row({ vmId: '101', mountPoint: '/cdrom', fsType: 'ISO9660', usedFraction: 1 }),
+      row({ vmId: '102', mountPoint: '/boot', fsType: ' erofs ', usedFraction: 1 }),
+    ]
+    const r = computeFsFillRisk(rows, 0.8)
+    // Only the ext4 row survives the filter.
+    expect(r.totalMounts).toBe(1)
+    expect(r.overThresholdCount).toBe(1)
+    expect(r.totalVms).toBe(1)
+    expect(r.overThreshold.every((m) => m.fsType.toLowerCase().trim() !== 'squashfs')).toBe(true)
+  })
 })

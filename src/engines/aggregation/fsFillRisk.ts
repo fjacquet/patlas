@@ -12,6 +12,14 @@ import type { ProxmoxPartitionRow } from '@/types/snapshot'
 
 export const FS_FILL_DEFAULT_THRESHOLD = 0.8
 
+/**
+ * Read-only pseudo-filesystems that report 100% used BY DESIGN (snap/AppImage
+ * `squashfs`, mounted ISOs `iso9660`, immutable-image `erofs`). They are not
+ * monitorable fill risks, so they are excluded before any counting — otherwise
+ * they dominate the "over threshold" count with false positives.
+ */
+export const FS_FILL_PSEUDO_TYPES: ReadonlySet<string> = new Set(['squashfs', 'iso9660', 'erofs'])
+
 export interface FsRiskRow {
   node: string
   vmId: string
@@ -42,10 +50,11 @@ export const computeFsFillRisk = (
   rows: ProxmoxPartitionRow[],
   threshold = FS_FILL_DEFAULT_THRESHOLD,
 ): FsFillRisk => {
+  const real = rows.filter((r) => !FS_FILL_PSEUDO_TYPES.has(r.fsType.toLowerCase().trim()))
   const vmIds = new Set<string>()
   const riskRows: FsRiskRow[] = []
 
-  for (const r of rows) {
+  for (const r of real) {
     if (r.vmId) vmIds.add(`${r.node}:${r.vmId}`)
     const usedPct = r.usedFraction === null ? null : r.usedFraction * 100
     const overThreshold = r.usedFraction !== null && r.usedFraction >= threshold
@@ -75,7 +84,7 @@ export const computeFsFillRisk = (
   return {
     overThreshold: over,
     overThresholdCount: over.length,
-    totalMounts: rows.length,
+    totalMounts: real.length,
     totalVms: vmIds.size,
     threshold,
   }
