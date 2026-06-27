@@ -1,4 +1,3 @@
-<!-- generated-by: gsd-doc-writer -->
 # Development
 
 This guide covers the day-to-day development workflow for patlas: the dev loop, type
@@ -137,8 +136,8 @@ product promise, not an accident.
 ## Branch conventions
 
 The default branch is `main`. Active milestone work happens on a dedicated branch
-(e.g. `gsd/v1.0-milestone`). No formal branch-naming scheme is documented beyond the
-milestone-branch pattern; do not work directly on `main`.
+(e.g. `feat/proxmox-atlas-v3`). No formal branch-naming scheme is documented beyond the
+milestone/feature-branch pattern; do not work directly on `main`.
 
 Commit messages use the prefix `<type>(NN-NN): …` where `NN-NN` is the phase-plan id,
 for example:
@@ -164,20 +163,6 @@ before pushing:
   dependencies or chart imports.
 - Keep commits scoped with the `<type>(NN-NN): …` prefix tied to the phase-plan id.
 - Open the PR against `main` from your milestone/feature branch.
-- All file-changing work must go through a GSD command (see below) so planning
-  artifacts stay in sync with the code.
-
-### GSD workflow enforcement
-
-Edits to this repository are expected to flow through a GSD command so planning
-artifacts and execution context stay synchronised. Use the appropriate entry point:
-
-- `/gsd-quick` — small fixes, doc updates, and ad-hoc tasks.
-- `/gsd-debug` — investigation and bug fixing.
-- `/gsd-execute-phase` — planned phase work.
-
-Do not make direct repo edits outside a GSD workflow unless explicitly asked to
-bypass it.
 
 ## Gotchas
 

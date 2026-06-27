@@ -32,10 +32,10 @@ runs on every push to `main`. **DEP-02 satisfied.**
 existing **Test** step (`npm run test:run`, line 98) — confirmed by running
 the full suite locally (green).
 
-## DEP-01 — Public URL `fjacquet.github.io/vatlas/`
+## DEP-01 — Public URL `fjacquet.github.io/patlas/`
 
-`vite.config.ts:9` → `base: '/vatlas/'`. The Pages deploy job serves the
-built `dist/` at `https://fjacquet.github.io/vatlas/`. **DEP-01 satisfied.**
+`vite.config.ts:10` → `base: '/patlas/'`. The Pages deploy job serves the
+built `dist/` at `https://fjacquet.github.io/patlas/`. **DEP-01 satisfied.**
 
 ## Corroboration — recent `static.yml` runs
 

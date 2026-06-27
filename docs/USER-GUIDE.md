@@ -1,7 +1,6 @@
-<!-- generated-by: gsd-doc-writer -->
 # patlas — User Guide
 
-patlas turns one or more Proxmox VE reports into a navigable, visual atlas of your Proxmox estate: a global dashboard, an inventory browser, a nodes view, capacity planning, OS End-of-Support forecasting, in-session trends across multiple reports, storage analysis, network overview, right-sizing, monster guests, and three Proxmox-native views (Snapshot Sprawl, Storage Content, Cluster Health). You open it in a web browser, drop your report file, and read the numbers.
+patlas turns one or more Proxmox VE reports into a navigable, visual atlas of your Proxmox estate: a global dashboard, an inventory browser, a nodes view, capacity planning, OS End-of-Support forecasting, in-session trends across multiple reports, RRD-based node headroom and storage growth analytics, storage analysis (with storage-by-role segmentation), network overview, right-sizing, monster guests, a Protection pack (filesystem fill risk, disk hygiene, backup coverage), a Governance pack (cv4pve issues, access posture, resource pools), and Proxmox-native health views (Snapshot Sprawl, Storage Content, Cluster Health). You open it in a web browser, drop your report file, and read the numbers.
 
 This guide is for the person using the deployed app at `https://fjacquet.github.io/patlas/`. No installation, account, or server is involved.
 
@@ -74,7 +73,7 @@ In-session trend charts across multiple loaded snapshots are available from the 
 
 ## 4. The global dashboard
 
-The top navigation has segments — **Dashboard**, **Inventory**, **Nodes**, **Planning**, and others. The app opens on **Dashboard**.
+The top navigation has the following segments (in order): **Dashboard**, **Inventory**, **Nodes**, **Node Headroom**, **Planning**, **OS end-of-support**, **Trends**, **Storage**, **Storage Growth**, **Network**, **Right-sizing**, **Monster Guests**, **Snapshot Sprawl**, **Storage Content**, **Cluster Health**, **Protection**, **Governance**. The app opens on **Dashboard**.
 
 The Dashboard shows, for the active snapshot:
 
@@ -135,11 +134,61 @@ The planned ratios live in memory only; refreshing the page resets them.
 
 ---
 
-## 7. Proxmox-native views
+## 7. Additional views
 
-Three views show Proxmox-specific data parsed from dedicated report sheets. These views are **web-only** — they are not included in the HTML report export or the PPTX deck.
+Beyond the global dashboard and inventory, patlas provides the following views. Views marked **web-only** are excluded from the HTML report export and PPTX deck.
 
-### Snapshot Sprawl
+### Node Headroom (RRD analytics)
+
+Select **Node Headroom** from the navigation.
+
+Shows CPU and RAM headroom per node derived from RRD time-series data in the report (peak, P95, and average utilisation). Only available when the cv4pve-report bundle includes RRD data; the view shows an informational message otherwise.
+
+### Storage Growth (RRD analytics)
+
+Select **Storage Growth** from the navigation.
+
+Shows storage time-to-full projections for each storage pool, derived from historical RRD growth data in the report. Only available when the cv4pve-report bundle includes RRD storage data.
+
+### OS end-of-support
+
+Select **OS end-of-support** from the navigation.
+
+Shows at-risk guest counts grouped into +3 / +6 / +9 / +12 month buckets and an "overdue" bucket based on the OS build of each guest compared to a built-in EOS catalogue. Clicking a bucket drills into the affected guest list. Guests with an unrecognized OS string appear in an "unknown OS" bucket rather than being silently dropped.
+
+### Trends
+
+Select **Trends** from the navigation.
+
+When two or more reports are loaded in the same session, Trends shows headline metrics evolving over time using the actual capture dates of the loaded reports as the X-axis. Refreshing the page clears the trend data — there is no cross-session persistence.
+
+### Storage
+
+Select **Storage** from the navigation.
+
+Shows storage capacity by pool with a storage-by-role band: VM data / backup / local — each showing real used vs configured capacity. Powered by the `storageByRole` engine.
+
+### Protection (web-only)
+
+Select **Protection** from the navigation.
+
+The Protection pack shows three risk signals derived from the report:
+
+- **Filesystem fill risk** — in-guest filesystem utilisation from guest agent data; highlights filesystems approaching capacity.
+- **Disk hygiene** — identifies old, orphaned, or oversized disk images.
+- **Backup coverage** — per-guest backup recency; flags guests with no recent backup.
+
+### Governance (web-only)
+
+Select **Governance** from the navigation.
+
+The Governance pack shows operational posture data parsed from the report:
+
+- **cv4pve issues** — issues reported by the cv4pve-report tool itself.
+- **Access posture** — API token and user account audit.
+- **Resource pools** — resource pool inventory and assignment.
+
+### Snapshot Sprawl (web-only)
 
 Select **Snapshot Sprawl** from the navigation.
 
@@ -150,19 +199,19 @@ Shows guest snapshots still held across the estate:
 
 The Proxmox `current` live-state marker is excluded — only real checkpoints appear. Parsed from the report `Snapshots` sheet.
 
-### Storage Content
+### Storage Content (web-only)
 
 Select **Storage Content** from the navigation.
 
 Shows what occupies each Proxmox storage pool, broken down by content type:
 
-- Content-type breakdown: images (VM disks), rootdir (container data), iso (ISO images), vztmpl (container templates), backup, and others.
+- Content-type breakdown: images (guest disks), rootdir (container data), iso (ISO images), vztmpl (container templates), backup, and others.
 - Per-storage summary table.
 - Backup-file inventory with per-guest recency information.
 
 Parsed from the report `Storage Content` sheet.
 
-### Cluster Health
+### Cluster Health (web-only)
 
 Select **Cluster Health** from the navigation.
 
@@ -187,12 +236,10 @@ On the **Inventory** view, the **Export CSV** button above the table downloads t
 
 ## 9. HTML report and PPTX export
 
-The **Export** controls produce shareable output from the inherited analytics views (Dashboard, Inventory, Nodes, Planning, Trends, Right-sizing, Monster guests):
+The **Export** controls produce shareable output. Views marked **web-only** in §7 (Protection, Governance, Snapshot Sprawl, Storage Content, Cluster Health) are excluded from both exports.
 
 - **HTML report** — a self-contained, statically viewable HTML file. Charts are embedded as SVG; no JavaScript is required to view it.
 - **PPTX deck** — a PowerPoint-compatible slide deck generated entirely in the browser.
-
-The three Proxmox-native views (Snapshot Sprawl, Storage Content, Cluster Health) are deliberately excluded from both exports — they are web-only.
 
 ---
 
@@ -220,11 +267,18 @@ These two preferences are the only things patlas stores between sessions, and th
 | Browse guests / nodes / storage | **Inventory** segment, then the **Object type** control |
 | Narrow a table | The filter box; or the inventory tree to scope by node |
 | See all nodes at once | **Nodes** segment |
+| See CPU/RAM headroom from RRD data | **Node Headroom** segment |
+| See storage growth projections | **Storage Growth** segment |
 | Set a planned consolidation ratio | **Planning** segment → Capacity planning — what-if |
+| View OS end-of-support risk | **OS end-of-support** segment |
+| Compare metrics across loaded reports | **Trends** segment (requires 2+ reports loaded) |
+| View storage by pool and role | **Storage** segment |
+| View protection risks (FS, disk, backup) | **Protection** segment (web-only) |
+| View governance posture | **Governance** segment (web-only) |
 | View snapshot sprawl | **Snapshot Sprawl** segment (web-only) |
 | View storage content breakdown | **Storage Content** segment (web-only) |
 | View HA and backup job status | **Cluster Health** segment (web-only) |
 | Export a table | **Export CSV** on the Inventory view |
-| Export HTML report or PPTX deck | Export controls (inherited analytics only) |
+| Export HTML report or PPTX deck | Export controls (web-only views excluded) |
 | Switch language / theme | Header toggles, top-right |
 | Discard everything | Refresh or close the tab |

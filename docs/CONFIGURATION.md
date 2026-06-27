@@ -1,4 +1,3 @@
-<!-- generated-by: gsd-doc-writer -->
 # Configuration
 
 patlas is a 100% client-side static web app. It has **no server, no backend, no API keys, and no environment-variable runtime configuration**. The privacy invariant forbids any network call that ships report bytes, so there are no service endpoints, secrets, or `.env` files to configure.
@@ -7,7 +6,7 @@ What *is* configurable is the **build, lint, test, and supply-chain tooling**. T
 
 ## Environment Variables
 
-vatlas reads **no environment variables at runtime**. There is no `.env.example`, no `.env` consumption, and no `process.env.*` access in application code. The app runs entirely in the browser with state held in memory only.
+patlas reads **no environment variables at runtime**. There is no `.env.example`, no `.env` consumption, and no `process.env.*` access in application code. The app runs entirely in the browser with state held in memory only.
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
@@ -98,7 +97,7 @@ Defined in `src/hooks/useTheme.ts`:
 | Theme preference | `'auto'` (follows OS `prefers-color-scheme`) | Returned by `readStoredPreference()` when no stored value or on `localStorage` access failure |
 | Resolved theme when `auto` | `'dark'` if OS prefers dark, else `'light'` | `computeResolved()` via `matchMedia('(prefers-color-scheme: dark)')` |
 
-When the preference is `'auto'`, the `vatlas-theme` key is *removed* from `localStorage` rather than written.
+When the preference is `'auto'`, the `patlas-theme` key is *removed* from `localStorage` rather than written.
 
 ### Locale (i18n)
 

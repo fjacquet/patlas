@@ -1,4 +1,3 @@
-<!-- GSD:project-start source:PROJECT.md -->
 ## Project
 
 **patlas**
@@ -15,9 +14,7 @@ patlas is a 100 % client-side web app that turns one or more Proxmox VE cluster 
 - **Deploy target:** GitHub Pages static site at `fjacquet.github.io/patlas/` (same CI shape as vsizer: typecheck → lint → test → build → deploy).
 - **Input format:** Proxmox `cv4pve-report` export — a `.zip` bundle (`report.xlsx` + optional `network-diagram.svg`) or a bare `.xlsx`.
 - **Charting:** Apache ECharts with `{ renderer: 'svg' }` mandated project-wide (locked in during research — SVG everywhere for crisp pictures and trivial HTML-report inlining). Canvas permitted only as a per-chart escape hatch for in-app >10k-point overviews that don't appear in the HTML report.
-<!-- GSD:project-end -->
 
-<!-- GSD:stack-start source:research/STACK.md -->
 ## Technology Stack
 
 ## Executive summary (read this first)
@@ -28,21 +25,21 @@ patlas is a 100 % client-side web app that turns one or more Proxmox VE cluster 
 
 | Technology | Version | Purpose | Why Recommended |
 |------------|---------|---------|-----------------|
-| React | `^19.2.6` | UI runtime | vsizer is on 19.2.6; current stable line; vatlas is client-only with **no React Server Components**, so the 2025-12/2026-01 RSC CVE chain (CVE-2025-55182, CVE-2026-23870, etc.) does **not** apply. Still pin `>=19.2.4` for hygiene. |
+| React | `^19.2.6` | UI runtime | vsizer is on 19.2.6; current stable line; patlas is client-only with **no React Server Components**, so the 2025-12/2026-01 RSC CVE chain (CVE-2025-55182, CVE-2026-23870, etc.) does **not** apply. Still pin `>=19.2.4` for hygiene. |
 | react-dom | `^19.2.6` | DOM bindings | Lockstep with React. |
 | TypeScript | `~5.9.3` | Strict typing | vsizer's `tsconfig.app.json` enables `strict`, `noUncheckedIndexedAccess`, `verbatimModuleSyntax`, `erasableSyntaxOnly`. Copy verbatim; do not regress to looser settings. |
 | Vite | `^8.0.12` | Dev server + production bundler | Vite 8 went GA 2026-03-12 with **Rolldown** as the unified Rust-based bundler (10–30× faster builds, full Rollup plugin API compatibility). vsizer is already on 8.0.12. |
 | `@vitejs/plugin-react` | `^6.0.1` | React JSX/Fast Refresh | Required peer for Vite 8 + React 19. |
 | Tailwind CSS | `^4.3.0` | Styling | v4 is stable since 2025-01; latest minor is 4.3.0 (npm, last week of April 2026). CSS-first config, 5× full-build / 100× incremental speedup. |
 | `@tailwindcss/vite` | `^4.3.0` | Tailwind Vite integration | First-party plugin; use this instead of PostCSS. Drops the `tailwind.config.js` dependency entirely (v4 uses `@theme` blocks in CSS). |
-| Zustand | `^5.0.13` | Client state | v5 is stable; v5.0.13 published ~9 days ago. **Use named imports** (`import { create } from 'zustand'`), not the deprecated default export. Memory-only — never persist `vinfo`/`vhost` rows (privacy invariant from vsizer ADR-0001/0004). |
+| Zustand | `^5.0.13` | Client state | v5 is stable; v5.0.13 published ~9 days ago. **Use named imports** (`import { create } from 'zustand'`), not the deprecated default export. Memory-only — never persist `guests`/`nodes` rows (privacy invariant from vsizer ADR-0001/0004). |
 | Zod | `^4.4.3` | Runtime schema validation at the parser boundary | v4 is stable (GA Aug 2025), with 14× faster string parsing, 7× faster array parsing, 2.3× smaller core bundle, ~10× faster TS compilation than v3. vsizer is already on `^4.4.3`. **Do not** mix v3 patterns — the error customization API changed (`message` → `error`, `.default()` semantics changed). |
-| SheetJS (xlsx) | `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz` | RVTools `.xlsx` parsing | The **only** correct install channel. See "What NOT to Use" — the npm `xlsx` package is stuck at 0.18.5 and carries CVE-2024-22363 (ReDoS). 0.20.3 is the current CDN release; no 0.20.4 has shipped as of 2026-05-15 and there are no open CVEs against 0.20.3. |
+| SheetJS (xlsx) | `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz` | cv4pve-report `.xlsx` parsing | The **only** correct install channel. See "What NOT to Use" — the npm `xlsx` package is stuck at 0.18.5 and carries CVE-2024-22363 (ReDoS). 0.20.3 is the current CDN release; no 0.20.4 has shipped as of 2026-05-15 and there are no open CVEs against 0.20.3. |
 | Apache ECharts | `^6.0.0` | Charting engine (treemap, sunburst, heatmap, calendar, gauge, bar, line, pie, area, radial) | Resolved during Phase-2 research to v6 (GA 2025-07-30; tree-shaking + `SVGRenderer` import paths unchanged from v5). Shipped in Phase 2. See "Charting decision" section below. Tree-shake via `echarts/core` + per-chart-type imports + `SVGRenderer`, ~150–300 KB gzipped. |
 | `echarts-for-react` | `^3.0.6` | Thin React wrapper around ECharts | The de-facto React binding; declares `echarts ^6.0.0` in peerDependencies. Use the core entry (`echarts-for-react/lib/core`) with tree-shaken `echarts.use([...])`; supports `opts={{ renderer: 'svg' }}` which is the keystone of the HTML report export plan. |
 | pptxgenjs | `^4.0.1` | PPTX export | Still the only credible browser-side PPTX generator in 2026. 4.0.1 was the only 4.x release and remains the current version; mature, no known CVEs. vsizer's PPTX engine in `engines/export/pptx/` is reusable. |
-| react-i18next | `^16.6.6` | i18n (FR · EN · DE · IT) | vsizer's setup translates 1:1. DE/IT shipped 2026-05-25; technical terms pending native review. |
-| i18next | `^26.1.0` | i18n core | Lockstep with react-i18next. |
+| react-i18next | `^17.0.8` | i18n (FR · EN · DE · IT) | vsizer's setup translated 1:1. DE/IT shipped 2026-05-25; technical terms pending native review. |
+| i18next | `^26.2.0` | i18n core | Lockstep with react-i18next. |
 | i18next-browser-languagedetector | `^8.2.1` | Locale detection | Same chain (`?lang=` → localStorage → navigator → `fr` fallback). Note: a `patlas-lang` localStorage key is allowed (it stores a locale code, not dataset rows — does not breach the privacy invariant). |
 
 ### Supporting Libraries
@@ -51,15 +48,15 @@ patlas is a 100 % client-side web app that turns one or more Proxmox VE cluster 
 |---------|---------|---------|-------------|
 | react-error-boundary | `^6.1.1` | Crash isolation | Wrap `<App />` so a bad workbook does not white-screen. Same pattern as vsizer's `App.tsx`. |
 | sonner | `^2.0.7` | Toast notifications | "Workbook loaded", "Export ready", "Parse error". One `<Toaster />` mounted at the root. |
-| fflate | `^0.8.2` | Optional: client-side zip handling | vsizer carries this for Live Optics `.zip` bundles. **vatlas does not need it in v1** (RVTools-only, no zip bundles). Add only if a future format pivot pulls it back. |
-| ECharts add-ons (`@kurkle/color`, `geo` JSON) | not needed | — | The chart types vatlas needs (treemap, sunburst, heatmap, calendar, gauge, bar/line/pie/area, radial) are all in the core `echarts` package. No map/3D add-ons required. |
+| fflate | `^0.8.3` | Client-side zip handling | Unzips the cv4pve-report `.zip` bundle (`report.xlsx` + optional `network-diagram.svg`) in the parser worker. Inherited from vsizer; **required** — cv4pve ships its export as a zip. |
+| ECharts add-ons (`@kurkle/color`, `geo` JSON) | not needed | — | The chart types patlas needs (treemap, sunburst, heatmap, calendar, gauge, bar/line/pie/area, radial) are all in the core `echarts` package. No map/3D add-ons required. |
 
 ### Development Tools
 
 | Tool | Version | Purpose | Notes |
 |------|---------|---------|-------|
 | Biome | `^2.4.15` | Lint + format | Single quotes (JS), double quotes (CSS), no semicolons, 2-space, 100-char, auto-organize imports. Copy `biome.json` from vsizer. |
-| Vitest | `^4.1.2` | Unit + integration tests | v4 graduated Browser Mode to stable (Oct 2025), added `toMatchScreenshot()`, Playwright Trace integration, schema-matching API. vsizer is on 4.1.2. For vatlas, plan to use **Browser Mode** for any ECharts test that needs real rendering (jsdom does not produce real SVG geometry). |
+| Vitest | `^4.1.2` | Unit + integration tests | v4 graduated Browser Mode to stable (Oct 2025), added `toMatchScreenshot()`, Playwright Trace integration, schema-matching API. vsizer is on 4.1.2. For patlas, plan to use **Browser Mode** for any ECharts test that needs real rendering (jsdom does not produce real SVG geometry). |
 | `@vitest/coverage-v8` | `^4.1.2` | Coverage provider | Gate `engines/` + `utils/` at 75 % (vsizer ADR-0005). Add `engines/export/html/` to the gated paths once the report builder lands. |
 | `@testing-library/react` | `^16.3.2` | Component tests | Standard. |
 | `@testing-library/jest-dom` | `^6.9.1` | DOM matchers | Standard. |
@@ -68,7 +65,7 @@ patlas is a 100 % client-side web app that turns one or more Proxmox VE cluster 
 | `@types/react` / `@types/react-dom` | `^19.2.14` / `^19.2.3` | Type defs | Lockstep with runtime. |
 | `@types/node` | `^25.7.0` | Vite/Node types | For `vite.config.ts`. |
 
-### Charting decision (the key new choice for vatlas)
+### Charting decision (the key new choice for patlas)
 
 | Chart type | Used for | Recharts | Visx | Nivo | Plotly | **ECharts** |
 |---|---|---|---|---|---|---|
@@ -82,7 +79,7 @@ patlas is a 100 % client-side web app that turns one or more Proxmox VE cluster 
 | Server/static SVG output | needed for HTML report | not designed for it | possible | possible | only with Plotly's server bundle | **first-class — `renderer: 'svg'` + `renderToSVGString`** |
 
 - Always use the tree-shaking import path (`echarts/core`), never `import * as echarts from 'echarts'`. Register only the charts and components you use.
-- Pick the **SVG renderer**, not Canvas. Canvas is faster for >10k points; vatlas's per-cluster cardinality is in the hundreds-to-low-thousands, well within SVG's comfort zone. SVG is what makes the HTML report export trivial and what keeps charts crisp in the exported PPTX (pptxgenjs can embed SVG paths or rasterize cleanly).
+- Pick the **SVG renderer**, not Canvas. Canvas is faster for >10k points; patlas's per-cluster cardinality is in the hundreds-to-low-thousands, well within SVG's comfort zone. SVG is what makes the HTML report export trivial and what keeps charts crisp in the exported PPTX (pptxgenjs can embed SVG paths or rasterize cleanly).
 - Wrap `<ReactECharts>` in a thin `<Chart>` component that injects the SVG renderer and a project-wide theme so every chart inherits the Midnight Executive palette tokens defined in CSS.
 
 ### HTML report export decision (the second key new choice)
@@ -90,11 +87,11 @@ patlas is a 100 % client-side web app that turns one or more Proxmox VE cluster 
 | Approach | Verdict | Reason |
 |---|---|---|
 | **Live-DOM serialization (recommended)** | YES | Zero new runtime deps. Reuses the same ECharts SVG already rendered on screen. Resulting file is statically viewable in any browser — even Safari with JS disabled. Pure function in `engines/`, easy to coverage-gate. |
-| `vite-plugin-singlefile` | NO — wrong problem | This bundles the **vatlas app itself** into a single HTML for distribution (think: download the app as one file). It does **not** help produce a per-snapshot report file from inside a running app. Don't conflate the two. |
-| `@react-pdf/renderer` | NO | It produces PDF, not HTML. vatlas wants HTML (interactive-ish, copyable text, no font embedding hassles). PDF is a different deliverable and is not in scope. |
+| `vite-plugin-singlefile` | NO — wrong problem | This bundles the **patlas app itself** into a single HTML for distribution (think: download the app as one file). It does **not** help produce a per-snapshot report file from inside a running app. Don't conflate the two. |
+| `@react-pdf/renderer` | NO | It produces PDF, not HTML. patlas wants HTML (interactive-ish, copyable text, no font embedding hassles). PDF is a different deliverable and is not in scope. |
 | Headless rendering via `puppeteer` / Playwright | NO | Requires a server / Node process; violates the 100 % client-side invariant. |
 | `single-file` browser extension (gildas-lormeau/SingleFile) | NO | Asks the user to install a browser extension. Not acceptable for "drop file, get report" UX. Internally it does what we already plan — serialize the live DOM with inlined resources — but as an extension. We do this in-app instead. |
-| Custom HTML string assembly (template literals) | NO — but partial yes | Hand-concatenating HTML strings for the report shell is fine for a one-off; for the volume of structure in vatlas (KPI tiles, tables, multiple chart sections per page, multiple pages) `renderToStaticMarkup` of a real React tree is dramatically less error-prone and gives us free typed components. |
+| Custom HTML string assembly (template literals) | NO — but partial yes | Hand-concatenating HTML strings for the report shell is fine for a one-off; for the volume of structure in patlas (KPI tiles, tables, multiple chart sections per page, multiple pages) `renderToStaticMarkup` of a real React tree is dramatically less error-prone and gives us free typed components. |
 
 ## Installation
 
@@ -110,17 +107,17 @@ patlas is a 100 % client-side web app that turns one or more Proxmox VE cluster 
 
 | Recommended | Alternative | When the alternative would be the right call |
 |---|---|---|
-| Apache ECharts | **Recharts** | If vatlas dropped treemap, sunburst, heatmap, calendar, and gauge from the brief and was limited to bar/line/pie/area. It is not. |
+| Apache ECharts | **Recharts** | If patlas dropped treemap, sunburst, heatmap, calendar, and gauge from the brief and was limited to bar/line/pie/area. It is not. |
 | Apache ECharts | **Nivo** | If hard-contractual WCAG 2.1 AA on chart elements is required (it is not in the brief). Nivo's ARIA labels and keyboard nav are best-in-class. |
-| Apache ECharts | **Visx (`@visx/*`)** | If the team wanted to build a bespoke design language for charts pixel-by-pixel. vatlas is not a charting product, it is an analytics product that uses charts. |
-| Apache ECharts | **Plotly** | If 3D, geo-maps, or scientific plots were required. vatlas needs neither. |
+| Apache ECharts | **Visx (`@visx/*`)** | If the team wanted to build a bespoke design language for charts pixel-by-pixel. patlas is not a charting product, it is an analytics product that uses charts. |
+| Apache ECharts | **Plotly** | If 3D, geo-maps, or scientific plots were required. patlas needs neither. |
 | Apache ECharts | **MUI X Charts** | If the rest of the UI was on MUI. It is not (Tailwind v4 + custom). MUI X Charts also has a partial Pro license tier that complicates the open-source story. |
 | Live-DOM serialization | **`@react-pdf/renderer`** | If the user wanted PDF as the share format. They want HTML + PPTX. Re-evaluate if a PDF requirement appears. |
-| Live-DOM serialization | **`vite-plugin-singlefile`** | If the deliverable were "ship the whole vatlas app as a single HTML you can run offline". Adjacent product, not the v1 report. Could be added later for the GitHub Pages bundle itself. |
+| Live-DOM serialization | **`vite-plugin-singlefile`** | If the deliverable were "ship the whole patlas app as a single HTML you can run offline". Adjacent product, not the v1 report. Could be added later for the GitHub Pages bundle itself. |
 | pptxgenjs | **officegen** | Lower maintenance, weaker API, no advantage. Skip. |
-| pptxgenjs | **Aspose.Slides Cloud / SlideForge API** | If editorial AI-generated decks were the goal. They are not — vatlas's PPTX is factual, no narrative. |
+| pptxgenjs | **Aspose.Slides Cloud / SlideForge API** | If editorial AI-generated decks were the goal. They are not — patlas's PPTX is factual, no narrative. |
 | Vitest 4 | **Jest 30** | Migrating to Jest would cost weeks for no gain. Vitest is already wired in vsizer and is faster on Vite-native code. |
-| Zustand 5 | **Redux Toolkit / Jotai / Valtio** | Only if vatlas grew to need time-travel debugging or graph-of-derived-state semantics. The dataset shape (vinfo, vhost, datastores, snapshots) is flat and Zustand handles it cleanly. |
+| Zustand 5 | **Redux Toolkit / Jotai / Valtio** | Only if patlas grew to need time-travel debugging or graph-of-derived-state semantics. The dataset shape (guests, nodes, storages, snapshots) is flat and Zustand handles it cleanly. |
 | Zod 4 | **Valibot / ArkType** | Smaller bundles, but Zod 4 is now within ~10–30 % of Valibot on bundle size and is what the team already uses. Switching costs more than it saves. |
 
 ## What NOT to Use
@@ -128,20 +125,20 @@ patlas is a 100 % client-side web app that turns one or more Proxmox VE cluster 
 | Avoid | Why | Use Instead |
 |---|---|---|
 | `npm install xlsx` from the npm registry | npm package is frozen at **0.18.5** and carries CVE-2023-30533 (prototype pollution) and CVE-2024-22363 (ReDoS). SheetJS deliberately stopped publishing to npm; the npm package is **not** the same code as the current CDN release. | The CDN tarball: `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz`, pinned in `package.json`'s `dependencies` field exactly as shown. Same approach as vsizer ADR-0002. |
-| `import * as echarts from 'echarts'` | Pulls the entire 1 MB ECharts bundle into vatlas. | `import * as echarts from 'echarts/core'` + per-feature imports + `echarts.use([...])`. Land at ~150–300 KB. |
-| ECharts Canvas renderer for vatlas | Inline SVG in the HTML report becomes impossible from Canvas-rendered charts; you would have to rasterize to PNG and embed as data URIs, losing crispness and exploding file size. | `{ renderer: 'svg' }` on every ECharts instance. The chart counts in vatlas (low thousands of points max per chart) are well within SVG's comfort zone. |
+| `import * as echarts from 'echarts'` | Pulls the entire 1 MB ECharts bundle into patlas. | `import * as echarts from 'echarts/core'` + per-feature imports + `echarts.use([...])`. Land at ~150–300 KB. |
+| ECharts Canvas renderer for patlas | Inline SVG in the HTML report becomes impossible from Canvas-rendered charts; you would have to rasterize to PNG and embed as data URIs, losing crispness and exploding file size. | `{ renderer: 'svg' }` on every ECharts instance. The chart counts in patlas (low thousands of points max per chart) are well within SVG's comfort zone. |
 | `vite-plugin-singlefile` for the **report** output | It builds the **app** into one HTML at build time. It is not a runtime export mechanism and cannot serialize per-snapshot in-memory state. | Live-DOM serialization at export time inside the app (see "HTML report export decision"). |
-| `localStorage` / `sessionStorage` / IndexedDB / OPFS for parsed RVTools rows | Violates the privacy invariant inherited from vsizer (ADR-0001, ADR-0004). Refresh-equals-data-gone is a product promise. | Memory only — Zustand store, `ArrayBuffer` from `FileReader`, both garbage-collected on refresh. Persisting only **UI** preferences (locale, theme) is fine because they contain no dataset content. |
+| `localStorage` / `sessionStorage` / IndexedDB / OPFS for parsed cv4pve-report rows | Violates the privacy invariant inherited from vsizer (ADR-0001, ADR-0004). Refresh-equals-data-gone is a product promise. | Memory only — Zustand store, `ArrayBuffer` from `FileReader`, both garbage-collected on refresh. Persisting only **UI** preferences (locale, theme) is fine because they contain no dataset content. |
 | Zustand `import create from 'zustand'` (default export) | Deprecated since v4; warns on console in v5. | `import { create } from 'zustand'`. For non-React stores: `import { createStore } from 'zustand/vanilla'`. |
 | Zod v3 idioms in new code | v4 changed `.default()` semantics (defaults now applied when absent, not when invalid) and replaced `message`/`invalid_type_error`/`required_error` with a single `error` parameter. v3 patterns silently misbehave. | Use the v4 API directly. If migrating any vsizer schemas, run `npx @zod/codemod --transform v3-to-v4` once. |
-| `localStorage` of workbook bytes for "trends" | Same privacy violation. Multi-snapshot trends ship in the active scope on purpose. | Make trends an in-session feature: user drags N monthly RVTools files in at once, vatlas holds them all in memory, trend charts render, refresh wipes everything. This matches `PROJECT.md`'s explicit Out of Scope. |
-| Live Optics parsing code from vsizer | Out of scope for vatlas v1. | Cherry-pick only the RVTools side of `engines/parser/` (parseXlsx, RVTools normalizer, Zod schemas). Skip `detectSource` and the Live Optics adapter entirely. |
+| `localStorage` of workbook bytes for "trends" | Same privacy violation. Multi-snapshot trends ship in the active scope on purpose. | Make trends an in-session feature: user drags N monthly cv4pve-report files in at once, patlas holds them all in memory, trend charts render, refresh wipes everything. This matches `PROJECT.md`'s explicit Out of Scope. |
+| Live Optics / RVTools / multi-format `detectSource` parsing (vsizer carried these) | patlas is **cv4pve-only**; a source-detection layer is dead weight and dilutes the Proxmox-native model. | The single `engines/parser/adapters/proxmox.ts` path (parseXlsx → adaptProxmox → Zod at the boundary). Add another source only if the product scope actually changes. |
 | PostCSS-based Tailwind config | Slower, more boilerplate, no benefit for a Vite project. | `@tailwindcss/vite` + `@theme` blocks in `src/index.css`. |
 | `npm audit fix --force` | Will silently rewrite the xlsx tarball URL to the npm version and break the privacy/security model. | Investigate manually, never blindly. Keep the CI audit gate from vsizer (LOW+ severity gates from ADR-0016) but resolve issues by upgrading, not by forcing the resolver. |
 
 ## Stack Patterns by Variant
 
-- Add `vite-plugin-singlefile` as a **separate optional build target** (e.g. `npm run build:portable`) to produce a single-file version of the vatlas app itself, alongside the normal GitHub Pages build. This is independent of the per-snapshot HTML report and useful only as an offline distribution form.
+- Add `vite-plugin-singlefile` as a **separate optional build target** (e.g. `npm run build:portable`) to produce a single-file version of the patlas app itself, alongside the normal GitHub Pages build. This is independent of the per-snapshot HTML report and useful only as an offline distribution form.
 - Switch the offending chart instances from `renderer: 'svg'` to `renderer: 'canvas'` on a per-chart basis. Keep SVG for charts that go into the HTML report; use Canvas only for in-app overview charts that don't need SVG output. ECharts supports this per-instance.
 - Add `@react-pdf/renderer` as a third export engine alongside HTML and PPTX. Reuse the same chart SVGs (the renderer can embed SVG into PDF).
 - Re-evaluate Nivo vs ECharts for charts. ECharts has accessibility props (`aria` config on series) but Nivo's ARIA story is significantly more polished out of the box.
@@ -192,27 +189,19 @@ patlas is a 100 % client-side web app that turns one or more Proxmox VE cluster 
 - [GitHub Advisory GHSA-5pgg-2g8v-p4x9](https://github.com/advisories/GHSA-5pgg-2g8v-p4x9) — same CVE, public advisory. HIGH.
 - [pptxgenjs project home](https://gitbrent.github.io/PptxGenJS/) and [GitHub](https://github.com/gitbrent/PptxGenJS) — confirms project is alive, 4.0.1 current. HIGH.
 - [Snyk pptxgenjs](https://security.snyk.io/package/npm/pptxgenjs) — no current advisories at recommendation time. HIGH.
-<!-- GSD:stack-end -->
 
-<!-- GSD:conventions-start source:CONVENTIONS.md -->
 ## Conventions
 
 Conventions not yet established. Will populate as patterns emerge during development.
-<!-- GSD:conventions-end -->
 
-<!-- GSD:architecture-start source:ARCHITECTURE.md -->
 ## Architecture
 
 Architecture not yet mapped. Follow existing patterns found in the codebase.
-<!-- GSD:architecture-end -->
 
-<!-- GSD:skills-start source:skills/ -->
 ## Project Skills
 
 No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.
-<!-- GSD:skills-end -->
 
-<!-- project-notes: hand-maintained, NOT a GSD-managed fence -->
 ## Commands
 
 ```bash
@@ -226,19 +215,25 @@ npm run check:supply-chain        # fails on telemetry pkgs or xlsx pin drift
 npm run check:bundle-size         # fails if echarts chunk > 300 KB gz
 ```
 
-## Architecture (shipped P1–P7)
+## Architecture (shipped)
 
 - `src/engines/**` — pure functions only (no React/DOM/Zustand/Zod; Zod lives only at the parser boundary). Vitest-gated ≥75%.
-- `src/store/datasetStore.ts` — Zustand, **inputs only** (`Map<id,Snapshot>` immutable). No cached aggregates (deliberate vsizer deviation).
+- `src/store/snapshotStore.ts` — Zustand, **inputs only** (`Map<id,Snapshot>` immutable). No cached aggregates (deliberate vsizer deviation).
 - `src/hooks/useEstateView.ts` — the **single** `useMemo` in non-test `src/`; the only bridge store→UI/exports. Components consume this hook, never engines.
 - Parser runs in a Web Worker; `xlsx` import is confined to `parser.worker.ts`.
 - `src/components/Chart.tsx` — the only ECharts import site; single `option` prop; SVG renderer mandated.
-- **Right-sizing + Monster VMs** (branch `feat/vm-rightsizing-stress`, post-v2.0, via the superpowers spec/plan flow — see `docs/superpowers/`): RVTools `vMemory`+`vCPU` parsed into a parallel `VmUsageRow[]` on `Snapshot` (config stays on `VInfoRow`; `null`=not-derivable, never 0). Pure `engines/aggregation/sizing.ts` (oversized/undersized/stressed — CPU/mem utilization vs allocation, **max across loaded snapshots, powered-on only**) + `monsterVm.ts` (largest by configured vCPU/vRAM) → `EstateView.sizing` / `.monsters`. In-memory `sizingThresholds` / `monsterThresholds` store slices, threaded through the single `useEstateView` memo. `components/rightsizing/RightSizingView` + `components/monstervm/MonsterVmView` (nav ids `rightsizing`/`monstervm`); native PPTX `slides/rightSizingSlide` (KPI+bar, emits when `sizing.hasUsageData`) + `slides/monsterSlide` (KPI+native table, emits when `monsters.count>0`). The HTML report deliberately **excludes** both (web + PPTX only). CPU-util denominator = `vcpu × host per-core MHz` (approximation). RVTools is point-in-time; "max" = max across the snapshots in scope.
+- **Right-sizing + Monster VMs** (branch `feat/vm-rightsizing-stress`, post-v2.0, via the superpowers spec/plan flow — see `docs/superpowers/`): cv4pve VMs-sheet `Memory Usage %` + `Cpu Usage %` parsed into a parallel `VmUsageRow[]` on `Snapshot` (config stays on `GuestRow`; `null`=not-derivable, never 0). Pure `engines/aggregation/sizing.ts` (oversized/undersized/stressed — CPU/mem utilization vs allocation, **max across loaded snapshots, powered-on only**) + `monsterVm.ts` (largest by configured vCPU/vRAM) → `EstateView.sizing` / `.monsters`. In-memory `sizingThresholds` / `monsterThresholds` store slices, threaded through the single `useEstateView` memo. `components/rightsizing/RightSizingView` + `components/monstervm/MonsterVmView` (nav ids `rightsizing`/`monstervm`); native PPTX `slides/rightSizingSlide` (KPI+bar, emits when `sizing.hasUsageData`) + `slides/monsterSlide` (KPI+native table, emits when `monsters.count>0`). The HTML report deliberately **excludes** both (web + PPTX only). CPU-util denominator = `vcpu × node per-core MHz` (approximation). cv4pve-report is point-in-time; "max" = max across the snapshots in scope.
+- **Proxmox Atlas v3** (`feat/proxmox-atlas-v3`): node/guest CPU now derives from the cv4pve **RRD Nodes** sheet (`Cpu Usage %`, a 0–1 fraction; fixes the prior hardcoded-0 CPU), with a VM `Cpu Usage %` fallback. Three value packs land as pure engines + views + native PPTX slides with HTML-report parity:
+  - **RRD analytics** — `engines/aggregation/rrdNodeStats.ts` (per-node peak/avg/p95 CPU·mem, PSI, IO-wait, loadavg, net) + `rrdStorageGrowth.ts` (least-squares days-to-full) → `components/rrd/{RrdHeadroomView,StorageGrowthView}` (nav `rrdheadroom`/`storagegrowth`); single-file trends are fed from RRD timestamps so `TrendsView` renders from ONE export.
+  - **Protection** — `fsFillRisk.ts` (Partitions sheet, in-guest FS fill), `diskHygiene.ts` (Disks sheet, unused/orphaned/ISO/cache), `backupCoverage.ts` (Cluster Tasks `vzdump` outcomes) → `components/protection/ProtectionView` (nav `protection`).
+  - **Governance** — `governance.ts` (cv4pve Issues + Cluster Access posture + Cluster Pools) → `components/governance/GovernanceView` (nav `governance`).
+  - The **Network** section is re-modelled to Proxmox bridges/bonds/NICs/VLANs (`network.ts`, from the Network sheet's stacked sections).
+  - **Storage by role** — `storageByRole.ts` classifies each Storages-sheet row (`StorageRole` = VM data / backup / local-boot / other, from Plugin Type + Content + Shared) and reports **real datastore used vs capacity** (`used = capacity − free` from the Storages sheet — NEVER the always-zero per-VM `Disk Usage GB`). Surfaced as a StatTile band in `StorageView`, a per-role table in the HTML report, and the PPTX storage slide. A few PBS backup repos routinely dwarf VM storage, so role grouping (not one total) is mandatory.
 
 ## Conventions
 
 - Commit prefix `<type>(NN-NN): …` (phase-plan id), e.g. `feat(03-02): …`.
-- Branded units (`MiB`/`GiB`/`MHz`/`GHz`/…) — never a raw `* 1.048576` (RVTools "MB" is MiB; ADR-0010).
+- Branded units (`MiB`/`GiB`/`MHz`/`GHz`/…) — never a raw `* 1.048576` (cv4pve-report "MB" is MiB; ADR-0010).
 - Toggles/tabs reuse the `ThemeToggle` `<fieldset role="group">` + `aria-pressed` idiom — don't reinvent.
 - i18n keys land in ALL FOUR locales (`en`/`fr`/`de`/`it`); the `src/i18n/keyParity.test.ts` gate enforces identical key paths (namespaces auto-derived from `locales/en/`). No pre-formatted numbers in strings; no editorial verbs ("recommend/should/poor/good"). DE/IT technical terminology is pending native review (tracked in the de-it-i18n spec risk).
 - No `localStorage` of dataset rows — only `patlas-theme` + `patlas-lang` keys are allowed.
@@ -249,7 +244,8 @@ npm run check:bundle-size         # fails if echarts chunk > 300 KB gz
 - **Privacy guard throws, it does not silently block.** Any non-same-origin `fetch`/`XHR`/`WS`/`sendBeacon` throws synchronously (intentional — silent block is undetectable). Adding any network call breaks the app by design.
 - **Reusing `components/inventory/DataTable.tsx`:** it resolves visible column headers via `useTranslation('inventory')` → `t('col.<id>')` — the `headerFor` prop is **CSV-only**. A new column `id` needs an `inventory:col.<id>` key in `i18n/locales/{en,fr}/inventory.json` or the header renders the raw key. The virtualized `<tbody>` rows are `flex w-full` + per-cell `flex-1`; the `<thead>` must use the **same** flex layout (not default table-cell sizing) or header/body columns desync (latent bug fixed in P7 — affected all consumers).
 - **`rtk tsc` only typechecks the app project** (`tsconfig.app`). Test-file type errors — e.g. a `Snapshot`/`EstateView` literal missing a newly-required field — surface ONLY under the full `npm run typecheck` (app + `tsconfig.test.json`). After adding a required field to a shared type, run `npm run typecheck`, not just `rtk tsc`.
-- **`vsanRelink.realfile.test.ts` can time out (5 s) under `--coverage`** when the real workbook is present (instrumentation slows the 3-vCenter parse) — not a regression. Use `npm run test:coverage -- --testTimeout=60000` for a clean coverage gate.
+- **The `*.realfile.test.ts` suites (`proxmox-estate.realfile`, `rrd.realfile`, …) can time out (5 s) under `--coverage`** when the real cv4pve workbook is present (instrumentation slows the parse of the 36k-row RRD Storage / 8.6k-row RRD Nodes sheets) — not a regression. Use `npm run test:coverage -- --testTimeout=60000` for a clean coverage gate.
+- **Every cv4pve "%" column is a 0–1 FRACTION, not 0–100** (`Cpu Usage %` `0.023` = 2.3%; `Disk Usage %` `0.0005`). Multiply by 100 only at display. The per-VM `Disk Usage GB`/`Disk Usage %` columns are **uniformly empty/0** in real exports — VM "consumed" storage is not derivable per-VM; real usage lives in the **Storages** sheet (`Disk Usage GB` per datastore) and in-guest in the **Partitions** sheet. This is why storage "in use" is sourced from datastores, not summed VM rows.
 - **`grep -c "<token>" == 0` plan gates (and the security hook) match doc-comments too.** A comment documenting a token's *deliberate absence* (e.g. naming `new Date(` or the React raw-HTML prop to say "never used") fails the gate / blocks the write. Phrase absence comments without the literal token.
 
 <!-- rtk-instructions v2 -->

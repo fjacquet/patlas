@@ -1,4 +1,3 @@
-<!-- generated-by: gsd-doc-writer -->
 # Testing
 
 How patlas is tested: the framework, how to run the suite, where tests live, the

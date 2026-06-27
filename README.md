@@ -1,4 +1,3 @@
-<!-- generated-by: gsd-doc-writer -->
 # pAtlas
 
 [![Deploy to GitHub Pages](https://github.com/fjacquet/patlas/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/fjacquet/patlas/actions/workflows/deploy.yml)
@@ -52,18 +51,25 @@ The defining product invariant — enforced in code, not just promised: a runtim
 
 ## Status
 
-patlas v2.1.0 ships the following features:
+patlas ships the following features:
 
-**Inherited analytics (Proxmox-relabeled):** global dashboard, inventory tree, nodes view, capacity planning, OS End-of-Support forecasting, in-session trends (multiple reports loaded at once), storage capacity by storage pool, network, right-sizing, monster guests.
+**Foundation analytics:** global dashboard, inventory tree (cluster → node → guest), nodes view, capacity planning (what-if lens), OS End-of-Support forecasting, in-session trends (multiple reports loaded at once), network diagram, right-sizing, monster guests.
 
-**Proxmox-native views (v2.1.0):**
+**RRD analytics pack:**
+- **Node Headroom** — CPU and RAM headroom per node derived from RRD time-series (peak, P95, average); shows real utilisation alongside configured capacity.
+- **Storage Growth** — storage time-to-full projection from RRD growth history.
+
+**Proxmox-native health views:**
 - **Snapshot Sprawl** — guest snapshots held on the estate: count, guests-with-snapshots, total size, oldest age. Parses the `Snapshots` sheet; excludes the Proxmox `current` live-state marker.
 - **Storage Content** — what occupies each storage pool, broken down by content type (images / rootdir / iso / vztmpl / backup …) plus a backup-file inventory with per-guest recency. Parses the `Storage Content` sheet.
 - **Cluster Health** — HA status (quorum / fencing service state, HA-managed guest resources) and scheduled backup jobs. Parses the stacked `Cluster HA` / `Cluster` composite sheets.
+- **Storage** — storage capacity by pool with storage-by-role segmentation (VM data / backup / local), real used vs capacity.
 
-**Exports:** HTML report + PPTX deck (inherited analytics). The three Proxmox-native views are web-only.
+**Protection pack:** in-guest filesystem fill risk, disk hygiene, and backup coverage analysis.
 
-`.planning/ROADMAP.md` is the source of truth for current phase status.
+**Governance pack:** cv4pve issues, access posture, and resource pool analysis.
+
+**Exports:** HTML report + PPTX deck (foundation analytics). Proxmox-native health views are web-only.
 
 ## License
 
