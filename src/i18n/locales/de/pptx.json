@@ -19,7 +19,9 @@
     "cores": "Physische Kerne",
     "hostMem": "Knoten-Arbeitsspeicher",
     "provisioned": "Bereitgestellt",
-    "usedStorage": "Belegter Speicher"
+    "usedStorage": "Belegter Speicher",
+    "vmStorageUsed": "VM-Speicher belegt",
+    "vmStorageCapacity": "VM-Speicherkapazität"
   },
   "protection": {
     "fsFill": { "more": "+ {{count}} weitere Mounts über dem Schwellenwert" }

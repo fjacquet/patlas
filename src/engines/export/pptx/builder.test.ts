@@ -454,6 +454,17 @@ describe('buildPptx — golden structural snapshot', () => {
     expect(withPng.byteLength).toBeGreaterThan(withNote.byteLength)
   })
 
+  it('Fix 1 — overview shows VM-storage KPIs, not per-VM Provisioned/Used storage', async () => {
+    const a = snap('a', 3, TODAY)
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    const ab = await buildPptx(view, trends, strings, 'en')
+    const txt = new TextDecoder('latin1').decode(new Uint8Array(ab))
+    expect(txt).toContain('VM storage used')
+    expect(txt).toContain('VM storage capacity')
+    expect(txt).not.toContain('Provisioned')
+    expect(txt).not.toContain('Used storage')
+  })
+
   it('PPT-02: overview + cluster slides surface the previously-dropped facts', async () => {
     const a = snap('a', 3, TODAY)
     const { view, trends } = buildExportView(a, [a], MODE, TODAY)

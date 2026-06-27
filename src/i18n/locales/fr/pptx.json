@@ -19,7 +19,9 @@
     "cores": "Cœurs physiques",
     "hostMem": "Mémoire nœud",
     "provisioned": "Provisionné",
-    "usedStorage": "Stockage utilisé"
+    "usedStorage": "Stockage utilisé",
+    "vmStorageUsed": "Stockage VM utilisé",
+    "vmStorageCapacity": "Capacité stockage VM"
   },
   "protection": {
     "fsFill": { "more": "+ {{count}} montages supplémentaires au-dessus du seuil" }
