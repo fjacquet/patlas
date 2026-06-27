@@ -66,17 +66,20 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
       vms: fmtN(view.globals.vmCount),
       captureDate: new Date(req.active.capturedAt).toLocaleDateString(bcp47),
     }
-    const strings: typeof req.strings = {}
-    for (const [k, v] of Object.entries(req.strings)) {
-      // `req.strings` is the app's own i18n bundle, but it crosses a postMessage
-      // boundary — guard the dynamic property write against prototype-polluting
-      // keys, and resolve placeholders only against own keys of `vars`.
-      if (k === '__proto__' || k === 'prototype' || k === 'constructor') continue
-      strings[k] = v.replace(/\{\{(\w+)\}\}/g, (m, key) => {
-        const val = Object.hasOwn(vars, key) ? vars[key] : undefined
-        return val ?? m
-      })
-    }
+    // `req.strings` is the app's own i18n bundle, but it crosses a postMessage
+    // boundary. Build the resolved bundle via Object.fromEntries — no computed
+    // property-write sink, and its [[DefineOwnProperty]] semantics mean a
+    // '__proto__' key becomes a plain own property, never polluting the
+    // prototype. Resolve `{{token}}` only against own keys of `vars`.
+    const strings = Object.fromEntries(
+      Object.entries(req.strings).map(([k, v]) => [
+        k,
+        v.replace(/\{\{(\w+)\}\}/g, (m, key) => {
+          const val = Object.hasOwn(vars, key) ? vars[key] : undefined
+          return val ?? m
+        }),
+      ]),
+    ) as typeof req.strings
 
     let bytes: ArrayBuffer
     if (req.kind === 'html') {
