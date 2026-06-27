@@ -4,6 +4,7 @@ import PptxGenJS from 'pptxgenjs'
 import { describe, expect, it } from 'vitest'
 import type { BackupCoverage } from '@/engines/aggregation/backupCoverage'
 import type { FsFillRisk, FsRiskRow } from '@/engines/aggregation/fsFillRisk'
+import type { TopologyView } from '@/engines/aggregation/topologyTree'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
 import type { GuestRow } from '@/types/guest'
@@ -17,6 +18,8 @@ import type {
   Snapshot,
 } from '@/types/snapshot'
 import { buildExportView } from '../buildExportView'
+import { topologyTreeOption } from '../charts/topologyOption'
+import { chartToSvg } from '../html/renderCharts'
 import { buildPptx } from './builder'
 import { chartSvgToPng } from './primitives/chartSvg'
 import { addBackupCoverageSlide } from './slides/backupCoverageSlide'
@@ -466,7 +469,7 @@ describe('buildPptx — golden structural snapshot', () => {
     expect(slideCount(ab)).toBe(10)
   })
 
-  it('REAL WRITE: a non-null networkPng serializes to a valid OOXML deck (no throw)', async () => {
+  it('REAL WRITE: a non-null topologyPng serializes to a valid OOXML deck (no throw)', async () => {
     // Regression guard for the v2.2.1 export-breaking bug: the network slide
     // used to embed a raw SVG data URI, which throws on a real pptxgenjs write
     // in the browser worker (PowerPoint can't render embedded SVG). The old
@@ -475,15 +478,15 @@ describe('buildPptx — golden structural snapshot', () => {
     // RESOLVES and the network slide is present in the output.
     const a = snap('a', 3, TODAY)
     const { view, trends } = buildExportView(a, [a], MODE, TODAY)
-    const networkPng = await chartSvgToPng(
+    const topologyPng = await chartSvgToPng(
       '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="#0a0"/></svg>',
       40,
       40,
       wasmBytes,
     )
-    expect(networkPng[0]).toBe(0x89) // PNG magic — the bytes are a real PNG
+    expect(topologyPng[0]).toBe(0x89) // PNG magic — the bytes are a real PNG
 
-    const withPng = await buildPptx(view, trends, strings, 'en', { networkPng })
+    const withPng = await buildPptx(view, trends, strings, 'en', { topologyPng })
     expect(isZip(withPng)).toBe(true)
     expect(withPng.byteLength).toBeGreaterThan(1000)
     // Slide count is unchanged vs the note path (the network slide always
@@ -527,23 +530,54 @@ describe('buildPptx — golden structural snapshot', () => {
     expect(txt).toContain('Reserved capacity')
   })
 
-  it('Fix 4 — oversized network slide omits the raster and shows the HTML-report note', async () => {
+  it('P-NT: topology PNG embeds in the deck (deck-with-png > deck-without)', async () => {
+    // Spec 2: the network slide now renders the ECharts topology tree to a PNG
+    // (drops the interim Spec-1 oversized-SVG raster path entirely). Build a
+    // real topologyPng via the full pipeline — chartToSvg → chartSvgToPng —
+    // and assert the OOXML package contains the embedded media bytes.
     const a = snap('a', 3, TODAY)
     const { view, trends } = buildExportView(a, [a], MODE, TODAY)
-    const networkPng = await chartSvgToPng(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="#0a0"/></svg>',
-      40,
-      40,
-      wasmBytes,
-    )
-    const oversized = await buildPptx(view, trends, strings, 'en', {
-      networkPng,
-      networkOversized: true,
-    })
-    const embedded = await buildPptx(view, trends, strings, 'en', { networkPng })
-    // No embedded PNG media in the oversized deck → strictly smaller bytes.
-    expect(oversized.byteLength).toBeLessThan(embedded.byteLength)
-    const txt = new TextDecoder('latin1').decode(new Uint8Array(oversized))
-    expect(txt).toContain('Full network diagram available in the HTML report.')
+
+    // Minimal but valid TopologyView fixture (the test must not depend on
+    // nodeInterfaces being present in the snap fixture — snap() has none).
+    const topoView: TopologyView = {
+      hasData: true,
+      groups: [
+        {
+          nodes: ['pve1'],
+          signature: 'vmbr0',
+          unconfiguredNicCount: 0,
+          roots: [
+            {
+              id: 'g0/vmbr0',
+              name: 'vmbr0',
+              kind: 'bridge',
+              vmCount: 2,
+              vmNodeSpread: { withVms: 1, total: 1 },
+              children: [],
+            },
+          ],
+        },
+      ],
+    }
+    const TOPOLOGY_LABELS = {
+      estate: 'Estate',
+      nodesWord: 'nodes',
+      unconfigured: '+ {{count}} unconfigured NICs',
+      vms: 'VMs',
+      ofNodes: '{{withVms}}/{{total}} nodes',
+    }
+    const { option, height } = topologyTreeOption(topoView, TOPOLOGY_LABELS)
+    const topologyPng = await chartSvgToPng(chartToSvg(option, 800, height), 800, height, wasmBytes)
+    expect(topologyPng[0]).toBe(0x89) // PNG magic — real rasterized bytes
+
+    const withPng = await buildPptx(view, trends, strings, 'en', { topologyPng })
+    const withNote = await buildPptx(view, trends, strings, 'en')
+    expect(isZip(withPng)).toBe(true)
+    // The embedded PNG media adds real bytes the note path lacks → PNG deck is
+    // strictly larger, proving the topology image was serialized into the package.
+    expect(withPng.byteLength).toBeGreaterThan(withNote.byteLength)
+    // Slide count is always the same — the network slide always emits one slide.
+    expect(slideCount(withPng)).toBe(slideCount(withNote))
   })
 })

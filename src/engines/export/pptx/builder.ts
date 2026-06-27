@@ -51,16 +51,12 @@ export interface BuildPptxOpts {
   /** The active snapshot's capture date (ISO `YYYY-MM-DD`), used verbatim
    *  on the D-03 title slide — NOT the vCenter label. */
   capturedAt?: string
-  /** Rasterized network diagram PNG (the worker resvg-rasterizes
-   *  `Snapshot.networkSvg` with a bundled font). When present it is embedded
-   *  as a PowerPoint-safe image on the Network slide (PowerPoint cannot render
-   *  embedded SVG — Pitfall 1). When null/undefined the slide shows a factual
-   *  Proxmox-correct note. */
-  networkPng?: Uint8Array | null
-  /** True when the SVG was extreme-portrait (e.g. 1762×14092); the worker
-   *  capped the raster height to avoid a 12 000-px PNG, and the slide should
-   *  reserve space for a "see HTML report" note. */
-  networkOversized?: boolean
+  /** Rasterized topology-tree PNG (the worker renders the ECharts topology
+   *  option to SVG, then rasterizes via resvg-wasm). When present it is
+   *  embedded as a PowerPoint-safe image on the Network slide (PowerPoint
+   *  cannot render embedded SVG — Pitfall 1). When null/undefined the slide
+   *  shows a factual Proxmox-correct note. */
+  topologyPng?: Uint8Array | null
 }
 
 export async function buildPptx(
@@ -119,14 +115,7 @@ export async function buildPptx(
   // F-2 (D-05): Storage + Network after the per-cluster narrative,
   // before the conditional annex. Network has no chart (D-08).
   addStorageSlide(pptx, view, strings, locale)
-  addNetworkSlide(
-    pptx,
-    opts.networkPng ?? null,
-    strings,
-    locale,
-    opts.networkOversized ?? false,
-    view.network,
-  )
+  addNetworkSlide(pptx, opts.topologyPng ?? null, strings, locale, view.network)
 
   // Conditional CPU-Ready annex.
   if (opts.contentionRows && opts.contentionRows.length > 0) {
