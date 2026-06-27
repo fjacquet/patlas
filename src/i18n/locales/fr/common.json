@@ -2,6 +2,11 @@
   "appName": "patlas",
   "tagline": "Proxmox → atlas de votre parc Proxmox (100 % client)",
   "footer": "100 % client · votre fichier ne quitte jamais votre navigateur",
+  "privacy": {
+    "badge": "Aucune donnée ne quitte cet appareil",
+    "tooltip": "pAtlas s'exécute entièrement dans votre navigateur. Les requêtes réseau vers d'autres origines sont bloquées par politique — déconnectez le réseau et tout continue de fonctionner.",
+    "offline": "Hors ligne"
+  },
   "error": {
     "title": "Une erreur est survenue"
   },
