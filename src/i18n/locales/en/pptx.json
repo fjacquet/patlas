@@ -134,8 +134,7 @@
   "network": {
     "title": "Network",
     "diagramAlt": "Network topology diagram",
-    "absent": "No network diagram is included in this report.",
-    "oversizedNote": "Full network diagram available in the HTML report."
+    "absent": "No network diagram is included in this report."
   },
   "os": {
     "title": "Operating systems",

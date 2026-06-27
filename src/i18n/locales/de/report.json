@@ -67,7 +67,6 @@
     "vlans": "VLANs",
     "vmNics": "Gast-NIC-Zuordnungen",
     "diagramAlt": "Netzwerktopologie-Diagramm",
-    "oversizedNote": "Das vollständige Netzwerkdiagramm ist im HTML-Bericht verfügbar.",
     "absent": "Kein Netzwerkdiagramm in diesem Bericht enthalten."
   },
   "eos": {

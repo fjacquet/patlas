@@ -134,8 +134,7 @@
   "network": {
     "title": "Réseau",
     "diagramAlt": "Diagramme de topologie réseau",
-    "absent": "Aucun schéma réseau n'est inclus dans ce rapport.",
-    "oversizedNote": "Le schéma réseau complet est disponible dans le rapport HTML."
+    "absent": "Aucun schéma réseau n'est inclus dans ce rapport."
   },
   "os": {
     "title": "Systèmes d'exploitation",

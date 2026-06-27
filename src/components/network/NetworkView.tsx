@@ -1,10 +1,10 @@
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
+import { Chart } from '@/components/Chart'
 import { topologyTreeOption } from '@/engines/export/charts/topologyOption'
 import { svgToDataUri } from '@/engines/export/svgDataUri'
 import { useEstateView } from '@/hooks/useEstateView'
 import { selectActiveSnapshot, useSnapshotStore } from '@/store/snapshotStore'
-import { Chart } from '../Chart'
 import { nodeNetworkColumns, vmNicColumns } from '../inventory/columns/networkColumns'
 import { DataTable } from '../inventory/DataTable'
 

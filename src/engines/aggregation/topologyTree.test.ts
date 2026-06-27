@@ -120,6 +120,40 @@ describe('buildTopology', () => {
     expect(untagged?.vmNodeSpread).toEqual({ withVms: 2, total: 2 })
   })
 
+  it('inactive non-eth (bond/vlan) does NOT raise unconfiguredNicCount; inactive eth does', () => {
+    // Inactive bond — must NOT count as unconfigured NIC.
+    const downBond = iface({ node: 'pve1', name: 'bond9', type: 'bond', active: false })
+    // Inactive eth — must count as unconfigured NIC.
+    const downEth = iface({ node: 'pve1', name: 'eno9', type: 'eth', active: false })
+    // An active standard node to form a valid group.
+    const rows = [...standardNode('pve1'), downBond, downEth]
+    const v = buildTopology({ nodeInterfaces: rows })
+    expect(v.groups).toHaveLength(1)
+    const unconfigured = v.groups[0]?.unconfiguredNicCount ?? 0
+    // downEth counts; downBond must NOT count.
+    expect(unconfigured).toBe(1)
+  })
+
+  it('standalone NIC (no bond) bridge: root is nic kind with bridge child', () => {
+    // Covers the `nic:${b.port}` branch in signatureOf and the `'nic'` kind in roots.
+    const rows = [
+      iface({ node: 'pve1', name: 'eth0', type: 'eth', active: true }),
+      iface({
+        node: 'pve1',
+        name: 'vmbr0',
+        type: 'bridge',
+        bridgePorts: 'eth0',
+        bridgeVlanAware: false,
+      }),
+    ]
+    const v = buildTopology({ nodeInterfaces: rows })
+    expect(v.hasData).toBe(true)
+    const root = v.groups[0]?.roots[0]
+    expect(root?.kind).toBe('nic')
+    expect(root?.name).toContain('eth0')
+    expect(root?.children?.[0]?.kind).toBe('bridge')
+  })
+
   it('does not crash on unknown/SDN interface types', () => {
     const rows = [iface({ node: 'pve1', name: 'vxlan1', type: 'vxlan' })]
     expect(() => buildTopology({ nodeInterfaces: rows })).not.toThrow()

@@ -134,8 +134,7 @@
   "network": {
     "title": "Rete",
     "diagramAlt": "Diagramma della topologia di rete",
-    "absent": "Nessuno schema di rete è incluso in questo rapporto.",
-    "oversizedNote": "Il diagramma di rete completo è disponibile nel report HTML."
+    "absent": "Nessuno schema di rete è incluso in questo rapporto."
   },
   "os": {
     "title": "Sistemi operativi",

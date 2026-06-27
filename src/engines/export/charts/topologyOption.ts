@@ -50,7 +50,7 @@ export function topologyTreeOption(
         ? ` · ${l.unconfigured.replace('{{count}}', String(g.unconfiguredNicCount))}`
         : ''
     return {
-      name: `${g.nodes.join(', ')}  (× ${g.nodes.length} ${l.nodesWord}${head})`,
+      name: `${g.nodes.join(', ')} (× ${g.nodes.length} ${l.nodesWord}${head})`,
       children: g.roots.map((r) => toDatum(r, l)),
     }
   })

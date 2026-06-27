@@ -70,7 +70,7 @@ const modelOf = (rows: NodeInterfaceRow[]): NodeModel => {
   }
   const unconfigured = rows
     .filter((r) => {
-      if (!r.active) return true
+      if (!r.active) return norm(r.type) === 'eth'
       const t = norm(r.type)
       if (t === 'eth') return !reachableNics.has(r.name)
       return false
