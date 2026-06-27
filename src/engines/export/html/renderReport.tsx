@@ -243,7 +243,11 @@ function Report({
           label={strings['network.vmNics'] ?? 'Guest NIC attachments'}
           value={fmtInt(view.network.vmNicCount, loc)}
         />
-        {networkSvg ? (
+        {view.topology.hasData ? (
+          /* topology-tree slot — assembleHtml splices the ECharts-SSR SVG here;
+             the upstream networkSvg <img> is suppressed when tree data is present. */
+          <div data-chart-slot="topology-tree" className="chart-slot" />
+        ) : networkSvg ? (
           <img
             src={svgToDataUri(networkSvg)}
             alt={strings['network.diagramAlt'] ?? 'Network topology diagram'}

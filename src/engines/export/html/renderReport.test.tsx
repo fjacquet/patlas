@@ -6,7 +6,7 @@ import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
 import type { GuestRow } from '@/types/guest'
 import type { NodeRow } from '@/types/node'
-import type { Snapshot } from '@/types/snapshot'
+import type { NodeInterfaceRow, Snapshot } from '@/types/snapshot'
 import { buildExportView } from '../buildExportView'
 import { renderReport, TOP_N_CLUSTERS } from './renderReport'
 
@@ -229,5 +229,60 @@ describe('renderReport — security', () => {
     // not itself spell the literal token (CLAUDE.md grep-gate trap).
     const forbidden = `dangerously${'Set'}InnerHTML`
     expect(src.includes(forbidden)).toBe(false)
+  })
+})
+
+// Minimal NodeInterfaceRow helpers for topology tests.
+const iface = (over: Partial<NodeInterfaceRow>): NodeInterfaceRow => ({
+  node: 'pve1',
+  name: 'eth0',
+  type: 'eth',
+  active: true,
+  autostart: true,
+  method: '',
+  cidr: '',
+  address: '',
+  gateway: '',
+  mtu: null,
+  bondMode: '',
+  slaves: [],
+  bridgePorts: '',
+  bridgeVlanAware: false,
+  vlanId: null,
+  vlanRawDevice: '',
+  comments: '',
+  ...over,
+})
+
+describe('renderReport — network topology tree (Task 5)', () => {
+  it('emits topology-tree chart-slot placeholder when view.topology.hasData', () => {
+    const bridge = iface({ name: 'vmbr0', type: 'bridge', bridgePorts: 'eth0' })
+    const nic = iface({ name: 'eth0', type: 'eth' })
+    const a = snap({ nodeInterfaces: [bridge, nic] })
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    expect(view.topology.hasData).toBe(true)
+    const html = renderReport({ view, trends, strings, locale: 'en' })
+    expect(html).toContain('data-chart-slot="topology-tree"')
+  })
+
+  it('suppresses the networkSvg <img> when topology data is present', () => {
+    const bridge = iface({ name: 'vmbr0', type: 'bridge', bridgePorts: 'eth0' })
+    const nic = iface({ name: 'eth0', type: 'eth' })
+    const a = snap({ nodeInterfaces: [bridge, nic] })
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>'
+    const html = renderReport({ view, trends, strings, locale: 'en', networkSvg: svg })
+    expect(html).not.toContain('data:image/svg+xml;base64,')
+    expect(html).toContain('data-chart-slot="topology-tree"')
+  })
+
+  it('falls back to networkSvg <img> when topology has no data', () => {
+    const a = snap({})
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    expect(view.topology.hasData).toBe(false)
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>'
+    const html = renderReport({ view, trends, strings, locale: 'en', networkSvg: svg })
+    expect(html).not.toContain('data-chart-slot="topology-tree"')
+    expect(html).toContain('data:image/svg+xml;base64,')
   })
 })

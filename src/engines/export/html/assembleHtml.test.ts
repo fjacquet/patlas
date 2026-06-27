@@ -3,7 +3,8 @@ import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
 import type { GuestRow } from '@/types/guest'
 import type { NodeRow } from '@/types/node'
-import type { Snapshot } from '@/types/snapshot'
+import type { NodeInterfaceRow, Snapshot } from '@/types/snapshot'
+import { topologyTreeOption } from '@/engines/export/charts/topologyOption'
 import { buildExportView } from '../buildExportView'
 import { assembleHtml } from './assembleHtml'
 import { assertSizeBudget } from './inlineAssets'
@@ -139,5 +140,55 @@ describe('assembleHtml — single self-contained offline document', () => {
     const html = assembleHtml({ view, trends, charts: new Map(), strings, locale: 'en' })
     expect(html).toContain('<div class="chart-slot"></div>')
     expect(html).not.toContain('data-chart-slot') // all slots resolved
+  })
+})
+
+// Minimal NodeInterfaceRow builder used by the topology test below.
+const niface = (over: Partial<NodeInterfaceRow>): NodeInterfaceRow => ({
+  node: 'pve1',
+  name: 'eth0',
+  type: 'eth',
+  active: true,
+  autostart: true,
+  method: '',
+  cidr: '',
+  address: '',
+  gateway: '',
+  mtu: null,
+  bondMode: '',
+  slaves: [],
+  bridgePorts: '',
+  bridgeVlanAware: false,
+  vlanId: null,
+  vlanRawDevice: '',
+  comments: '',
+  ...over,
+})
+
+describe('assembleHtml — topology tree render (Task 5)', () => {
+  it('assembled HTML for a topology-bearing view contains the bridge name vmbr0', () => {
+    const s: Snapshot = {
+      ...estate(10),
+      nodeInterfaces: [
+        niface({ name: 'vmbr0', type: 'bridge', bridgePorts: 'eth0' }),
+        niface({ name: 'eth0', type: 'eth' }),
+      ],
+    }
+    const { view, trends } = buildExportView(s, [s], MODE, TODAY)
+    expect(view.topology.hasData).toBe(true)
+
+    const labels = {
+      estate: 'Estate',
+      nodesWord: 'nodes',
+      unconfigured: '+ {{count}} unconfigured NICs',
+      vms: 'VMs',
+      ofNodes: '{{withVms}}/{{total}} nodes',
+    }
+    const { option, height } = topologyTreeOption(view.topology, labels)
+    const topoSvg = chartToSvg(option, 1100, height)
+
+    const charts = new Map<string, string>([['topology-tree', topoSvg]])
+    const html = assembleHtml({ view, trends, charts, strings, locale: 'en' })
+    expect(html).toContain('vmbr0')
   })
 })
