@@ -5,15 +5,25 @@ import {
   GaugeIcon,
   HardDriveIcon,
   MemoryIcon,
-  PackageIcon,
   PowerIcon,
 } from '@/components/icons'
 import { StatTile, type TileAccent } from '@/components/StatTile'
 import type { OperationalInsights as OI } from '@/types/estate'
-import { fmtInt, fmtPercentValue, fmtRatio } from '@/utils/format'
+import { fmtInt, fmtMemMb, fmtPercentValue, fmtRatio } from '@/utils/format'
+
+/** Em-dash sentinel — a figure that is not derivable, never a fabricated 0. */
+const NA = '—'
 
 export interface OperationalInsightsProps {
   insights: OI
+  /**
+   * Estate VM-data datastore used / capacity (the `vmdata` storage-role
+   * group), or `null` when no VM-data datastore exists. Sourced from the
+   * Storages sheet — cv4pve leaves the per-VM `Disk Size`/`Disk Usage`
+   * columns largely empty, so the estate storage headline comes from real
+   * datastores, never the per-VM `provisionedMib`/`inUseMib` columns.
+   */
+  vmStorage: { usedMib: number; capacityMib: number } | null
 }
 
 /**
@@ -22,7 +32,7 @@ export interface OperationalInsightsProps {
  * upstream. Guest data shows the em-dash sentinel when no vPartition data
  * (calc-from-real-data, never an invented 0). Factual, no editorial verbs.
  */
-export function OperationalInsights({ insights: o }: OperationalInsightsProps) {
+export function OperationalInsights({ insights: o, vmStorage }: OperationalInsightsProps) {
   const { t, i18n } = useTranslation('rci')
   const loc = i18n.language
 
@@ -61,18 +71,13 @@ export function OperationalInsights({ insights: o }: OperationalInsightsProps) {
       ].join(' · '),
     },
     {
-      label: t('insights.provisioned'),
-      value: fmtInt(o.provisionedMib as number, loc),
-      icon: <PackageIcon />,
-    },
-    {
       label: t('insights.usedStorage'),
-      value: fmtInt(o.usedStorageMib as number, loc),
+      value: vmStorage ? fmtMemMb(vmStorage.usedMib, loc) : NA,
       icon: <HardDriveIcon />,
     },
     {
-      label: t('insights.inUse'),
-      value: fmtInt(o.inUseMib as number, loc),
+      label: t('insights.vmCapacity'),
+      value: vmStorage ? fmtMemMb(vmStorage.capacityMib, loc) : NA,
       icon: <HardDriveIcon />,
     },
     {

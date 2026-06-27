@@ -69,6 +69,9 @@ export function GlobalDashboard() {
   }
 
   const capturedDate = snapshot.capturedAt.toLocaleDateString(i18n.language)
+  // Estate storage headline comes from real datastores (Storages sheet),
+  // not the largely-empty per-VM disk columns — the VM-data storage role.
+  const vmStorage = view.storage.byRole.find((g) => g.role === 'vmdata') ?? null
 
   // Drill: a cluster-detail screen replaces the dashboard body when a
   // cluster is selected (one-screen-fit, export-ready for Phase 10).
@@ -92,7 +95,7 @@ export function GlobalDashboard() {
             <AccountingModeToggle value={mode} onChange={setMode} />
           </div>
           <GlobalSummaryCard globals={view.globals} mode={mode} capturedDate={capturedDate} />
-          <OperationalInsights insights={view.operationalInsights} />
+          <OperationalInsights insights={view.operationalInsights} vmStorage={vmStorage} />
           <OsBreakdownDonut osBreakdown={view.osBreakdown} />
           <PerClusterColumns
             clusters={view.clusters}

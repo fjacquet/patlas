@@ -28,8 +28,6 @@ export interface StorageRoleGroup {
   capacityMib: MiB
   usedMib: MiB
   freeMib: MiB
-  /** used / capacity; 0 when capacity is 0. */
-  usedRatio: number
 }
 
 /** Canonical display order — VM storage leads, backup + local follow. */
@@ -57,7 +55,6 @@ export const storageByRole = (storages: StorageRow[]): StorageRoleGroup[] => {
       capacityMib: mib(capacity),
       usedMib: mib(used),
       freeMib: mib(freeMib),
-      usedRatio: capacity === 0 ? 0 : used / capacity,
     })
   }
   return out
