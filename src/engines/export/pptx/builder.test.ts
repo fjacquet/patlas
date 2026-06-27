@@ -526,4 +526,24 @@ describe('buildPptx — golden structural snapshot', () => {
     expect(txt).toContain('vCPU allocated')
     expect(txt).toContain('Reserved capacity')
   })
+
+  it('Fix 4 — oversized network slide omits the raster and shows the HTML-report note', async () => {
+    const a = snap('a', 3, TODAY)
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    const networkPng = await chartSvgToPng(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="#0a0"/></svg>',
+      40,
+      40,
+      wasmBytes,
+    )
+    const oversized = await buildPptx(view, trends, strings, 'en', {
+      networkPng,
+      networkOversized: true,
+    })
+    const embedded = await buildPptx(view, trends, strings, 'en', { networkPng })
+    // No embedded PNG media in the oversized deck → strictly smaller bytes.
+    expect(oversized.byteLength).toBeLessThan(embedded.byteLength)
+    const txt = new TextDecoder('latin1').decode(new Uint8Array(oversized))
+    expect(txt).toContain('Full network diagram available in the HTML report.')
+  })
 })

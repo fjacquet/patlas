@@ -59,15 +59,14 @@ export function addNetworkSlide(
 
   if (networkPng && networkPng.length > 0) {
     if (oversized) {
-      // Reserve the bottom strip for the factual "see HTML report" note.
-      const noteH = 0.6
-      const gap = 0.12
-      const imgH = SLIDE.h - y - M - noteH - gap
-      addChartImage(s, networkPng, { x: M, y, w: CONTENT_W, h: imgH })
+      // INTERIM (superseded by Spec 2's topology tree): the upstream SVG is
+      // extreme-portrait (e.g. 1762×14092). Rasterized into a wide-short slide
+      // box it is an unreadable blur, so DO NOT embed it. The KPI cards above
+      // carry the facts; point to the HTML report, which inlines the full SVG.
       addNote(
         s,
         strings['network.oversizedNote'] ?? 'Full network diagram available in the HTML report.',
-        y + imgH + gap,
+        y,
       )
     } else {
       // Locked-safe PNG embed (Pitfall 1) — addChartImage always emits an

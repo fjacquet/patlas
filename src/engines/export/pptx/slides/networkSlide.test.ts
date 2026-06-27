@@ -107,7 +107,10 @@ describe('addNetworkSlide', () => {
     expect((pptx as unknown as { slides: unknown[] }).slides.length).toBe(1)
   })
 
-  it('oversized: adds both an image and a note text when oversized=true', async () => {
+  it('oversized: shows the HTML-report note and does NOT embed the raster', async () => {
+    // Fix 4 (interim): the upstream SVG is extreme-portrait; rasterized into a
+    // wide-short slide box it is an unreadable blur.  Do NOT embed it — show
+    // the note only.  The non-oversized path still embeds (tested above).
     const pptx = new PptxGenJS()
     const slide = {
       addImage: vi.fn(),
@@ -126,9 +129,9 @@ describe('addNetworkSlide', () => {
     )
 
     expect(addSlideSpy).toHaveBeenCalledOnce()
-    // Image still placed (even if small)
-    expect(slide.addImage).toHaveBeenCalledOnce()
-    // Note text appended below
+    // No image embed in the oversized branch.
+    expect(slide.addImage).not.toHaveBeenCalled()
+    // Note text is shown instead.
     const textCalls = (slide.addText as ReturnType<typeof vi.fn>).mock.calls
     const noteCall = textCalls.find(
       (c: unknown[]) => typeof c[0] === 'string' && c[0].includes('HTML report'),
