@@ -19,7 +19,13 @@
     "cores": "Physical cores",
     "hostMem": "Node memory",
     "provisioned": "Provisioned",
-    "usedStorage": "Used storage"
+    "usedStorage": "Used storage",
+    "vmStorageUsed": "VM storage used",
+    "vmStorageCapacity": "VM storage capacity"
+  },
+  "protection": {
+    "fsFill": { "more": "+ {{count}} more mounts over threshold" },
+    "backupCoverage": { "more": "+ {{count}} more guests without backup" }
   },
   "cluster": {
     "stretched": "Stretched",

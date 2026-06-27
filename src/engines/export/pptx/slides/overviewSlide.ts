@@ -14,6 +14,10 @@ export interface OverviewData {
   globals: GlobalSummary
   insights: OperationalInsights
   osBreakdown: OsBreakdown
+  /** VM-data datastore used/capacity (from `view.storage.byRole` vmdata group),
+   *  in MiB. `null` when no vmdata storage role is present → cards show "—".
+   *  Replaces the unreliable per-VM `Provisioned`/`Used storage` columns. */
+  vmStorage: { usedMib: number; capacityMib: number } | null
 }
 
 export function addOverviewSlide(
@@ -66,12 +70,12 @@ export function addOverviewSlide(
         value: pptxMemMib(Number(o.totalHostMemoryMib), locale),
       },
       {
-        label: strings['overview.provisioned'] ?? 'Provisioned',
-        value: pptxMemMib(Number(o.provisionedMib), locale),
+        label: strings['overview.vmStorageUsed'] ?? 'VM storage used',
+        value: d.vmStorage ? pptxMemMib(d.vmStorage.usedMib, locale) : '—',
       },
       {
-        label: strings['overview.usedStorage'] ?? 'Used storage',
-        value: pptxMemMib(Number(o.usedStorageMib), locale),
+        label: strings['overview.vmStorageCapacity'] ?? 'VM storage capacity',
+        value: d.vmStorage ? pptxMemMib(d.vmStorage.capacityMib, locale) : '—',
       },
     ],
     y2,

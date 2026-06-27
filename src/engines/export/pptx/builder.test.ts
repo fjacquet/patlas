@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import PptxGenJS from 'pptxgenjs'
 import { describe, expect, it } from 'vitest'
+import type { BackupCoverage } from '@/engines/aggregation/backupCoverage'
+import type { FsFillRisk, FsRiskRow } from '@/engines/aggregation/fsFillRisk'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
 import type { GuestRow } from '@/types/guest'
@@ -16,7 +19,9 @@ import type {
 import { buildExportView } from '../buildExportView'
 import { buildPptx } from './builder'
 import { chartSvgToPng } from './primitives/chartSvg'
+import { addBackupCoverageSlide } from './slides/backupCoverageSlide'
 import type { ContentionRow } from './slides/contentionAnnex'
+import { addFsFillSlide } from './slides/fsFillSlide'
 
 // node-fs wasm bytes for producing a real network PNG (mirrors chartSvg.test).
 const require = createRequire(import.meta.url)
@@ -104,6 +109,88 @@ const isZip = (ab: ArrayBuffer): boolean => {
   const u = new Uint8Array(ab)
   return u[0] === 0x50 && u[1] === 0x4b && u[2] === 0x03 && u[3] === 0x04
 }
+
+async function renderSlideText(fn: (p: PptxGenJS) => void): Promise<string> {
+  const pptx = new PptxGenJS()
+  pptx.defineLayout({ name: 'WIDE', width: 13.333, height: 7.5 })
+  pptx.layout = 'WIDE'
+  fn(pptx)
+  const ab = (await pptx.write({ outputType: 'arraybuffer' })) as ArrayBuffer
+  return new TextDecoder('latin1').decode(new Uint8Array(ab))
+}
+
+const fsRow = (i: number): FsRiskRow => ({
+  node: `pve${i % 3}`,
+  vmId: String(100 + i),
+  vmName: `vm-${i}`,
+  vmType: 'qemu',
+  mountPoint: `/data${i}`,
+  fsType: 'ext4',
+  totalGb: 100,
+  usedGb: 95,
+  usedPct: 95,
+  overThreshold: true,
+})
+
+const fsRisk = (n: number): FsFillRisk => ({
+  overThreshold: Array.from({ length: n }, (_, i) => fsRow(i)),
+  overThresholdCount: n,
+  totalMounts: n,
+  totalVms: n,
+  threshold: 0.8,
+})
+
+const backupCov = (nUncovered: number): BackupCoverage => ({
+  vzdump: {
+    tasks: [],
+    totalCount: 20,
+    successCount: 18,
+    failedCount: 2,
+    coveredVmids: 5,
+    uncoveredGuests: Array.from({ length: nUncovered }, (_, i) => ({
+      vmid: String(200 + i),
+      vmName: `guest-${i}`,
+      lastSuccessAgeDays: null,
+      covered: false,
+    })),
+    uncoveredCount: nUncovered,
+    guestStatuses: [],
+  },
+  operationalHealth: {
+    taskTypes: [{ type: 'vzdump', total: 20, ok: 18, failed: 2 }],
+    totalTasks: 20,
+    totalOk: 18,
+    totalFailed: 2,
+  },
+})
+
+describe('Fix 3 — backup-coverage side-by-side + footer', () => {
+  it('shows both sub-headings and a remainder footer when uncovered exceeds the cap', async () => {
+    const txt = await renderSlideText((p) => addBackupCoverageSlide(p, backupCov(15), {}, 'en'))
+    expect(txt).toContain('VMs without successful backup')
+    expect(txt).toContain('Operational health')
+    expect(txt).toContain('more guests without backup')
+    expect(txt).toContain('+ 3 more') // 15 − 12
+  })
+
+  it('omits the footer when uncovered fits', async () => {
+    const txt = await renderSlideText((p) => addBackupCoverageSlide(p, backupCov(8), {}, 'en'))
+    expect(txt).not.toContain('more guests without backup')
+  })
+})
+
+describe('Fix 2 — FS-fill slide remainder footer', () => {
+  it('shows the footer when over-threshold rows exceed the cap', async () => {
+    const txt = await renderSlideText((p) => addFsFillSlide(p, fsRisk(15), {}, 'en'))
+    expect(txt).toContain('more mounts over threshold')
+    expect(txt).toContain('+ 3 more') // 15 − 12
+  })
+
+  it('omits the footer when rows fit', async () => {
+    const txt = await renderSlideText((p) => addFsFillSlide(p, fsRisk(10), {}, 'en'))
+    expect(txt).not.toContain('more mounts over threshold')
+  })
+})
 
 describe('buildPptx — Proxmox label on title slide', () => {
   it('title slide uses the Proxmox cluster label, not a VMware fallback', async () => {
@@ -408,6 +495,17 @@ describe('buildPptx — golden structural snapshot', () => {
     expect(withPng.byteLength).toBeGreaterThan(withNote.byteLength)
   })
 
+  it('Fix 1 — overview shows VM-storage KPIs, not per-VM Provisioned/Used storage', async () => {
+    const a = snap('a', 3, TODAY)
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    const ab = await buildPptx(view, trends, strings, 'en')
+    const txt = new TextDecoder('latin1').decode(new Uint8Array(ab))
+    expect(txt).toContain('VM storage used')
+    expect(txt).toContain('VM storage capacity')
+    expect(txt).not.toContain('Provisioned')
+    expect(txt).not.toContain('Used storage')
+  })
+
   it('PPT-02: overview + cluster slides surface the previously-dropped facts', async () => {
     const a = snap('a', 3, TODAY)
     const { view, trends } = buildExportView(a, [a], MODE, TODAY)
@@ -427,5 +525,25 @@ describe('buildPptx — golden structural snapshot', () => {
     expect(txt).toContain('GHz available')
     expect(txt).toContain('vCPU allocated')
     expect(txt).toContain('Reserved capacity')
+  })
+
+  it('Fix 4 — oversized network slide omits the raster and shows the HTML-report note', async () => {
+    const a = snap('a', 3, TODAY)
+    const { view, trends } = buildExportView(a, [a], MODE, TODAY)
+    const networkPng = await chartSvgToPng(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="#0a0"/></svg>',
+      40,
+      40,
+      wasmBytes,
+    )
+    const oversized = await buildPptx(view, trends, strings, 'en', {
+      networkPng,
+      networkOversized: true,
+    })
+    const embedded = await buildPptx(view, trends, strings, 'en', { networkPng })
+    // No embedded PNG media in the oversized deck → strictly smaller bytes.
+    expect(oversized.byteLength).toBeLessThan(embedded.byteLength)
+    const txt = new TextDecoder('latin1').decode(new Uint8Array(oversized))
+    expect(txt).toContain('Full network diagram available in the HTML report.')
   })
 })

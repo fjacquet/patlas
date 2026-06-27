@@ -91,12 +91,16 @@ export async function buildPptx(
     strings,
     locale,
   )
+  const vmRole = view.storage.byRole.find((g) => g.role === 'vmdata')
   addOverviewSlide(
     pptx,
     {
       globals: view.globals,
       insights: view.operationalInsights,
       osBreakdown: view.osBreakdown,
+      vmStorage: vmRole
+        ? { usedMib: Number(vmRole.usedMib), capacityMib: Number(vmRole.capacityMib) }
+        : null,
     },
     strings,
     locale,

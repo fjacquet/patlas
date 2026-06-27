@@ -8,9 +8,9 @@ import type { FsFillRisk } from '@/engines/aggregation/fsFillRisk'
 import type { ExportStrings } from '../../types'
 import { type ExportLocale, pptxNumber, pptxSafeFormat } from '../format'
 import { PPTX_COLORS } from '../primitives/colors'
-import { addHeader, addKpiRow, CONTENT_W, M } from './_layout'
+import { addHeader, addKpiRow, addMoreFooter, CONTENT_W, M } from './_layout'
 
-const TOP_N = 20
+const TOP_N = 12
 
 export function addFsFillSlide(
   pptx: PptxGenJS,
@@ -100,20 +100,21 @@ export function addFsFillSlide(
     }),
   ]
 
-  const rows = risk.overThreshold
-    .slice(0, TOP_N)
-    .map((r) => [
-      cell(r.node),
-      cell(r.vmName || r.vmId),
-      cell(r.mountPoint),
-      cell(r.fsType),
-      cell(pptxNumber(Math.round(r.totalGb), locale), { align: 'right' }),
-      cell(r.usedPct !== null ? pct(r.usedPct) : '—', { align: 'right' }),
-    ])
+  const shown = risk.overThreshold.slice(0, TOP_N)
+  const rows = shown.map((r) => [
+    cell(r.node),
+    cell(r.vmName || r.vmId),
+    cell(r.mountPoint),
+    cell(r.fsType),
+    cell(pptxNumber(Math.round(r.totalGb), locale), { align: 'right' }),
+    cell(r.usedPct !== null ? pct(r.usedPct) : '—', { align: 'right' }),
+  ])
 
+  const rowH = 0.26
+  const tableY = y2 + 0.05
   s.addTable([hdr, ...rows], {
     x: M,
-    y: y2 + 0.05,
+    y: tableY,
     w: CONTENT_W,
     colW: [
       CONTENT_W * 0.15,
@@ -123,9 +124,20 @@ export function addFsFillSlide(
       CONTENT_W * 0.11,
       CONTENT_W * 0.11,
     ],
-    rowH: 0.26,
+    rowH,
     valign: 'middle',
     border: { type: 'solid', pt: 0.5, color: PPTX_COLORS.hairline },
     autoPage: false,
   })
+
+  const remainder = risk.overThreshold.length - shown.length
+  if (remainder > 0) {
+    addMoreFooter(
+      s,
+      strings['protection.fsFill.more'] ?? '+ {{count}} more mounts over threshold',
+      remainder,
+      locale,
+      { x: M, y: tableY + (shown.length + 1) * rowH + 0.06, w: CONTENT_W, h: 0.3 },
+    )
+  }
 }
