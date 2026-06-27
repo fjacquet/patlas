@@ -22,19 +22,19 @@ const tinyPng = async (): Promise<Uint8Array> =>
   )
 
 describe('addNetworkSlide', () => {
-  it('adds exactly one slide when networkPng is null', () => {
+  it('adds exactly one slide when topology PNG is null', () => {
     const pptx = new PptxGenJS()
     addNetworkSlide(pptx, null, strings, 'en')
     expect((pptx as unknown as { slides: unknown[] }).slides.length).toBe(1)
   })
 
-  it('adds exactly one slide when networkPng is provided', async () => {
+  it('adds exactly one slide when topology PNG is provided', async () => {
     const pptx = new PptxGenJS()
     addNetworkSlide(pptx, await tinyPng(), strings, 'en')
     expect((pptx as unknown as { slides: unknown[] }).slides.length).toBe(1)
   })
 
-  it('embeds an image/png data URI when networkPng is provided', async () => {
+  it('embeds an image/png data URI when topology PNG is provided', async () => {
     const pptx = new PptxGenJS()
     const slide = {
       addImage: vi.fn(),
@@ -55,7 +55,7 @@ describe('addNetworkSlide', () => {
     addSlideSpy.mockRestore()
   })
 
-  it('shows factual Proxmox note (no addImage) when networkPng is null', () => {
+  it('shows factual Proxmox note (no addImage) when topology PNG is null', () => {
     const pptx = new PptxGenJS()
     const slide = {
       addImage: vi.fn(),

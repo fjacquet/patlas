@@ -13,8 +13,8 @@ import { buildExportView } from './buildExportView'
 import { buildChartBundle, type PngBundle } from './chartBundle'
 import { topologyTreeOption } from './charts/topologyOption'
 import { assembleHtml } from './html/assembleHtml'
+import { buildHtmlCharts } from './html/buildHtmlCharts'
 import { chartToSvg } from './html/renderCharts'
-import { exportChartSlots } from './html/renderReport'
 import { chartSvgToPng } from './pptx/primitives/chartSvg'
 import type { ExportRequest, ExportResponse } from './types'
 
@@ -77,21 +77,25 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
       ]),
     ) as typeof req.strings
 
+    // Topology labels shared by both export branches. The resolved `strings`
+    // bag has the same values as req.strings for these keys (the worker's
+    // vars step only substitutes vcenters/clusters/hosts/vms/captureDate;
+    // {{count}}/{{withVms}}/{{total}} are left intact for topologyTreeOption
+    // to interpolate). Using `strings` here keeps both branches consistent.
+    const topoLabels = {
+      estate: strings['topology.estate'] ?? 'Estate',
+      nodesWord: strings['topology.nodesWord'] ?? 'nodes',
+      unconfigured: strings['topology.unconfigured'] ?? '+ {{count}} unconfigured NICs',
+      vms: strings['topology.vms'] ?? 'VMs',
+      ofNodes: strings['topology.ofNodes'] ?? '{{withVms}}/{{total}} nodes',
+    }
+
     let bytes: ArrayBuffer
     if (req.kind === 'html') {
-      // HTML inlines SVG directly — feed each per-cluster slot the REAL
-      // per-cluster gauge SVG (no rasterize, no resvg on this path).
-      const charts = new Map<string, string>()
-      for (const slot of exportChartSlots(view)) {
-        const opt = optBundle.perCluster.get(slot.cluster)
-        if (opt) charts.set(slot.id, chartToSvg(opt, CHART_W, CHART_H))
-      }
-      // F-2: the single estate-level Storage treemap (fixed slot id —
-      // matches renderReport.tsx's data-chart-slot="storage-treemap").
-      // 11-01 threads it unconditionally; guard is factual (absent ⇒
-      // empty slot, never fabricated).
-      const treemap = optBundle.shared.storageTreemap
-      if (treemap) charts.set('storage-treemap', chartToSvg(treemap, CHART_W, CHART_H))
+      // HTML inlines SVG directly (no rasterize, no resvg on this path).
+      // buildHtmlCharts covers per-cluster gauges, storage-treemap, AND the
+      // topology-tree slot — the seam is now tested in buildHtmlCharts.test.ts.
+      const charts = buildHtmlCharts(view, optBundle, topoLabels, CHART_W, CHART_H)
       const html = assembleHtml({
         view,
         trends,
@@ -128,14 +132,7 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
       let topologyPng: Uint8Array | null = null
       if (view.topology.hasData) {
         try {
-          const labels = {
-            estate: req.strings['topology.estate'] ?? 'Estate',
-            nodesWord: req.strings['topology.nodesWord'] ?? 'nodes',
-            unconfigured: req.strings['topology.unconfigured'] ?? '+ {{count}} unconfigured NICs',
-            vms: req.strings['topology.vms'] ?? 'VMs',
-            ofNodes: req.strings['topology.ofNodes'] ?? '{{withVms}}/{{total}} nodes',
-          }
-          const { option, height } = topologyTreeOption(view.topology, labels)
+          const { option, height } = topologyTreeOption(view.topology, topoLabels)
           topologyPng = await chartSvgToPng(
             chartToSvg(option, CHART_W, height),
             CHART_W,
