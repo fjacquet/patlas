@@ -58,7 +58,6 @@ describe('storageByRole', () => {
     expect(Number(vm?.usedMib)).toBe(1000) // (1000−400)+(500−100)
     expect(Number(vm?.freeMib)).toBe(500)
     expect(vm?.count).toBe(2)
-    expect(vm?.usedRatio).toBeCloseTo(1000 / 1500)
   })
 
   it('does NOT dedupe by name — six per-node "local" storages all count', () => {
@@ -83,9 +82,9 @@ describe('storageByRole', () => {
     ])
   })
 
-  it('zero capacity → usedRatio 0 (no divide-by-zero)', () => {
+  it('zero capacity → usedMib 0 (no negative, no NaN)', () => {
     const [g] = storageByRole([ds({ role: 'vmdata', capacityMib: mib(0), freeMib: mib(0) })])
-    expect(g?.usedRatio).toBe(0)
+    expect(Number(g?.usedMib)).toBe(0)
   })
 
   it('empty input → empty result', () => {

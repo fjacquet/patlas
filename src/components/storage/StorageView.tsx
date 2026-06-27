@@ -4,6 +4,7 @@ import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
 import { useEstateView } from '@/hooks/useEstateView'
 import { selectActiveSnapshot, selectThresholds, useSnapshotStore } from '@/store/snapshotStore'
+import type { StorageRole } from '@/types/snapshot'
 import { fmtInt, fmtMemMb } from '@/utils/format'
 import { Chart } from '../Chart'
 import { datastoreColumns } from '../inventory/columns/datastoreColumns'
@@ -16,6 +17,15 @@ import { VmDetail } from './VmDetail'
 
 type Scope = 'cluster' | 'esx' | 'vm' | 'datastore'
 const SCOPES: ReadonlyArray<Scope> = ['cluster', 'esx', 'vm', 'datastore']
+
+/** Storage-role → tile accent. VM data leads (primary), backup highlighted
+ *  (gold), local/other neutral. Exhaustive over {@link StorageRole}. */
+const ROLE_ACCENT: Record<StorageRole, TileAccent> = {
+  vmdata: 'primary',
+  backup: 'gold',
+  local: 'neutral',
+  other: 'neutral',
+}
 
 function StorageError({ error }: FallbackProps) {
   const message = error instanceof Error ? error.message : 'unknown error'
@@ -125,12 +135,6 @@ export function StorageView() {
   // Storage-by-role band (cv4pve VM data / backup / local). Real datastore
   // used / capacity — never the always-zero per-VM "Disk Usage GB".
   const mem = (m: number): string => fmtMemMb(Number(m), loc)
-  const roleAccent: Record<string, TileAccent> = {
-    vmdata: 'primary',
-    backup: 'gold',
-    local: 'neutral',
-    other: 'neutral',
-  }
 
   return (
     <main className="flex-1 overflow-y-auto p-8">
@@ -150,7 +154,7 @@ export function StorageView() {
                     label={t(`role.${g.role}`)}
                     value={`${mem(g.usedMib as number)} / ${mem(g.capacityMib as number)}`}
                     sub={`${fmtInt(g.count, loc)} · ${mem(g.freeMib as number)} ${t('role.free')}`}
-                    accent={roleAccent[g.role] ?? 'neutral'}
+                    accent={ROLE_ACCENT[g.role]}
                   />
                 ))}
               </div>

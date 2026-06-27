@@ -320,10 +320,11 @@ export const classifyStorageRole = (
   shared: boolean,
 ): StorageRole => {
   const plugin = pluginType.toLowerCase().trim()
+  // Split on the whitespace-inclusive delimiter class — tokens carry no
+  // boundary whitespace, so only empty strings need filtering.
   const tokens = content
     .toLowerCase()
     .split(/[\s,;]+/)
-    .map((t) => t.trim())
     .filter((t) => t.length > 0)
   if (plugin === 'pbs') return 'backup'
   if (tokens.length > 0 && tokens.every((t) => t === 'backup')) return 'backup'
