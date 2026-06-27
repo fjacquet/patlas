@@ -21,5 +21,10 @@ precacheAndRoute(self.__WB_MANIFEST)
 // registerType is 'prompt'; registerSW.ts posts SKIP_WAITING when the user (or
 // the empty-store fast path) opts in.
 self.addEventListener('message', (event: ExtendableMessageEvent) => {
+  // Service worker — its clients are same-origin, so `event.origin` is the
+  // controlled page's origin (or '' for a port message). Reject any unexpected
+  // cross-origin sender defensively (CodeQL js/missing-origin-check) before
+  // acting on `event.data`.
+  if (event.origin !== '' && event.origin !== self.location.origin) return
   if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting()
 })
