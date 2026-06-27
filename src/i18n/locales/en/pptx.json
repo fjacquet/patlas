@@ -47,7 +47,7 @@
     "consumedGhz": "GHz consumed",
     "availableGhz": "GHz available",
     "ramAvailable": "RAM available",
-    "footer": "Source: Proxmox — node (CPU/RAM usage %, Speed × Cores, Memory) + guest info (vCPUs, Memory)"
+    "footer": "Source: Proxmox — RRD time-series (node CPU usage %) + node (RAM usage %, Speed × Cores, Memory) + guest info (vCPUs, Memory)"
   },
   "eos": {
     "title": "OS end-of-support forecast",
@@ -71,7 +71,12 @@
     "title": "In-session trends",
     "points": "Timeline points",
     "deltas": "Deltas",
-    "series": "Guest count over snapshots"
+    "series": "Guest count over snapshots",
+    "singleTitle": "Single-file trends — RRD time-series",
+    "singleNote": "Derived from the RRD time-series in this export.",
+    "singleCpu": "Mean CPU %",
+    "singleMem": "Mean memory %",
+    "singleSamples": "Timeline samples"
   },
   "inventory": {
     "title": "Inventory summary",
@@ -105,12 +110,26 @@
     "colCluster": "Cluster",
     "colProvisioned": "Provisioned",
     "colInUse": "In use",
-    "vsanShared": "Shared across {{n}} clusters"
+    "vsanShared": "Shared across {{n}} clusters",
+    "vmUsed": "VM used",
+    "vmCapacity": "VM capacity",
+    "vmAllocated": "VM allocated",
+    "colRole": "Role",
+    "colUsed": "Used",
+    "colCapacity": "Capacity",
+    "colFree": "Free",
+    "role": {
+      "vmdata": "VM storage",
+      "backup": "Backup",
+      "local": "Local / boot",
+      "other": "Other"
+    }
   },
   "network": {
     "title": "Network",
     "diagramAlt": "Network topology diagram",
-    "absent": "No network diagram is included in this report."
+    "absent": "No network diagram is included in this report.",
+    "oversizedNote": "Full network diagram available in the HTML report."
   },
   "os": {
     "title": "Operating systems",
@@ -176,6 +195,61 @@
       "enabled": "Enabled"
     }
   },
+  "governance": {
+    "issues": {
+      "title": "Issues",
+      "kpi": {
+        "total": "Total",
+        "errors": "Errors",
+        "warnings": "Warnings"
+      },
+      "col": {
+        "severity": "Severity",
+        "section": "Section",
+        "message": "Message"
+      }
+    },
+    "access": {
+      "title": "Access posture",
+      "kpi": {
+        "users": "Users",
+        "enabled": "Enabled",
+        "tokens": "API tokens",
+        "roles": "Roles",
+        "acls": "ACL entries",
+        "rootAccounts": "Root accounts"
+      },
+      "users": {
+        "heading": "Users",
+        "col": {
+          "id": "ID",
+          "enabled": "Enabled",
+          "email": "Email"
+        }
+      },
+      "tokens": {
+        "heading": "API tokens",
+        "col": {
+          "user": "User",
+          "tokenId": "Token ID",
+          "privSeparated": "Priv. sep."
+        }
+      }
+    },
+    "pools": {
+      "title": "Resource pools",
+      "kpi": {
+        "pools": "Pools",
+        "members": "Members"
+      },
+      "col": {
+        "pool": "Pool",
+        "members": "Members",
+        "vms": "Guests",
+        "storages": "Storages"
+      }
+    }
+  },
   "storageContent": {
     "title": "Storage content — file inventory by type and pool",
     "kpi": {
@@ -195,6 +269,44 @@
       "storage": "Storage",
       "count": "Count",
       "sizeGib": "Size (GiB)"
+    }
+  },
+  "rrdHeadroom": {
+    "title": "Node headroom — RRD utilization",
+    "kpi": {
+      "cpuPeak": "Peak CPU",
+      "cpuAvg": "Mean CPU",
+      "memPeak": "Peak memory",
+      "memAvg": "Mean memory",
+      "ioWaitPeak": "Peak IO-wait",
+      "psiMemPeak": "Peak memory pressure"
+    },
+    "col": {
+      "node": "Node",
+      "cpuPeak": "CPU peak",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU mean",
+      "memPeak": "Mem peak",
+      "memP95": "Mem p95",
+      "memAvg": "Mem mean"
+    }
+  },
+  "storageGrowth": {
+    "title": "Storage time-to-full — RRD growth",
+    "kpi": {
+      "storages": "Storages",
+      "soonest": "Soonest full (days)",
+      "window": "Window (days)",
+      "growing": "Growing storages"
+    },
+    "col": {
+      "storage": "Storage",
+      "node": "Node",
+      "used": "Used (GiB)",
+      "size": "Size (GiB)",
+      "usage": "Usage",
+      "growth": "Growth (GiB/day)",
+      "daysToFull": "Days to full"
     }
   }
 }

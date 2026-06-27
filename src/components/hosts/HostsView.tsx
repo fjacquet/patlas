@@ -40,18 +40,7 @@ export function HostsView() {
 
   const host = drilledHost ? view.hosts.find((x) => x.hostName === drilledHost) : undefined
   if (host) {
-    return (
-      <EsxDetail
-        detail={{
-          host,
-          vswitches: view.network.vswitches.filter((s) => s.host === host.hostName),
-          dvswitches: view.network.dvswitches.filter((dv) =>
-            dv.hostMembers.includes(host.hostName),
-          ),
-        }}
-        onBack={() => setDrilledHost(null)}
-      />
-    )
+    return <EsxDetail detail={{ host }} onBack={() => setDrilledHost(null)} />
   }
 
   return (

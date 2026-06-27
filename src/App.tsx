@@ -6,13 +6,17 @@ import { GlobalDashboard } from './components/dashboard/GlobalDashboard'
 import { ExportButtons } from './components/ExportButtons'
 import { EosView } from './components/eos/EosView'
 import { FallbackError } from './components/FallbackError'
+import { GovernanceView } from './components/governance/GovernanceView'
 import { HostsView } from './components/hosts/HostsView'
 import { InventoryView } from './components/inventory/InventoryView'
 import { LanguageToggle } from './components/LanguageToggle'
 import { MonsterVmView } from './components/monstervm/MonsterVmView'
 import { NetworkView } from './components/network/NetworkView'
 import { PlanningView } from './components/planning/PlanningView'
+import { ProtectionView } from './components/protection/ProtectionView'
 import { RightSizingView } from './components/rightsizing/RightSizingView'
+import { RrdHeadroomView } from './components/rrd/RrdHeadroomView'
+import { StorageGrowthView } from './components/rrd/StorageGrowthView'
 import { SnapshotListSidebar } from './components/SnapshotListSidebar'
 import { SnapshotSprawlView } from './components/snapshots/SnapshotSprawlView'
 import { StorageView } from './components/storage/StorageView'
@@ -56,6 +60,10 @@ function App() {
               <InventoryView />
             ) : activeView === 'hosts' ? (
               <HostsView />
+            ) : activeView === 'rrdheadroom' ? (
+              <RrdHeadroomView />
+            ) : activeView === 'storagegrowth' ? (
+              <StorageGrowthView />
             ) : activeView === 'planning' ? (
               <PlanningView />
             ) : activeView === 'eos' ? (
@@ -76,6 +84,10 @@ function App() {
               <StorageContentView />
             ) : activeView === 'clusterhealth' ? (
               <ClusterHealthView />
+            ) : activeView === 'protection' ? (
+              <ProtectionView />
+            ) : activeView === 'governance' ? (
+              <GovernanceView />
             ) : (
               <GlobalDashboard />
             )}

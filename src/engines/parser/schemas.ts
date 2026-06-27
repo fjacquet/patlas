@@ -1,16 +1,17 @@
 import { z } from 'zod'
 import type { Cores, MHz, MiB, Sockets } from '@/engines/units'
 import type {
-  VDatastoreRow,
-  VDvPortRow,
-  VDvSwitchRow,
-  VHostRow,
-  VInfoRow,
+  GuestRow,
+  NodeInterfaceRow,
+  NodeRow,
+  ProxmoxDiskRow,
+  ProxmoxPartitionRow,
+  ProxmoxTaskRow,
+  StorageRow,
   VMetaDataRow,
+  VmNicRow,
   VmUsageRow,
-  VNetworkRow,
   VPartitionRow,
-  VSwitchRow,
 } from '@/types'
 
 /**
@@ -65,7 +66,7 @@ const SocketsSchema = z
   .positive()
   .transform((n) => n as Sockets)
 
-export const VInfoRowSchema: z.ZodType<VInfoRow> = z.object({
+export const GuestRowSchema: z.ZodType<GuestRow> = z.object({
   vmName: z.string().trim().min(1),
   cluster: z.string().trim().min(1),
   host: z.string().trim(),
@@ -91,7 +92,7 @@ export const VInfoRowSchema: z.ZodType<VInfoRow> = z.object({
   guestType: z.enum(['qemu', 'lxc']),
 })
 
-export const VHostRowSchema: z.ZodType<VHostRow> = z.object({
+export const NodeRowSchema: z.ZodType<NodeRow> = z.object({
   hostName: z.string().trim().min(1),
   cluster: z.string().trim(),
   sockets: SocketsSchema,
@@ -108,13 +109,14 @@ export const VHostRowSchema: z.ZodType<VHostRow> = z.object({
   esxVersion: z.string().trim(),
 })
 
-export const VDatastoreRowSchema: z.ZodType<VDatastoreRow> = z.object({
+export const StorageRowSchema: z.ZodType<StorageRow> = z.object({
   name: z.string().trim().min(1),
   capacityMib: MibSchema,
   freeMib: MibSchema,
   provisionedMib: MibSchema,
   naa: z.string().trim().min(1).nullable(),
   type: z.string().trim(),
+  role: z.enum(['vmdata', 'backup', 'local', 'other']),
   // Empty string allowed — not every datastore lists its host set.
   hosts: z.string().trim(),
   // Empty string allowed — a host-local datastore has no cluster. Do NOT
@@ -130,43 +132,35 @@ export const VPartitionRowSchema: z.ZodType<VPartitionRow> = z.object({
   freeMib: MibSchema,
 })
 
-const NonNegIntSchema = z.number().int().nonnegative()
-
-export const VNetworkRowSchema: z.ZodType<VNetworkRow> = z.object({
-  vm: z.string().trim().min(1),
-  network: z.string().trim(),
-  switch: z.string().trim(),
-  adapter: z.string().trim(),
-  connected: z.string().trim(),
-  cluster: z.string().trim(),
-  host: z.string().trim(),
+export const NodeInterfaceRowSchema: z.ZodType<NodeInterfaceRow> = z.object({
+  node: z.string().trim().min(1),
+  name: z.string().trim().min(1),
+  type: z.string().trim(),
+  active: z.boolean(),
+  autostart: z.boolean(),
+  method: z.string().trim(),
+  cidr: z.string().trim(),
+  address: z.string().trim(),
+  gateway: z.string().trim(),
+  mtu: z.number().int().nonnegative().nullable(),
+  bondMode: z.string().trim(),
+  slaves: z.array(z.string()),
+  bridgePorts: z.string().trim(),
+  bridgeVlanAware: z.boolean(),
+  vlanId: z.number().int().nonnegative().nullable(),
+  vlanRawDevice: z.string().trim(),
+  comments: z.string().trim(),
 })
 
-export const VSwitchRowSchema: z.ZodType<VSwitchRow> = z.object({
-  host: z.string().trim().min(1),
-  cluster: z.string().trim(),
-  switch: z.string().trim().min(1),
-  ports: NonNegIntSchema,
-  freePorts: NonNegIntSchema,
-  mtu: NonNegIntSchema,
-})
-
-export const VDvSwitchRowSchema: z.ZodType<VDvSwitchRow> = z.object({
-  switch: z.string().trim().min(1),
-  name: z.string().trim(),
-  version: z.string().trim(),
-  hostMembers: z.string().trim(),
-  ports: NonNegIntSchema,
-  vms: NonNegIntSchema,
-  maxMtu: NonNegIntSchema,
-})
-
-export const VDvPortRowSchema: z.ZodType<VDvPortRow> = z.object({
-  port: z.string().trim().min(1),
-  switch: z.string().trim(),
-  vlan: z.string().trim(),
-  activeUplink: z.string().trim(),
-  standbyUplink: z.string().trim(),
+export const VmNicRowSchema: z.ZodType<VmNicRow> = z.object({
+  node: z.string().trim().min(1),
+  vmId: z.string().trim(),
+  vmName: z.string().trim(),
+  vmType: z.string().trim(),
+  macAddress: z.string().trim(),
+  bridge: z.string().trim(),
+  tag: z.number().int().nonnegative().nullable(),
+  model: z.string().trim(),
 })
 
 export const VMetaDataRowSchema: z.ZodType<VMetaDataRow> = z.object({
@@ -177,6 +171,70 @@ export const VMetaDataRowSchema: z.ZodType<VMetaDataRow> = z.object({
       exportedTimestamp: z.string().nullable(),
     }),
   ),
+})
+
+/**
+ * Minimal validated shape for one "RRD Nodes" time-series sample. Used at the
+ * parser boundary by `adaptProxmoxRrdNodes` to build a per-node cpuRatio map;
+ * engines downstream never see raw RRD rows.
+ *
+ * cpuUsagePct is a 0-1 fraction in the Proxmox report (real values ~0.01–0.32);
+ * max 1.5 to absorb transient spikes without rejecting the row.
+ */
+export const RrdNodeSampleSchema = z.object({
+  node: z.string().trim().min(1),
+  timeDate: z.string(),
+  cpuUsagePct: z.number().min(0).max(1.5),
+})
+export type RrdNodeSample = z.infer<typeof RrdNodeSampleSchema>
+
+export const ProxmoxPartitionRowSchema: z.ZodType<ProxmoxPartitionRow> = z.object({
+  node: z.string().trim().min(1),
+  vmId: z.string().trim(),
+  vmName: z.string().trim(),
+  vmType: z.string().trim(),
+  vmStatus: z.string().trim(),
+  mountPoint: z.string().trim().min(1),
+  fsType: z.string().trim(),
+  totalGb: z.number().nonnegative(),
+  usedGb: z.number().nonnegative(),
+  usedFraction: z.number().min(0).max(2).nullable(),
+  error: z.string().trim(),
+  name: z.string().trim(),
+  disks: z.string().trim(),
+})
+
+export const ProxmoxDiskRowSchema: z.ZodType<ProxmoxDiskRow> = z.object({
+  node: z.string().trim().min(1),
+  vmId: z.string().trim(),
+  vmName: z.string().trim(),
+  vmType: z.string().trim(),
+  vmStatus: z.string().trim(),
+  kind: z.string().trim(),
+  id: z.string().trim(),
+  storage: z.string().trim(),
+  storageType: z.string().trim(),
+  storageShared: z.boolean(),
+  fileName: z.string().trim(),
+  sizeGb: z.number().nonnegative(),
+  storageUsageFraction: z.number().min(0).max(2).nullable(),
+  cache: z.string().trim(),
+  backup: z.string().trim(),
+  isUnused: z.boolean(),
+  device: z.string().trim(),
+  mountPoint: z.string().trim(),
+})
+
+export const ProxmoxTaskRowSchema: z.ZodType<ProxmoxTaskRow> = z.object({
+  node: z.string().trim().min(1),
+  taskId: z.string().trim(),
+  type: z.string().trim().min(1),
+  user: z.string().trim(),
+  status: z.string().trim(),
+  statusOk: z.boolean(),
+  startSerial: z.number().nullable(),
+  endSerial: z.number().nullable(),
+  durationDays: z.number().nonnegative().nullable(),
 })
 
 /**

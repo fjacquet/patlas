@@ -4,9 +4,8 @@
   },
   "section": {
     "diagram": "Topologia di rete",
-    "vswitch": "Switch standard",
-    "dvswitch": "Switch distribuiti",
-    "vnetwork": "Gruppi di porte ospiti"
+    "interfaces": "Interfacce dei nodi",
+    "vmNics": "Schede di rete ospiti"
   },
   "img": {
     "alt": "Diagramma di rete Proxmox"
@@ -16,9 +15,6 @@
     "title": "Nodo — {{name}}",
     "datastores": "Archiviazioni montate",
     "datastoresNote": "I nomi delle archiviazioni per nodo non sono disponibili (Nodi archiviazione è un conteggio).",
-    "vswitches": "Switch standard",
-    "dvswitches": "Switch distribuiti",
-    "uplinks": "Uplink",
     "cluster": "Cluster",
     "esxVersion": "versione PVE"
   },

@@ -17,19 +17,27 @@ import type { EstateView, TrendSeries } from '@/types/estate'
 import type { PngBundle } from '../chartBundle'
 import type { ExportStrings } from '../types'
 import type { ExportLocale } from './format'
+import { addAccessPostureSlide } from './slides/accessPostureSlide'
+import { addBackupCoverageSlide } from './slides/backupCoverageSlide'
 import { addClusterHealthSlide } from './slides/clusterHealthSlide'
 import { addClusterSlide } from './slides/clusterSlide'
 import { addContentionAnnex, type ContentionRow } from './slides/contentionAnnex'
+import { addDiskHygieneSlide } from './slides/diskHygieneSlide'
 import { addEosSlide } from './slides/eosSlide'
+import { addFsFillSlide } from './slides/fsFillSlide'
 import { addInventorySlide } from './slides/inventorySlide'
+import { addIssuesSlide } from './slides/issuesSlide'
 import { addMonsterSlide } from './slides/monsterSlide'
 import { addNetworkSlide } from './slides/networkSlide'
 import { addOverviewSlide } from './slides/overviewSlide'
 import { addPhysicalInventorySlide } from './slides/physicalInventorySlide'
 import { addPlannedSlide } from './slides/plannedSlide'
+import { addPoolsSlide } from './slides/poolsSlide'
 import { addRightSizingSlide } from './slides/rightSizingSlide'
+import { addRrdHeadroomSlide } from './slides/rrdHeadroomSlide'
 import { addSnapshotSprawlSlide } from './slides/snapshotSprawlSlide'
 import { addStorageContentSlide } from './slides/storageContentSlide'
+import { addStorageGrowthSlide } from './slides/storageGrowthSlide'
 import { addStorageSlide } from './slides/storageSlide'
 import { addTitleSlide } from './slides/titleSlide'
 import { addTrendsSlide } from './slides/trendsSlide'
@@ -49,6 +57,10 @@ export interface BuildPptxOpts {
    *  embedded SVG — Pitfall 1). When null/undefined the slide shows a factual
    *  Proxmox-correct note. */
   networkPng?: Uint8Array | null
+  /** True when the SVG was extreme-portrait (e.g. 1762×14092); the worker
+   *  capped the raster height to avoid a 12 000-px PNG, and the slide should
+   *  reserve space for a "see HTML report" note. */
+  networkOversized?: boolean
 }
 
 export async function buildPptx(
@@ -102,8 +114,15 @@ export async function buildPptx(
 
   // F-2 (D-05): Storage + Network after the per-cluster narrative,
   // before the conditional annex. Network has no chart (D-08).
-  addStorageSlide(pptx, view, png('storageTreemap'), strings, locale)
-  addNetworkSlide(pptx, opts.networkPng ?? null, strings, locale)
+  addStorageSlide(pptx, view, strings, locale)
+  addNetworkSlide(
+    pptx,
+    opts.networkPng ?? null,
+    strings,
+    locale,
+    opts.networkOversized ?? false,
+    view.network,
+  )
 
   // Conditional CPU-Ready annex.
   if (opts.contentionRows && opts.contentionRows.length > 0) {
@@ -122,6 +141,16 @@ export async function buildPptx(
     addMonsterSlide(pptx, view.monsters, strings, locale)
   }
 
+  // P8 Pack A — node headroom (RRD): only when RRD-Nodes samples were present.
+  if (view.rrdHeadroom.hasData) {
+    addRrdHeadroomSlide(pptx, view.rrdHeadroom, strings, locale)
+  }
+  // P8 Pack A — storage time-to-full (RRD): only when RRD-Storage samples were
+  // present.
+  if (view.rrdStorageGrowth.hasData) {
+    addStorageGrowthSlide(pptx, view.rrdStorageGrowth, strings, locale)
+  }
+
   if (view.snapshotSprawl.count > 0) {
     addSnapshotSprawlSlide(pptx, view.snapshotSprawl, strings, locale)
   }
@@ -136,12 +165,43 @@ export async function buildPptx(
     addClusterHealthSlide(pptx, view.clusterHealth, strings, locale)
   }
 
+  // Pack B — protection & risk (conditional: only when data is present)
+  if (view.fsFillRisk.overThresholdCount > 0 || view.fsFillRisk.totalMounts > 0) {
+    addFsFillSlide(pptx, view.fsFillRisk, strings, locale)
+  }
+  if (
+    view.diskHygiene.unusedCount > 0 ||
+    view.diskHygiene.strayIsoCount > 0 ||
+    view.diskHygiene.noBackupCount > 0 ||
+    view.diskHygiene.riskyCacheCount > 0
+  ) {
+    addDiskHygieneSlide(pptx, view.diskHygiene, strings, locale)
+  }
+  if (view.backupCoverage.vzdump.totalCount > 0) {
+    addBackupCoverageSlide(pptx, view.backupCoverage, strings, locale)
+  }
+
+  // Pack C governance — conditional: only emit when each data source is present.
+  if (view.governance.issues.totalCount > 0) {
+    addIssuesSlide(pptx, view.governance.issues, strings, locale)
+  }
+  if (view.governance.access.userCount > 0 || view.governance.access.tokenCount > 0) {
+    addAccessPostureSlide(pptx, view.governance.access, strings, locale)
+  }
+  if (view.governance.pools.poolCount > 0) {
+    addPoolsSlide(pptx, view.governance.pools, strings, locale)
+  }
+
   addEosSlide(pptx, view.eos, png('eosBar'), strings, locale)
   // F-1 (deck side): planned-vs-measured with the other re-aggregation.
   addPlannedSlide(pptx, view, strings, locale)
 
-  // D-09: trends slide only when trends is non-null (<2 snapshots ⇒ omit).
-  if (trends !== null) addTrendsSlide(pptx, trends, png('trendLine'), strings, locale)
+  // D-09 + P8 Pack A: the trends slide emits when there is a cross-snapshot
+  // series (≥2 snapshots) OR a single-file RRD timeline (intra-export trend) —
+  // so a single dropped file still produces a trends slide.
+  if (trends !== null || view.rrdHeadroom.timeline.length > 0) {
+    addTrendsSlide(pptx, trends, view.rrdHeadroom, png('trendLine'), strings, locale)
+  }
 
   addInventorySlide(pptx, view, png('osDonut'), strings, locale)
 

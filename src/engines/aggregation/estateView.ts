@@ -14,15 +14,24 @@ import type {
 } from '@/types/estate'
 import type { Snapshot } from '@/types/snapshot'
 import { aggregateClusters } from './aggregateClusters'
+import type { BackupCoverage } from './backupCoverage'
+import { computeBackupCoverage } from './backupCoverage'
 import { computeClusterHealth } from './clusterHealth'
 import { buildDatastoreDetail, buildVmDetail } from './detailIndex'
+import type { DiskHygiene } from './diskHygiene'
+import { computeDiskHygiene } from './diskHygiene'
+import type { FsFillRisk } from './fsFillRisk'
+import { computeFsFillRisk, FS_FILL_DEFAULT_THRESHOLD } from './fsFillRisk'
 import { aggregateGlobals, emptySummary } from './globals'
+import { computeGovernance } from './governance'
 import { aggregateGuestData, type GuestData } from './guestData'
 import { computeMonsters, DEFAULT_MONSTER_THRESHOLDS, type MonsterThresholds } from './monsterVm'
 import { networkRollup } from './network'
 import { classifyOsFamily } from './osFamily'
 import { datastoreCountByCluster, perDatastore } from './perDatastore'
 import { perEsx } from './perEsx'
+import { computeRrdNodeStats, EMPTY_RRD_HEADROOM } from './rrdNodeStats'
+import { computeRrdStorageGrowth } from './rrdStorageGrowth'
 import {
   computeSizing,
   DEFAULT_SIZING_THRESHOLDS,
@@ -104,37 +113,37 @@ export function buildEstateView(
   // vSAN/host-local datastores attribute to their hosts' cluster(s)
   // instead of being dropped (Pitfall 6 / Plan 04-02).
   const hostClusterMap = new Map<string, string>()
-  for (const hrow of merged.vhost) {
+  for (const hrow of merged.nodes) {
     if (hrow.hostName !== '' && hrow.cluster !== '') hostClusterMap.set(hrow.hostName, hrow.cluster)
   }
   const dsByCluster =
-    merged.vdatastore.length === 0
+    merged.storages.length === 0
       ? undefined
-      : datastoreCountByCluster(merged.vdatastore, hostClusterMap)
+      : datastoreCountByCluster(merged.storages, hostClusterMap)
   const clusters = aggregateClusters({
-    vinfo: merged.vinfo,
-    vhost: merged.vhost,
+    guests: merged.guests,
+    nodes: merged.nodes,
     mode,
     datastoreCountByCluster: dsByCluster,
     allocRatios,
   })
 
-  const datastores = perDatastore(merged.vdatastore)
+  const datastores = perDatastore(merged.storages)
   const datastoreCount = datastores.length
   const totalStorageMib = mib(datastores.reduce((acc, d) => acc + (d.capacityMib as number), 0))
 
   const globals = aggregateGlobals(clusters, datastoreCount, totalStorageMib)
-  const hosts = perEsx(merged.vhost, merged.vinfo, mode)
+  const hosts = perEsx(merged.nodes, merged.guests, mode)
 
   // ── P9 (D-07..D-11) — four pure projections composed in THIS single
   // pass (no second memo). vsan feeds storage's per-cluster attribution;
   // flags reads the deduped `datastores` + the in-memory thresholds line.
-  const vsan = relinkBlankClusterDatastores(merged.vinfo, merged.vdatastore)
+  const vsan = relinkBlankClusterDatastores(merged.guests, merged.storages)
   const storage = storageByX(merged, mode, vsan)
   const network = networkRollup(merged)
   const thresholds = opts?.thresholds ?? DEFAULT_THRESHOLDS
   const flags = computeThresholdFlags(merged.vpartition, datastores, thresholds)
-  const datastoreDetail = buildDatastoreDetail(datastores, merged.vdatastore, vsan, thresholds)
+  const datastoreDetail = buildDatastoreDetail(datastores, merged.storages, vsan, thresholds)
   const vmDetail = buildVmDetail(merged, thresholds)
 
   // OS breakdown — global + per-cluster. `other` is always present even
@@ -143,7 +152,7 @@ export function buildEstateView(
   const osBreakdown = emptyBreakdown()
   const vmsByCluster = new Map<string, OsBreakdown>()
   const vmRows: VmDisplayRow[] = []
-  for (const vm of merged.vinfo) {
+  for (const vm of merged.guests) {
     const family = classifyOsFamily(vm.osConfig, vm.osTools)
     osBreakdown[family] += 1
     const perCluster = vmsByCluster.get(vm.cluster) ?? emptyBreakdown()
@@ -166,7 +175,7 @@ export function buildEstateView(
 
   // ── P5 operational insights (RCI) — estate + per-cluster, all
   // calculated from parsed columns; runs in THIS single pass (no memo).
-  const gd = aggregateGuestData(merged.vpartition, merged.vinfo)
+  const gd = aggregateGuestData(merged.vpartition, merged.guests)
   interface Acc {
     on: number
     off: number
@@ -178,7 +187,7 @@ export function buildEstateView(
   const zero = (): Acc => ({ on: 0, off: 0, susp: 0, tmpl: 0, prov: 0, inuse: 0 })
   const estAcc = zero()
   const accBy = new Map<string, Acc>()
-  for (const v of merged.vinfo) {
+  for (const v of merged.guests) {
     const a = accBy.get(v.cluster) ?? zero()
     const bump = (t: Acc) => {
       if (v.template) t.tmpl += 1
@@ -259,8 +268,8 @@ export function buildEstateView(
       ? null
       : (() => {
           const plannedClusters = aggregateClusters({
-            vinfo: merged.vinfo,
-            vhost: merged.vhost,
+            guests: merged.guests,
+            nodes: merged.nodes,
             mode,
             datastoreCountByCluster: dsByCluster,
             allocRatios: plannedRatios,
@@ -277,8 +286,8 @@ export function buildEstateView(
   // `classifyOsFamily` vinfo pass above. `today` is the injected reference
   // clock (D-07) — never constructed here, so this engine stays pure.
   const eos = buildEosProjection({
-    vinfo: merged.vinfo,
-    vhost: merged.vhost,
+    guests: merged.guests,
+    nodes: merged.nodes,
     catalogue: loadEosCatalogue(),
     today,
   })
@@ -296,8 +305,8 @@ export function buildEstateView(
   // speed for the utilization denominator. Pure — reuses the shipped rows.
   const sizingThresholds = opts?.sizingThresholds ?? DEFAULT_SIZING_THRESHOLDS
   const sizing = computeSizing(
-    merged.vinfo,
-    merged.vhost,
+    merged.guests,
+    merged.nodes,
     maxVmUsageAcrossSnapshots(selected),
     sizingThresholds,
     selected.length,
@@ -306,7 +315,7 @@ export function buildEstateView(
   // P-RS monster-VM extract — same single pass; configured allocation only,
   // so no multi-snapshot max is needed (vCPU/vRAM are stable per VM).
   const monsters = computeMonsters(
-    merged.vinfo,
+    merged.guests,
     opts?.monsterThresholds ?? DEFAULT_MONSTER_THRESHOLDS,
   )
 
@@ -325,6 +334,31 @@ export function buildEstateView(
     merged.proxmoxHaStatus,
     merged.proxmoxBackupJobs,
   )
+
+  // Pack B — protection & risk (P6). Three new sheets, same single pass.
+  const fsFillRisk = computeFsFillRisk(merged.proxmoxPartitions ?? [])
+  const diskHygiene = computeDiskHygiene(merged.proxmoxDisks ?? [])
+  const backupCoverage = computeBackupCoverage(merged.proxmoxTasks ?? [], merged.guests, today)
+
+  // Pack C governance & ops — same single pass.
+  const governance = computeGovernance(
+    merged.proxmoxIssues,
+    merged.proxmoxAccessUsers,
+    merged.proxmoxAccessTokens,
+    merged.proxmoxAccessRoles,
+    merged.proxmoxAccessAcls,
+    merged.proxmoxPoolMembers,
+  )
+  // P8 Pack A — RRD analytics. Computed from the PRE-merge `selected` snapshots'
+  // RRD time-series (like trends/sizing — RRD is per-snapshot, not part of the
+  // spatial merge). Concatenated across selected files (peak/avg over the
+  // loaded window); for the primary single-file case this is just the one
+  // export. Pure — reuses the parsed rows. `?? []` tolerates Snapshot objects
+  // built before this phase (and released raw rows).
+  const rrdNodeRows = selected.flatMap((s) => s.rrdNodes ?? [])
+  const rrdStorageRows = selected.flatMap((s) => s.rrdStorage ?? [])
+  const rrdHeadroom = computeRrdNodeStats(rrdNodeRows)
+  const rrdStorageGrowth = computeRrdStorageGrowth(rrdStorageRows)
 
   return {
     globals,
@@ -350,8 +384,14 @@ export function buildEstateView(
     snapshotSprawl,
     storageContent,
     clusterHealth,
+    governance,
     datastoreDetail,
     vmDetail,
+    fsFillRisk,
+    diskHygiene,
+    backupCoverage,
+    rrdHeadroom,
+    rrdStorageGrowth,
   }
 }
 
@@ -405,6 +445,7 @@ const EMPTY_STORAGE = Object.freeze({
   byDatastore: Object.freeze([]) as never[],
   capacityByDatastore: Object.freeze([]) as never[],
   capacityByCluster: Object.freeze([]) as never[],
+  byRole: Object.freeze([]) as never[],
   estate: Object.freeze({
     provisionedMib: mib(0),
     inUseMib: mib(0),
@@ -422,10 +463,12 @@ const EMPTY_VSAN = Object.freeze({
 })
 
 const EMPTY_NETWORK = Object.freeze({
-  vswitches: Object.freeze([]) as never[],
-  dvswitches: Object.freeze([]) as never[],
-  portgroups: Object.freeze([]) as never[],
-  vmPortgroupCount: 0,
+  byNode: Object.freeze([]) as never[],
+  totalNics: 0,
+  totalBonds: 0,
+  totalBridges: 0,
+  totalVlans: 0,
+  vmNicCount: 0,
 })
 
 const EMPTY_FLAGS = Object.freeze({
@@ -482,6 +525,34 @@ const EMPTY_STORAGE_CONTENT = Object.freeze({
   fileCount: 0,
 })
 
+const EMPTY_GOVERNANCE = Object.freeze({
+  issues: Object.freeze({
+    rows: Object.freeze([]) as never[],
+    totalCount: 0,
+    errorCount: 0,
+    warningCount: 0,
+    bySection: Object.freeze([]) as never[],
+  }),
+  access: Object.freeze({
+    users: Object.freeze([]) as never[],
+    tokens: Object.freeze([]) as never[],
+    roles: Object.freeze([]) as never[],
+    acls: Object.freeze([]) as never[],
+    userCount: 0,
+    enabledUserCount: 0,
+    tokenCount: 0,
+    roleCount: 0,
+    aclCount: 0,
+    rootCount: 0,
+  }),
+  pools: Object.freeze({
+    members: Object.freeze([]) as never[],
+    poolCount: 0,
+    totalMembers: 0,
+    pools: Object.freeze([]) as never[],
+  }),
+})
+
 const EMPTY_CLUSTER_HEALTH = Object.freeze({
   ha: Object.freeze({
     resources: Object.freeze([]) as never[],
@@ -495,6 +566,45 @@ const EMPTY_CLUSTER_HEALTH = Object.freeze({
     jobCount: 0,
     enabledCount: 0,
     guestsCovered: 0,
+  }),
+})
+
+const EMPTY_FS_FILL: FsFillRisk = Object.freeze({
+  overThreshold: Object.freeze([]) as never[],
+  overThresholdCount: 0,
+  totalMounts: 0,
+  totalVms: 0,
+  threshold: FS_FILL_DEFAULT_THRESHOLD,
+})
+
+const EMPTY_DISK_HYGIENE: DiskHygiene = Object.freeze({
+  unusedDisks: Object.freeze([]) as never[],
+  unusedCount: 0,
+  reclaimableGb: 0,
+  strayIsos: Object.freeze([]) as never[],
+  strayIsoCount: 0,
+  noBackupDisks: Object.freeze([]) as never[],
+  noBackupCount: 0,
+  riskyCacheDisks: Object.freeze([]) as never[],
+  riskyCacheCount: 0,
+})
+
+const EMPTY_BACKUP_COVERAGE: BackupCoverage = Object.freeze({
+  vzdump: Object.freeze({
+    tasks: Object.freeze([]) as never[],
+    totalCount: 0,
+    successCount: 0,
+    failedCount: 0,
+    coveredVmids: 0,
+    uncoveredGuests: Object.freeze([]) as never[],
+    uncoveredCount: 0,
+    guestStatuses: Object.freeze([]) as never[],
+  }),
+  operationalHealth: Object.freeze({
+    taskTypes: Object.freeze([]) as never[],
+    totalTasks: 0,
+    totalOk: 0,
+    totalFailed: 0,
   }),
 })
 
@@ -527,6 +637,17 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
   snapshotSprawl: EMPTY_SPRAWL,
   storageContent: EMPTY_STORAGE_CONTENT,
   clusterHealth: EMPTY_CLUSTER_HEALTH,
+  governance: EMPTY_GOVERNANCE,
   datastoreDetail: new Map(),
   vmDetail: new Map(),
+  fsFillRisk: EMPTY_FS_FILL,
+  diskHygiene: EMPTY_DISK_HYGIENE,
+  backupCoverage: EMPTY_BACKUP_COVERAGE,
+  rrdHeadroom: EMPTY_RRD_HEADROOM,
+  rrdStorageGrowth: Object.freeze({
+    hasData: false,
+    rows: Object.freeze([]) as never[],
+    soonestDaysToFull: null,
+    windowDays: 0,
+  }),
 })

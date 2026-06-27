@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mib } from '@/engines/units'
 import type { DatastoreAggregate } from '@/types/estate'
-import type { VDatastoreRow, VNetworkRow, VPartitionRow } from '@/types/snapshot'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
+import type { StorageRow, VmNicRow, VPartitionRow } from '@/types/snapshot'
 import { buildDatastoreDetail, buildVmDetail } from './detailIndex'
 import type { VsanRelinkResult } from './vsanRelink'
 
@@ -20,13 +20,14 @@ const dsAgg = (over: Partial<DatastoreAggregate>): DatastoreAggregate => ({
   ...over,
 })
 
-const dsRow = (over: Partial<VDatastoreRow>): VDatastoreRow => ({
+const dsRow = (over: Partial<StorageRow>): StorageRow => ({
   name: 'DS_A',
   capacityMib: mib(1000),
   freeMib: mib(100),
   provisionedMib: mib(800),
   naa: null,
   type: 'vSAN',
+  role: 'other',
   hosts: '3',
   clusterName: '',
   ...over,
@@ -39,10 +40,10 @@ const NO_VSAN: VsanRelinkResult = {
   datastoreVms: new Map(),
 }
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm-1',
   cluster: 'CL_1',
-  host: 'esx-1',
+  host: 'pve-1',
   vcpu: cores(4),
   vramMib: mib(8192),
   cpuReadinessPercent: null,
@@ -58,7 +59,7 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   guestType: 'qemu',
   provisionedMib: mib(40_960),
   inUseMib: mib(20_480),
-  path: '[DS_A] vm-1/vm-1.vmx',
+  path: '[DS_A] vm-1/vm-1.conf',
   ...over,
 })
 
@@ -71,14 +72,16 @@ const part = (over: Partial<VPartitionRow>): VPartitionRow => ({
   ...over,
 })
 
-const netRow = (over: Partial<VNetworkRow>): VNetworkRow => ({
-  vm: 'vm-1',
-  network: 'PG-Prod',
-  switch: 'vSwitch0',
-  adapter: 'vmxnet3',
-  connected: 'True',
-  cluster: 'CL_1',
-  host: 'esx-1',
+/** Two VmNicRow entries for 'vm-1' on the same bridge → deduplicate to 1 bridge entry. */
+const nicRow = (over: Partial<VmNicRow>): VmNicRow => ({
+  node: 'pve-1',
+  vmId: '101',
+  vmName: 'vm-1',
+  vmType: 'qemu',
+  macAddress: 'BC:24:11:AA:BB:CC',
+  bridge: 'vmbr0',
+  tag: null,
+  model: 'virtio',
   ...over,
 })
 
@@ -114,15 +117,16 @@ describe('buildDatastoreDetail (LC-4)', () => {
 })
 
 describe('buildVmDetail (LC-4)', () => {
-  it('projects partitions with the factual fs flag, portgroups, and the path datastore', () => {
+  it('projects partitions with the factual fs flag, bridges, and the path datastore', () => {
     const out = buildVmDetail(
       {
-        vinfo: [vm({})],
+        guests: [vm({})],
         vpartition: [
           part({ consumedMib: mib(950) }),
           part({ disk: '/var', consumedMib: mib(100) }),
         ],
-        vnetwork: [netRow({}), netRow({})],
+        // Two NIC rows on the same bridge → deduped to 1 bridge entry.
+        vmNics: [nicRow({}), nicRow({})],
       },
       { fsUsedPct: 90, dsUsedPct: 85, luUsedPct: 85 },
     )
@@ -130,19 +134,19 @@ describe('buildVmDetail (LC-4)', () => {
     expect(d?.partitions).toHaveLength(2)
     expect(d?.partitions[0]?.flagged).toBe(true) // 95% ≥ 90
     expect(d?.partitions[1]?.flagged).toBe(false) // 10%
-    expect(d?.portgroups).toHaveLength(1) // deduped
+    expect(d?.bridges).toHaveLength(1) // deduped
     expect(d?.datastores).toEqual(['DS_A'])
     expect(d?.os).toBe('RHEL 8')
   })
 
-  it('empty partition/portgroup lists when none reference the VM (em-dash upstream)', () => {
+  it('empty partition/bridge lists when none reference the VM (em-dash upstream)', () => {
     const out = buildVmDetail(
-      { vinfo: [vm({ vmName: 'lonely', path: 'no-bracket' })], vpartition: [], vnetwork: [] },
+      { guests: [vm({ vmName: 'lonely', path: 'no-bracket' })], vpartition: [], vmNics: [] },
       { fsUsedPct: 90, dsUsedPct: 85, luUsedPct: 85 },
     )
     const d = out.get('lonely')
     expect(d?.partitions).toEqual([])
-    expect(d?.portgroups).toEqual([])
+    expect(d?.bridges).toEqual([])
     expect(d?.datastores).toEqual([])
   })
 })

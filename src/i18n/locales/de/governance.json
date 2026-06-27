@@ -1,0 +1,82 @@
+{
+  "heading": "Governance & Betrieb",
+  "subtitle": "Probleme, Zugriffsposition und Ressourcenpools",
+  "empty": {
+    "heading": "Kein Bericht geladen",
+    "body": "Laden Sie einen Bericht, um Governance-Daten anzuzeigen."
+  },
+  "issues": {
+    "heading": "Probleme",
+    "none": "Keine Probleme gefunden.",
+    "kpi": {
+      "total": "Gesamt",
+      "errors": "Fehler",
+      "warnings": "Warnungen"
+    },
+    "col": {
+      "severity": "Schweregrad",
+      "section": "Abschnitt",
+      "message": "Meldung",
+      "linkKey": "Referenz"
+    },
+    "bySection": "Nach Abschnitt"
+  },
+  "access": {
+    "heading": "Zugriffsposition",
+    "kpi": {
+      "users": "Benutzer",
+      "enabled": "Aktiv",
+      "tokens": "API-Token",
+      "roles": "Rollen",
+      "acls": "ACL-Einträge",
+      "rootAccounts": "Root-Konten"
+    },
+    "users": {
+      "heading": "Benutzer",
+      "none": "Keine Benutzer gefunden.",
+      "col": {
+        "id": "ID",
+        "enabled": "Aktiv",
+        "email": "E-Mail",
+        "groups": "Gruppen",
+        "expire": "Ablauf"
+      }
+    },
+    "tokens": {
+      "heading": "API-Token",
+      "none": "Keine API-Token gefunden.",
+      "col": {
+        "user": "Benutzer",
+        "tokenId": "Token-ID",
+        "privSeparated": "Priv. getrennt",
+        "expire": "Ablauf"
+      }
+    },
+    "acls": {
+      "heading": "ACL-Einträge",
+      "none": "Keine ACL-Einträge gefunden.",
+      "col": {
+        "path": "Pfad",
+        "usersOrGroup": "Benutzer / Gruppe",
+        "type": "Typ",
+        "role": "Rolle",
+        "propagate": "Propagierung"
+      }
+    }
+  },
+  "pools": {
+    "heading": "Ressourcenpools",
+    "none": "Keine Ressourcenpools gefunden.",
+    "kpi": {
+      "pools": "Pools",
+      "members": "Mitglieder"
+    },
+    "col": {
+      "pool": "Pool",
+      "members": "Mitglieder",
+      "vms": "Gäste",
+      "storages": "Speicher"
+    }
+  },
+  "na": "—"
+}

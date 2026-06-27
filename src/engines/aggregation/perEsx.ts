@@ -1,27 +1,27 @@
 import { cores as coresOf, mib } from '@/engines/units'
 import type { AccountingMode, EsxAggregate } from '@/types/estate'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import { physicalGhz } from './ghz'
 import { readinessStats } from './vinfoMerge'
 
 /**
  * Per-ESX-host rollup (DSH-01 + Phase-3 inventory-tree consumer). Hosts
- * grouped by `hostName`; VMs attached via `VInfoRow.host === hostName`.
+ * grouped by `hostName`; VMs attached via `GuestRow.host === hostName`.
  *
  * DRY mandate (RESEARCH §perEsx): CPU Ready stats reuse the SAME
  * `readinessStats` helper `vinfoMerge` exports — the reduce-not-spread
  * loop is NOT copy-pasted. `vmCount`/`vcpuAllocated` honor the same
  * accounting `mode` as `vinfoMerge` (powered-off excluded unless
- * `configured`). `cores` is PHYSICAL cores — `VHostRow` structurally has
+ * `configured`). `cores` is PHYSICAL cores — `NodeRow` structurally has
  * no threads field so the Moderate-4 bug is type-prevented.
  */
 export const perEsx = (
-  vhost: VHostRow[],
-  vinfo: VInfoRow[],
+  vhost: NodeRow[],
+  vinfo: GuestRow[],
   mode: AccountingMode,
 ): EsxAggregate[] => {
-  const vmsByHost = new Map<string, VInfoRow[]>()
+  const vmsByHost = new Map<string, GuestRow[]>()
   for (const vm of vinfo) {
     const list = vmsByHost.get(vm.host) ?? []
     list.push(vm)

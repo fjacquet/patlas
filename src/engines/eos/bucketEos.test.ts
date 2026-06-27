@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mhz, mib, sockets } from '@/engines/units'
 import type { NodeHostRow } from '@/types/estate'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import { buildEosProjection } from './bucketEos'
 import type { EosCatalogue } from './catalogueSchema'
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm',
   cluster: 'C1',
   host: 'esx-1',
@@ -29,7 +29,7 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   ...over,
 })
 
-const host = (over: Partial<VHostRow>): VHostRow => ({
+const host = (over: Partial<NodeRow>): NodeRow => ({
   hostName: 'esx-1',
   cluster: 'C1',
   sockets: sockets(2),
@@ -78,7 +78,7 @@ describe('buildEosProjection — reconciliation invariant (D-06/D-10)', () => {
       vm({ osConfig: 'Other (64-bit)' }), // unknown (unnormalized)
       vm({ osConfig: 'Oracle Linux 8' }), // unknown (no catalogue entry)
     ]
-    const p = buildEosProjection({ vinfo, vhost: [], catalogue, today: TODAY })
+    const p = buildEosProjection({ guests: vinfo, nodes: [], catalogue, today: TODAY })
     const sum =
       p.partition.overdue.length +
       p.partition.w3.length +
@@ -94,8 +94,8 @@ describe('buildEosProjection — reconciliation invariant (D-06/D-10)', () => {
 describe('buildEosProjection — overdue uses the injected today (D-07)', () => {
   it('an eolFrom strictly before the injected today buckets overdue', () => {
     const p = buildEosProjection({
-      vinfo: [vm({ osConfig: 'Microsoft Windows Server 2012 (64-bit)' })],
-      vhost: [],
+      guests: [vm({ osConfig: 'Microsoft Windows Server 2012 (64-bit)' })],
+      nodes: [],
       catalogue,
       today: TODAY,
     })
@@ -108,12 +108,12 @@ describe('buildEosProjection — overdue uses the injected today (D-07)', () => 
 describe('buildEosProjection — unknown is first-class with verbatim raw (D-11/D-12)', () => {
   it('unnormalized + no-catalogue-EOL land in unknown; rawUnknown is verbatim + counted', () => {
     const p = buildEosProjection({
-      vinfo: [
+      guests: [
         vm({ osConfig: 'Other (64-bit)' }),
         vm({ osConfig: 'Other (64-bit)' }),
         vm({ osConfig: 'Oracle Linux 8' }), // normalizes but no catalogue entry → unknown
       ],
-      vhost: [],
+      nodes: [],
       catalogue,
       today: TODAY,
     })
@@ -133,7 +133,7 @@ describe('buildEosProjection — cumulative derived from the disjoint partition'
       vm({ osConfig: 'Red Hat Enterprise Linux 8 (64-bit)' }), // beyond12
       vm({ osConfig: 'Other (64-bit)' }), // unknown
     ]
-    const p = buildEosProjection({ vinfo, vhost: [], catalogue, today: TODAY })
+    const p = buildEosProjection({ guests: vinfo, nodes: [], catalogue, today: TODAY })
     expect(p.cumulative.overdue).toBe(p.partition.overdue.length)
     expect(p.cumulative.le3).toBe(p.partition.overdue.length + p.partition.w3.length)
     expect(p.cumulative.le6).toBe(p.cumulative.le3 + p.partition.w3to6.length)
@@ -147,7 +147,7 @@ describe('buildEosProjection — host vs VM cardinality never conflated (D-09b)'
   it('ESXi hosts are reported separately and never summed into the VM partition total', () => {
     const vinfo = [vm({ osConfig: 'Red Hat Enterprise Linux 8 (64-bit)' })]
     const vhost = [host({}), host({ hostName: 'esx-2' })]
-    const p = buildEosProjection({ vinfo, vhost, catalogue, today: TODAY })
+    const p = buildEosProjection({ guests: vinfo, nodes: vhost, catalogue, today: TODAY })
     const vmSum =
       p.partition.overdue.length +
       p.partition.w3.length +
@@ -190,7 +190,7 @@ describe('buildEosProjection — pve node classification (pB-03)', () => {
       },
     }
     const vhost = [host({ esxVersion: '8.2' })]
-    const p = buildEosProjection({ vinfo: [], vhost, catalogue: cat, today: TODAY })
+    const p = buildEosProjection({ guests: [], nodes: vhost, catalogue: cat, today: TODAY })
     expect(p.nodes.hosts).toHaveLength(1)
     const row: NodeHostRow | undefined = p.nodes.hosts[0]
     expect(row?.major).toBe('8')
@@ -210,8 +210,8 @@ describe('buildEosProjection — month-boundary date math (CodeRabbit PR#1)', ()
       products: { debian: { name: 'Debian', releases: [r('12', '2026-07-01')] } },
     }
     const p = buildEosProjection({
-      vinfo: [vm({ osConfig: 'Debian GNU/Linux 12 (64-bit)' })],
-      vhost: [],
+      guests: [vm({ osConfig: 'Debian GNU/Linux 12 (64-bit)' })],
+      nodes: [],
       catalogue: cat,
       today: new Date('2026-03-31T00:00:00Z'),
     })
@@ -225,8 +225,8 @@ describe('buildEosProjection — month-boundary date math (CodeRabbit PR#1)', ()
       products: { debian: { name: 'Debian', releases: [r('12', '2026-06-15')] } },
     }
     const p = buildEosProjection({
-      vinfo: [vm({ osConfig: 'Debian GNU/Linux 12 (64-bit)' })],
-      vhost: [],
+      guests: [vm({ osConfig: 'Debian GNU/Linux 12 (64-bit)' })],
+      nodes: [],
       catalogue: cat,
       today: new Date('2026-06-15T14:30:00Z'), // same calendar day, afternoon
     })

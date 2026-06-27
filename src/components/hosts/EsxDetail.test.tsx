@@ -33,18 +33,6 @@ const host = (): EsxAggregate =>
 
 const data = (over: Partial<EsxDetailData> = {}): EsxDetailData => ({
   host: host(),
-  vswitches: [
-    {
-      host: 'esx-1',
-      cluster: 'CL_1',
-      switch: 'vSwitch0',
-      ports: 128,
-      freePorts: 96,
-      mtu: 1500,
-      vmCount: 8,
-    },
-  ],
-  dvswitches: [],
   ...over,
 })
 
@@ -53,10 +41,9 @@ describe('EsxDetail (LC-4, augments Hosts)', () => {
     await i18n.changeLanguage('en')
   })
 
-  it('renders the host title, switches, and the factual datastore em-dash + note', () => {
+  it('renders the host title and the factual datastore em-dash + note', () => {
     render(<EsxDetail detail={data()} onBack={() => {}} />)
     expect(screen.getByText(/esx-1/)).not.toBeNull()
-    expect(screen.getByText('vSwitch0')).not.toBeNull()
     expect(screen.getByText(/Per-node storage names are not available/)).not.toBeNull() // datastoresNote
     expect(screen.getAllByText('—').length).toBeGreaterThan(0)
   })

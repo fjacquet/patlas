@@ -27,7 +27,8 @@ export default defineConfig({
       manifest: {
         name: 'pAtlas',
         short_name: 'pAtlas',
-        description: 'RVTools → atlas of your VMware estate (100% client-side)',
+        description:
+          'Proxmox VE atlas (100% client-side) — drop a cv4pve-report export, get insights and exports',
         id: '/patlas/',
         scope: '/patlas/',
         start_url: '/patlas/',

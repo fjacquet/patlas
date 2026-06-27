@@ -1,15 +1,14 @@
-<!-- generated-by: gsd-doc-writer -->
 # Product Requirements Document: patlas
 
-**Status:** Current through v2.1.0 (completed 2026-06-24)
-**Document date:** 2026-06-24
-**Sources reconciled:** `docs-facts.md`, `.planning/PROJECT.md`, `.planning/REQUIREMENTS.md`, `.planning/ROADMAP.md`, `.planning/STATE.md`, and the replan ADRs (`docs/adr/0020`, `0021`, `0022`). Where `.planning/PROJECT.md` conflicts with newer sources, the newer source is authoritative.
+**Status:** Current through v3.0 (feat/proxmox-atlas-v3)
+**Document date:** 2026-06-27
+**Sources reconciled:** `CLAUDE.md` (project constraints), `docs/ARCHITECTURE.md`, and the replan ADRs (`docs/adr/0020`, `0021`, `0022`). The shipped feature set reflects what is registered in `src/components/ViewToggle.tsx` and the `src/engines/aggregation/` directory.
 
 ---
 
 ## 1. Overview & Core Value
 
-patlas is a 100% client-side web app that turns one or more Proxmox VE reports into a navigable, visual atlas of a Proxmox estate: a global dashboard, inventory tree views, allocation analysis, OS End-of-Support forecasting, in-session trends across multiple reports, and three Proxmox-native health views (Snapshot Sprawl, Storage Content, Cluster Health). It exports the result as a shareable HTML report and a PPTX deck. It is a fork of [vatlas](https://github.com/fjacquet/vatlas) (the VMware sibling) and follows the same architectural mold (drop file in browser, see numbers, export, leave), with the domain remapped to Proxmox.
+patlas is a 100% client-side web app that turns one or more Proxmox VE reports into a navigable, visual atlas of a Proxmox estate: a global dashboard, inventory tree views, allocation analysis, OS End-of-Support forecasting, in-session trends, RRD-based node headroom and storage growth analytics, protection and governance packs, storage-by-role segmentation, and Proxmox-native health views (Snapshot Sprawl, Storage Content, Cluster Health). It exports the result as a shareable HTML report and a PPTX deck. It is a fork of [vatlas](https://github.com/fjacquet/vatlas) (the VMware/RVTools sibling — historical fork provenance) and follows the same architectural mold (drop file in browser, see numbers, export, leave), with the domain remapped to Proxmox.
 
 **Core value:** A user drops a Proxmox report and walks away with a polished, shareable HTML report and PPTX deck describing their Proxmox estate, without uploading a single byte. The report is the product.
 
@@ -96,22 +95,25 @@ Note: the former "Stretched Cluster" scope (STR-01..04) is removed. There is no 
 
 Note: the former DR Simulation scope (DRX-01..06) is removed. There is no Proxmox analog in scope.
 
-### 4.7 OS End-of-Support Forecast — Phase 7 (Planned)
+### 4.7 OS End-of-Support Forecast — Phase 7 (Shipped)
 
 - **EOS-01..06:** EOS forecast view with at-risk counts at +3/+6/+9/+12 months plus an "overdue" bucket; clickable buckets drilling into the affected guest list; nodes classified by build → support state; an "unknown OS" bucket for unmatched OS strings (not silently dropped); a `lastVerified` date on the EOS catalogue, refreshed at CI build time from endoflife.date.
 
-### 4.8 In-Session Trends — Phase 8 (Planned)
+### 4.8 In-Session Trends — Phase 8 (Shipped)
 
 - **TRD-01..05:** Load 2–12 monthly Proxmox reports together and see headline metrics evolve; temporal X-axis using actual capture dates (not categorical labels); per-cluster sparklines on the dashboard when multiple reports are loaded; a delta panel showing what changed between consecutive reports; refresh confirms trends are gone (no cross-session persistence).
 
-### 4.9 Storage / Network / Detailed Views — Phase 9 (Planned)
+### 4.9 RRD Analytics, Protection & Governance Packs — Phase 9 (Shipped)
 
-Storage views (total disk sizes by cluster / node / guest / storage pool), detailed cluster/node/guest/storage views with disk and partition threshold alerting, ports and switches (network) detail, and a personal-config surface for thresholds (UI preferences only, never dataset rows). Requirements and success criteria are to be re-derived in the discuss-phase step.
+- **RRD-01..04 — RRD Analytics:** Node Headroom view (CPU / RAM peak, P95, average per node from RRD time-series) and Storage Growth view (storage time-to-full projection from RRD growth history). Only available when the cv4pve-report bundle includes RRD data.
+- **PRO-01..04 — Protection Pack:** In-guest filesystem fill risk (FS utilisation from guest agent data), disk hygiene (old/orphaned disk detection), and backup coverage (per-guest backup recency status). Web-only view.
+- **GOV-01..04 — Governance Pack:** cv4pve issues (parsed from the report issues sheet), access posture (API token + user audit), and resource pool analysis. Web-only view.
+- **SBR-01..02 — Storage-by-Role:** Storage capacity segmented by role (VM data / backup / local) within the Storage view; real used vs configured capacity per role band.
 
-### 4.10 HTML Report & PPTX Exports + Deploy — Phase 10 (Planned)
+### 4.10 HTML Report & PPTX Exports + Deploy — Phase 10 (Shipped)
 
 - **HTM-01..05:** One-click download of a single self-contained `.html` file; opens offline with no JS execution required and crisp inline SVG charts; under 5 MB for a typical estate and under 15 MB for the largest supported (hard ceiling); contains cover, executive headlines, per-cluster, EOS forecast, trends, annex, methodology footer; factual numbers only (no editorial recommendations).
-- **PPT-01..04:** One-click PPTX deck using the same neutral Midnight Executive palette as vatlas; includes title, overview, per-cluster, conditional CPU Ready annex, EOS, trends, inventory summary; locale-formatted numbers (FR `,` with U+00A0 thousands separator, EN `.` with `,` thousands separator).
+- **PPT-01..04:** One-click PPTX deck using the same neutral Midnight Executive palette; includes title, overview, per-cluster, EOS, trends, inventory summary; locale-formatted numbers (FR `,` with U+00A0 thousands separator, EN `.` with `,` thousands separator).
 - **DEP-01..02:** Public access at `fjacquet.github.io/patlas/`; deploy is the result of a CI pipeline running typecheck → lint → test → build → deploy on every push to `main`.
 
 ### 4.11 Proxmox-Native Views — v2.1.0 (Shipped 2026-06-24)
@@ -132,20 +134,22 @@ These three views are **web-only** — deliberately excluded from the HTML repor
 | Multi-Cluster Merge | MVC-01..04 | Shipped (re-derived; DR/Stretched removed) |
 | Rich Cluster / Node Intelligence | RCI-01..05 | Shipped |
 | Capacity Planning (what-if) | PLN-01..04 | Shipped (re-derived; old ALC/DRS retired) |
-| Snapshot Sprawl | SNP-01..04 | Shipped v2.1.0 |
-| Storage Content | STC-01..04 | Shipped v2.1.0 |
-| Cluster Health (HA + backup jobs) | CLH-01..04 | Shipped v2.1.0 |
-| OS End-of-Support Forecast | EOS-01..06 | Planned |
-| In-Session Trends | TRD-01..05 | Planned |
-| Storage / Network / Detailed Views | TBD | Planned |
-| HTML / PPTX Exports + Deploy | HTM-01..05, PPT-01..04, DEP-01..02 | Planned |
+| Snapshot Sprawl | SNP-01..04 | Shipped |
+| Storage Content | STC-01..04 | Shipped |
+| Cluster Health (HA + backup jobs) | CLH-01..04 | Shipped |
+| OS End-of-Support Forecast | EOS-01..06 | Shipped |
+| In-Session Trends | TRD-01..05 | Shipped |
+| RRD Analytics (Node Headroom + Storage Growth) | RRD-01..04 | Shipped |
+| Protection Pack (FS fill risk, disk hygiene, backup coverage) | PRO-01..04 | Shipped |
+| Governance Pack (issues, access posture, pools) | GOV-01..04 | Shipped |
+| Storage-by-Role segmentation | SBR-01..02 | Shipped |
+| HTML / PPTX Exports + Deploy | HTM-01..05, PPT-01..04, DEP-01..02 | Shipped |
 
 ---
 
 ## 5. Open Questions
 
-- **OPEN-2 — Detailed-views navigation taxonomy (OPEN, gates Phase 9).** How far to mirror a dedicated-screen navigation taxonomy versus the current Dashboard ⟷ Inventory ViewToggle. To be resolved in the Phase 9 discuss-phase step before planning.
-- **OPEN-3 — Threshold alerting + user-config surface (OPEN, gates Phase 9).** Whether disk/partition threshold alerting and a user-configurable threshold surface are in this milestone. The threshold config must remain UI-preferences only and never breach the privacy invariant. To be resolved in the Phase 9 discuss-phase step before planning.
+No open requirements-blocking questions remain for the shipped scope. Future additions (if any) should follow the same discuss → spec → plan pattern.
 
 ---
 
@@ -156,5 +160,5 @@ These three views are **web-only** — deliberately excluded from the HTML repor
 - `docs/adr/0001-privacy-invariant.md` — privacy invariant (runtime guard, CSP, CI denylist).
 - `docs/adr/0002-sheetjs-xlsx-cdn-tarball-pin.md` — SheetJS tarball pin (CVE avoidance).
 - `docs/adr/0004-no-localstorage-of-dataset-rows.md` — no persistence of dataset rows.
-- `docs/adr/0010-rvtools-mb-as-mib.md` — report "MB" treated as MiB.
+- `docs/adr/0010-rvtools-mb-as-mib.md` — cv4pve-report "MB" values treated as MiB (no `* 1.048576` conversion).
 - `docs/adr/0020-allocation-ratio-is-calculated-not-selected.md` — allocation is calculated; planned lens is separate.

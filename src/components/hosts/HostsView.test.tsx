@@ -19,7 +19,7 @@ const snapshot = (): Snapshot =>
     source: 'proxmox',
     viSdkUuid: null,
     vMetaData: [],
-    vinfo: [
+    guests: [
       {
         vmName: 'vm-1',
         cluster: 'CL_1',
@@ -41,7 +41,7 @@ const snapshot = (): Snapshot =>
         path: '[DS_A] vm-1/vm-1.vmx',
       },
     ],
-    vhost: [
+    nodes: [
       {
         hostName: 'esx-1',
         cluster: 'CL_1',
@@ -57,14 +57,10 @@ const snapshot = (): Snapshot =>
         esxVersion: '8.0.0',
       },
     ],
-    vdatastore: [],
+    storages: [],
     vpartition: [],
-    vnetwork: [],
-    vswitch: [
-      { host: 'esx-1', cluster: 'CL_1', switch: 'vSwitch0', ports: 128, freePorts: 96, mtu: 1500 },
-    ],
-    dvswitch: [],
-    dvport: [],
+    nodeInterfaces: [],
+    vmNics: [],
     parseErrors: [],
   }) as unknown as Snapshot
 
@@ -78,9 +74,8 @@ describe('HostsView — ESX detail drill (LC-4, D-06)', () => {
     useSnapshotStore.getState().addSnapshot(snapshot())
     render(<HostsView />)
     await userEvent.click(screen.getByRole('button', { name: 'esx-1' }))
-    // EsxDetail renders: title + the per-host switch + back affordance.
+    // EsxDetail renders: title + factual cluster/version info + back affordance.
     expect(screen.getByText(/Node — esx-1/)).not.toBeNull()
-    expect(screen.getByText('vSwitch0')).not.toBeNull()
     expect(screen.getByText(/Back/)).not.toBeNull()
   })
 })

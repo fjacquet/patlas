@@ -47,7 +47,7 @@
     "consumedGhz": "GHz consumati",
     "availableGhz": "GHz disponibili",
     "ramAvailable": "RAM disponibile",
-    "footer": "Fonte: Proxmox — nodo (utilizzo CPU/RAM %, Speed × Cores, Memory) + info ospite (vCPUs, Memory)"
+    "footer": "Fonte: Proxmox — serie temporali RRD (utilizzo CPU % nodo) + nodo (utilizzo RAM %, Speed × Cores, Memory) + info ospite (vCPUs, Memory)"
   },
   "eos": {
     "title": "Previsione di fine supporto degli OS",
@@ -71,7 +71,12 @@
     "title": "Andamenti nella sessione",
     "points": "Punti della cronologia",
     "deltas": "Delta",
-    "series": "Numero di ospiti tra gli snapshot"
+    "series": "Numero di ospiti tra gli snapshot",
+    "singleTitle": "Andamenti file singolo — serie RRD",
+    "singleNote": "Derivato dalla serie temporale RRD di questo export.",
+    "singleCpu": "CPU media %",
+    "singleMem": "Memoria media %",
+    "singleSamples": "Punti serie"
   },
   "inventory": {
     "title": "Riepilogo dell'inventario",
@@ -105,12 +110,26 @@
     "colCluster": "Cluster",
     "colProvisioned": "Provisionato",
     "colInUse": "In uso",
-    "vsanShared": "Condiviso su {{n}} cluster"
+    "vsanShared": "Condiviso su {{n}} cluster",
+    "vmUsed": "VM usato",
+    "vmCapacity": "VM capacità",
+    "vmAllocated": "Allocato VM",
+    "colRole": "Ruolo",
+    "colUsed": "Usato",
+    "colCapacity": "Capacità",
+    "colFree": "Libero",
+    "role": {
+      "vmdata": "Storage VM",
+      "backup": "Backup",
+      "local": "Locale / avvio",
+      "other": "Altro"
+    }
   },
   "network": {
     "title": "Rete",
     "diagramAlt": "Diagramma della topologia di rete",
-    "absent": "Nessuno schema di rete è incluso in questo rapporto."
+    "absent": "Nessuno schema di rete è incluso in questo rapporto.",
+    "oversizedNote": "Il diagramma di rete completo è disponibile nel report HTML."
   },
   "os": {
     "title": "Sistemi operativi",
@@ -195,6 +214,99 @@
       "storage": "Storage",
       "count": "Quantità",
       "sizeGib": "Dimensione (GiB)"
+    }
+  },
+  "governance": {
+    "issues": {
+      "title": "Problemi",
+      "kpi": {
+        "total": "Totale",
+        "errors": "Errori",
+        "warnings": "Avvisi"
+      },
+      "col": {
+        "severity": "Gravità",
+        "section": "Sezione",
+        "message": "Messaggio"
+      }
+    },
+    "access": {
+      "title": "Postura di accesso",
+      "kpi": {
+        "users": "Utenti",
+        "enabled": "Attivi",
+        "tokens": "Token API",
+        "roles": "Ruoli",
+        "acls": "Voci ACL",
+        "rootAccounts": "Account root"
+      },
+      "users": {
+        "heading": "Utenti",
+        "col": {
+          "id": "ID",
+          "enabled": "Attivo",
+          "email": "E-mail"
+        }
+      },
+      "tokens": {
+        "heading": "Token API",
+        "col": {
+          "user": "Utente",
+          "tokenId": "ID token",
+          "privSeparated": "Priv. sep."
+        }
+      }
+    },
+    "pools": {
+      "title": "Pool di risorse",
+      "kpi": {
+        "pools": "Pool",
+        "members": "Membri"
+      },
+      "col": {
+        "pool": "Pool",
+        "members": "Membri",
+        "vms": "Ospiti",
+        "storages": "Storage"
+      }
+    }
+  },
+  "rrdHeadroom": {
+    "title": "Margine nodo — utilizzo RRD",
+    "kpi": {
+      "cpuPeak": "CPU picco",
+      "cpuAvg": "CPU media",
+      "memPeak": "Memoria picco",
+      "memAvg": "Memoria media",
+      "ioWaitPeak": "Attesa I/O picco",
+      "psiMemPeak": "Pressione memoria picco"
+    },
+    "col": {
+      "node": "Nodo",
+      "cpuPeak": "CPU picco",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU media",
+      "memPeak": "Mem picco",
+      "memP95": "Mem p95",
+      "memAvg": "Mem media"
+    }
+  },
+  "storageGrowth": {
+    "title": "Tempo al riempimento — crescita RRD",
+    "kpi": {
+      "storages": "Storage",
+      "soonest": "Riempimento più vicino (giorni)",
+      "window": "Finestra (giorni)",
+      "growing": "Storage in crescita"
+    },
+    "col": {
+      "storage": "Storage",
+      "node": "Nodo",
+      "used": "Usato (GiB)",
+      "size": "Dimensione (GiB)",
+      "usage": "Utilizzo",
+      "growth": "Crescita (GiB/giorno)",
+      "daysToFull": "Giorni al riempimento"
     }
   }
 }

@@ -3,12 +3,12 @@ import { aggregateClusters, aggregateGlobals, perDatastore } from '@/engines/agg
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { TrendHeadline } from '@/types/estate'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import type { Snapshot } from '@/types/snapshot'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
 import { buildTrendSeries } from './buildTrendSeries'
 
-const host = (over: Partial<VHostRow>): VHostRow => ({
+const host = (over: Partial<NodeRow>): NodeRow => ({
   hostName: 'esx-1',
   cluster: 'C1',
   sockets: sockets(2),
@@ -25,7 +25,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   ...over,
 })
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm',
   cluster: 'C1',
   host: 'esx-1',
@@ -58,18 +58,18 @@ const snap = (over: Partial<Snapshot> & { id: string }): Snapshot => ({
   source: 'proxmox',
   viSdkUuid: null,
   vMetaData: [],
-  vhost: [host({})],
+  nodes: [host({})],
   vmUsage: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
   proxmoxHaResources: [],
   proxmoxHaStatus: [],
   proxmoxBackupJobs: [],
-  vinfo: [
+  guests: [
     vm({ vmName: 'on-1', poweredOn: true, powerState: 'poweredOn' }),
     vm({ vmName: 'off-1', poweredOn: false, powerState: 'poweredOff' }),
   ],
-  vdatastore: [
+  storages: [
     {
       name: 'ds-A',
       capacityMib: mib(1000),
@@ -77,27 +77,27 @@ const snap = (over: Partial<Snapshot> & { id: string }): Snapshot => ({
       provisionedMib: mib(800),
       naa: 'naa.s',
       type: 'VMFS',
+      role: 'other',
       hosts: '',
       clusterName: 'C1',
     },
   ],
   vpartition: [],
-  vnetwork: [],
-  vswitch: [],
-  dvswitch: [],
-  dvport: [],
+  nodeInterfaces: [],
+
+  vmNics: [],
   parseErrors: [],
   ...over,
 })
 
 const expectedHeadline = (snaps: Snapshot[]): Pick<TrendHeadline, 'vmCount' | 'poweredOnVms'> => {
   const m = mergeSnapshotsToEstate(snaps)
-  const clusters = aggregateClusters({ vinfo: m.vinfo, vhost: m.vhost, mode: 'active' })
-  const ds = perDatastore(m.vdatastore)
+  const clusters = aggregateClusters({ guests: m.guests, nodes: m.nodes, mode: 'active' })
+  const ds = perDatastore(m.storages)
   const g = aggregateGlobals(clusters, ds.length, mib(0))
   return {
     vmCount: g.vmCount,
-    poweredOnVms: m.vinfo.filter((v) => !v.template && v.powerState === 'poweredOn').length,
+    poweredOnVms: m.guests.filter((v) => !v.template && v.powerState === 'poweredOn').length,
   }
 }
 
@@ -130,8 +130,8 @@ describe('buildTrendSeries', () => {
       id: 'b',
       capturedAt: new Date('2026-02-15T18:00:00Z'),
       vCenterLabel: 'vc-b',
-      vinfo: [vm({ vmName: 'b-on', cluster: 'C2', host: 'esx-2' })],
-      vhost: [host({ hostName: 'esx-2', cluster: 'C2' })],
+      guests: [vm({ vmName: 'b-on', cluster: 'C2', host: 'esx-2' })],
+      nodes: [host({ hostName: 'esx-2', cluster: 'C2' })],
     })
     const c = snap({ id: 'c', capturedAt: new Date('2026-03-20') })
     const out = buildTrendSeries([a, b, c], 'active', {})
@@ -177,7 +177,7 @@ describe('buildTrendSeries', () => {
       id: 'b',
       capturedAt: new Date('2026-02-28'),
       parsedAt: new Date('2026-03-01'),
-      vinfo: [
+      guests: [
         vm({ vmName: 'on-1', powerState: 'poweredOn' }),
         vm({ vmName: 'on-2', powerState: 'poweredOn' }),
         vm({ vmName: 'off-1', powerState: 'poweredOff', poweredOn: false }),
@@ -209,9 +209,9 @@ describe('buildTrendSeries', () => {
       id: 'old',
       capturedAt: new Date('2026-01-31'),
       parsedAt: new Date('2026-02-01'),
-      vinfo: [], // rows released — empty
-      vhost: [],
-      vdatastore: [],
+      guests: [], // rows released — empty
+      nodes: [],
+      storages: [],
       rawReleased: true,
       releasedAggregate: { headline: frozen, byCluster: new Map([['C1', frozen]]) },
     })
@@ -238,7 +238,7 @@ describe('buildTrendSeries', () => {
       id: 'epoch',
       capturedAt: new Date(0), // mtime fallback absent -> undeterminable
       parsedAt: new Date('2026-02-05'),
-      vinfo: [vm({ vmName: 'e1', powerState: 'poweredOn' })],
+      guests: [vm({ vmName: 'e1', powerState: 'poweredOn' })],
     })
     const out = buildTrendSeries([epoch, dated], 'active', {})
     expect(out?.orderInferred).toBe(true)

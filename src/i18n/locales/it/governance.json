@@ -1,0 +1,82 @@
+{
+  "heading": "Governance & Operazioni",
+  "subtitle": "Problemi, postura di accesso e pool di risorse",
+  "empty": {
+    "heading": "Nessun report caricato",
+    "body": "Caricare un report per visualizzare i dati di governance."
+  },
+  "issues": {
+    "heading": "Problemi",
+    "none": "Nessun problema trovato.",
+    "kpi": {
+      "total": "Totale",
+      "errors": "Errori",
+      "warnings": "Avvisi"
+    },
+    "col": {
+      "severity": "Gravità",
+      "section": "Sezione",
+      "message": "Messaggio",
+      "linkKey": "Riferimento"
+    },
+    "bySection": "Per sezione"
+  },
+  "access": {
+    "heading": "Postura di accesso",
+    "kpi": {
+      "users": "Utenti",
+      "enabled": "Attivi",
+      "tokens": "Token API",
+      "roles": "Ruoli",
+      "acls": "Voci ACL",
+      "rootAccounts": "Account root"
+    },
+    "users": {
+      "heading": "Utenti",
+      "none": "Nessun utente trovato.",
+      "col": {
+        "id": "ID",
+        "enabled": "Attivo",
+        "email": "E-mail",
+        "groups": "Gruppi",
+        "expire": "Scadenza"
+      }
+    },
+    "tokens": {
+      "heading": "Token API",
+      "none": "Nessun token API trovato.",
+      "col": {
+        "user": "Utente",
+        "tokenId": "ID token",
+        "privSeparated": "Priv. separati",
+        "expire": "Scadenza"
+      }
+    },
+    "acls": {
+      "heading": "Voci ACL",
+      "none": "Nessuna voce ACL trovata.",
+      "col": {
+        "path": "Percorso",
+        "usersOrGroup": "Utente / Gruppo",
+        "type": "Tipo",
+        "role": "Ruolo",
+        "propagate": "Propagazione"
+      }
+    }
+  },
+  "pools": {
+    "heading": "Pool di risorse",
+    "none": "Nessun pool di risorse trovato.",
+    "kpi": {
+      "pools": "Pool",
+      "members": "Membri"
+    },
+    "col": {
+      "pool": "Pool",
+      "members": "Membri",
+      "vms": "Ospiti",
+      "storages": "Storage"
+    }
+  },
+  "na": "—"
+}

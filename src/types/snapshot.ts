@@ -1,7 +1,7 @@
 import type { Bytes, MiB } from '@/engines/units'
 import type { TrendHeadline } from './estate'
-import type { VHostRow } from './vhost'
-import type { VInfoRow, VmUsageRow } from './vinfo'
+import type { GuestRow, VmUsageRow } from './guest'
+import type { NodeRow } from './node'
 
 /**
  * The aggregated trend facts that SURVIVE when a snapshot's raw rows are
@@ -121,6 +121,61 @@ export interface ProxmoxStorageContentRow {
 }
 
 /**
+ * One parsed "RRD Nodes" time-series sample (P8 Pack A). The cv4pve report
+ * emits ~1 day of per-node samples (minute resolution). Only the columns the
+ * headroom engine consumes are carried — read in a single pass to keep the
+ * 8.6k-row sheet cheap. `timeSerial` is the raw Excel serial day (parseXlsx
+ * does not convert dates). All `*Ratio` fields are 0-1 fractions (the report's
+ * "%" columns); `loadavg` is the absolute system load; net throughput is MB.
+ */
+export interface RrdNodeRow {
+  node: string
+  timeSerial: number
+  /** CPU usage, 0-1 fraction. */
+  cpuRatio: number
+  /** Memory usage, 0-1 fraction. */
+  memRatio: number
+  /** IO-wait, 0-1 fraction. */
+  ioWaitRatio: number
+  /** System load average (absolute). */
+  loadavg: number
+  /** Inbound network, MB (per sample). */
+  netInMb: number
+  /** Outbound network, MB (per sample). */
+  netOutMb: number
+  /** PSI memory pressure "some", 0-1 fraction. */
+  psiMemSomeRatio: number
+}
+
+/**
+ * One parsed "RRD Storage" time-series sample (P8 Pack A). One row per
+ * node+storage+timestamp; the source sheet is large (~36k rows) so only the
+ * six needed columns are read in a single pass. `Size GB`/`Used GB` are
+ * reinterpreted as GiB (ADR-0010); `usageRatio` is a 0-1 fraction.
+ */
+export interface RrdStorageRow {
+  node: string
+  storage: string
+  timeSerial: number
+  sizeGib: number
+  usedGib: number
+  usageRatio: number
+}
+
+/**
+ * One parsed "RRD Guests" time-series sample (P8 Pack A, defensive). The
+ * sheet is empty in current exports but supported; parsed when present and
+ * degrades to `[]` otherwise. `*Ratio` fields are 0-1 fractions.
+ */
+export interface RrdGuestRow {
+  vmId: string
+  node: string
+  timeSerial: number
+  cpuRatio: number
+  memRatio: number
+}
+
+/**
  * A single parsed RVTools workbook, normalized to vatlas' canonical shape.
  *
  * The parser worker produces everything except `id` and `parsedAt` — those
@@ -150,8 +205,10 @@ export interface Snapshot {
    * Empty when the `vMetaData` sheet is absent. (Phase 4 MVC-04.)
    */
   vMetaData: VMetaDataEntry[]
-  vinfo: VInfoRow[]
-  vhost: VHostRow[]
+  /** Proxmox guest rows (VMs + LXC containers) from the report `VMs` + `Containers` sheets. */
+  guests: GuestRow[]
+  /** Proxmox node rows from the report `Nodes` sheet. */
+  nodes: NodeRow[]
   /** Per-VM runtime/perf metrics from `vMemory`+`vCPU` (right-sizing/stress).
    *  `[]` when both OPTIONAL sheets are absent (factual-degrade). Never
    *  undefined. */
@@ -168,18 +225,48 @@ export interface Snapshot {
   proxmoxHaStatus: ProxmoxHaStatusRow[]
   /** Proxmox scheduled backup jobs (`Cluster` → Backup Jobs). `[]` when absent. */
   proxmoxBackupJobs: ProxmoxBackupJobRow[]
-  vdatastore: VDatastoreRow[]
+  /** Proxmox in-guest filesystem partition rows from the `Partitions` sheet.
+   *  `[]` when the sheet is absent. Optional for backwards compat with test fixtures. */
+  proxmoxPartitions?: ProxmoxPartitionRow[]
+  /** Proxmox guest disk rows from the `Disks` sheet.
+   *  `[]` when the sheet is absent. Optional for backwards compat with test fixtures. */
+  proxmoxDisks?: ProxmoxDiskRow[]
+  /** Proxmox cluster task rows from the `Cluster Tasks` sheet.
+   *  `[]` when the sheet is absent. Optional for backwards compat with test fixtures. */
+  proxmoxTasks?: ProxmoxTaskRow[]
+  /** Proxmox storage rows from the report `Storages` sheet. */
+  storages: StorageRow[]
   vpartition: VPartitionRow[]
-  /** RVTools `vNetwork` rows (VM→portgroup). `[]` when the OPTIONAL sheet
-   *  is absent — never undefined (P9 D-11 factual-degrade). */
-  vnetwork: VNetworkRow[]
-  /** RVTools `vSwitch` rows (standard switches). `[]` when absent. */
-  vswitch: VSwitchRow[]
-  /** RVTools `dvSwitch` rows (distributed switches). `[]` when absent. */
-  dvswitch: VDvSwitchRow[]
-  /** RVTools `dvPort` rows (distributed portgroups). `[]` when absent. */
-  dvport: VDvPortRow[]
+  /** Proxmox node interface rows from the "Network" sheet "Nodes Networks"
+   *  sub-table. `[]` when the OPTIONAL Network sheet is absent — never
+   *  undefined (P5 factual-degrade). */
+  nodeInterfaces: NodeInterfaceRow[]
+  /** Proxmox guest NIC attachment rows from the "Network" sheet "VM Networks"
+   *  sub-table. `[]` when absent — never undefined (P5 factual-degrade). */
+  vmNics: VmNicRow[]
+  /** P8 Pack A — "RRD Nodes" per-node utilization time-series. Optional (the
+   *  sheet is OPTIONAL, and older Snapshot objects predate this field): read
+   *  via `?? []`. Large; dropped by `releaseRawRows` beyond 4 snapshots. */
+  rrdNodes?: RrdNodeRow[]
+  /** P8 Pack A — "RRD Storage" per-storage capacity time-series. Optional;
+   *  read via `?? []`. Large (~36k rows); dropped by `releaseRawRows`. */
+  rrdStorage?: RrdStorageRow[]
+  /** P8 Pack A — "RRD Guests" per-guest time-series. Optional; empty in
+   *  current exports (defensive). Read via `?? []`. */
+  rrdGuests?: RrdGuestRow[]
   parseErrors: ParseError[]
+  /** Proxmox issue rows from the `Issues` sheet. `undefined` when sheet is absent. */
+  proxmoxIssues?: ProxmoxIssueRow[]
+  /** Proxmox access user rows from the `Cluster Access` sheet "Users" sub-table. */
+  proxmoxAccessUsers?: ProxmoxAccessUserRow[]
+  /** Proxmox API token rows from the `Cluster Access` sheet "API Tokens" sub-table. */
+  proxmoxAccessTokens?: ProxmoxAccessTokenRow[]
+  /** Proxmox role definition rows from the `Cluster Access` sheet "Roles" sub-table. */
+  proxmoxAccessRoles?: ProxmoxAccessRoleRow[]
+  /** Proxmox ACL entries from the `Cluster Access` sheet "ACL" sub-table. */
+  proxmoxAccessAcls?: ProxmoxAccessAclRow[]
+  /** Proxmox pool member rows from the `Cluster Pools` sheet. `undefined` when absent. */
+  proxmoxPoolMembers?: ProxmoxPoolMemberRow[]
   /**
    * The `network-diagram.svg` from a Proxmox `.zip` bundle, as a raw SVG
    * string. `null` for a bare `.xlsx` (no bundle). Per-active-snapshot asset;
@@ -202,8 +289,22 @@ export interface Snapshot {
   releasedAggregate?: ReleasedTrendAggregate | null
 }
 
-/** A datastore row from the RVTools `vDatastore` sheet. */
-export interface VDatastoreRow {
+/**
+ * cv4pve storage role, classified at the parser boundary from the Storages
+ * sheet's `Plugin Type` + `Content` + `Shared` columns. Proxmox datastores
+ * serve very different purposes — VM disk images, backup repositories, and
+ * node-local boot/OS storage — and summing them into one capacity figure is
+ * misleading (in real estates a few PBS backup repos can dwarf VM storage by
+ * 5×). The Storage view groups by this role instead.
+ *  - `vmdata` — shared storage holding VM disks / CT rootfs (`images`/`rootdir`)
+ *  - `backup` — Proxmox Backup Server, or a target dedicated to `backup`
+ *  - `local`  — node-local (non-shared) `local`/`local-lvm` boot/OS storage
+ *  - `other`  — shared ISO/template/snippet libraries, unconfigured targets
+ */
+export type StorageRole = 'vmdata' | 'backup' | 'local' | 'other'
+
+/** A datastore row from the cv4pve `Storages` sheet. */
+export interface StorageRow {
   name: string
   capacityMib: MiB
   freeMib: MiB
@@ -212,6 +313,8 @@ export interface VDatastoreRow {
   naa: string | null
   /** VMFS, NFS, vSAN, … */
   type: string
+  /** cv4pve storage role (see {@link StorageRole}); `'other'` when unknown. */
+  role: StorageRole
   /**
    * RVTools `Hosts` — the host-name list this datastore is mounted on.
    * Empty string when the column is absent. Consumed by Plan 04-02 to
@@ -235,81 +338,73 @@ export interface VPartitionRow {
 }
 
 /**
- * A VM→portgroup row from the RVTools `vNetwork` sheet. Plain strings; no
- * branded units. Empty string when a column is absent. (P9 D-11.)
+ * A per-node network interface row from the Proxmox "Network" sheet,
+ * "Nodes Networks" sub-table.
+ *
+ * `type` ∈ {'eth', 'bond', 'bridge', 'vlan', 'ovs_bridge', 'ovs_bond',
+ * 'ovs_port', 'ovs_intport', 'vxlan'} — the Proxmox network primitives.
+ * `mtu`/`vlanId` are `null` when the column cell is blank ("not derivable").
+ * `slaves` is always an array (empty when not a bond). Parsed via the
+ * stacked-section helper, same pattern as Cluster HA. (P5.)
  */
-export interface VNetworkRow {
-  /** RVTools `vNetwork.VM`. */
-  vm: string
-  /** RVTools `vNetwork.Network` — the portgroup name. */
-  network: string
-  /** RVTools `vNetwork.Switch` — the owning vSwitch/dvSwitch name. */
-  switch: string
-  /** RVTools `vNetwork.Adapter` — the virtual NIC adapter type. */
-  adapter: string
-  /** RVTools `vNetwork.Connected` (raw text, e.g. `True`/`False`). */
-  connected: string
-  /** RVTools `vNetwork.Cluster`. */
-  cluster: string
-  /** RVTools `vNetwork.Host`. */
-  host: string
-}
-
-/**
- * A standard-switch row from the RVTools `vSwitch` sheet. Port counts are
- * plain non-negative numbers (NOT MiB-branded). (P9 D-11.)
- */
-export interface VSwitchRow {
-  /** RVTools `vSwitch.Host`. */
-  host: string
-  /** RVTools `vSwitch.Cluster`. */
-  cluster: string
-  /** RVTools `vSwitch.Switch` — the standard vSwitch name. */
-  switch: string
-  /** RVTools `vSwitch.# Ports`. */
-  ports: number
-  /** RVTools `vSwitch.Free Ports`. */
-  freePorts: number
-  /** RVTools `vSwitch.MTU`. */
-  mtu: number
-}
-
-/**
- * A distributed-switch row from the RVTools `dvSwitch` sheet. Counts are
- * plain non-negative numbers (NOT MiB-branded). (P9 D-11.)
- */
-export interface VDvSwitchRow {
-  /** RVTools `dvSwitch.Switch`. */
-  switch: string
-  /** RVTools `dvSwitch.Name`. */
+export interface NodeInterfaceRow {
+  /** Proxmox node hostname. */
+  node: string
+  /** Interface name (e.g. eno1, bond0, vmbr0, COROSYNC). */
   name: string
-  /** RVTools `dvSwitch.Version`. */
-  version: string
-  /** RVTools `dvSwitch.Host members`. */
-  hostMembers: string
-  /** RVTools `dvSwitch.# Ports`. */
-  ports: number
-  /** RVTools `dvSwitch.# VMs`. */
-  vms: number
-  /** RVTools `dvSwitch.Max MTU`. */
-  maxMtu: number
+  /** Proxmox interface type: eth | bond | bridge | vlan | ovs* | vxlan. */
+  type: string
+  /** True when the interface is currently active ('X' in the sheet). */
+  active: boolean
+  /** True when the interface is set to auto-start on boot. */
+  autostart: boolean
+  /** IPv4 method: 'static' | 'dhcp' | 'manual' | ''. */
+  method: string
+  /** IPv4 CIDR (e.g. '10.4.32.1/28'). Empty when absent. */
+  cidr: string
+  /** IPv4 address. Empty when absent. */
+  address: string
+  /** IPv4 gateway. Empty when absent. */
+  gateway: string
+  /** MTU in bytes; `null` when the cell is blank. */
+  mtu: number | null
+  /** Bond mode (e.g. '802.3ad', 'active-backup'). Empty for non-bond. */
+  bondMode: string
+  /** Bond slave interface names. Empty array for non-bond. */
+  slaves: string[]
+  /** Linux bridge port(s), e.g. 'bond1'. Empty for non-bridge. */
+  bridgePorts: string
+  /** True when the bridge has VLAN-awareness enabled. */
+  bridgeVlanAware: boolean
+  /** VLAN id; `null` when absent (non-VLAN iface). */
+  vlanId: number | null
+  /** The device this VLAN is sliced from (e.g. 'bond0'). Empty for non-VLAN. */
+  vlanRawDevice: string
+  /** Freeform comments from the "Comments" column. */
+  comments: string
 }
 
 /**
- * A distributed-portgroup row from the RVTools `dvPort` sheet. Empty string
- * when a column is absent. (P9 D-11.)
+ * A guest NIC attachment row from the Proxmox "Network" sheet,
+ * "VM Networks" sub-table. One row per NIC per guest. (P5.)
  */
-export interface VDvPortRow {
-  /** RVTools `dvPort.Port` — the distributed portgroup name. */
-  port: string
-  /** RVTools `dvPort.Switch` — the owning dvSwitch name. */
-  switch: string
-  /** RVTools `dvPort.VLAN` (raw text — can be a range or trunk spec). */
-  vlan: string
-  /** RVTools `dvPort.Active Uplink`. */
-  activeUplink: string
-  /** RVTools `dvPort.Standby Uplink`. */
-  standbyUplink: string
+export interface VmNicRow {
+  /** Node hosting the guest. */
+  node: string
+  /** Proxmox VMID (numeric string). */
+  vmId: string
+  /** Guest display name. */
+  vmName: string
+  /** Guest type: 'qemu' (KVM VM) or 'lxc' (container). */
+  vmType: string
+  /** MAC address. */
+  macAddress: string
+  /** Linux bridge the NIC is attached to (e.g. 'vmbr1'). */
+  bridge: string
+  /** VLAN tag; `null` when the NIC is untagged. */
+  tag: number | null
+  /** NIC model (e.g. 'virtio', 'e1000'). */
+  model: string
 }
 
 /**
@@ -335,6 +430,150 @@ export interface VMetaDataEntry {
  */
 export interface VMetaDataRow {
   entries: VMetaDataEntry[]
+}
+
+/** A row from the Proxmox report `Issues` sheet. */
+export interface ProxmoxIssueRow {
+  severity: string
+  section: string
+  message: string
+  /** Excel serial date; `null` when the cell is blank. */
+  timestampSerial: number | null
+  linkKey: string
+}
+
+/** A user row from the `Cluster Access` sheet "Users" sub-table. */
+export interface ProxmoxAccessUserRow {
+  id: string
+  enabled: boolean
+  firstname: string
+  lastname: string
+  email: string
+  groups: string
+  keys: string
+  totpLocked: boolean
+  expire: string
+  comment: string
+}
+
+/** An API token row from the `Cluster Access` sheet "API Tokens" sub-table. */
+export interface ProxmoxAccessTokenRow {
+  user: string
+  tokenId: string
+  expire: string
+  privSeparated: boolean
+  comment: string
+}
+
+/** A role definition row from the `Cluster Access` sheet "Roles" sub-table. */
+export interface ProxmoxAccessRoleRow {
+  id: string
+  privileges: string
+  /** True when this is a built-in Proxmox role. */
+  special: boolean
+}
+
+/** An ACL entry row from the `Cluster Access` sheet "ACL" sub-table. */
+export interface ProxmoxAccessAclRow {
+  path: string
+  usersOrGroup: string
+  /** 'user' | 'group' | 'token' */
+  type: string
+  /** Role id (e.g. 'Administrator', 'PVEAuditor'). */
+  roleId: string
+  propagate: boolean
+}
+
+/** A pool member row from the `Cluster Pools` sheet "Pools" sub-table. */
+export interface ProxmoxPoolMemberRow {
+  pool: string
+  /** 'qemu' | 'lxc' | 'storage' */
+  type: string
+  node: string
+  vmId: string
+  storage: string
+  status: string
+  description: string
+  comment: string
+}
+
+/**
+ * An in-guest filesystem partition row from the Proxmox report `Partitions`
+ * sheet. `usedFraction` is a 0–1 fraction (cv4pve stores "%" as fraction).
+ * `null` means the cell was blank ("not derivable"; ADR-0012, never coerced
+ * to 0).
+ */
+export interface ProxmoxPartitionRow {
+  node: string
+  /** Proxmox VMID (numeric string). */
+  vmId: string
+  vmName: string
+  vmType: string
+  vmStatus: string
+  mountPoint: string
+  fsType: string
+  /** Total filesystem size in GiB. */
+  totalGb: number
+  /** Used filesystem size in GiB. */
+  usedGb: number
+  /** Used fraction, 0–1 (cv4pve "Used %" column is a 0–1 fraction). */
+  usedFraction: number | null
+  error: string
+  name: string
+  disks: string
+}
+
+/**
+ * A guest disk row from the Proxmox report `Disks` sheet.
+ * `storageUsageFraction` is a 0–1 fraction. Empty string `backup` means the
+ * disk is excluded from backup (non-"X" cell). `isUnused === true` means the
+ * disk is detached/orphaned. `kind` distinguishes 'Cdrom' from 'Disk'.
+ */
+export interface ProxmoxDiskRow {
+  node: string
+  vmId: string
+  vmName: string
+  vmType: string
+  vmStatus: string
+  /** 'Disk' | 'Cdrom' | other */
+  kind: string
+  id: string
+  storage: string
+  storageType: string
+  storageShared: boolean
+  fileName: string
+  /** Size in GiB (as reported; may be 0 for empty cdroms). */
+  sizeGb: number
+  /** Storage usage fraction 0–1; null when blank. */
+  storageUsageFraction: number | null
+  cache: string
+  /** 'X' → included in backup; '' → excluded. */
+  backup: string
+  /** True when the disk is not attached to any guest (orphaned). */
+  isUnused: boolean
+  device: string
+  mountPoint: string
+}
+
+/**
+ * A Proxmox task row from the `Cluster Tasks` sheet.
+ * `statusOk === true` when the "Status Ok" column is "X". `startSerial` /
+ * `endSerial` are raw Excel serials (fractional day values); `null` when blank.
+ */
+export interface ProxmoxTaskRow {
+  node: string
+  taskId: string
+  /** Task type, e.g. 'vzdump', 'aptupdate', 'qmdelsnapshot'. */
+  type: string
+  user: string
+  status: string
+  statusOk: boolean
+  /** Excel serial for the start time; `null` when blank. */
+  startSerial: number | null
+  /** Excel serial for the end time; `null` when blank. */
+  endSerial: number | null
+  /** Duration in fractional days; `null` when blank. */
+  durationDays: number | null
 }
 
 /**

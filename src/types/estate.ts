@@ -2,7 +2,11 @@
 // aggregation engines — no runtime coupling, no cycle (the engines import
 // their input types from here; these are produced in the single
 // `buildEstateView` pass and surfaced on `EstateView`).
+import type { BackupCoverage } from '@/engines/aggregation/backupCoverage'
 import type { ClusterHealth } from '@/engines/aggregation/clusterHealth'
+import type { DiskHygiene } from '@/engines/aggregation/diskHygiene'
+import type { FsFillRisk } from '@/engines/aggregation/fsFillRisk'
+import type { GovernancePosture } from '@/engines/aggregation/governance'
 import type { MonsterEstate } from '@/engines/aggregation/monsterVm'
 import type { NetworkRollup } from '@/engines/aggregation/network'
 import type { EstateSizing } from '@/engines/aggregation/sizing'
@@ -24,7 +28,7 @@ import type { Cores, GHz, GiB, MHz, MiB, Sockets } from '@/engines/units'
  *   `physicalRamMib: MiB` / `vramAllocatedMib: MiB` (RVTools "MB" IS MiB —
  *   reinterpreted, never converted).
  * - vsizer's active-memory sum chain is DROPPED entirely: vatlas'
- *   Phase-1 `VInfoRow` does not parse active memory, so the field would
+ *   Phase-1 `GuestRow` does not parse active memory, so the field would
  *   be permanently `null` — dead code, removed at the type level.
  * - New for vatlas: `AccountingMode`, `OsFamily`, `DatastoreAggregate`
  *   (Moderate-11 NAA dedupe), `EsxAggregate` (per-host rollup), and the
@@ -247,7 +251,7 @@ export interface DatastoreAggregate {
 
 /**
  * Per-ESX-host rollup (DSH-01 + Phase-3 inventory tree consumer). `cores`
- * is PHYSICAL cores — `VHostRow` structurally has no threads field so the
+ * is PHYSICAL cores — `NodeRow` structurally has no threads field so the
  * Moderate-4 bug is type-prevented. `vmCount`/`vcpuAllocated` honor the
  * accounting `mode`; CPU Ready reuses the SHARED `readinessStats`.
  */
@@ -283,7 +287,7 @@ export interface EsxAggregate {
 
 /**
  * Flat per-VM row for the Phase-3 inventory table (INV-05). This is a PURE
- * PROJECTION of `Snapshot.vinfo`, NOT an aggregation — a 1:1 filter/map of
+ * PROJECTION of `Snapshot.guests`, NOT an aggregation — a 1:1 filter/map of
  * the source rows (same operation-class as the `classifyOsFamily` call in
  * the existing `buildEstateView` vinfo loop), never a group/sum. It rides
  * inside that one existing pass so the project keeps exactly one `useMemo`
@@ -376,6 +380,101 @@ export interface TrendSeries {
 }
 
 /**
+ * P8 Pack A — per-node RRD utilization/headroom statistics. Every ratio is a
+ * 0-1 fraction; peaks/avgs/p95 are computed across the node's samples in the
+ * loaded window. Neutral measurement (no verdict/colour), `rrdNodeStats.ts`.
+ */
+export interface RrdNodeStat {
+  node: string
+  cpuPeak: number
+  cpuAvg: number
+  cpuP95: number
+  memPeak: number
+  memAvg: number
+  memP95: number
+  ioWaitPeak: number
+  ioWaitAvg: number
+  loadavgPeak: number
+  loadavgAvg: number
+  netInPeakMb: number
+  netInAvgMb: number
+  netOutPeakMb: number
+  netOutAvgMb: number
+  psiMemPeak: number
+  psiMemAvg: number
+  sampleCount: number
+}
+
+/**
+ * One estate-wide RRD timeline point (P8 Pack A) — the mean CPU/memory across
+ * all nodes at a single timestamp, plus summed network throughput. Drives the
+ * single-file trends chart (intra-export time-series). `timeSerial` is the raw
+ * Excel serial day.
+ */
+export interface RrdEstateTimePoint {
+  timeSerial: number
+  cpuAvg: number
+  memAvg: number
+  netInMb: number
+  netOutMb: number
+}
+
+/**
+ * P8 Pack A — node-headroom rollup over the RRD window. `hasData` is false
+ * when no RRD-Nodes samples were present (factual-degrade). `timeline` is the
+ * estate-wide utilization series feeding single-file trends.
+ */
+export interface RrdHeadroom {
+  hasData: boolean
+  perNode: RrdNodeStat[]
+  estate: {
+    cpuPeak: number
+    cpuAvg: number
+    memPeak: number
+    memAvg: number
+    ioWaitPeak: number
+    loadavgPeak: number
+    psiMemPeak: number
+  }
+  timeline: RrdEstateTimePoint[]
+  /** Raw Excel-serial window bounds; `null` when no data. */
+  windowStartSerial: number | null
+  windowEndSerial: number | null
+}
+
+/**
+ * P8 Pack A — per-storage capacity projection. `growthGibPerDay` is the
+ * least-squares slope of used capacity over the RRD window; `daysToFull` is
+ * the projected days until `usedGib` reaches `sizeGib`, `null` when not
+ * growing / already full / insufficient data (never fabricated).
+ */
+export interface RrdStorageProjection {
+  node: string
+  storage: string
+  key: string
+  sizeGib: number
+  usedGib: number
+  usageRatio: number
+  growthGibPerDay: number
+  daysToFull: number | null
+  sampleCount: number
+}
+
+/**
+ * P8 Pack A — storage time-to-full rollup over the RRD-Storage window.
+ * `hasData` is false when no RRD-Storage samples were present. `soonestDaysToFull`
+ * is the minimum projected days-to-full across all storages (`null` when none
+ * is projectable).
+ */
+export interface RrdStorageGrowth {
+  hasData: boolean
+  rows: RrdStorageProjection[]
+  soonestDaysToFull: number | null
+  /** Observation window span in days (max-min serial across all samples). */
+  windowDays: number
+}
+
+/**
  * P7 OS End-of-Support projection. Defined here (not in the engine) so the
  * types→engines import direction is preserved — `bucketEos.ts` imports these
  * as types (no cycle). The `partition` is a DISJOINT cover whose counts
@@ -434,7 +533,7 @@ export interface EstateView {
   hosts: EsxAggregate[]
   datastores: DatastoreAggregate[]
   /** Flat per-VM rows for the inventory table (INV-05). Pure projection
-   *  of `Snapshot.vinfo`, produced in the single `buildEstateView` pass. */
+   *  of `Snapshot.guests`, produced in the single `buildEstateView` pass. */
   vmRows: VmDisplayRow[]
   /** Per-cluster OS breakdown, keyed by cluster name. */
   vmsByCluster: Map<string, OsBreakdown>
@@ -479,8 +578,8 @@ export interface EstateView {
    * `naa ?? name` datastore key. Same single-pass origin. */
   vsan: VsanRelinkResult
   /**
-   * P9 network topology rollup (D-11) — vSwitch/dvSwitch/portgroup/
-   * uplink aggregates; empty when the OPTIONAL network sheets were
+   * P9 network topology rollup (D-11) — Proxmox-native NIC/bond/bridge/VLAN
+   * aggregates; empty when the OPTIONAL network sheets were
    * absent (factual-degrade). Same single-pass origin. */
   network: NetworkRollup
   /**
@@ -516,6 +615,11 @@ export interface EstateView {
    * `EMPTY_VIEW`. */
   clusterHealth: ClusterHealth
   /**
+   * Pack C governance & ops — issues, access posture (users/tokens/roles/
+   * ACLs), and resource pools. Neutral measurement; same single-pass origin;
+   * `EMPTY_GOVERNANCE` in `EMPTY_VIEW`. */
+  governance: GovernancePosture
+  /**
    * P9 LC-4 per-datastore drill projection, keyed by the `naa ?? name`
    * datastore key. Produced in the single `buildEstateView` pass — no
    * second `useMemo`. Empty `Map` in `EMPTY_VIEW`. */
@@ -524,6 +628,31 @@ export interface EstateView {
    * P9 LC-4 per-VM drill projection, keyed by VM name. Same single-pass
    * origin; empty `Map` in `EMPTY_VIEW`. */
   vmDetail: Map<string, VmDetailEntry>
+  /**
+   * Pack B — in-guest filesystem fill risk (Partitions sheet). Neutral
+   * measurement; same single-pass origin; `EMPTY_FS_FILL` in `EMPTY_VIEW`. */
+  fsFillRisk: FsFillRisk
+  /**
+   * Pack B — disk hygiene (Disks sheet). Neutral measurement; same
+   * single-pass origin; `EMPTY_DISK_HYGIENE` in `EMPTY_VIEW`. */
+  diskHygiene: DiskHygiene
+  /**
+   * Pack B — backup coverage + operational health (Cluster Tasks sheet).
+   * Neutral measurement; same single-pass origin; `EMPTY_BACKUP_COVERAGE`
+   * in `EMPTY_VIEW`. */
+  backupCoverage: BackupCoverage
+  /**
+   * P8 Pack A — node headroom from the RRD-Nodes time-series (peak/avg/p95
+   * CPU + memory, PSI memory-pressure, IO-wait, loadavg, net throughput),
+   * plus the estate-wide `timeline` that drives single-file trends. Computed
+   * from the pre-merge `selected` snapshots' RRD rows in the single
+   * `buildEstateView` pass; `EMPTY_RRD_HEADROOM` in `EMPTY_VIEW`. */
+  rrdHeadroom: RrdHeadroom
+  /**
+   * P8 Pack A — per-storage capacity growth + projected days-to-full from the
+   * RRD-Storage time-series. Same single-pass origin;
+   * `EMPTY_RRD_STORAGE_GROWTH` in `EMPTY_VIEW`. */
+  rrdStorageGrowth: RrdStorageGrowth
 }
 
 /**
@@ -617,6 +746,6 @@ export interface VmDetailEntry {
   inUseMib: MiB
   poweredOn: boolean
   partitions: VmPartitionEntry[]
-  portgroups: { network: string; switch: string }[]
+  bridges: { bridge: string; tag: string }[]
   datastores: string[]
 }

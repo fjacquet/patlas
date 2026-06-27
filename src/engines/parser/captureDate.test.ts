@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { VInfoRow } from '@/types'
+import type { GuestRow } from '@/types'
 import { inferCaptureDate, inferRvtoolsVersion, inferVCenterLabel } from './captureDate'
 import type { ParsedWorkbook } from './parseXlsx'
 
@@ -80,7 +80,7 @@ describe('inferCaptureDate', () => {
 })
 
 describe('inferVCenterLabel', () => {
-  const row = (viSdkServer: string): VInfoRow => ({ viSdkServer }) as unknown as VInfoRow
+  const row = (viSdkServer: string): GuestRow => ({ viSdkServer }) as unknown as GuestRow
 
   it('returns the first non-empty viSdkServer from vinfo', () => {
     expect(inferVCenterLabel([row(''), row('vcenter.prod.local')], 'f.xlsx')).toBe(

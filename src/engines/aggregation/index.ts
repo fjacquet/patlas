@@ -3,10 +3,31 @@
  * future export import `buildEstateView`/`EMPTY_VIEW` from here.
  */
 export { aggregateClusters } from './aggregateClusters'
+export {
+  type BackupCoverage,
+  type BackupTaskRow,
+  computeBackupCoverage,
+  type GuestBackupStatus,
+  type TaskTypeSummary,
+} from './backupCoverage'
 export { type ClusterHealth, computeClusterHealth } from './clusterHealth'
 export { CONTENTION_THRESHOLDS, TOP_N_DEFAULT } from './contention'
 export { buildDatastoreDetail, buildVmDetail } from './detailIndex'
+export {
+  computeDiskHygiene,
+  type DiskHygiene,
+  type NoBackupRow,
+  type RiskyCacheRow,
+  type StrayIsoRow,
+  type UnusedDiskRow,
+} from './diskHygiene'
 export { buildEstateView, EMPTY_VIEW } from './estateView'
+export {
+  computeFsFillRisk,
+  FS_FILL_DEFAULT_THRESHOLD,
+  type FsFillRisk,
+  type FsRiskRow,
+} from './fsFillRisk'
 export { consumedGhz, physicalGhz } from './ghz'
 export { aggregateGlobals, emptySummary } from './globals'
 export {
@@ -17,16 +38,16 @@ export {
   type MonsterVm,
 } from './monsterVm'
 export {
-  type DvSwitchAgg,
   type NetworkRollup,
+  type NodeNetworkStats,
   networkRollup,
-  type PortgroupAgg,
-  type VSwitchAgg,
 } from './network'
 export { classifyOsFamily, type OsFamily } from './osFamily'
 export { aggregateHostsPerCluster } from './perCluster'
 export { perDatastore } from './perDatastore'
 export { perEsx } from './perEsx'
+export { computeRrdNodeStats, EMPTY_RRD_HEADROOM } from './rrdNodeStats'
+export { computeRrdStorageGrowth } from './rrdStorageGrowth'
 export {
   computeSizing,
   DEFAULT_SIZING_THRESHOLDS,

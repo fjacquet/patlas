@@ -5,15 +5,15 @@ import { buildEstateView } from '@/engines/aggregation'
 import { mergeSnapshotsToEstate } from '@/engines/snapshotMerge'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import type { Snapshot } from '@/types/snapshot'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
 import { buildExportView } from './buildExportView'
 
 const TODAY = new Date('2026-01-01T00:00:00Z')
 const MODE: AccountingMode = 'configured'
 
-const host = (over: Partial<VHostRow>): VHostRow => ({
+const host = (over: Partial<NodeRow>): NodeRow => ({
   hostName: 'esx-1',
   cluster: 'C1',
   sockets: sockets(2),
@@ -30,7 +30,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   ...over,
 })
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm-1',
   cluster: 'C1',
   host: 'esx-1',
@@ -64,20 +64,19 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   source: 'proxmox',
   viSdkUuid: null,
   vMetaData: [],
-  vinfo: [vm({})],
-  vhost: [host({})],
+  guests: [vm({})],
+  nodes: [host({})],
   vmUsage: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
   proxmoxHaResources: [],
   proxmoxHaStatus: [],
   proxmoxBackupJobs: [],
-  vdatastore: [],
+  storages: [],
   vpartition: [],
-  vnetwork: [],
-  vswitch: [],
-  dvswitch: [],
-  dvport: [],
+  nodeInterfaces: [],
+
+  vmNics: [],
   parseErrors: [],
   ...over,
 })
@@ -103,8 +102,8 @@ describe('buildExportView — D-08 active-snapshot body', () => {
   })
 
   it('body is the ACTIVE snapshot, not the merged set (D-08): two snapshots, view == active-only view', () => {
-    const a = snap({ id: 'a', vinfo: [vm({ vmName: 'only-in-a' })] })
-    const b = snap({ id: 'b', vinfo: [vm({ vmName: 'only-in-b', cluster: 'C2' })] })
+    const a = snap({ id: 'a', guests: [vm({ vmName: 'only-in-a' })] })
+    const b = snap({ id: 'b', guests: [vm({ vmName: 'only-in-b', cluster: 'C2' })] })
     const activeOnly = buildEstateView(mergeSnapshotsToEstate([a]), [a], MODE, TODAY)
     const { view } = buildExportView(a, [a, b], MODE, TODAY)
     expect(view).toEqual(activeOnly)
@@ -126,13 +125,13 @@ describe('buildExportView — D-08 active-snapshot body', () => {
     const a = snap({
       id: 'a',
       capturedAt: new Date('2026-01-01'),
-      vinfo: [vm({ vmInstanceUuid: 'i1' })],
+      guests: [vm({ vmInstanceUuid: 'i1' })],
       vmUsage: [usage()],
     })
     const b = snap({
       id: 'b',
       capturedAt: new Date('2026-02-01'),
-      vinfo: [vm({ vmInstanceUuid: 'i1' })],
+      guests: [vm({ vmInstanceUuid: 'i1' })],
       vmUsage: [usage({ cpuUsageMhz: mhz(50) })],
     })
     const { sizing } = buildExportView(a, [a, b], MODE, TODAY)

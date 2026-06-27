@@ -4,6 +4,14 @@
     "consumption": "Consumption",
     "capacity": "Capacity"
   },
+  "role": {
+    "heading": "By storage role",
+    "vmdata": "VM storage",
+    "backup": "Backup",
+    "local": "Local / boot",
+    "other": "Other",
+    "free": "free"
+  },
   "scope": {
     "label": "By",
     "cluster": "Cluster",
@@ -32,7 +40,7 @@
     "vram": "vRAM",
     "disks": "Disks",
     "partitions": "Partitions",
-    "portgroups": "Portgroups",
+    "bridges": "Bridges",
     "switches": "Switches",
     "datastores": "Storages"
   }

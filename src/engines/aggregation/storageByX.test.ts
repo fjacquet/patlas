@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mib } from '@/engines/units'
-import type { VDatastoreRow } from '@/types/snapshot'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
+import type { StorageRow } from '@/types/snapshot'
 import { storageByX } from './storageByX'
 import type { VsanRelinkResult } from './vsanRelink'
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm-1',
   cluster: 'CL_1',
   host: 'esx-1',
@@ -28,13 +28,14 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   ...over,
 })
 
-const ds = (over: Partial<VDatastoreRow>): VDatastoreRow => ({
+const ds = (over: Partial<StorageRow>): StorageRow => ({
   name: 'DS_X',
   capacityMib: mib(1000),
   freeMib: mib(400),
   provisionedMib: mib(600),
   naa: null,
   type: 'VMFS',
+  role: 'other',
   hosts: '1',
   clusterName: 'CL_1',
   ...over,
@@ -51,11 +52,11 @@ describe('storageByX — two lenses, reconcile to estate (D-07/D-08)', () => {
   it('consumption sums per cluster reconcile to the estate total', () => {
     const out = storageByX(
       {
-        vinfo: [
+        guests: [
           vm({ vmName: 'a', cluster: 'CL_1', provisionedMib: mib(1000), inUseMib: mib(600) }),
           vm({ vmName: 'b', cluster: 'CL_2', provisionedMib: mib(500), inUseMib: mib(200) }),
         ],
-        vdatastore: [],
+        storages: [],
       },
       'active',
       NO_VSAN,
@@ -71,8 +72,8 @@ describe('storageByX — two lenses, reconcile to estate (D-07/D-08)', () => {
   it('a shared LUN (same NAA, 2 rows) is counted once — no double-count', () => {
     const out = storageByX(
       {
-        vinfo: [],
-        vdatastore: [
+        guests: [],
+        storages: [
           ds({ name: 'view-a', naa: 'naa.shared', capacityMib: mib(1000), freeMib: mib(250) }),
           ds({ name: 'view-b', naa: 'naa.shared', capacityMib: mib(1000), freeMib: mib(250) }),
         ],
@@ -90,8 +91,8 @@ describe('storageByX — two lenses, reconcile to estate (D-07/D-08)', () => {
       vm({ vmName: 'on', poweredOn: true, provisionedMib: mib(100) }),
       vm({ vmName: 'off', poweredOn: false, powerState: 'poweredOff', provisionedMib: mib(900) }),
     ]
-    const cfg = storageByX({ vinfo, vdatastore: [] }, 'configured', NO_VSAN)
-    const act = storageByX({ vinfo, vdatastore: [] }, 'active', NO_VSAN)
+    const cfg = storageByX({ guests: vinfo, storages: [] }, 'configured', NO_VSAN)
+    const act = storageByX({ guests: vinfo, storages: [] }, 'active', NO_VSAN)
     expect(cfg.estate.provisionedMib as number).toBe(1000)
     expect(act.estate.provisionedMib as number).toBe(100)
   })
@@ -105,8 +106,8 @@ describe('storageByX — two lenses, reconcile to estate (D-07/D-08)', () => {
     }
     const out = storageByX(
       {
-        vinfo: [],
-        vdatastore: [ds({ name: 'BLANK_DS', naa: null, clusterName: '', capacityMib: mib(2000) })],
+        guests: [],
+        storages: [ds({ name: 'BLANK_DS', naa: null, clusterName: '', capacityMib: mib(2000) })],
       },
       'active',
       vsan,
@@ -124,8 +125,8 @@ describe('storageByX — two lenses, reconcile to estate (D-07/D-08)', () => {
     }
     const out = storageByX(
       {
-        vinfo: [],
-        vdatastore: [ds({ name: 'SHARED_DS', naa: null, clusterName: '', capacityMib: mib(5000) })],
+        guests: [],
+        storages: [ds({ name: 'SHARED_DS', naa: null, clusterName: '', capacityMib: mib(5000) })],
       },
       'active',
       vsan,

@@ -1,6 +1,6 @@
 import type { MiB } from '@/engines/units'
 import { mib } from '@/engines/units'
-import type { VInfoRow, VPartitionRow } from '@/types'
+import type { GuestRow, VPartitionRow } from '@/types'
 
 /** In-guest disk totals (P5). Calculated only from real vPartition rows. */
 export interface GuestData {
@@ -24,7 +24,7 @@ export interface GuestDataResult {
  */
 export const aggregateGuestData = (
   vpartition: VPartitionRow[],
-  vinfo: VInfoRow[],
+  vinfo: GuestRow[],
 ): GuestDataResult => {
   if (vpartition.length === 0) return { estate: null, byCluster: new Map() }
 

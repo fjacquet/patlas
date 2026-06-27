@@ -1,0 +1,78 @@
+{
+  "headroom": {
+    "heading": "Margine nodo",
+    "subtitle": "Utilizzo per nodo dalla serie temporale RRD",
+    "empty": "Nessuna serie temporale nodo RRD in questo export.",
+    "kpi": {
+      "cpuPeak": "CPU picco",
+      "cpuAvg": "CPU media",
+      "memPeak": "Memoria picco",
+      "memAvg": "Memoria media",
+      "ioWaitPeak": "Attesa I/O picco",
+      "psiMemPeak": "Pressione memoria picco"
+    },
+    "chartTitle": "CPU e memoria per nodo",
+    "series": {
+      "cpuPeak": "CPU picco",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU media",
+      "memPeak": "Memoria picco",
+      "memP95": "Memoria p95",
+      "memAvg": "Memoria media"
+    },
+    "col": {
+      "node": "Nodo",
+      "cpuPeak": "CPU picco",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU media",
+      "memPeak": "Mem picco",
+      "memP95": "Mem p95",
+      "memAvg": "Mem media",
+      "ioWait": "Attesa I/O picco",
+      "loadavg": "Carico picco",
+      "psiMem": "Pressione mem picco",
+      "netIn": "Rete in picco",
+      "netOut": "Rete out picco",
+      "samples": "Campioni"
+    }
+  },
+  "storageGrowth": {
+    "heading": "Tempo al riempimento",
+    "subtitle": "Crescita capacità dalla serie temporale RRD",
+    "empty": "Nessuna serie temporale storage RRD in questo export.",
+    "kpi": {
+      "storages": "Storage",
+      "soonest": "Riempimento più vicino",
+      "window": "Finestra",
+      "growing": "In crescita"
+    },
+    "chartTitle": "Crescita capacità usata per storage",
+    "series": {
+      "growth": "Crescita"
+    },
+    "col": {
+      "storage": "Storage",
+      "node": "Nodo",
+      "used": "Usato",
+      "size": "Dimensione",
+      "usage": "Utilizzo",
+      "growth": "Crescita",
+      "daysToFull": "Giorni al riempimento",
+      "samples": "Campioni"
+    },
+    "unit": {
+      "gibPerDay": "GiB/giorno",
+      "days": "giorni"
+    }
+  },
+  "single": {
+    "heading": "Andamenti file singolo",
+    "note": "Derivato dalla serie temporale RRD di questo export — nessun secondo snapshot necessario.",
+    "empty": "Nessuna serie temporale RRD disponibile per gli andamenti a file singolo.",
+    "chartTitle": "Utilizzo del parco nella finestra RRD",
+    "series": {
+      "cpu": "CPU media",
+      "mem": "Memoria media"
+    }
+  }
+}

@@ -28,6 +28,10 @@ const parseCaptureDate = (filename: string, mtime: number): Date => {
 }
 
 self.onmessage = (e: MessageEvent<ParseRequest>) => {
+  // Dedicated worker — only the same-origin parent document can post here, so
+  // `e.origin` is always '' in practice. Reject any unexpected cross-origin
+  // sender defensively before touching `e.data`.
+  if (e.origin !== '' && e.origin !== self.location.origin) return
   if (e.data.kind !== 'parse') return
   try {
     const u8 = new Uint8Array(e.data.buf)
@@ -63,20 +67,30 @@ self.onmessage = (e: MessageEvent<ParseRequest>) => {
       viSdkUuid: null,
       vMetaData: [],
       source: 'proxmox',
-      vinfo: bundle.vinfo,
-      vhost: bundle.vhost,
+      guests: bundle.guests,
+      nodes: bundle.nodes,
       vmUsage: bundle.vmUsage,
       proxmoxSnapshots: bundle.proxmoxSnapshots,
       proxmoxStorageContent: bundle.proxmoxStorageContent,
       proxmoxHaResources: bundle.proxmoxHaResources,
       proxmoxHaStatus: bundle.proxmoxHaStatus,
       proxmoxBackupJobs: bundle.proxmoxBackupJobs,
-      vdatastore: bundle.vdatastore,
+      proxmoxPartitions: bundle.proxmoxPartitions,
+      proxmoxDisks: bundle.proxmoxDisks,
+      proxmoxTasks: bundle.proxmoxTasks,
+      storages: bundle.storages,
       vpartition: [],
-      vnetwork: [],
-      vswitch: [],
-      dvswitch: [],
-      dvport: [],
+      nodeInterfaces: bundle.nodeInterfaces,
+      vmNics: bundle.vmNics,
+      proxmoxIssues: bundle.proxmoxIssues,
+      proxmoxAccessUsers: bundle.proxmoxAccessUsers,
+      proxmoxAccessTokens: bundle.proxmoxAccessTokens,
+      proxmoxAccessRoles: bundle.proxmoxAccessRoles,
+      proxmoxAccessAcls: bundle.proxmoxAccessAcls,
+      proxmoxPoolMembers: bundle.proxmoxPoolMembers,
+      rrdNodes: bundle.rrdNodes,
+      rrdStorage: bundle.rrdStorage,
+      rrdGuests: bundle.rrdGuests,
       parseErrors: bundle.warnings,
       networkSvg,
     }

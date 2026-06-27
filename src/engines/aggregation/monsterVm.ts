@@ -1,4 +1,4 @@
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
 
 /**
  * Pure "monster VM" extract — the unusually large VMs in the estate, by
@@ -45,7 +45,7 @@ export interface MonsterEstate {
 }
 
 export const computeMonsters = (
-  vinfo: VInfoRow[],
+  vinfo: GuestRow[],
   thresholds: MonsterThresholds,
 ): MonsterEstate => {
   const minMib = thresholds.minVramGib * MIB_PER_GIB

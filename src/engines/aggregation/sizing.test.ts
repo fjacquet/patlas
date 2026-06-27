@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mhz, mib } from '@/engines/units'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import type { Snapshot } from '@/types/snapshot'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
 import { computeSizing, DEFAULT_SIZING_THRESHOLDS, maxVmUsageAcrossSnapshots } from './sizing'
 
-const vinfo = (over: Partial<VInfoRow> = {}): VInfoRow => ({
+const vinfo = (over: Partial<GuestRow> = {}): GuestRow => ({
   vmName: 'web01',
   cluster: 'C1',
   host: 'h1',
@@ -28,7 +28,7 @@ const vinfo = (over: Partial<VInfoRow> = {}): VInfoRow => ({
   ...over,
 })
 
-const host = (): VHostRow => ({
+const host = (): NodeRow => ({
   hostName: 'h1',
   cluster: 'C1',
   sockets: 2 as never,
@@ -44,8 +44,8 @@ const host = (): VHostRow => ({
   esxVersion: '',
 })
 
-const snap = (vmUsage: Snapshot['vmUsage'], vi: VInfoRow[] = [vinfo()]): Snapshot =>
-  ({ vinfo: vi, vmUsage }) as unknown as Snapshot
+const snap = (vmUsage: Snapshot['vmUsage'], vi: GuestRow[] = [vinfo()]): Snapshot =>
+  ({ guests: vi, vmUsage }) as unknown as Snapshot
 
 describe('computeSizing oversize', () => {
   it('flags CPU + memory oversized when usage is far below capacity', () => {

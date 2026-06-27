@@ -1,6 +1,6 @@
 import { mib } from '@/engines/units'
 import type { DatastoreAggregate } from '@/types/estate'
-import type { VDatastoreRow } from '@/types/snapshot'
+import type { StorageRow } from '@/types/snapshot'
 
 /**
  * NAA-deduped datastore rollup (Moderate-11 / Pitfall 5). Reuses the
@@ -18,7 +18,7 @@ import type { VDatastoreRow } from '@/types/snapshot'
 /** The Moderate-11 dedupe key for a datastore row (`naa ?? name`). One
  *  shared LUN collapses to one key; reused estate-wide AND within a cluster
  *  so per-cluster and global counts use the SAME identity rule. */
-const dedupeKey = (row: VDatastoreRow): string => row.naa ?? row.name
+const dedupeKey = (row: StorageRow): string => row.naa ?? row.name
 
 /**
  * Split a RVTools `Hosts` cell into individual host names. RVTools emits
@@ -49,7 +49,7 @@ const splitHosts = (hosts: string): string[] =>
  * shape as `perDatastore`/`perCluster.groupByCluster` (no new mechanism).
  */
 export const datastoreCountByCluster = (
-  vdatastore: VDatastoreRow[],
+  vdatastore: StorageRow[],
   hostClusterMap?: ReadonlyMap<string, string>,
 ): Map<string, number> => {
   const keysByCluster = new Map<string, Set<string>>()
@@ -78,8 +78,8 @@ export const datastoreCountByCluster = (
   return out
 }
 
-export const perDatastore = (vdatastore: VDatastoreRow[]): DatastoreAggregate[] => {
-  const groups = new Map<string, VDatastoreRow[]>()
+export const perDatastore = (vdatastore: StorageRow[]): DatastoreAggregate[] => {
+  const groups = new Map<string, StorageRow[]>()
   for (const row of vdatastore) {
     const key = dedupeKey(row)
     const list = groups.get(key) ?? []

@@ -47,7 +47,7 @@
     "consumedGhz": "GHz consommés",
     "availableGhz": "GHz disponibles",
     "ramAvailable": "RAM disponible",
-    "footer": "Source : Proxmox — nœud (% CPU/RAM, Speed × Cores, Memory) + info invité (vCPUs, Memory)"
+    "footer": "Source : Proxmox — séries RRD (% CPU nœud) + nœud (% RAM, Speed × Cores, Memory) + info invité (vCPUs, Memory)"
   },
   "eos": {
     "title": "Prévision de fin de support des OS",
@@ -71,7 +71,12 @@
     "title": "Tendances de session",
     "points": "Points de la chronologie",
     "deltas": "Deltas",
-    "series": "Nombre d'invités sur les instantanés"
+    "series": "Nombre d'invités sur les instantanés",
+    "singleTitle": "Tendances mono-fichier — série RRD",
+    "singleNote": "Dérivé de la série temporelle RRD de cet export.",
+    "singleCpu": "CPU moyen %",
+    "singleMem": "Mémoire moyenne %",
+    "singleSamples": "Points de la série"
   },
   "inventory": {
     "title": "Synthèse d'inventaire",
@@ -105,12 +110,26 @@
     "colCluster": "Cluster",
     "colProvisioned": "Provisionné",
     "colInUse": "Utilisé",
-    "vsanShared": "Partagé sur {{n}} clusters"
+    "vsanShared": "Partagé sur {{n}} clusters",
+    "vmUsed": "VM utilisé",
+    "vmCapacity": "VM capacité",
+    "vmAllocated": "Alloué VM",
+    "colRole": "Rôle",
+    "colUsed": "Utilisé",
+    "colCapacity": "Capacité",
+    "colFree": "Libre",
+    "role": {
+      "vmdata": "Stockage VM",
+      "backup": "Sauvegarde",
+      "local": "Local / amorçage",
+      "other": "Autre"
+    }
   },
   "network": {
     "title": "Réseau",
     "diagramAlt": "Diagramme de topologie réseau",
-    "absent": "Aucun schéma réseau n'est inclus dans ce rapport."
+    "absent": "Aucun schéma réseau n'est inclus dans ce rapport.",
+    "oversizedNote": "Le schéma réseau complet est disponible dans le rapport HTML."
   },
   "os": {
     "title": "Systèmes d'exploitation",
@@ -195,6 +214,99 @@
       "storage": "Stockage",
       "count": "Quantité",
       "sizeGib": "Taille (Gio)"
+    }
+  },
+  "governance": {
+    "issues": {
+      "title": "Problèmes",
+      "kpi": {
+        "total": "Total",
+        "errors": "Erreurs",
+        "warnings": "Avertissements"
+      },
+      "col": {
+        "severity": "Sévérité",
+        "section": "Section",
+        "message": "Message"
+      }
+    },
+    "access": {
+      "title": "Posture d'accès",
+      "kpi": {
+        "users": "Utilisateurs",
+        "enabled": "Actifs",
+        "tokens": "Jetons API",
+        "roles": "Rôles",
+        "acls": "Entrées ACL",
+        "rootAccounts": "Comptes root"
+      },
+      "users": {
+        "heading": "Utilisateurs",
+        "col": {
+          "id": "ID",
+          "enabled": "Actif",
+          "email": "E-mail"
+        }
+      },
+      "tokens": {
+        "heading": "Jetons API",
+        "col": {
+          "user": "Utilisateur",
+          "tokenId": "ID jeton",
+          "privSeparated": "Priv. séparés"
+        }
+      }
+    },
+    "pools": {
+      "title": "Pools de ressources",
+      "kpi": {
+        "pools": "Pools",
+        "members": "Membres"
+      },
+      "col": {
+        "pool": "Pool",
+        "members": "Membres",
+        "vms": "Invités",
+        "storages": "Stockages"
+      }
+    }
+  },
+  "rrdHeadroom": {
+    "title": "Marge nœud — utilisation RRD",
+    "kpi": {
+      "cpuPeak": "CPU crête",
+      "cpuAvg": "CPU moyen",
+      "memPeak": "Mémoire crête",
+      "memAvg": "Mémoire moyenne",
+      "ioWaitPeak": "Attente E/S crête",
+      "psiMemPeak": "Pression mémoire crête"
+    },
+    "col": {
+      "node": "Nœud",
+      "cpuPeak": "CPU crête",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU moyen",
+      "memPeak": "Mém crête",
+      "memP95": "Mém p95",
+      "memAvg": "Mém moyen"
+    }
+  },
+  "storageGrowth": {
+    "title": "Temps avant saturation — croissance RRD",
+    "kpi": {
+      "storages": "Stockages",
+      "soonest": "Saturation la plus proche (jours)",
+      "window": "Fenêtre (jours)",
+      "growing": "Stockages en croissance"
+    },
+    "col": {
+      "storage": "Stockage",
+      "node": "Nœud",
+      "used": "Utilisé (Gio)",
+      "size": "Taille (Gio)",
+      "usage": "Utilisation",
+      "growth": "Croissance (Gio/jour)",
+      "daysToFull": "Jours avant saturation"
     }
   }
 }

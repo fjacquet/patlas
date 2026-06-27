@@ -1,4 +1,4 @@
-import type { VInfoRow } from '@/types'
+import type { GuestRow } from '@/types'
 import type { ParsedWorkbook } from './parseXlsx'
 
 /**
@@ -127,7 +127,7 @@ export const inferCaptureDate = (
  * the filename stem with the `RVTools_export_<scope>_` prefix stripped.
  */
 export const inferVCenterLabel = (
-  vinfo: VInfoRow[],
+  vinfo: GuestRow[],
   filename: string,
   sheets?: ParsedWorkbook,
 ): string => {

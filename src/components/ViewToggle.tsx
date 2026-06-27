@@ -4,31 +4,39 @@ export type AppView =
   | 'dashboard'
   | 'inventory'
   | 'hosts'
+  | 'rrdheadroom'
   | 'planning'
   | 'eos'
   | 'trends'
   | 'storage'
+  | 'storagegrowth'
   | 'network'
   | 'rightsizing'
   | 'monstervm'
   | 'snapshots'
   | 'storagecontent'
   | 'clusterhealth'
+  | 'protection'
+  | 'governance'
 
 const VIEWS = [
   'dashboard',
   'inventory',
   'hosts',
+  'rrdheadroom',
   'planning',
   'eos',
   'trends',
   'storage',
+  'storagegrowth',
   'network',
   'rightsizing',
   'monstervm',
   'snapshots',
   'storagecontent',
   'clusterhealth',
+  'protection',
+  'governance',
 ] as const
 
 export interface ViewToggleProps {

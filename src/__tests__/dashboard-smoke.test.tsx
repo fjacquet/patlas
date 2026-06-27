@@ -23,7 +23,7 @@ vi.mock('echarts-for-react/esm/core', () => ({
 
 // Same synchronous-pipeline boundary mock as e2e-smoke: returns a minimal
 // Proxmox Snapshot in-process (jsdom cannot drive a module Worker).
-// Uses source: 'proxmox' with guestType set on every VInfoRow.
+// Uses source: 'proxmox' with guestType set on every GuestRow.
 vi.mock('@/engines/parser', () => ({
   parseInWorker: async (file: File) => {
     const buf = await file.arrayBuffer()
@@ -36,7 +36,7 @@ vi.mock('@/engines/parser', () => ({
       viSdkUuid: null,
       vMetaData: [],
       source: 'proxmox' as const,
-      vinfo: [
+      guests: [
         {
           vmName: 'vm-1',
           cluster: 'proxmox',
@@ -101,7 +101,7 @@ vi.mock('@/engines/parser', () => ({
           guestType: 'lxc',
         },
       ],
-      vhost: [
+      nodes: [
         {
           hostName: 'pve-node-1',
           cluster: 'proxmox',
@@ -124,12 +124,11 @@ vi.mock('@/engines/parser', () => ({
       proxmoxHaResources: [],
       proxmoxHaStatus: [],
       proxmoxBackupJobs: [],
-      vdatastore: [],
+      storages: [],
       vpartition: [],
-      vnetwork: [],
-      vswitch: [],
-      dvswitch: [],
-      dvport: [],
+      nodeInterfaces: [],
+
+      vmNics: [],
       parseErrors: [],
     }
     return { snapshot, warnings: [] }

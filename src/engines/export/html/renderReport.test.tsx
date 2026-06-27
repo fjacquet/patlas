@@ -4,16 +4,16 @@ import { describe, expect, it } from 'vitest'
 import { EMPTY_VIEW } from '@/engines/aggregation'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
+import type { GuestRow } from '@/types/guest'
+import type { NodeRow } from '@/types/node'
 import type { Snapshot } from '@/types/snapshot'
-import type { VHostRow } from '@/types/vhost'
-import type { VInfoRow } from '@/types/vinfo'
 import { buildExportView } from '../buildExportView'
 import { renderReport, TOP_N_CLUSTERS } from './renderReport'
 
 const TODAY = new Date('2026-01-01T00:00:00Z')
 const MODE: AccountingMode = 'configured'
 
-const host = (over: Partial<VHostRow>): VHostRow => ({
+const host = (over: Partial<NodeRow>): NodeRow => ({
   hostName: 'esx-1',
   cluster: 'C1',
   sockets: sockets(2),
@@ -30,7 +30,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
   ...over,
 })
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm-1',
   cluster: 'C1',
   host: 'esx-1',
@@ -64,20 +64,19 @@ const snap = (over: Partial<Snapshot>): Snapshot => ({
   source: 'proxmox',
   viSdkUuid: null,
   vMetaData: [],
-  vinfo: [vm({}), vm({ vmName: 'vm-2', cluster: 'C2', host: 'esx-2' })],
-  vhost: [host({}), host({ hostName: 'esx-2', cluster: 'C2' })],
+  guests: [vm({}), vm({ vmName: 'vm-2', cluster: 'C2', host: 'esx-2' })],
+  nodes: [host({}), host({ hostName: 'esx-2', cluster: 'C2' })],
   vmUsage: [],
   proxmoxSnapshots: [],
   proxmoxStorageContent: [],
   proxmoxHaResources: [],
   proxmoxHaStatus: [],
   proxmoxBackupJobs: [],
-  vdatastore: [],
+  storages: [],
   vpartition: [],
-  vnetwork: [],
-  vswitch: [],
-  dvswitch: [],
-  dvport: [],
+  nodeInterfaces: [],
+
+  vmNics: [],
   parseErrors: [],
   ...over,
 })
@@ -157,7 +156,7 @@ describe('renderReport — F-2/F-1 Phase 9 + planned sections', () => {
       vm({ vmName: `v${c}`, cluster: `C${c}`, host: `h${c}` }),
     )
     const vhost = Array.from({ length: N }, (_, c) => host({ hostName: `h${c}`, cluster: `C${c}` }))
-    const a = snap({ id: 'a', vinfo, vhost })
+    const a = snap({ id: 'a', guests: vinfo, nodes: vhost })
     const { view, trends } = buildExportView(a, [a], MODE, TODAY)
     const html = renderReport({ view, trends, strings, locale: 'en' })
     // The fold caps inline storage rows at TOP_N_CLUSTERS — not all 40
@@ -200,8 +199,8 @@ describe('renderReport — security', () => {
     const evil = '<script>alert(1)</script>'
     const a = snap({
       id: 'a',
-      vinfo: [vm({ cluster: evil }), vm({ vmName: 'v2', cluster: evil, host: 'esx-2' })],
-      vhost: [host({ cluster: evil }), host({ hostName: 'esx-2', cluster: evil })],
+      guests: [vm({ cluster: evil }), vm({ vmName: 'v2', cluster: evil, host: 'esx-2' })],
+      nodes: [host({ cluster: evil }), host({ hostName: 'esx-2', cluster: evil })],
     })
     const { view, trends } = buildExportView(a, [a], MODE, TODAY)
     const html = renderReport({ view, trends, strings, locale: 'en' })
@@ -212,8 +211,8 @@ describe('renderReport — security', () => {
   it('slug-colliding cluster names produce no duplicate id= (Pitfall 6)', () => {
     const a = snap({
       id: 'a',
-      vinfo: [vm({ cluster: 'Prod A' }), vm({ vmName: 'v2', cluster: 'Prod/A', host: 'esx-2' })],
-      vhost: [host({ cluster: 'Prod A' }), host({ hostName: 'esx-2', cluster: 'Prod/A' })],
+      guests: [vm({ cluster: 'Prod A' }), vm({ vmName: 'v2', cluster: 'Prod/A', host: 'esx-2' })],
+      nodes: [host({ cluster: 'Prod A' }), host({ hostName: 'esx-2', cluster: 'Prod/A' })],
     })
     const { view, trends } = buildExportView(a, [a], MODE, TODAY)
     const html = renderReport({ view, trends, strings, locale: 'en' })

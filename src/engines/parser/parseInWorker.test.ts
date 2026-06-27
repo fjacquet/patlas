@@ -10,7 +10,7 @@ type Listener = (e: MessageEvent) => void
 
 class FakeWorker {
   static instances = 0
-  static lastResponse: unknown = { kind: 'ok', snapshot: { vinfo: [] }, warnings: [] }
+  static lastResponse: unknown = { kind: 'ok', snapshot: { guests: [] }, warnings: [] }
   listeners = new Set<Listener>()
   posted: unknown[] = []
   constructor(_url: URL, _opts: unknown) {
@@ -50,12 +50,12 @@ describe('parseInWorker', () => {
   it('resolves with snapshot + warnings on a kind:ok response', async () => {
     FakeWorker.lastResponse = {
       kind: 'ok',
-      snapshot: { vinfo: [{ vmName: 'a' }] },
+      snapshot: { guests: [{ vmName: 'a' }] },
       warnings: [{ sheet: 'vDatastore', kind: 'missing-sheet', message: 'm' }],
     }
     const { parseInWorker } = await import('./parseInWorker')
     const out = await parseInWorker(file())
-    expect(out.snapshot).toMatchObject({ vinfo: [{ vmName: 'a' }] })
+    expect(out.snapshot).toMatchObject({ guests: [{ vmName: 'a' }] })
     expect(out.warnings).toHaveLength(1)
   })
 

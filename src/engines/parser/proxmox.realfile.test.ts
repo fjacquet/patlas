@@ -11,11 +11,11 @@ describe('proxmox real-file integration', () => {
   maybe('parses the real Proxmox report into a non-empty estate', () => {
     const wb = parseXlsx(readFileSync(fixture))
     const b = adaptProxmox(wb)
-    expect(b.vhost.length).toBeGreaterThan(0)
-    expect(b.vinfo.length).toBeGreaterThan(0)
-    expect(b.vinfo.some((g) => g.guestType === 'qemu')).toBe(true)
-    expect(b.vinfo.some((g) => g.guestType === 'lxc')).toBe(true)
-    expect(b.vinfo.every((g) => g.vramMib >= 0)).toBe(true)
+    expect(b.nodes.length).toBeGreaterThan(0)
+    expect(b.guests.length).toBeGreaterThan(0)
+    expect(b.guests.some((g) => g.guestType === 'qemu')).toBe(true)
+    expect(b.guests.some((g) => g.guestType === 'lxc')).toBe(true)
+    expect(b.guests.every((g) => g.vramMib >= 0)).toBe(true)
     // Plan 3A: the Snapshots sheet parses; the real report holds only the
     // per-guest 'current' live-state markers (no real checkpoints).
     expect(b.proxmoxSnapshots.length).toBeGreaterThan(0)

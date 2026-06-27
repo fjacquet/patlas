@@ -83,13 +83,11 @@ export function VmDetail({ detail: d, onBack }: VmDetailProps) {
             )}
           </div>
           <div className="overflow-hidden">
-            <p className="pb-1 text-sm text-slate-600 dark:text-slate-400">
-              {t('detail.portgroups')}
-            </p>
+            <p className="pb-1 text-sm text-slate-600 dark:text-slate-400">{t('detail.bridges')}</p>
             <p className="break-words pb-2 text-[12px] font-normal text-slate-500 dark:text-slate-400">
-              {d.portgroups.length === 0
+              {d.bridges.length === 0
                 ? na
-                : d.portgroups.map((pg) => `${pg.network} (${pg.switch})`).join(', ')}
+                : d.bridges.map((b) => (b.tag ? `${b.bridge} (${b.tag})` : b.bridge)).join(', ')}
             </p>
             <p className="pb-1 text-sm text-slate-600 dark:text-slate-400">
               {t('detail.datastores')}

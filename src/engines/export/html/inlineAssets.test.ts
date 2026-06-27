@@ -24,6 +24,13 @@ describe('inlineAssets', () => {
     // the factual gold threshold marker is present, no verdict colour
     expect(style).toContain('.metric-row.flagged')
   })
+
+  it('contains a .network-diagram rule that bounds the embedded diagram', () => {
+    const { style } = inlineAssets()
+    expect(style).toContain('.network-diagram')
+    expect(style).toContain('max-width:100%')
+    expect(style).toContain('max-height:900px')
+  })
 })
 
 describe('assertSizeBudget', () => {

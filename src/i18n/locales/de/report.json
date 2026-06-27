@@ -11,7 +11,27 @@
     "error": "Der Export wurde nicht abgeschlossen. Die Daten sind unverändert — öffnen Sie die Browser-Konsole für Details und versuchen Sie es erneut."
   },
   "footer": {
-    "methodology": "Erstellt von vatlas — faktische Bestandssynthese. Quelle: Proxmox-Export, erfasst am {{captureDate}}. Die Zahlen beziehen sich nur auf den aktiven Snapshot."
+    "methodology": "Erstellt von patlas — faktische Bestandssynthese. Quelle: Proxmox-Export, erfasst am {{captureDate}}. Die Zahlen beziehen sich nur auf den aktiven Snapshot."
+  },
+  "cover": {
+    "title": "Proxmox-Bestandsbericht",
+    "vms": "Gäste",
+    "hosts": "Knoten",
+    "clusters": "Cluster"
+  },
+  "headlines": {
+    "title": "Wichtigste Kennzahlen",
+    "vcpuPerPcpu": "vCPU : pCPU",
+    "cpuPct": "Mittlere CPU %",
+    "memPct": "Mittlerer Speicher %",
+    "poweredOn": "Eingeschaltete Gäste"
+  },
+  "cluster": {
+    "title": "Pro Cluster",
+    "hosts": "Knoten",
+    "vms": "Gäste",
+    "vcpuPerPcpu": "vCPU : pCPU",
+    "datastores": "Speicher"
   },
   "storage": {
     "title": "Speicher",
@@ -24,15 +44,40 @@
     "colCluster": "Cluster",
     "colProvisioned": "Bereitgestellt",
     "colInUse": "Belegt",
-    "vsanShared": "Über {{n}} Cluster geteilt"
+    "vsanShared": "Über {{n}} Cluster geteilt",
+    "vmUsedCapacity": "VM-Speicher (belegt / Kapazität)",
+    "vmAllocated": "VM zugewiesen",
+    "colRole": "Rolle",
+    "colUsed": "Belegt",
+    "colCapacity": "Kapazität",
+    "colFree": "Frei",
+    "colDatastores": "Speicher",
+    "role": {
+      "vmdata": "VM-Speicher",
+      "backup": "Sicherung",
+      "local": "Lokal / Boot",
+      "other": "Andere"
+    }
   },
   "network": {
     "title": "Netzwerk",
-    "vswitches": "vSwitches",
-    "dvswitches": "dvSwitches",
-    "portgroups": "Portgruppen",
-    "vnetwork": "Gast-Adjazenzen",
-    "diagramAlt": "Netzwerktopologie-Diagramm"
+    "nics": "Physische NICs",
+    "bonds": "Bonds",
+    "bridges": "Bridges",
+    "vlans": "VLANs",
+    "vmNics": "Gast-NIC-Zuordnungen",
+    "diagramAlt": "Netzwerktopologie-Diagramm",
+    "oversizedNote": "Das vollständige Netzwerkdiagramm ist im HTML-Bericht verfügbar.",
+    "absent": "Kein Netzwerkdiagramm in diesem Bericht enthalten."
+  },
+  "eos": {
+    "title": "OS-Support-Ende-Prognose",
+    "overdue": "Überfällig",
+    "le3": "≤ 3 Monate",
+    "le6": "≤ 6 Monate",
+    "le9": "≤ 9 Monate",
+    "le12": "≤ 12 Monate",
+    "unknown": "Unbekannt"
   },
   "planned": {
     "title": "Geplanter vs. gemessener Bestand",
@@ -45,5 +90,26 @@
     "colCluster": "Cluster",
     "colMeasured": "Gemessen",
     "colPlanned": "Geplant"
-  }
+  },
+  "trends": {
+    "title": "Sitzungsinterne Trends",
+    "points": "Zeitpunkte",
+    "deltas": "Änderungen"
+  },
+  "annex": {
+    "title": "Anhang",
+    "cluster": "Cluster",
+    "hosts": "Knoten",
+    "vms": "Gäste",
+    "datastores": "Speicher"
+  },
+  "governance.title": "Governance & Betrieb",
+  "governance.issues.total": "Probleme gesamt",
+  "governance.issues.errors": "Fehler",
+  "governance.issues.warnings": "Warnungen",
+  "governance.access.users": "Benutzer",
+  "governance.access.tokens": "API-Token",
+  "governance.access.acls": "ACL-Einträge",
+  "governance.pools.count": "Ressourcenpools",
+  "governance.pools.members": "Pool-Mitglieder"
 }

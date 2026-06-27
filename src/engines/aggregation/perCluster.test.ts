@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mhz, mib, sockets } from '@/engines/units'
 import { first } from '@/test/arrays'
-import type { VHostRow } from '@/types/vhost'
+import type { NodeRow } from '@/types/node'
 import { aggregateHostsPerCluster } from './perCluster'
 
-const host = (over: Partial<VHostRow>): VHostRow => ({
+const host = (over: Partial<NodeRow>): NodeRow => ({
   hostName: 'esx-1',
   cluster: 'C1',
   sockets: sockets(2),
@@ -23,7 +23,7 @@ const host = (over: Partial<VHostRow>): VHostRow => ({
 
 describe('aggregateHostsPerCluster', () => {
   it('capacity-weighted mean CPU ratio (ADR-0011) on a 2-host cluster', () => {
-    const hosts: VHostRow[] = [
+    const hosts: NodeRow[] = [
       host({ hostName: 'a', cores: cores(10), speedMhz: mhz(2000), cpuRatio: 0.2 }),
       host({ hostName: 'b', cores: cores(20), speedMhz: mhz(2000), cpuRatio: 0.5 }),
     ]

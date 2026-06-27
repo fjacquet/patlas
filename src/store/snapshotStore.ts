@@ -173,15 +173,19 @@ export const useSnapshotStore = create<SnapshotState>((set) => ({
       const next = new Map(state.snapshots)
       next.set(id, {
         ...snap,
-        vinfo: [],
-        vhost: [],
+        guests: [],
+        nodes: [],
         vmUsage: [],
-        vdatastore: [],
+        storages: [],
         vpartition: [],
-        vnetwork: [],
-        vswitch: [],
-        dvswitch: [],
-        dvport: [],
+        nodeInterfaces: [],
+
+        vmNics: [],
+        // P8 Pack A — the RRD time-series are the largest row sets (8.6k/36k
+        // rows); drop them too when releasing raw rows for GC.
+        rrdNodes: [],
+        rrdStorage: [],
+        rrdGuests: [],
         rawReleased: true,
         releasedAggregate,
       })

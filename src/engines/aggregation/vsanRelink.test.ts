@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { cores, mib } from '@/engines/units'
-import type { VDatastoreRow } from '@/types/snapshot'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
+import type { StorageRow } from '@/types/snapshot'
 import { relinkBlankClusterDatastores } from './vsanRelink'
 
-const vm = (over: Partial<VInfoRow>): VInfoRow => ({
+const vm = (over: Partial<GuestRow>): GuestRow => ({
   vmName: 'vm-1',
   cluster: 'CL_1',
   host: 'esx-1',
@@ -27,13 +27,14 @@ const vm = (over: Partial<VInfoRow>): VInfoRow => ({
   ...over,
 })
 
-const ds = (over: Partial<VDatastoreRow>): VDatastoreRow => ({
+const ds = (over: Partial<StorageRow>): StorageRow => ({
   name: 'DS_X',
   capacityMib: mib(1000),
   freeMib: mib(400),
   provisionedMib: mib(600),
   naa: null,
   type: 'vSAN',
+  role: 'other',
   hosts: '3',
   clusterName: '',
   ...over,

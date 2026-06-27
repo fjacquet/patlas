@@ -1,6 +1,6 @@
 import { cores as coresOf, mib } from '@/engines/units'
 import type { AccountingMode, ClusterVmStats, TopReadinessVm } from '@/types/estate'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
 import { CONTENTION_THRESHOLDS, TOP_N_DEFAULT } from './contention'
 
 /**
@@ -11,14 +11,14 @@ import { CONTENTION_THRESHOLDS, TOP_N_DEFAULT } from './contention'
  *   `configured` keeps powered-off VMs in the vCPU/vRAM sums.
  * - `v.vramMb` → `v.vramMib: MiB`; `v.vcpu` is branded `Cores`.
  * - vsizer's active-memory sum chain is DROPPED — vatlas' Phase-1
- *   `VInfoRow` does not parse active memory, so it would be dead code.
+ *   `GuestRow` does not parse active memory, so it would be dead code.
  * - `readinessStats` is EXPORTED so `perEsx` reuses it (DRY mandate) and
  *   is ALWAYS powered-on-only regardless of mode (a powered-off VM has
  *   no CPU Ready — ADR-0012).
  */
 
-const groupByCluster = (rows: VInfoRow[], mode: AccountingMode): Map<string, VInfoRow[]> => {
-  const out = new Map<string, VInfoRow[]>()
+const groupByCluster = (rows: GuestRow[], mode: AccountingMode): Map<string, GuestRow[]> => {
+  const out = new Map<string, GuestRow[]>()
   for (const row of rows) {
     // Configured = all VMs; Active / Storage-realistic exclude powered-off
     // from the vCPU/vRAM sums (Critical-6, RESEARCH §Three Accounting Modes).
@@ -45,7 +45,7 @@ const groupByCluster = (rows: VInfoRow[], mode: AccountingMode): Map<string, VIn
  * Exported for DRY reuse by `perEsx.ts` (RESEARCH §perEsx).
  */
 export const readinessStats = (
-  rows: VInfoRow[],
+  rows: GuestRow[],
 ): {
   mean: number | null
   max: number | null
@@ -76,7 +76,7 @@ export const readinessStats = (
  * Group VMs by cluster (accounting-mode aware) and sum allocations.
  */
 export const aggregateVmsPerCluster = (
-  vinfo: VInfoRow[],
+  vinfo: GuestRow[],
   mode: AccountingMode,
 ): ClusterVmStats[] => {
   const grouped = groupByCluster(vinfo, mode)
@@ -103,7 +103,7 @@ export const aggregateVmsPerCluster = (
  * the list. Always powered-on-only regardless of mode. See ADR-0012 §4.
  */
 export const topReadinessVmsByCluster = (
-  vinfo: VInfoRow[],
+  vinfo: GuestRow[],
   topN: number = TOP_N_DEFAULT,
 ): Map<string, TopReadinessVm[]> => {
   const grouped = groupByCluster(vinfo, 'active')

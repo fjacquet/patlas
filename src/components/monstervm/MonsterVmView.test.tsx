@@ -41,8 +41,8 @@ const snap = (): Snapshot =>
     source: 'proxmox',
     viSdkUuid: null,
     vMetaData: [],
-    vinfo: [vm('small-01', 4, 8192), vm('monster-01', 32, 16384)],
-    vhost: [
+    guests: [vm('small-01', 4, 8192), vm('monster-01', 32, 16384)],
+    nodes: [
       {
         hostName: 'h1',
         cluster: 'C1',
@@ -65,12 +65,11 @@ const snap = (): Snapshot =>
     proxmoxHaResources: [],
     proxmoxHaStatus: [],
     proxmoxBackupJobs: [],
-    vdatastore: [],
+    storages: [],
     vpartition: [],
-    vnetwork: [],
-    vswitch: [],
-    dvswitch: [],
-    dvport: [],
+    nodeInterfaces: [],
+
+    vmNics: [],
     parseErrors: [],
   }) as Snapshot
 

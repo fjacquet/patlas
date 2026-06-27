@@ -4,7 +4,7 @@ import type { ClusterAggregate, GlobalSummary } from '@/types/estate'
 /**
  * Estate-wide rollup — ported from vsizer `globals.ts` with the brand
  * retrofit. Deviations vs the port:
- * - the active-memory sum field is DROPPED (vatlas `VInfoRow` lacks it).
+ * - the active-memory sum field is DROPPED (vatlas `GuestRow` lacks it).
  * - `datastoreCount` + `totalStorageMib` ADDED (DSH-02). globals.ts only
  *   CARRIES these fields on `GlobalSummary`/`emptySummary`; they are
  *   populated by the `estateView` assembler from `perDatastore` output.

@@ -26,7 +26,7 @@ const entry = (over: Partial<VmDetailEntry> = {}): VmDetailEntry => ({
       flagged: false,
     },
   ],
-  portgroups: [{ network: 'PG-Prod', switch: 'vSwitch0' }],
+  bridges: [{ bridge: 'vmbr0', tag: '10' }],
   datastores: ['DS_A'],
   ...over,
 })
@@ -36,11 +36,11 @@ describe('VmDetail (LC-4)', () => {
     await i18n.changeLanguage('en')
   })
 
-  it('renders the VM title, partitions, portgroups and datastores', () => {
+  it('renders the VM title, partitions, bridges and datastores', () => {
     render(<VmDetail detail={entry()} onBack={() => {}} />)
     expect(screen.getByText(/vm-1/)).not.toBeNull()
     expect(screen.getByText('/')).not.toBeNull()
-    expect(screen.getByText(/PG-Prod \(vSwitch0\)/)).not.toBeNull()
+    expect(screen.getByText(/vmbr0 \(10\)/)).not.toBeNull()
     expect(screen.getByText('DS_A')).not.toBeNull()
   })
 
@@ -58,10 +58,10 @@ describe('VmDetail (LC-4)', () => {
     expect(container.querySelector(`[class*="util-${'high'}"]`)).toBeNull()
   })
 
-  it('renders the em-dash for empty partition/portgroup/datastore lists', () => {
+  it('renders the em-dash for empty partition/bridge/datastore lists', () => {
     render(
       <VmDetail
-        detail={entry({ partitions: [], portgroups: [], datastores: [] })}
+        detail={entry({ partitions: [], bridges: [], datastores: [] })}
         onBack={() => {}}
       />,
     )

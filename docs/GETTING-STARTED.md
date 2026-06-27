@@ -1,4 +1,3 @@
-<!-- generated-by: gsd-doc-writer -->
 # Getting Started
 
 You cloned `patlas`. This page gets you from a fresh checkout to a running dev server in three commands. It is intentionally short — for the end-user workflow see [USER-GUIDE.md](./USER-GUIDE.md), for the day-to-day dev loop see [DEVELOPMENT.md](./DEVELOPMENT.md), and for the design see [ARCHITECTURE.md](./ARCHITECTURE.md).
@@ -37,7 +36,7 @@ http://localhost:5173/patlas/
 
 The `/patlas/` path is required — it is the configured `base` in `vite.config.ts` (matching the GitHub Pages deploy path). The bare `http://localhost:5173/` will not load the app.
 
-**What you'll see:** a drop zone. Drag a Proxmox report (`.zip` bundle or bare `.xlsx`) onto it and `patlas` parses it entirely in your browser — no bytes leave the page — then renders the dashboard, inventory tree, nodes view, planning, and Proxmox-native views (Snapshot Sprawl, Storage Content, Cluster Health). Sample fixtures are available under `tests/fixtures/` if you don't have a Proxmox report handy.
+**What you'll see:** a drop zone. Drag a Proxmox report (`.zip` bundle or bare `.xlsx`) onto it and `patlas` parses it entirely in your browser — no bytes leave the page — then renders the full suite of views: dashboard, inventory tree, nodes view, planning, OS end-of-support, trends, RRD analytics (node headroom, storage growth), storage (with storage-by-role), network, right-sizing, monster guests, protection, governance, and the Proxmox-native health views (Snapshot Sprawl, Storage Content, Cluster Health). Sample fixtures are available under `tests/fixtures/` if you don't have a Proxmox report handy.
 
 ## Common setup issues
 

@@ -11,7 +11,27 @@
     "error": "L'esportazione non è stata completata. I dati sono invariati — apri la console del browser per i dettagli, poi riprova."
   },
   "footer": {
-    "methodology": "Generato da vatlas — sintesi fattuale del parco. Fonte: export Proxmox, acquisito il {{captureDate}}. I numeri riflettono solo lo snapshot attivo."
+    "methodology": "Generato da patlas — sintesi fattuale del parco. Fonte: export Proxmox, acquisito il {{captureDate}}. I numeri riflettono solo lo snapshot attivo."
+  },
+  "cover": {
+    "title": "Report del parco Proxmox",
+    "vms": "Ospiti",
+    "hosts": "Nodi",
+    "clusters": "Cluster"
+  },
+  "headlines": {
+    "title": "Punti chiave esecutivi",
+    "vcpuPerPcpu": "vCPU : pCPU",
+    "cpuPct": "CPU media %",
+    "memPct": "Memoria media %",
+    "poweredOn": "Ospiti accesi"
+  },
+  "cluster": {
+    "title": "Per cluster",
+    "hosts": "Nodi",
+    "vms": "Ospiti",
+    "vcpuPerPcpu": "vCPU : pCPU",
+    "datastores": "Archiviazioni"
   },
   "storage": {
     "title": "Archiviazione",
@@ -24,15 +44,40 @@
     "colCluster": "Cluster",
     "colProvisioned": "Provisionato",
     "colInUse": "In uso",
-    "vsanShared": "Condiviso su {{n}} cluster"
+    "vsanShared": "Condiviso su {{n}} cluster",
+    "vmUsedCapacity": "Storage VM (usato / capacità)",
+    "vmAllocated": "Allocato VM",
+    "colRole": "Ruolo",
+    "colUsed": "Usato",
+    "colCapacity": "Capacità",
+    "colFree": "Libero",
+    "colDatastores": "Archiviazioni",
+    "role": {
+      "vmdata": "Storage VM",
+      "backup": "Backup",
+      "local": "Locale / avvio",
+      "other": "Altro"
+    }
   },
   "network": {
     "title": "Rete",
-    "vswitches": "vSwitches",
-    "dvswitches": "dvSwitches",
-    "portgroups": "Gruppi di porte",
-    "vnetwork": "Adiacenze ospiti",
-    "diagramAlt": "Diagramma di topologia di rete"
+    "nics": "NIC fisiche",
+    "bonds": "Bond",
+    "bridges": "Bridge",
+    "vlans": "VLAN",
+    "vmNics": "Attacchi NIC ospiti",
+    "diagramAlt": "Diagramma di topologia di rete",
+    "oversizedNote": "Il diagramma di rete completo è disponibile nel report HTML.",
+    "absent": "Nessun diagramma di rete incluso in questo report."
+  },
+  "eos": {
+    "title": "Previsione fine supporto OS",
+    "overdue": "In ritardo",
+    "le3": "≤ 3 mesi",
+    "le6": "≤ 6 mesi",
+    "le9": "≤ 9 mesi",
+    "le12": "≤ 12 mesi",
+    "unknown": "Sconosciuto"
   },
   "planned": {
     "title": "Parco pianificato vs misurato",
@@ -45,5 +90,26 @@
     "colCluster": "Cluster",
     "colMeasured": "Misurato",
     "colPlanned": "Pianificato"
-  }
+  },
+  "trends": {
+    "title": "Tendenze in sessione",
+    "points": "Punti cronologici",
+    "deltas": "Variazioni"
+  },
+  "annex": {
+    "title": "Allegato",
+    "cluster": "Cluster",
+    "hosts": "Nodi",
+    "vms": "Ospiti",
+    "datastores": "Archiviazioni"
+  },
+  "governance.title": "Governance & Operazioni",
+  "governance.issues.total": "Problemi totali",
+  "governance.issues.errors": "Errori",
+  "governance.issues.warnings": "Avvisi",
+  "governance.access.users": "Utenti",
+  "governance.access.tokens": "Token API",
+  "governance.access.acls": "Voci ACL",
+  "governance.pools.count": "Pool di risorse",
+  "governance.pools.members": "Membri dei pool"
 }

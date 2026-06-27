@@ -1,5 +1,5 @@
 {
-  "appName": "vatlas",
+  "appName": "patlas",
   "tagline": "Proxmox → atlas of your Proxmox estate (100 % client-side)",
   "footer": "100% client-side · your file never leaves your browser",
   "error": {

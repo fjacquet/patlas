@@ -37,7 +37,7 @@ const snap = (): Snapshot =>
     source: 'proxmox',
     viSdkUuid: null,
     vMetaData: [],
-    vinfo: [
+    guests: [
       {
         vmName: 'debian-01',
         cluster: 'pve-cluster',
@@ -60,7 +60,7 @@ const snap = (): Snapshot =>
         guestType: 'qemu' as const,
       },
     ],
-    vhost: [
+    nodes: [
       {
         hostName: 'pve-node-1',
         cluster: 'pve-cluster',
@@ -84,12 +84,11 @@ const snap = (): Snapshot =>
     proxmoxHaResources: [],
     proxmoxHaStatus: [],
     proxmoxBackupJobs: [],
-    vdatastore: [],
+    storages: [],
     vpartition: [],
-    vnetwork: [],
-    vswitch: [],
-    dvswitch: [],
-    dvport: [],
+    nodeInterfaces: [],
+
+    vmNics: [],
     parseErrors: [],
   }) as Snapshot
 

@@ -11,7 +11,27 @@
     "error": "L'export ne s'est pas terminé. Les données sont inchangées — ouvrez la console du navigateur pour le détail, puis réessayez."
   },
   "footer": {
-    "methodology": "Généré par vatlas — synthèse factuelle du parc. Source : export Proxmox, capturé le {{captureDate}}. Les chiffres reflètent l'instantané actif uniquement."
+    "methodology": "Généré par patlas — synthèse factuelle du parc. Source : export Proxmox, capturé le {{captureDate}}. Les chiffres reflètent l'instantané actif uniquement."
+  },
+  "cover": {
+    "title": "Rapport de parc Proxmox",
+    "vms": "Invités",
+    "hosts": "Nœuds",
+    "clusters": "Clusters"
+  },
+  "headlines": {
+    "title": "Points clés exécutifs",
+    "vcpuPerPcpu": "vCPU : pCPU",
+    "cpuPct": "CPU moyen %",
+    "memPct": "Mémoire moyenne %",
+    "poweredOn": "Invités démarrés"
+  },
+  "cluster": {
+    "title": "Par cluster",
+    "hosts": "Nœuds",
+    "vms": "Invités",
+    "vcpuPerPcpu": "vCPU : pCPU",
+    "datastores": "Stockages"
   },
   "storage": {
     "title": "Stockage",
@@ -24,15 +44,40 @@
     "colCluster": "Cluster",
     "colProvisioned": "Provisionné",
     "colInUse": "Utilisé",
-    "vsanShared": "Partagé sur {{n}} clusters"
+    "vsanShared": "Partagé sur {{n}} clusters",
+    "vmUsedCapacity": "Stockage VM (utilisé / capacité)",
+    "vmAllocated": "Alloué VM",
+    "colRole": "Rôle",
+    "colUsed": "Utilisé",
+    "colCapacity": "Capacité",
+    "colFree": "Libre",
+    "colDatastores": "Stockages",
+    "role": {
+      "vmdata": "Stockage VM",
+      "backup": "Sauvegarde",
+      "local": "Local / amorçage",
+      "other": "Autre"
+    }
   },
   "network": {
     "title": "Réseau",
-    "vswitches": "vSwitches",
-    "dvswitches": "dvSwitches",
-    "portgroups": "Groupes de ports",
-    "vnetwork": "Adjacences invités",
-    "diagramAlt": "Schéma de topologie réseau"
+    "nics": "Cartes réseau physiques",
+    "bonds": "Liaisons (bonds)",
+    "bridges": "Ponts",
+    "vlans": "VLANs",
+    "vmNics": "Attachements NIC invités",
+    "diagramAlt": "Schéma de topologie réseau",
+    "oversizedNote": "Le schéma réseau complet est disponible dans le rapport HTML.",
+    "absent": "Aucun schéma réseau inclus dans ce rapport."
+  },
+  "eos": {
+    "title": "Prévision de fin de support OS",
+    "overdue": "En retard",
+    "le3": "≤ 3 mois",
+    "le6": "≤ 6 mois",
+    "le9": "≤ 9 mois",
+    "le12": "≤ 12 mois",
+    "unknown": "Inconnu"
   },
   "planned": {
     "title": "Parc planifié vs mesuré",
@@ -45,5 +90,26 @@
     "colCluster": "Cluster",
     "colMeasured": "Mesuré",
     "colPlanned": "Planifié"
-  }
+  },
+  "trends": {
+    "title": "Tendances en session",
+    "points": "Points chronologiques",
+    "deltas": "Variations"
+  },
+  "annex": {
+    "title": "Annexe",
+    "cluster": "Cluster",
+    "hosts": "Nœuds",
+    "vms": "Invités",
+    "datastores": "Stockages"
+  },
+  "governance.title": "Gouvernance & Opérations",
+  "governance.issues.total": "Total problèmes",
+  "governance.issues.errors": "Erreurs",
+  "governance.issues.warnings": "Avertissements",
+  "governance.access.users": "Utilisateurs",
+  "governance.access.tokens": "Jetons API",
+  "governance.access.acls": "Entrées ACL",
+  "governance.pools.count": "Pools de ressources",
+  "governance.pools.members": "Membres des pools"
 }

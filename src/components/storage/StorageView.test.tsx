@@ -19,7 +19,7 @@ const snapshot = (): Snapshot =>
     source: 'proxmox',
     viSdkUuid: null,
     vMetaData: [],
-    vinfo: [
+    guests: [
       {
         vmName: 'vm-1',
         cluster: 'CL_1',
@@ -42,14 +42,14 @@ const snapshot = (): Snapshot =>
         guestType: 'qemu',
       },
     ],
-    vhost: [],
+    nodes: [],
     vmUsage: [],
     proxmoxSnapshots: [],
     proxmoxStorageContent: [],
     proxmoxHaResources: [],
     proxmoxHaStatus: [],
     proxmoxBackupJobs: [],
-    vdatastore: [
+    storages: [
       {
         name: 'DS_A',
         capacityMib: mib(1000),
@@ -57,6 +57,7 @@ const snapshot = (): Snapshot =>
         provisionedMib: mib(800),
         naa: null,
         type: 'vSAN',
+        role: 'vmdata',
         hosts: '2',
         clusterName: 'CL_1',
       },
@@ -70,10 +71,9 @@ const snapshot = (): Snapshot =>
         freeMib: mib(10),
       },
     ],
-    vnetwork: [],
-    vswitch: [],
-    dvswitch: [],
-    dvport: [],
+    nodeInterfaces: [],
+
+    vmNics: [],
     parseErrors: [],
   }) satisfies Snapshot
 

@@ -1,5 +1,5 @@
-import type { VDatastoreRow } from '@/types/snapshot'
-import type { VInfoRow } from '@/types/vinfo'
+import type { GuestRow } from '@/types/guest'
+import type { StorageRow } from '@/types/snapshot'
 
 /**
  * P9 D-09 / D-10 — the vSAN / blank-`Cluster name` datastore relink.
@@ -33,7 +33,7 @@ const BRACKET = /^\[([^\]]+)\]/
 /** The shipped Moderate-11 dedupe key (`perDatastore.ts` line 21, verbatim).
  *  One blank datastore has an empty NAA so the `name` fallback is
  *  load-bearing — keep this identical to perDatastore. */
-const dedupeKey = (row: VDatastoreRow): string => row.naa ?? row.name
+const dedupeKey = (row: StorageRow): string => row.naa ?? row.name
 
 export interface VsanRelinkResult {
   /** dedupeKey → the single resolved cluster for a blank-cluster datastore. */
@@ -57,8 +57,8 @@ export interface VsanRelinkResult {
  * `clusterName` are left untouched (not in any result map). Pure.
  */
 export const relinkBlankClusterDatastores = (
-  vinfo: VInfoRow[],
-  vdatastore: VDatastoreRow[],
+  vinfo: GuestRow[],
+  vdatastore: StorageRow[],
 ): VsanRelinkResult => {
   // datastore NAME (the bracket token) → set of clusters / set of VM names
   // that reference it (SAME path parse — single source).

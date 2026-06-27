@@ -47,7 +47,7 @@
     "consumedGhz": "GHz verbraucht",
     "availableGhz": "GHz verfügbar",
     "ramAvailable": "RAM verfügbar",
-    "footer": "Quelle: Proxmox — Knoten (CPU/RAM-Auslastung %, Speed × Cores, Memory) + Gast-Info (vCPUs, Memory)"
+    "footer": "Quelle: Proxmox — RRD-Zeitreihe (CPU-Auslastung % des Knotens) + Knoten (RAM-Auslastung %, Speed × Cores, Memory) + Gast-Info (vCPUs, Memory)"
   },
   "eos": {
     "title": "Prognose zum OS-Support-Ende",
@@ -71,7 +71,12 @@
     "title": "Trends in der Sitzung",
     "points": "Zeitachsenpunkte",
     "deltas": "Deltas",
-    "series": "Gast-Anzahl über Snapshots"
+    "series": "Gast-Anzahl über Snapshots",
+    "singleTitle": "Einzeldatei-Trends — RRD-Zeitreihe",
+    "singleNote": "Abgeleitet aus der RRD-Zeitreihe dieses Exports.",
+    "singleCpu": "CPU-Mittel %",
+    "singleMem": "Speicher-Mittel %",
+    "singleSamples": "Zeitreihen-Punkte"
   },
   "inventory": {
     "title": "Inventarübersicht",
@@ -105,12 +110,26 @@
     "colCluster": "Cluster",
     "colProvisioned": "Bereitgestellt",
     "colInUse": "Belegt",
-    "vsanShared": "Über {{n}} Cluster geteilt"
+    "vsanShared": "Über {{n}} Cluster geteilt",
+    "vmUsed": "VM belegt",
+    "vmCapacity": "VM Kapazität",
+    "vmAllocated": "VM zugewiesen",
+    "colRole": "Rolle",
+    "colUsed": "Belegt",
+    "colCapacity": "Kapazität",
+    "colFree": "Frei",
+    "role": {
+      "vmdata": "VM-Speicher",
+      "backup": "Sicherung",
+      "local": "Lokal / Boot",
+      "other": "Andere"
+    }
   },
   "network": {
     "title": "Netzwerk",
     "diagramAlt": "Netzwerktopologie-Diagramm",
-    "absent": "In diesem Bericht ist kein Netzwerkdiagramm enthalten."
+    "absent": "In diesem Bericht ist kein Netzwerkdiagramm enthalten.",
+    "oversizedNote": "Das vollständige Netzwerkdiagramm ist im HTML-Bericht verfügbar."
   },
   "os": {
     "title": "Betriebssysteme",
@@ -195,6 +214,99 @@
       "storage": "Speicher",
       "count": "Anzahl",
       "sizeGib": "Größe (GiB)"
+    }
+  },
+  "governance": {
+    "issues": {
+      "title": "Probleme",
+      "kpi": {
+        "total": "Gesamt",
+        "errors": "Fehler",
+        "warnings": "Warnungen"
+      },
+      "col": {
+        "severity": "Schweregrad",
+        "section": "Abschnitt",
+        "message": "Meldung"
+      }
+    },
+    "access": {
+      "title": "Zugriffsposition",
+      "kpi": {
+        "users": "Benutzer",
+        "enabled": "Aktiv",
+        "tokens": "API-Token",
+        "roles": "Rollen",
+        "acls": "ACL-Einträge",
+        "rootAccounts": "Root-Konten"
+      },
+      "users": {
+        "heading": "Benutzer",
+        "col": {
+          "id": "ID",
+          "enabled": "Aktiv",
+          "email": "E-Mail"
+        }
+      },
+      "tokens": {
+        "heading": "API-Token",
+        "col": {
+          "user": "Benutzer",
+          "tokenId": "Token-ID",
+          "privSeparated": "Priv. get."
+        }
+      }
+    },
+    "pools": {
+      "title": "Ressourcenpools",
+      "kpi": {
+        "pools": "Pools",
+        "members": "Mitglieder"
+      },
+      "col": {
+        "pool": "Pool",
+        "members": "Mitglieder",
+        "vms": "Gäste",
+        "storages": "Speicher"
+      }
+    }
+  },
+  "rrdHeadroom": {
+    "title": "Knoten-Reserve — RRD-Auslastung",
+    "kpi": {
+      "cpuPeak": "CPU-Spitze",
+      "cpuAvg": "CPU-Mittel",
+      "memPeak": "Speicher-Spitze",
+      "memAvg": "Speicher-Mittel",
+      "ioWaitPeak": "IO-Wait-Spitze",
+      "psiMemPeak": "Speicherdruck-Spitze"
+    },
+    "col": {
+      "node": "Knoten",
+      "cpuPeak": "CPU-Spitze",
+      "cpuP95": "CPU p95",
+      "cpuAvg": "CPU-Mittel",
+      "memPeak": "Sp.-Spitze",
+      "memP95": "Sp. p95",
+      "memAvg": "Sp.-Mittel"
+    }
+  },
+  "storageGrowth": {
+    "title": "Zeit bis voll — RRD-Wachstum",
+    "kpi": {
+      "storages": "Speicher",
+      "soonest": "Am ehesten voll (Tage)",
+      "window": "Fenster (Tage)",
+      "growing": "Wachsende Speicher"
+    },
+    "col": {
+      "storage": "Speicher",
+      "node": "Knoten",
+      "used": "Belegt (GiB)",
+      "size": "Größe (GiB)",
+      "usage": "Auslastung",
+      "growth": "Wachstum (GiB/Tag)",
+      "daysToFull": "Tage bis voll"
     }
   }
 }
