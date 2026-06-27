@@ -67,7 +67,6 @@
     "vlans": "VLANs",
     "vmNics": "Guest NIC attachments",
     "diagramAlt": "Network topology diagram",
-    "oversizedNote": "Full network diagram available in the HTML report.",
     "absent": "No network diagram is included in this report."
   },
   "eos": {

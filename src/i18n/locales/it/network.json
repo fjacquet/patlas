@@ -18,5 +18,13 @@
     "cluster": "Cluster",
     "esxVersion": "versione PVE"
   },
-  "na": "—"
+  "na": "—",
+  "topology": {
+    "heading": "Topologia",
+    "estate": "Parco",
+    "nodesWord": "nodi",
+    "unconfigured": "+ {{count}} NIC non configurate",
+    "vms": "VM",
+    "ofNodes": "{{withVms}}/{{total}} nodi"
+  }
 }

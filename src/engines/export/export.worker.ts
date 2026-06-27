@@ -11,15 +11,11 @@ import './workerEnv'
 
 import { buildExportView } from './buildExportView'
 import { buildChartBundle, type PngBundle } from './chartBundle'
+import { topologyTreeOption } from './charts/topologyOption'
 import { assembleHtml } from './html/assembleHtml'
+import { buildHtmlCharts } from './html/buildHtmlCharts'
 import { chartToSvg } from './html/renderCharts'
-import { exportChartSlots } from './html/renderReport'
 import { chartSvgToPng } from './pptx/primitives/chartSvg'
-import {
-  cappedRenderWidth,
-  isSvgOversized,
-  parseSvgDimensions,
-} from './pptx/primitives/svgDimensions'
 import type { ExportRequest, ExportResponse } from './types'
 
 // PPT-01: render at print-grade resolution at the slide's 16:9 aspect
@@ -81,21 +77,25 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
       ]),
     ) as typeof req.strings
 
+    // Topology labels shared by both export branches. The resolved `strings`
+    // bag has the same values as req.strings for these keys (the worker's
+    // vars step only substitutes vcenters/clusters/hosts/vms/captureDate;
+    // {{count}}/{{withVms}}/{{total}} are left intact for topologyTreeOption
+    // to interpolate). Using `strings` here keeps both branches consistent.
+    const topoLabels = {
+      estate: strings['topology.estate'] ?? 'Estate',
+      nodesWord: strings['topology.nodesWord'] ?? 'nodes',
+      unconfigured: strings['topology.unconfigured'] ?? '+ {{count}} unconfigured NICs',
+      vms: strings['topology.vms'] ?? 'VMs',
+      ofNodes: strings['topology.ofNodes'] ?? '{{withVms}}/{{total}} nodes',
+    }
+
     let bytes: ArrayBuffer
     if (req.kind === 'html') {
-      // HTML inlines SVG directly — feed each per-cluster slot the REAL
-      // per-cluster gauge SVG (no rasterize, no resvg on this path).
-      const charts = new Map<string, string>()
-      for (const slot of exportChartSlots(view)) {
-        const opt = optBundle.perCluster.get(slot.cluster)
-        if (opt) charts.set(slot.id, chartToSvg(opt, CHART_W, CHART_H))
-      }
-      // F-2: the single estate-level Storage treemap (fixed slot id —
-      // matches renderReport.tsx's data-chart-slot="storage-treemap").
-      // 11-01 threads it unconditionally; guard is factual (absent ⇒
-      // empty slot, never fabricated).
-      const treemap = optBundle.shared.storageTreemap
-      if (treemap) charts.set('storage-treemap', chartToSvg(treemap, CHART_W, CHART_H))
+      // HTML inlines SVG directly (no rasterize, no resvg on this path).
+      // buildHtmlCharts covers per-cluster gauges, storage-treemap, AND the
+      // topology-tree slot — the seam is now tested in buildHtmlCharts.test.ts.
+      const charts = buildHtmlCharts(view, optBundle, topoLabels, CHART_W, CHART_H)
       const html = assembleHtml({
         view,
         trends,
@@ -125,45 +125,25 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
       }
       const charts: PngBundle = { shared: sharedPng, perCluster: perClusterPng }
 
-      // F-2 (Pitfall 1): the network diagram is an SVG too — PowerPoint can't
-      // render embedded SVG, so rasterize it to PNG like every chart. Resvg-wasm
-      // ships no default font, so the diagram's text labels need an explicit
-      // bundled font (NotoSans, loaded as a same-origin Vite asset). Best-effort:
-      // a diagram failure must never sink the whole export.
-      //
-      // Oversized guard: a large estate produces a 1762×14092 SVG. Fitting to
-      // CHART_W=1600 yields a 1600×12844 PNG (huge) that PowerPoint then
-      // letterboxes into a 0.7"-wide sliver on the slide (unreadable). When the
-      // SVG is extreme-portrait, cap the raster height at CHART_H instead and
-      // set networkOversized so the slide can add a "see HTML report" note.
-      let networkPng: Uint8Array | null = null
-      let networkOversized = false
-      if (req.active.networkSvg) {
+      // P-NT (Spec 2): render the topology tree to a PNG for the network slide.
+      // topologyTreeOption produces an ECharts tree option + dynamic height;
+      // chartToSvg renders it SSR; chartSvgToPng rasterizes via resvg-wasm.
+      // Best-effort: a topology render failure must never sink the whole export.
+      let topologyPng: Uint8Array | null = null
+      if (view.topology.hasData) {
         try {
-          const fontUrl = new URL('../../assets/fonts/NotoSans.ttf', import.meta.url)
-          const fontBytes = new Uint8Array(await (await fetch(fontUrl)).arrayBuffer())
-          const dims = parseSvgDimensions(req.active.networkSvg)
-          if (dims && isSvgOversized(dims)) {
-            networkOversized = true
-            const renderW = cappedRenderWidth(dims, CHART_H)
-            networkPng = await chartSvgToPng(
-              req.active.networkSvg,
-              renderW,
-              CHART_H,
-              wasmSource(),
-              [fontBytes],
-            )
-          } else {
-            networkPng = await chartSvgToPng(
-              req.active.networkSvg,
-              CHART_W,
-              CHART_H,
-              wasmSource(),
-              [fontBytes],
-            )
-          }
+          const { option, height } = topologyTreeOption(view.topology, topoLabels)
+          topologyPng = await chartSvgToPng(
+            chartToSvg(option, CHART_W, height),
+            CHART_W,
+            height,
+            wasmSource(),
+          )
         } catch {
-          networkPng = null // diagram is best-effort — never fail the whole export over it
+          // Warn (generic message, no payload — never leak parsed rows) so a
+          // permanently blank network slide is diagnosable (CodeRabbit, PR #25).
+          topologyPng = null
+          console.warn('[patlas] topology tree render failed; network slide omitted')
         }
       }
 
@@ -177,9 +157,8 @@ self.onmessage = async (e: MessageEvent<ExportRequest>) => {
         charts,
         // Active snapshot's real capture date for the D-03 title slide.
         capturedAt: new Date(req.active.capturedAt).toISOString().slice(0, 10),
-        // PowerPoint-safe rasterized network diagram (Pitfall 1).
-        networkPng,
-        networkOversized,
+        // Topology-tree PNG for the network slide (Pitfall 1 — must be PNG).
+        topologyPng,
       })
     }
 

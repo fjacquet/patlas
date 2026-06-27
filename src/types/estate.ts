@@ -14,6 +14,7 @@ import type { SnapshotSprawl } from '@/engines/aggregation/snapshotSprawl'
 import type { StorageByX } from '@/engines/aggregation/storageByX'
 import type { StorageContentHealth } from '@/engines/aggregation/storageContentHealth'
 import type { ThresholdFlags } from '@/engines/aggregation/thresholdFlags'
+import type { TopologyView } from '@/engines/aggregation/topologyTree'
 import type { VsanRelinkResult } from '@/engines/aggregation/vsanRelink'
 import type { Cores, GHz, GiB, MHz, MiB, Sockets } from '@/engines/units'
 
@@ -582,6 +583,9 @@ export interface EstateView {
    * aggregates; empty when the OPTIONAL network sheets were
    * absent (factual-degrade). Same single-pass origin. */
   network: NetworkRollup
+  /**
+   * P-NT deduplicated network topology tree (D-11). */
+  topology: TopologyView
   /**
    * P9 threshold flags (D-01/D-04) — factual per-row booleans + counts
    * driven by the in-memory thresholds slice; no verdict/severity/

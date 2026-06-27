@@ -67,7 +67,6 @@
     "vlans": "VLANs",
     "vmNics": "Attachements NIC invités",
     "diagramAlt": "Schéma de topologie réseau",
-    "oversizedNote": "Le schéma réseau complet est disponible dans le rapport HTML.",
     "absent": "Aucun schéma réseau inclus dans ce rapport."
   },
   "eos": {

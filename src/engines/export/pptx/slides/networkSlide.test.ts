@@ -22,19 +22,19 @@ const tinyPng = async (): Promise<Uint8Array> =>
   )
 
 describe('addNetworkSlide', () => {
-  it('adds exactly one slide when networkPng is null', () => {
+  it('adds exactly one slide when topology PNG is null', () => {
     const pptx = new PptxGenJS()
     addNetworkSlide(pptx, null, strings, 'en')
     expect((pptx as unknown as { slides: unknown[] }).slides.length).toBe(1)
   })
 
-  it('adds exactly one slide when networkPng is provided', async () => {
+  it('adds exactly one slide when topology PNG is provided', async () => {
     const pptx = new PptxGenJS()
     addNetworkSlide(pptx, await tinyPng(), strings, 'en')
     expect((pptx as unknown as { slides: unknown[] }).slides.length).toBe(1)
   })
 
-  it('embeds an image/png data URI when networkPng is provided', async () => {
+  it('embeds an image/png data URI when topology PNG is provided', async () => {
     const pptx = new PptxGenJS()
     const slide = {
       addImage: vi.fn(),
@@ -55,7 +55,7 @@ describe('addNetworkSlide', () => {
     addSlideSpy.mockRestore()
   })
 
-  it('shows factual Proxmox note (no addImage) when networkPng is null', () => {
+  it('shows factual Proxmox note (no addImage) when topology PNG is null', () => {
     const pptx = new PptxGenJS()
     const slide = {
       addImage: vi.fn(),
@@ -107,10 +107,9 @@ describe('addNetworkSlide', () => {
     expect((pptx as unknown as { slides: unknown[] }).slides.length).toBe(1)
   })
 
-  it('oversized: shows the HTML-report note and does NOT embed the raster', async () => {
-    // Fix 4 (interim): the upstream SVG is extreme-portrait; rasterized into a
-    // wide-short slide box it is an unreadable blur.  Do NOT embed it — show
-    // the note only.  The non-oversized path still embeds (tested above).
+  it('topology PNG: embeds the image when a non-empty PNG is provided', async () => {
+    // Spec 2: the oversized-SVG interim path is gone; a topology PNG is
+    // always embedded directly when present (no special-case branch).
     const pptx = new PptxGenJS()
     const slide = {
       addImage: vi.fn(),
@@ -120,28 +119,16 @@ describe('addNetworkSlide', () => {
     const addSlideSpy = vi.spyOn(pptx, 'addSlide').mockReturnValue(slide)
 
     const png = await tinyPng()
-    addNetworkSlide(
-      pptx,
-      png,
-      { 'network.oversizedNote': 'Full network diagram available in the HTML report.' },
-      'en',
-      true,
-    )
+    addNetworkSlide(pptx, png, strings, 'en')
 
     expect(addSlideSpy).toHaveBeenCalledOnce()
-    // No image embed in the oversized branch.
-    expect(slide.addImage).not.toHaveBeenCalled()
-    // Note text is shown instead.
-    const textCalls = (slide.addText as ReturnType<typeof vi.fn>).mock.calls
-    const noteCall = textCalls.find(
-      (c: unknown[]) => typeof c[0] === 'string' && c[0].includes('HTML report'),
-    )
-    expect(noteCall).toBeDefined()
+    // PNG is always embedded — no oversized-suppression path anymore.
+    expect(slide.addImage).toHaveBeenCalledOnce()
 
     addSlideSpy.mockRestore()
   })
 
-  it('oversized: when no PNG, still shows absent note (no image)', () => {
+  it('topology PNG absent: shows absent note (no image)', () => {
     const pptx = new PptxGenJS()
     const slide = {
       addImage: vi.fn(),
@@ -150,7 +137,7 @@ describe('addNetworkSlide', () => {
     } as unknown as PptxGenJS.Slide
     const addSlideSpy = vi.spyOn(pptx, 'addSlide').mockReturnValue(slide)
 
-    addNetworkSlide(pptx, null, strings, 'en', true)
+    addNetworkSlide(pptx, null, strings, 'en')
 
     expect(slide.addImage).not.toHaveBeenCalled()
 

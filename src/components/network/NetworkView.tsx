@@ -1,5 +1,7 @@
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
+import { Chart } from '@/components/Chart'
+import { topologyTreeOption } from '@/engines/export/charts/topologyOption'
 import { svgToDataUri } from '@/engines/export/svgDataUri'
 import { useEstateView } from '@/hooks/useEstateView'
 import { selectActiveSnapshot, useSnapshotStore } from '@/store/snapshotStore'
@@ -32,6 +34,14 @@ export function NetworkView() {
   const view = useEstateView('active')
   const snapshot = useSnapshotStore(selectActiveSnapshot)
   const n = view.network
+  const topology = view.topology
+  const topoLabels = {
+    estate: t('topology.estate'),
+    nodesWord: t('topology.nodesWord'),
+    unconfigured: t('topology.unconfigured'),
+    vms: t('topology.vms'),
+    ofNodes: t('topology.ofNodes'),
+  }
 
   if (!snapshot) {
     return (
@@ -61,18 +71,29 @@ export function NetworkView() {
     <main className="flex-1 overflow-y-auto p-8">
       <ErrorBoundary FallbackComponent={NetworkError}>
         <div className="flex flex-col gap-6">
-          {svg && (
+          {topology.hasData && (
             <section className="flex flex-col gap-2">
               <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-200">
-                {t('section.diagram')}
+                {t('topology.heading')}
               </h2>
+              {(() => {
+                const { option, height } = topologyTreeOption(topology, topoLabels)
+                return <Chart option={option} style={{ height }} />
+              })()}
+            </section>
+          )}
+          {svg && (
+            <details className="flex flex-col gap-2">
+              <summary className="cursor-pointer text-xl font-semibold text-slate-700 dark:text-slate-200">
+                {t('section.diagram')}
+              </summary>
               <div
                 className="overflow-auto rounded border border-slate-200 dark:border-slate-700"
                 style={{ maxHeight: '70vh' }}
               >
                 <img src={svgToDataUri(svg)} alt={t('img.alt')} className="max-w-full" />
               </div>
-            </section>
+            </details>
           )}
           <section className="flex flex-col gap-2">
             <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-200">

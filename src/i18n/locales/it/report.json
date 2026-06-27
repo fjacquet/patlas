@@ -67,7 +67,6 @@
     "vlans": "VLAN",
     "vmNics": "Attacchi NIC ospiti",
     "diagramAlt": "Diagramma di topologia di rete",
-    "oversizedNote": "Il diagramma di rete completo è disponibile nel report HTML.",
     "absent": "Nessun diagramma di rete incluso in questo report."
   },
   "eos": {

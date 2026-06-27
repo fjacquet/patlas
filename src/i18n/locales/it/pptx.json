@@ -134,8 +134,7 @@
   "network": {
     "title": "Rete",
     "diagramAlt": "Diagramma della topologia di rete",
-    "absent": "Nessuno schema di rete è incluso in questo rapporto.",
-    "oversizedNote": "Il diagramma di rete completo è disponibile nel report HTML."
+    "absent": "Nessuno schema di rete è incluso in questo rapporto."
   },
   "os": {
     "title": "Sistemi operativi",
@@ -314,5 +313,13 @@
       "growth": "Crescita (GiB/giorno)",
       "daysToFull": "Giorni al riempimento"
     }
+  },
+  "topology": {
+    "heading": "Topologia",
+    "estate": "Parco",
+    "nodesWord": "nodi",
+    "unconfigured": "+ {{count}} NIC non configurate",
+    "vms": "VM",
+    "ofNodes": "{{withVms}}/{{total}} nodi"
   }
 }

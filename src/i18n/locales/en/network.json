@@ -18,5 +18,13 @@
     "cluster": "Cluster",
     "esxVersion": "PVE version"
   },
-  "na": "—"
+  "na": "—",
+  "topology": {
+    "heading": "Topology",
+    "estate": "Estate",
+    "nodesWord": "nodes",
+    "unconfigured": "+ {{count}} unconfigured NICs",
+    "vms": "VMs",
+    "ofNodes": "{{withVms}}/{{total}} nodes"
+  }
 }
