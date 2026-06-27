@@ -22,7 +22,16 @@ export default defineConfig({
       registerType: 'prompt',
       injectRegister: null,
       injectManifest: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff,woff2,json}'],
+        // `ttf` + `wasm` are required for full offline parity: the PPTX export
+        // rasterizes charts via the resvg `.wasm` and embeds the bundled
+        // NotoSans `.ttf`. Without them precached, PPTX export fails when the
+        // app runs disconnected (everything else — viewing + HTML report — is
+        // SVG/JSON and already covered).
+        globPatterns: ['**/*.{js,css,html,svg,png,woff,woff2,ttf,wasm,json}'],
+        // The resvg wasm is ~2.4 MiB — above Workbox's 2 MiB default, which
+        // would silently drop it from the precache. Raise the ceiling so the
+        // PPTX-export asset is actually cached for offline use.
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },
       manifest: {
         name: 'pAtlas',
