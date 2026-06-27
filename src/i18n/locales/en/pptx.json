@@ -24,7 +24,8 @@
     "vmStorageCapacity": "VM storage capacity"
   },
   "protection": {
-    "fsFill": { "more": "+ {{count}} more mounts over threshold" }
+    "fsFill": { "more": "+ {{count}} more mounts over threshold" },
+    "backupCoverage": { "more": "+ {{count}} more guests without backup" }
   },
   "cluster": {
     "stretched": "Stretched",

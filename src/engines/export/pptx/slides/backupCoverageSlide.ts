@@ -1,16 +1,18 @@
 /**
  * Pack B — Backup coverage & operational health: vzdump task summary,
- * uncovered VMs, per-type task health. KPI band + native pptxgenjs tables.
- * Brand-free, factual, neutral. No editorial verbs, no numbers in strings.
+ * uncovered VMs, per-type task health. KPI band + two side-by-side native
+ * pptxgenjs tables (the slide is 12.33" wide). Side-by-side makes the prior
+ * vertical-stack overlap structurally impossible. Brand-free, factual, neutral.
+ * No editorial verbs, no numbers in strings.
  */
 import type PptxGenJS from 'pptxgenjs'
 import type { BackupCoverage } from '@/engines/aggregation/backupCoverage'
 import type { ExportStrings } from '../../types'
 import { type ExportLocale, pptxNumber, pptxSafeFormat } from '../format'
 import { PPTX_COLORS } from '../primitives/colors'
-import { addHeader, addKpiRow, CONTENT_W, M } from './_layout'
+import { addHeader, addKpiRow, addMoreFooter, CONTENT_W, M } from './_layout'
 
-const TOP_N = 14
+const TOP_N = 12
 
 export function addBackupCoverageSlide(
   pptx: PptxGenJS,
@@ -58,24 +60,35 @@ export function addBackupCoverageSlide(
   })
   const hdrCell = (text: string) => cell(text, { bold: true, color: PPTX_COLORS.inkMuted })
 
-  let curY = y2
+  // Two columns: left = uncovered guests, right = operational health. Both
+  // start at the same y below the KPI row, so they cannot collide vertically.
+  const leftX = M
+  const leftW = CONTENT_W * 0.48
+  const rightX = M + CONTENT_W * 0.52
+  const rightW = CONTENT_W * 0.46
+  const startY = y2
+  const rowH = 0.24
 
-  const subHead = (label: string): void => {
+  const subHead = (label: string, x: number, w: number): void => {
     s.addText(pptxSafeFormat(label), {
-      x: M,
-      y: curY,
-      w: CONTENT_W,
+      x,
+      y: startY,
+      w,
       h: 0.28,
       color: PPTX_COLORS.ink,
       fontFace: 'Arial',
       fontSize: 11,
       bold: true,
     })
-    curY += 0.3
   }
+  const tableY = startY + 0.32
 
-  // Uncovered VMs table
-  subHead(strings['protection.backupCoverage.uncovered.heading'] ?? 'VMs without successful backup')
+  // LEFT — VMs without a successful backup (capped + remainder footer).
+  subHead(
+    strings['protection.backupCoverage.uncovered.heading'] ?? 'VMs without successful backup',
+    leftX,
+    leftW,
+  )
   if (coverage.vzdump.uncoveredGuests.length === 0) {
     s.addText(
       pptxSafeFormat(
@@ -83,39 +96,50 @@ export function addBackupCoverageSlide(
           'All VMs have at least one successful backup.',
       ),
       {
-        x: M,
-        y: curY,
-        w: CONTENT_W,
+        x: leftX,
+        y: tableY,
+        w: leftW,
         h: 0.3,
         color: PPTX_COLORS.inkMuted,
         fontFace: 'Arial',
         fontSize: 10,
       },
     )
-    curY += 0.35
   } else {
     const uncovHdr = [
       hdrCell(strings['protection.backupCoverage.col.vmName'] ?? 'VM'),
       hdrCell(strings['protection.backupCoverage.col.vmId'] ?? 'VM ID'),
     ]
-    const uncovRows = coverage.vzdump.uncoveredGuests
-      .slice(0, TOP_N)
-      .map((g) => [cell(g.vmName), cell(g.vmid)])
+    const shown = coverage.vzdump.uncoveredGuests.slice(0, TOP_N)
+    const uncovRows = shown.map((g) => [cell(g.vmName), cell(g.vmid)])
     s.addTable([uncovHdr, ...uncovRows], {
-      x: M,
-      y: curY,
-      w: CONTENT_W * 0.48,
-      colW: [CONTENT_W * 0.34, CONTENT_W * 0.14],
-      rowH: 0.24,
+      x: leftX,
+      y: tableY,
+      w: leftW,
+      colW: [leftW * 0.7, leftW * 0.3],
+      rowH,
       valign: 'middle',
       border: { type: 'solid', pt: 0.5, color: PPTX_COLORS.hairline },
       autoPage: false,
     })
-    curY += (uncovRows.length + 1) * 0.24 + 0.15
+    const remainder = coverage.vzdump.uncoveredGuests.length - shown.length
+    if (remainder > 0) {
+      addMoreFooter(
+        s,
+        strings['protection.backupCoverage.more'] ?? '+ {{count}} more guests without backup',
+        remainder,
+        locale,
+        { x: leftX, y: tableY + (shown.length + 1) * rowH + 0.06, w: leftW, h: 0.3 },
+      )
+    }
   }
 
-  // Operational health: per-type summary table
-  subHead(strings['protection.backupCoverage.operationalHealth.heading'] ?? 'Operational health')
+  // RIGHT — operational health per task type.
+  subHead(
+    strings['protection.backupCoverage.operationalHealth.heading'] ?? 'Operational health',
+    rightX,
+    rightW,
+  )
   if (coverage.operationalHealth.taskTypes.length > 0) {
     const ohHdr = [
       hdrCell(strings['protection.backupCoverage.col.type'] ?? 'Type'),
@@ -144,11 +168,11 @@ export function addBackupCoverageSlide(
         cell(pptxNumber(t.failed, locale), { align: 'right' }),
       ])
     s.addTable([ohHdr, ...ohRows], {
-      x: M,
-      y: curY,
-      w: CONTENT_W * 0.5,
-      colW: [CONTENT_W * 0.28, CONTENT_W * 0.07, CONTENT_W * 0.07, CONTENT_W * 0.08],
-      rowH: 0.24,
+      x: rightX,
+      y: tableY,
+      w: rightW,
+      colW: [rightW * 0.46, rightW * 0.18, rightW * 0.18, rightW * 0.18],
+      rowH,
       valign: 'middle',
       border: { type: 'solid', pt: 0.5, color: PPTX_COLORS.hairline },
       autoPage: false,

@@ -24,7 +24,8 @@
     "vmStorageCapacity": "VM-Speicherkapazität"
   },
   "protection": {
-    "fsFill": { "more": "+ {{count}} weitere Mounts über dem Schwellenwert" }
+    "fsFill": { "more": "+ {{count}} weitere Mounts über dem Schwellenwert" },
+    "backupCoverage": { "more": "+ {{count}} weitere Gäste ohne Sicherung" }
   },
   "cluster": {
     "stretched": "Stretched",

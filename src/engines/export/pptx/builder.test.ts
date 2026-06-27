@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import PptxGenJS from 'pptxgenjs'
 import { describe, expect, it } from 'vitest'
+import type { BackupCoverage } from '@/engines/aggregation/backupCoverage'
 import type { FsFillRisk, FsRiskRow } from '@/engines/aggregation/fsFillRisk'
 import { bytes, cores, mhz, mib, sockets } from '@/engines/units'
 import type { AccountingMode } from '@/types/estate'
@@ -18,6 +19,7 @@ import type {
 import { buildExportView } from '../buildExportView'
 import { buildPptx } from './builder'
 import { chartSvgToPng } from './primitives/chartSvg'
+import { addBackupCoverageSlide } from './slides/backupCoverageSlide'
 import type { ContentionRow } from './slides/contentionAnnex'
 import { addFsFillSlide } from './slides/fsFillSlide'
 
@@ -136,6 +138,45 @@ const fsRisk = (n: number): FsFillRisk => ({
   totalMounts: n,
   totalVms: n,
   threshold: 0.8,
+})
+
+const backupCov = (nUncovered: number): BackupCoverage => ({
+  vzdump: {
+    tasks: [],
+    totalCount: 20,
+    successCount: 18,
+    failedCount: 2,
+    coveredVmids: 5,
+    uncoveredGuests: Array.from({ length: nUncovered }, (_, i) => ({
+      vmid: String(200 + i),
+      vmName: `guest-${i}`,
+      lastSuccessAgeDays: null,
+      covered: false,
+    })),
+    uncoveredCount: nUncovered,
+    guestStatuses: [],
+  },
+  operationalHealth: {
+    taskTypes: [{ type: 'vzdump', total: 20, ok: 18, failed: 2 }],
+    totalTasks: 20,
+    totalOk: 18,
+    totalFailed: 2,
+  },
+})
+
+describe('Fix 3 — backup-coverage side-by-side + footer', () => {
+  it('shows both sub-headings and a remainder footer when uncovered exceeds the cap', async () => {
+    const txt = await renderSlideText((p) => addBackupCoverageSlide(p, backupCov(15), {}, 'en'))
+    expect(txt).toContain('VMs without successful backup')
+    expect(txt).toContain('Operational health')
+    expect(txt).toContain('more guests without backup')
+    expect(txt).toContain('+ 3 more') // 15 − 12
+  })
+
+  it('omits the footer when uncovered fits', async () => {
+    const txt = await renderSlideText((p) => addBackupCoverageSlide(p, backupCov(8), {}, 'en'))
+    expect(txt).not.toContain('more guests without backup')
+  })
 })
 
 describe('Fix 2 — FS-fill slide remainder footer', () => {

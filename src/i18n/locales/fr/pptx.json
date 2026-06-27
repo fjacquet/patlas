@@ -24,7 +24,8 @@
     "vmStorageCapacity": "Capacité stockage VM"
   },
   "protection": {
-    "fsFill": { "more": "+ {{count}} montages supplémentaires au-dessus du seuil" }
+    "fsFill": { "more": "+ {{count}} montages supplémentaires au-dessus du seuil" },
+    "backupCoverage": { "more": "+ {{count}} autres invités sans sauvegarde" }
   },
   "cluster": {
     "stretched": "Étendu",
