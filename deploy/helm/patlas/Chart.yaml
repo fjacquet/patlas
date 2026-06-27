@@ -1,0 +1,19 @@
+apiVersion: v2
+name: patlas
+description: 100% client-side Proxmox cv4pve-report atlas, self-hosted as a static site
+type: application
+# Chart version — bump on chart changes (SemVer).
+version: 0.1.0
+# Application version — the patlas image tag this chart defaults to.
+appVersion: "2.2.2"
+home: https://github.com/fjacquet/patlas
+sources:
+  - https://github.com/fjacquet/patlas
+keywords:
+  - proxmox
+  - cv4pve
+  - static-site
+  - client-side
+maintainers:
+  - name: fjacquet
+    url: https://github.com/fjacquet

@@ -1,0 +1,78 @@
+# Default values for patlas.
+# patlas is a static, stateless site — no backend, no database, no persistence.
+
+replicaCount: 2
+
+image:
+  repository: ghcr.io/fjacquet/patlas
+  # Image tag. Defaults to the chart's appVersion when left empty.
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  # A static site needs no Kubernetes API access — keep the token off the pod.
+  automount: false
+  annotations: {}
+  name: ""
+
+service:
+  type: ClusterIP
+  # Service port. The container always listens on 8080.
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: patlas.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: patlas-tls
+  #    hosts:
+  #      - patlas.example.com
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 250m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 80
+
+# Hardened defaults: non-root, read-only root filesystem (nginx's writable
+# paths are backed by emptyDir volumes in the Deployment).
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 101
+  runAsGroup: 101
+  fsGroup: 101
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+podAnnotations: {}
+podLabels: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -4,10 +4,16 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// Base path. Defaults to the GitHub Pages subpath (fjacquet.github.io/patlas/);
+// override with VITE_BASE for other deploy targets — e.g. `VITE_BASE=/` for the
+// self-hosted container, which serves patlas at the host root. The PWA manifest
+// scope / start_url / id all derive from this so installability stays correct
+// on either target.
+const base = process.env.VITE_BASE ?? '/patlas/'
+
 // https://vite.dev/config/
 export default defineConfig({
-  // Base path for GitHub Pages deployment (https://fjacquet.github.io/patlas/)
-  base: '/patlas/',
+  base,
   plugins: [
     react(),
     tailwindcss(),
@@ -38,9 +44,9 @@ export default defineConfig({
         short_name: 'pAtlas',
         description:
           'Proxmox VE atlas (100% client-side) — drop a cv4pve-report export, get insights and exports',
-        id: '/patlas/',
-        scope: '/patlas/',
-        start_url: '/patlas/',
+        id: base,
+        scope: base,
+        start_url: base,
         display: 'standalone',
         theme_color: '#11161f',
         background_color: '#11161f',
