@@ -12,6 +12,7 @@ import { InventoryView } from './components/inventory/InventoryView'
 import { LanguageToggle } from './components/LanguageToggle'
 import { MonsterVmView } from './components/monstervm/MonsterVmView'
 import { NetworkView } from './components/network/NetworkView'
+import { PrivacyBadge } from './components/PrivacyBadge'
 import { PlanningView } from './components/planning/PlanningView'
 import { ProtectionView } from './components/protection/ProtectionView'
 import { RightSizingView } from './components/rightsizing/RightSizingView'
@@ -39,7 +40,10 @@ function App() {
     <ErrorBoundary FallbackComponent={FallbackError}>
       <div className="flex min-h-screen flex-col">
         <header className="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-3 dark:border-surface-700">
-          <h1 className="text-lg font-semibold text-slate-700 dark:text-slate-200">pAtlas</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-lg font-semibold text-slate-700 dark:text-slate-200">pAtlas</h1>
+            <PrivacyBadge />
+          </div>
           <div className="flex items-center gap-2">
             {hasSnapshots ? <ExportButtons /> : null}
             <LanguageToggle />

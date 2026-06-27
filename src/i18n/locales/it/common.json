@@ -2,6 +2,11 @@
   "appName": "patlas",
   "tagline": "Proxmox → atlante della tua infrastruttura Proxmox (100 % lato client)",
   "footer": "100 % lato client · il tuo file non lascia mai il browser",
+  "privacy": {
+    "badge": "Nessun dato lascia questo dispositivo",
+    "tooltip": "pAtlas funziona interamente nel tuo browser. Le richieste di rete verso altre origini sono bloccate per criterio — disconnetti la rete e continua a funzionare.",
+    "offline": "Offline"
+  },
   "error": {
     "title": "Si è verificato un errore"
   },

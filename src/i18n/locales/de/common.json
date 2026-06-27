@@ -2,6 +2,11 @@
   "appName": "patlas",
   "tagline": "Proxmox → Atlas Ihres Proxmox-Bestands (100 % clientseitig)",
   "footer": "100 % clientseitig · Ihre Datei verlässt nie Ihren Browser",
+  "privacy": {
+    "badge": "Keine Daten verlassen dieses Gerät",
+    "tooltip": "pAtlas läuft vollständig in Ihrem Browser. Netzwerkanfragen zu anderen Ursprüngen werden per Richtlinie blockiert — trennen Sie die Verbindung, und es funktioniert weiter.",
+    "offline": "Offline"
+  },
   "error": {
     "title": "Ein Fehler ist aufgetreten"
   },

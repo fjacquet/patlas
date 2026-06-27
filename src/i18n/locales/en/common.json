@@ -2,6 +2,11 @@
   "appName": "patlas",
   "tagline": "Proxmox → atlas of your Proxmox estate (100 % client-side)",
   "footer": "100% client-side · your file never leaves your browser",
+  "privacy": {
+    "badge": "No data leaves this device",
+    "tooltip": "pAtlas runs entirely in your browser. Cross-origin network requests are blocked by policy — disconnect the network and it keeps working.",
+    "offline": "Offline"
+  },
   "error": {
     "title": "An error occurred"
   },
