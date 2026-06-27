@@ -55,6 +55,28 @@ function flattenBundle(b: Record<string, unknown>, prefix = ''): Record<string, 
   return out
 }
 
+/**
+ * Flatten + merge the i18n bundles that feed an export into one flat, dotted
+ * string bag. `protection` is merged under the `protection.` prefix so its keys
+ * land exactly where the PPTX slides and the HTML report look them up
+ * (`protection.fsFill.heading`, `protection.backupCoverage.*`, …) — without it,
+ * those lookups silently fell back to English in EVERY locale (the bag carried
+ * only `report` + `pptx`). `pptx` is merged LAST so a PPTX-specific override
+ * (e.g. the `protection.*.more` footers, which live only in `pptx.json`) wins
+ * over the shared `protection` namespace.
+ */
+export function buildExportStrings(
+  report: Record<string, unknown>,
+  pptx: Record<string, unknown>,
+  protection: Record<string, unknown>,
+): Record<string, string> {
+  return {
+    ...flattenBundle(report),
+    ...flattenBundle(protection, 'protection.'),
+    ...flattenBundle(pptx),
+  }
+}
+
 export function useExport(): { run: (kind: ExportKind) => Promise<void>; busy: boolean } {
   const { i18n } = useTranslation()
   const [busy, setBusy] = useState(false)
@@ -72,14 +94,11 @@ export function useExport(): { run: (kind: ExportKind) => Promise<void>; busy: b
       const locale = (i18n.language?.startsWith('fr') ? 'fr' : 'en') as 'en' | 'fr'
       const ext = kind === 'html' ? 'html' : 'pptx'
       const filename = exportFilename(active.vCenterLabel, snapshots.size, active.capturedAt, ext)
-      const strings = {
-        ...flattenBundle(
-          (i18n.getResourceBundle(i18n.language, 'report') ?? {}) as Record<string, unknown>,
-        ),
-        ...flattenBundle(
-          (i18n.getResourceBundle(i18n.language, 'pptx') ?? {}) as Record<string, unknown>,
-        ),
-      }
+      const strings = buildExportStrings(
+        (i18n.getResourceBundle(i18n.language, 'report') ?? {}) as Record<string, unknown>,
+        (i18n.getResourceBundle(i18n.language, 'pptx') ?? {}) as Record<string, unknown>,
+        (i18n.getResourceBundle(i18n.language, 'protection') ?? {}) as Record<string, unknown>,
+      )
       const req: ExportRequest = {
         kind,
         active,
