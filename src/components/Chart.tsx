@@ -4,6 +4,7 @@ import {
   HeatmapChart,
   LineChart,
   PieChart,
+  TreeChart,
   TreemapChart,
 } from 'echarts/charts'
 import {
@@ -39,6 +40,7 @@ echarts.use([
   GaugeChart,
   HeatmapChart, // P7 EOS forecast timeline (SVG — VIZ-01)
   LineChart, // P8 trend line + per-cluster sparkline (SVG — VIZ-01)
+  TreeChart, // P-NT network topology tree (SVG — VIZ-01)
   TreemapChart, // P9 datastore-footprint consumption lens (SVG — VIZ-01/D-08)
   GridComponent,
   TooltipComponent,
