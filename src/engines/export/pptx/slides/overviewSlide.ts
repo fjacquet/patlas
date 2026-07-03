@@ -87,7 +87,7 @@ export function addOverviewSlide(
     y2,
   )
   // Avg VM size — mean/median folded into one value string since KPI tiles
-  // have no sub-caption (matches the reviewed mock, e.g. "6.4 / 4.0").
+  // have no sub-caption (matches the reviewed mock, e.g. "6.4 / 4").
   const a = d.avgVmSize
   const y4 = addKpiRow(
     s,

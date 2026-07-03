@@ -246,6 +246,12 @@ describe('buildEstateView', () => {
     expect(configured.avgVmSize.vmCount).toBe(4)
   })
 
+  it('avgVmSize.vcpu.mean × vmCount reconciles with globals.vcpuAllocated (configured mode)', () => {
+    const view = buildEstateView(snapshot(), 'configured')
+    const product = (view.avgVmSize.vcpu.mean as number) * view.avgVmSize.vmCount
+    expect(product).toBeCloseTo(view.globals.vcpuAllocated as number, 6)
+  })
+
   it('EMPTY_VIEW.avgVmSize deep-equals emptyAvgVmSize', () => {
     expect(EMPTY_VIEW.avgVmSize).toEqual(emptyAvgVmSize)
   })

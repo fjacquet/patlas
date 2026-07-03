@@ -5,9 +5,10 @@ import type { GuestRow } from '@/types/guest'
 
 /**
  * Average VM size — mean/median vCPU, vRAM and provisioned storage over the
- * accounting-mode-filtered guest population. Same powered-off filter as
- * `vinfoMerge.groupByCluster` (Critical-6): `configured` keeps powered-off
- * VMs, `active`/`storage-realistic` exclude them.
+ * accounting-mode-filtered guest population. Same population definition as
+ * `vinfoMerge.groupByCluster` (Critical-6): guests with an empty cluster are
+ * dropped, and `configured` keeps powered-off VMs while
+ * `active`/`storage-realistic` exclude them.
  */
 
 export interface AvgVmSize {
@@ -36,7 +37,9 @@ const medianOf = (values: readonly number[]): number => {
 }
 
 export const computeAvgVmSize = (guests: readonly GuestRow[], mode: AccountingMode): AvgVmSize => {
-  const filtered = guests.filter((g) => mode === 'configured' || g.poweredOn)
+  const filtered = guests.filter(
+    (g) => g.cluster.length > 0 && (mode === 'configured' || g.poweredOn),
+  )
   if (filtered.length === 0) return emptyAvgVmSize
 
   const vcpuValues = filtered.map((g) => g.vcpu as number)
