@@ -4,6 +4,7 @@
  *  (off-brand) and were redundant with the Avg CPU/Mem cards — both dropped
  *  for readable text. Pure, factual, brand-free. */
 import type PptxGenJS from 'pptxgenjs'
+import type { AvgVmSize } from '@/engines/aggregation/avgVmSize'
 import type { GlobalSummary, OperationalInsights, OsBreakdown } from '@/types/estate'
 import type { ExportStrings } from '../../types'
 import { type ExportLocale, pptxMemMib, pptxNumber, pptxSafeFormat } from '../format'
@@ -18,6 +19,11 @@ export interface OverviewData {
    *  in MiB. `null` when no vmdata storage role is present → cards show "—".
    *  Replaces the unreliable per-VM `Provisioned`/`Used storage` columns. */
   vmStorage: { usedMib: number; capacityMib: number } | null
+  /** Mean/median VM size (vCPU, vRAM, provisioned storage) over the
+   *  accounting-mode-filtered guest population. PPTX KPI tiles have no
+   *  sub-caption, so mean and median are folded into one value string
+   *  (`mean / median`). */
+  avgVmSize: AvgVmSize
 }
 
 export function addOverviewSlide(
@@ -80,6 +86,27 @@ export function addOverviewSlide(
     ],
     y2,
   )
+  // Avg VM size — mean/median folded into one value string since KPI tiles
+  // have no sub-caption (matches the reviewed mock, e.g. "6.4 / 4.0").
+  const a = d.avgVmSize
+  const y4 = addKpiRow(
+    s,
+    [
+      {
+        label: strings['overview.avgVcpu'] ?? 'Avg vCPU (mean / median)',
+        value: `${pptxNumber(Number(a.vcpu.mean), locale, 1)} / ${pptxNumber(Number(a.vcpu.median), locale, 1)}`,
+      },
+      {
+        label: strings['overview.avgRam'] ?? 'Avg RAM (mean / median)',
+        value: `${pptxMemMib(Number(a.vramMib.mean), locale)} / ${pptxMemMib(Number(a.vramMib.median), locale)}`,
+      },
+      {
+        label: strings['overview.avgDisk'] ?? 'Avg disk (mean / median)',
+        value: `${pptxMemMib(Number(a.provisionedMib.mean), locale)} / ${pptxMemMib(Number(a.provisionedMib.median), locale)}`,
+      },
+    ],
+    y3,
+  )
   // OS-family breakdown as factual text (counts + share). Replaces the
   // unlabeled donut so the families are actually named on the slide.
   const os = d.osBreakdown
@@ -88,7 +115,7 @@ export function addOverviewSlide(
     total > 0 ? ` (${pptxNumber(Math.round((k / total) * 100), locale)} %)` : ''
   s.addText(pptxSafeFormat(strings['os.title'] ?? 'Operating systems'), {
     x: M,
-    y: y3 + 0.05,
+    y: y4 + 0.05,
     w: 6,
     h: 0.3,
     fontFace: 'Arial',
@@ -113,6 +140,6 @@ export function addOverviewSlide(
         value: pptxNumber(os.other, locale) + share(os.other),
       },
     ],
-    y3 + 0.45,
+    y4 + 0.45,
   )
 }

@@ -21,7 +21,10 @@
     "provisioned": "Bereitgestellt",
     "usedStorage": "Belegter Speicher",
     "vmStorageUsed": "VM-Speicher belegt",
-    "vmStorageCapacity": "VM-Speicherkapazität"
+    "vmStorageCapacity": "VM-Speicherkapazität",
+    "avgVcpu": "Ø vCPU (Mittelwert / Median)",
+    "avgRam": "Ø RAM (Mittelwert / Median)",
+    "avgDisk": "Ø Speicherplatz (Mittelwert / Median)"
   },
   "protection": {
     "fsFill": { "more": "+ {{count}} weitere Mounts über dem Schwellenwert" },

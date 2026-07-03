@@ -21,7 +21,10 @@
     "provisioned": "Provisionné",
     "usedStorage": "Stockage utilisé",
     "vmStorageUsed": "Stockage VM utilisé",
-    "vmStorageCapacity": "Capacité stockage VM"
+    "vmStorageCapacity": "Capacité stockage VM",
+    "avgVcpu": "vCPU moy. (moyenne / médiane)",
+    "avgRam": "RAM moy. (moyenne / médiane)",
+    "avgDisk": "Disque moy. (moyenne / médiane)"
   },
   "protection": {
     "fsFill": { "more": "+ {{count}} montages supplémentaires au-dessus du seuil" },

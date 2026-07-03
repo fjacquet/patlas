@@ -97,6 +97,7 @@ export async function buildPptx(
       vmStorage: vmRole
         ? { usedMib: Number(vmRole.usedMib), capacityMib: Number(vmRole.capacityMib) }
         : null,
+      avgVmSize: view.avgVmSize,
     },
     strings,
     locale,
