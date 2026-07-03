@@ -14,6 +14,7 @@ import type {
 } from '@/types/estate'
 import type { Snapshot } from '@/types/snapshot'
 import { aggregateClusters } from './aggregateClusters'
+import { computeAvgVmSize, emptyAvgVmSize } from './avgVmSize'
 import type { BackupCoverage } from './backupCoverage'
 import { computeBackupCoverage } from './backupCoverage'
 import { computeClusterHealth } from './clusterHealth'
@@ -174,6 +175,10 @@ export function buildEstateView(
       guestType: vm.guestType,
     })
   }
+
+  // Average VM size — mean/median vCPU, vRAM and provisioned storage over
+  // the accounting-mode-filtered guest population. Same single-pass origin.
+  const avgVmSize = computeAvgVmSize(merged.guests, mode)
 
   // ── P5 operational insights (RCI) — estate + per-cluster, all
   // calculated from parsed columns; runs in THIS single pass (no memo).
@@ -395,6 +400,7 @@ export function buildEstateView(
     backupCoverage,
     rrdHeadroom,
     rrdStorageGrowth,
+    avgVmSize,
   }
 }
 
@@ -654,4 +660,5 @@ export const EMPTY_VIEW: EstateView = Object.freeze({
     soonestDaysToFull: null,
     windowDays: 0,
   }),
+  avgVmSize: emptyAvgVmSize,
 })
