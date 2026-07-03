@@ -21,7 +21,10 @@
     "provisioned": "Provisioned",
     "usedStorage": "Used storage",
     "vmStorageUsed": "VM storage used",
-    "vmStorageCapacity": "VM storage capacity"
+    "vmStorageCapacity": "VM storage capacity",
+    "avgVcpu": "Avg vCPU (mean / median)",
+    "avgRam": "Avg RAM (mean / median)",
+    "avgDisk": "Avg disk (mean / median)"
   },
   "protection": {
     "fsFill": { "more": "+ {{count}} more mounts over threshold" },

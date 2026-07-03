@@ -5,6 +5,7 @@ import type { AccountingMode } from '@/types/estate'
 import type { GuestRow } from '@/types/guest'
 import type { NodeRow } from '@/types/node'
 import type { Snapshot } from '@/types/snapshot'
+import { emptyAvgVmSize } from './avgVmSize'
 import { buildEstateView as buildEstateViewMerged, EMPTY_VIEW } from './estateView'
 
 // Phase-4 contract: `buildEstateView` consumes the MERGED bundle. These
@@ -229,6 +230,30 @@ describe('buildEstateView', () => {
     expect(EMPTY_VIEW.vsan.unrelinkable.size).toBe(0)
     expect(EMPTY_VIEW.network.vmNicCount).toBe(0)
     expect(EMPTY_VIEW.flags.counts).toEqual({ fs: 0, ds: 0, lu: 0 })
+  })
+
+  it('avgVmSize reflects the accounting-mode-filtered guest population', () => {
+    // Fixture: 4 guests, all default vcpu=4/vram=8192MiB/provisioned=40960MiB;
+    // 2 powered-on (on-1, on-2), 2 powered-off (off-1, off-2).
+    const active = buildEstateView(snapshot(), 'active')
+    expect(active.avgVmSize.vmCount).toBe(2)
+    expect(active.avgVmSize.vcpu.mean as number).toBe(4)
+    expect(active.avgVmSize.vcpu.median as number).toBe(4)
+    expect(active.avgVmSize.vramMib.mean as number).toBe(8192)
+    expect(active.avgVmSize.provisionedMib.median as number).toBe(40_960)
+
+    const configured = buildEstateView(snapshot(), 'configured')
+    expect(configured.avgVmSize.vmCount).toBe(4)
+  })
+
+  it('avgVmSize.vcpu.mean × vmCount reconciles with globals.vcpuAllocated (configured mode)', () => {
+    const view = buildEstateView(snapshot(), 'configured')
+    const product = (view.avgVmSize.vcpu.mean as number) * view.avgVmSize.vmCount
+    expect(product).toBeCloseTo(view.globals.vcpuAllocated as number, 6)
+  })
+
+  it('EMPTY_VIEW.avgVmSize deep-equals emptyAvgVmSize', () => {
+    expect(EMPTY_VIEW.avgVmSize).toEqual(emptyAvgVmSize)
   })
 
   it('vmRows projection carries guestType from source GuestRow', () => {

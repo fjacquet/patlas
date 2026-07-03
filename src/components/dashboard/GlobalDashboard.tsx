@@ -94,7 +94,12 @@ export function GlobalDashboard() {
             </h2>
             <AccountingModeToggle value={mode} onChange={setMode} />
           </div>
-          <GlobalSummaryCard globals={view.globals} mode={mode} capturedDate={capturedDate} />
+          <GlobalSummaryCard
+            globals={view.globals}
+            mode={mode}
+            capturedDate={capturedDate}
+            avgVmSize={view.avgVmSize}
+          />
           <OperationalInsights insights={view.operationalInsights} vmStorage={vmStorage} />
           <OsBreakdownDonut osBreakdown={view.osBreakdown} />
           <PerClusterColumns

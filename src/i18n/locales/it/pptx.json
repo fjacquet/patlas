@@ -21,7 +21,10 @@
     "provisioned": "Provisionato",
     "usedStorage": "Spazio utilizzato",
     "vmStorageUsed": "Storage VM usato",
-    "vmStorageCapacity": "Capacità storage VM"
+    "vmStorageCapacity": "Capacità storage VM",
+    "avgVcpu": "vCPU media (media / mediana)",
+    "avgRam": "RAM media (media / mediana)",
+    "avgDisk": "Disco medio (media / mediana)"
   },
   "protection": {
     "fsFill": { "more": "+ {{count}} altri montaggi oltre la soglia" },

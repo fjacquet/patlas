@@ -9,14 +9,16 @@ import {
   ServerIcon,
 } from '@/components/icons'
 import { StatTile } from '@/components/StatTile'
+import type { AvgVmSize } from '@/engines/aggregation/avgVmSize'
 import type { AccountingMode, GlobalSummary } from '@/types/estate'
-import { fmtInt, fmtMemMb } from '@/utils/format'
+import { fmtInt, fmtMemMb, fmtNum1 } from '@/utils/format'
 
 export interface GlobalSummaryCardProps {
   globals: GlobalSummary
   mode: AccountingMode
   /** Already-localized capture date string (formatted by the caller). */
   capturedDate: string
+  avgVmSize: AvgVmSize
 }
 
 /** Maps the accounting union member to its i18n key segment. */
@@ -33,11 +35,21 @@ const MODE_KEY: Record<AccountingMode, string> = {
  * `sections.summary` (the dashboard smoke test reads it via getByLabelText).
  * Each tile keeps label/value as adjacent siblings (StatTile contract).
  */
-export function GlobalSummaryCard({ globals, mode, capturedDate }: GlobalSummaryCardProps) {
+export function GlobalSummaryCard({
+  globals,
+  mode,
+  capturedDate,
+  avgVmSize,
+}: GlobalSummaryCardProps) {
   const { t, i18n } = useTranslation('dashboard')
   const loc = i18n.language
 
-  const tiles: ReadonlyArray<{ label: string; value: string; icon: React.ReactNode }> = [
+  const tiles: ReadonlyArray<{
+    label: string
+    value: string
+    icon: React.ReactNode
+    sub?: string
+  }> = [
     { label: t('stats.clusters'), value: fmtInt(globals.clusterCount, loc), icon: <LayersIcon /> },
     { label: t('stats.esx'), value: fmtInt(globals.hostCount, loc), icon: <ServerIcon /> },
     { label: t('stats.vms'), value: fmtInt(globals.vmCount, loc), icon: <GridIcon /> },
@@ -61,6 +73,26 @@ export function GlobalSummaryCard({ globals, mode, capturedDate }: GlobalSummary
       value: fmtMemMb(globals.totalStorageMib as number, loc),
       icon: <HardDriveIcon />,
     },
+    {
+      label: t('stats.avgVcpu'),
+      value: fmtNum1(avgVmSize.vcpu.mean as number, loc),
+      sub: t('stats.median', { value: fmtNum1(avgVmSize.vcpu.median as number, loc) }),
+      icon: <CpuIcon />,
+    },
+    {
+      label: t('stats.avgRam'),
+      value: fmtMemMb(avgVmSize.vramMib.mean as number, loc),
+      sub: t('stats.median', { value: fmtMemMb(avgVmSize.vramMib.median as number, loc) }),
+      icon: <MemoryIcon />,
+    },
+    {
+      label: t('stats.avgDisk'),
+      value: fmtMemMb(avgVmSize.provisionedMib.mean as number, loc),
+      sub: t('stats.median', {
+        value: fmtMemMb(avgVmSize.provisionedMib.median as number, loc),
+      }),
+      icon: <HardDriveIcon />,
+    },
   ]
 
   const modeLabel = t(`accountingMode.${MODE_KEY[mode]}`)
@@ -79,6 +111,7 @@ export function GlobalSummaryCard({ globals, mode, capturedDate }: GlobalSummary
             icon={tile.icon}
             label={tile.label}
             value={tile.value}
+            sub={tile.sub}
             accent="primary"
           />
         ))}

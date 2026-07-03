@@ -32,7 +32,11 @@
     "vcpuPerCore": "vCPU par cœur physique",
     "cpuReadyMean": "CPU Ready (moy.)",
     "cpuReadyMax": "CPU Ready (max)",
-    "vmsAboveReady": "Invités > 5 % CPU Ready"
+    "vmsAboveReady": "Invités > 5 % CPU Ready",
+    "avgVcpu": "vCPU moy.",
+    "avgRam": "vRAM moy.",
+    "avgDisk": "Disque moy.",
+    "median": "médiane {{value}}"
   },
   "os": {
     "windows": "Windows",

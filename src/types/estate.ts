@@ -2,6 +2,7 @@
 // aggregation engines — no runtime coupling, no cycle (the engines import
 // their input types from here; these are produced in the single
 // `buildEstateView` pass and surfaced on `EstateView`).
+import type { AvgVmSize } from '@/engines/aggregation/avgVmSize'
 import type { BackupCoverage } from '@/engines/aggregation/backupCoverage'
 import type { ClusterHealth } from '@/engines/aggregation/clusterHealth'
 import type { DiskHygiene } from '@/engines/aggregation/diskHygiene'
@@ -657,6 +658,11 @@ export interface EstateView {
    * RRD-Storage time-series. Same single-pass origin;
    * `EMPTY_RRD_STORAGE_GROWTH` in `EMPTY_VIEW`. */
   rrdStorageGrowth: RrdStorageGrowth
+  /**
+   * Average VM size — mean/median vCPU, vRAM and provisioned storage over
+   * the accounting-mode-filtered guest population. Same single-pass origin;
+   * `emptyAvgVmSize` in `EMPTY_VIEW`. */
+  avgVmSize: AvgVmSize
 }
 
 /**
