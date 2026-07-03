@@ -5,6 +5,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ---
 
+## [3.1.0] - 2026-07-03
+
+### Added
+
+- **Average VM size** — mean *and* median of per-VM vCPU, RAM, and configured disk, surfaced estate-wide on the dashboard (three KPI tiles: mean as the value, median as the sub-caption) and on the PPTX overview slide (formatted `mean / median`). Median is reported alongside the mean because a handful of oversized VMs skew the mean above the typical VM. The population honors the active accounting mode (configured = all VMs, active = powered-on only), so the mean stays consistent with the estate totals; storage uses each VM's configured (provisioned) disk. New pure `computeAvgVmSize` engine and `EstateView.avgVmSize`.
+
+### Security
+
+- **Bumped echarts to `^6.1.0`**, closing a moderate cross-site-scripting advisory ([GHSA-fgmj-fm8m-jvvx](https://github.com/advisories/GHSA-fgmj-fm8m-jvvx)) affecting `echarts < 6.1.0`.
+
+---
+
 ## [3.0.0] - 2026-06-27
 
 **Proxmox Atlas v3** — patlas sheds the last of its inherited VMware DNA and becomes a Proxmox-native estate atlas: real RRD-derived metrics, three new value packs (performance/capacity, protection/risk, governance/ops), a Proxmox-correct network model, a self-host container, and full offline support.
