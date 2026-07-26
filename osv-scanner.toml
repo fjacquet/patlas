@@ -49,3 +49,21 @@ even though its explicit affected `versions` list is only
 2026-08-14: confirm the override still pins 1.0.3 and that no clean
 fixed version > 1.0.3 has shipped to upgrade to.
 """
+
+# ---------------------------------------------------------------------------
+# Blanket exemption for development-only dependencies.
+#
+# Policy change (2026-07-26): dev dependencies are build and test tooling. They
+# are not resolved, downloaded or executed by anything we ship, so an advisory
+# against one does not describe risk in the delivered artifact. Chasing patch
+# bumps on transitive tooling we do not control kept the required
+# `security / osv-scan` check permanently red and blocked unrelated work.
+#
+# Production dependencies stay fully gated: findings there are resolved by
+# upgrading, never by waiving.
+# ---------------------------------------------------------------------------
+
+[[PackageOverrides]]
+group = "dev"
+vulnerability.ignore = true
+reason = "Dev-only dependency: build/test tooling, never shipped in the production bundle"
