@@ -66,7 +66,11 @@ a process bug. Current waivers (re-check by **2026-08-14**):
 |----------|---------|-----------|
 | GHSA-4r6h-8v6p-xvw6 | xlsx | SheetJS prototype pollution, fixed < 0.19.3; we ship 0.20.3 (CDN tarball, ADR-0002). OSV range `introduced:0`/no-fixed over-matches all versions. |
 | GHSA-5pgg-2g8v-p4x9 | xlsx | SheetJS ReDoS, fixed < 0.20.2; we ship 0.20.3. Same OSV no-fixed-event over-match. |
-| MAL-2026-4153 | size-sensor | Mini Shai-Hulud malicious releases were **1.0.4 / 1.1.4 / 1.2.4** (2026-05-19). We pin **1.0.3** — the last clean version and npm's current `latest` (malicious versions unpublished) — hard-enforced via a `package.json` `overrides` block so echarts-for-react's `^1.0.1` range can never resolve to a malicious version. OSV's `introduced:0`/no-fixed range over-matches 1.0.3. Transitive of echarts-for-react (v1.0 dep) — applies to main too. |
+
+MAL-2026-4153 (size-sensor) was withdrawn on 2026-07-26: OSV replaced the
+`introduced: 0`/no-fixed range with an explicit versions list
+(1.0.4 / 1.1.4 / 1.2.4), so it stopped matching the pinned 1.0.3. The
+`overrides` pin remains in place.
 
 **`overrides` policy:** when a transitive dependency's semver range would permit a known-malicious version, hard-pin the clean version via `overrides` (defense beyond the lockfile) AND waive the over-matching advisory — never waive without pinning.
 
