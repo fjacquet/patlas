@@ -70,6 +70,25 @@ a process bug. Current waivers (re-check by **2026-08-14**):
 
 **`overrides` policy:** when a transitive dependency's semver range would permit a known-malicious version, hard-pin the clean version via `overrides` (defense beyond the lockfile) AND waive the over-matching advisory — never waive without pinning.
 
+### Standing exemption — development-only dependencies (2026-07-26)
+
+Advisories against `devDependencies` are exempt from the gate via a blanket
+`[[PackageOverrides]] group = "dev"` entry in `osv-scanner.toml`. Dev
+dependencies are build and test tooling: nothing we ship resolves, downloads or
+executes them, so an advisory against one does not describe exposure in the
+delivered artifact.
+
+The exemption is open-ended by design and carries no `ignoreUntil`. It
+supersedes the per-advisory rule above *for this class of finding only*.
+Rationale: that rule meant tracking patch bumps on transitive tooling outside
+our control (`brace-expansion`, `fast-uri`, `postcss`), which held the required
+`security / osv-scan` check red across the fleet and blocked unrelated work —
+including production-dependency upgrades that did matter.
+
+**Production dependencies are unaffected.** They stay fully gated: each finding
+is resolved by upgrading, or waived per-advisory with a mirrored entry and an
+expiry, exactly as described above.
+
 ## Consequences
 
 - Adding a telemetry-adjacent package requires amending the denylist in
