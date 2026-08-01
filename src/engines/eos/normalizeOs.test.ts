@@ -106,12 +106,12 @@ describe('normalizeOs — Proxmox QEMU bare "OsName OsVersion" forms', () => {
     ['Rocky Linux 9', { slug: 'rocky-linux', version: '9' }],
     ['AlmaLinux 9', { slug: 'almalinux', version: '9' }],
     ['CentOS 7', { slug: 'centos', version: '7' }],
-  ] as [
-    string,
-    { slug: string; version: string },
-  ][])('normalizes Proxmox QEMU "%s"', (raw, expected) => {
-    expect(normalizeOs(raw)).toEqual(expected)
-  })
+  ] as [string, { slug: string; version: string }][])(
+    'normalizes Proxmox QEMU "%s"',
+    (raw, expected) => {
+      expect(normalizeOs(raw)).toEqual(expected)
+    },
+  )
 })
 
 describe('normalizeOs — Proxmox LXC template name forms', () => {
@@ -124,12 +124,12 @@ describe('normalizeOs — Proxmox LXC template name forms', () => {
     ['rockylinux-9-default', { slug: 'rocky-linux', version: '9' }],
     ['almalinux-9-default', { slug: 'almalinux', version: '9' }],
     ['centos-7-default', { slug: 'centos', version: '7' }],
-  ] as [
-    string,
-    { slug: string; version: string },
-  ][])('normalizes LXC template "%s"', (raw, expected) => {
-    expect(normalizeOs(raw)).toEqual(expected)
-  })
+  ] as [string, { slug: string; version: string }][])(
+    'normalizes LXC template "%s"',
+    (raw, expected) => {
+      expect(normalizeOs(raw)).toEqual(expected)
+    },
+  )
 
   it('returns null for alpine LXC template (not in catalogue)', () => {
     expect(normalizeOs('alpine 3.19')).toBeNull()
