@@ -10,7 +10,7 @@
 # nginx-unprivileged on :8080 as a non-root user (uid 101) — no root, no setcap.
 
 # ---- build ----
-FROM node:22-alpine AS build
+FROM node:24-alpine AS build
 WORKDIR /app
 # Copy manifests first so `npm ci` is cached across source-only changes.
 COPY package.json package-lock.json ./
