@@ -65,8 +65,8 @@ Each waiver lives in `osv-scanner.toml` and MUST mirror an entry here (same
 
 | Advisory | Package | Expires | Why waived |
 |----------|---------|---------|-----------|
-| GHSA-4r6h-8v6p-xvw6 | xlsx | 2026-08-14 | SheetJS prototype pollution, fixed < 0.19.3; we ship 0.20.3 (CDN tarball, ADR-0002). OSV range `introduced:0`/no-fixed over-matches all versions. |
-| GHSA-5pgg-2g8v-p4x9 | xlsx | 2026-08-14 | SheetJS ReDoS, fixed < 0.20.2; we ship 0.20.3. Same OSV no-fixed-event over-match. |
+| GHSA-4r6h-8v6p-xvw6 | xlsx | 2026-11-13 | SheetJS prototype pollution, fixed < 0.19.3; we ship 0.20.3 (CDN tarball, ADR-0002). OSV range `introduced:0`/no-fixed over-matches all versions. |
+| GHSA-5pgg-2g8v-p4x9 | xlsx | 2026-11-13 | SheetJS ReDoS, fixed < 0.20.2; we ship 0.20.3. Same OSV no-fixed-event over-match. |
 | GHSA-5p2g-fcmc-qvqq | image-size | 2026-11-08 | JXL/HEIF parser infinite-loop DoS, reached via `pptxgenjs@4.0.1 → image-size@^1.2.1` (production). OSV range is `introduced:0`/`last_affected:2.0.2` and 2.0.2 is the newest release on npm, so **no patched version exists to upgrade to**; pptxgenjs 4.0.1 is also the latest and still pins `^1.2.1`, so an `overrides` bump buys nothing. Only reached when pptxgenjs measures an image the user is embedding locally in their own browser — no untrusted input path, worst case is the user hanging their own tab. |
 | GHSA-w3rx-r6r6-pgpr | image-size | 2026-11-08 | ICNS parser infinite-loop DoS. Same dependency path, same absence of any patched release, same unreachable vector as GHSA-5p2g-fcmc-qvqq. |
 
