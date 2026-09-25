@@ -43,7 +43,8 @@
     "zustand": "^5.0.13"
   },
   "overrides": {
-    "size-sensor": "1.0.3"
+    "size-sensor": "1.0.3",
+    "image-size": "^2.0.4"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",
