@@ -5,6 +5,95 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ---
 
+## [Unreleased]
+
+---
+
+## [3.2.3] - 2026-10-02
+
+### Security
+
+- Refreshed the lockfile for the `undici` advisory **GHSA-w293-vg96-wgc3** (lockfile-only, no
+  range changes).
+- Overrode `image-size` to `^2.0.4` (the unused `pptxgenjs` transitive dependency), patching the
+  advisories behind **GHSA-5p2g-fcmc-qvqq** and **GHSA-w3rx-r6r6-pgpr**, and removed the two
+  matching `osv-scanner.toml` waivers (and their ADR-0016 references), which `osv-scanner` now
+  reports as unused. The `xlsx` waivers are unchanged.
+
+---
+
+## [3.2.1] - 2026-09-13
+
+### Security
+
+- Bumped `vitest`/`@vitest/coverage-v8` to 4.1.11, resolving **GHSA-82fw-gwwq-j7x9** (a stale
+  transitive `@vitest/mocker`), and `fast-uri` to 3.1.7 via `ajv`, resolving
+  **GHSA-5jgf-p345-68v8**, **GHSA-f65p-4m7j-42xc**, **GHSA-fph4-wmhf-6fwf**,
+  **GHSA-jqff-g426-hqxp**. Both stay within existing ranges.
+- Renewed the `xlsx` osv-scanner waivers for 90 days (new expiry 2026-11-13); SheetJS's CDN
+  still ships 0.20.3, already past both advisories' fix ranges.
+
+### Changed
+
+- Resynced the `biome.json` `$schema` with the installed Biome CLI (Biome 2.5.7 made a schema
+  mismatch a non-zero exit) and dropped the deprecated `recommended` field. Config only.
+
+(v3.2.2 was tagged on the same commit and carries no further changes.)
+
+---
+
+## [3.2.0] - 2026-08-10
+
+### Changed
+
+- `deploy/Dockerfile` now fully qualifies its base image names so builds resolve identically
+  under Docker and Podman.
+
+---
+
+## [3.1.4] - 2026-08-10
+
+### Changed
+
+- The Docker build stage now uses Node 24, aligning it with CI.
+
+---
+
+## [3.1.3] - 2026-08-10
+
+### Security
+
+- Cleared the nightly `osv-scan` gate: waived the two `image-size` advisories
+  **GHSA-5p2g-fcmc-qvqq** and **GHSA-w3rx-r6r6-pgpr** (reached via `pptxgenjs`; no fix was
+  available at the time) in `osv-scanner.toml` until 2026-11-08, and updated ADR-0016.
+
+---
+
+## [3.1.2] - 2026-08-01
+
+### Security
+
+- Full `npm update` to clear open Dependabot alerts (5 high); `npm audit` reports 0
+  vulnerabilities.
+- Dropped the obsolete `MAL-2026-4153` osv-scanner waiver.
+
+### Changed
+
+- Applied Biome formatting after the tool bump.
+
+---
+
+## [3.1.1] - 2026-07-26
+
+### Changed
+
+- CI: Dependabot auto-merge now uses rebase instead of squash (squash merging is disabled on
+  this repository).
+- CI: dev-only dependencies are exempt from the OSV gate (production dependencies remain fully
+  gated); ADR-0016 records the standing exemption.
+
+---
+
 ## [3.1.0] - 2026-07-03
 
 ### Added
