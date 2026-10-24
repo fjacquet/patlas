@@ -13,6 +13,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 - Lockfile refresh within existing ranges: `vite` moves to its patched release, closing three
   Dependabot advisories. `osv-scanner` recursive scan is clean.
+- `@biomejs/biome` held at 2.5.15 in the lockfile (range unchanged): 2.6 starts formatting
+  Markdown and YAML and cannot parse the Helm templates, which belongs in its own change, not a security refresh.
 
 ---
 
