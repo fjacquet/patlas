@@ -11,10 +11,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ### Security
 
-- Lockfile refresh within existing ranges: `vite` moves to its patched release, closing three
-  Dependabot advisories. `osv-scanner` recursive scan is clean.
-- `@biomejs/biome` held at 2.5.15 in the lockfile (range unchanged): 2.6 starts formatting
-  Markdown and YAML and cannot parse the Helm templates, which belongs in its own change, not a security refresh.
+- `vite` 8.3.2 → 8.3.5 for GHSA-587h-7wmj-h5pm, GHSA-r825-w8mm-5pxw and GHSA-698v-4r3x-3vcv.
+- `zod` 4.6.5 → 4.6.7 for GHSA-mrhx-c7xc-m3w5.
+
+### Changed
+
+- `@biomejs/biome` pinned to `~2.5.15`: 2.6 formats Markdown and YAML and cannot parse the Helm templates and fails CI on files
+  this release never touched. Adopting 2.6 is its own change.
+- Lockfile refresh within existing ranges, including react 19.3.1 and i18next 26.5.8.
 
 ---
 
