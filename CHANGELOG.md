@@ -7,6 +7,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+### Security
+
+- Renewed the `xlsx` osv-scanner waivers (GHSA-4r6h-8v6p-xvw6, GHSA-5pgg-2g8v-p4x9) to 2027-02-11; SheetJS
+  still ships 0.20.3 as newest, so no upgrade exists. ADR-0016 updated.
+
 ## [3.2.4] - 2026-10-24
 
 ### Security
