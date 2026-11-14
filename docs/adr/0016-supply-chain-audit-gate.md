@@ -65,8 +65,8 @@ Each waiver lives in `osv-scanner.toml` and MUST mirror an entry here (same
 
 | Advisory | Package | Expires | Why waived |
 |----------|---------|---------|-----------|
-| GHSA-4r6h-8v6p-xvw6 | xlsx | 2026-11-13 | SheetJS prototype pollution, fixed < 0.19.3; we ship 0.20.3 (CDN tarball, ADR-0002). OSV range `introduced:0`/no-fixed over-matches all versions. |
-| GHSA-5pgg-2g8v-p4x9 | xlsx | 2026-11-13 | SheetJS ReDoS, fixed < 0.20.2; we ship 0.20.3. Same OSV no-fixed-event over-match. |
+| GHSA-4r6h-8v6p-xvw6 | xlsx | 2027-02-11 | SheetJS prototype pollution, fixed < 0.19.3; we ship 0.20.3 (CDN tarball, ADR-0002). OSV range `introduced:0`/no-fixed over-matches all versions. |
+| GHSA-5pgg-2g8v-p4x9 | xlsx | 2027-02-11 | SheetJS ReDoS, fixed < 0.20.2; we ship 0.20.3. Same OSV no-fixed-event over-match. |
 
 MAL-2026-4153 (size-sensor) was withdrawn on 2026-07-26: OSV replaced the
 `introduced: 0`/no-fixed range with an explicit versions list
